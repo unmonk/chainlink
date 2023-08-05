@@ -1,3 +1,26 @@
 @tailwind base;
+* {
+  scrollbar-width: 1px;
+  scrollbar-color: hsl(var(--nextui-background)) hsl(var(--nextui-primary-500));
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+}
+
+*::-webkit-scrollbar-track {
+  background: hsl(var(--nextui-background));
+  border-radius: 5px;
+  opacity: 0.3;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--nextui-primary-500));
+  border-radius: 5px;
+  opacity: 0.3;
+  border: 1px solid hsl(var(--nextui-primary-500));
+}
 @tailwind components;
 @tailwind utilities;

@@ -9,18 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@nextui-org/button": "2.0.0",
+    "@clerk/nextjs": "^4.23.2",
+    "@nextui-org/avatar": "^2.0.1",
+    "@nextui-org/button": "^2.0.0",
+    "@nextui-org/card": "^2.0.1",
     "@nextui-org/code": "2.0.0",
+    "@nextui-org/divider": "^2.0.1",
     "@nextui-org/input": "2.0.0",
     "@nextui-org/kbd": "2.0.0",
     "@nextui-org/link": "2.0.0",
     "@nextui-org/navbar": "2.0.0",
+    "@nextui-org/progress": "^2.0.1",
+    "@nextui-org/react": "^2.0.1",
     "@nextui-org/snippet": "2.0.0",
     "@nextui-org/switch": "2.0.0",
     "@nextui-org/system": "2.0.0",
     "@nextui-org/theme": "2.0.0",
-    "@react-aria/visually-hidden": "^3.8.1",
     "@react-aria/ssr": "^3.6.0",
+    "@react-aria/visually-hidden": "^3.8.1",
     "@types/node": "20.2.5",
     "@types/react": "18.2.8",
     "@types/react-dom": "18.2.4",
@@ -28,8 +34,9 @@
     "clsx": "^1.2.1",
     "eslint": "8.41.0",
     "eslint-config-next": "13.4.4",
-    "framer-motion": "^10.12.16",
+    "framer-motion": "^10.15.0",
     "intl-messageformat": "^10.1.0",
+    "lucide-react": "^0.263.1",
     "next": "13.4.9",
     "next-themes": "^0.2.1",
     "postcss": "8.4.24",
@@ -38,5 +45,9 @@
     "tailwind-variants": "^0.1.13",
     "tailwindcss": "3.3.2",
     "typescript": "5.0.4"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.1",
+    "prettier-plugin-tailwindcss": "^0.4.1"
   }
 }
