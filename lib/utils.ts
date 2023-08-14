@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getPacifictime(date?: Date) {
+export function getPacifictime(date?: Date | string | number) {
   if (!date) {
     date = new Date();
   }
@@ -21,4 +21,8 @@ export function getPacifictime(date?: Date) {
     url: `${year}${month}${day}`,
     redis: `${month}/${day}/${year}`,
   };
+}
+
+export function absoluteUrl(path: string) {
+  return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
 }

@@ -1,17 +1,19 @@
 import { Button } from "../ui/button";
+import PickButton from "./pick-button";
 import { Matchup, MatchupStatus, Pick, PickStatus } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { FC } from "react";
 
 interface MatchupCardButtonProps {
   matchup: Partial<Matchup>;
-  userPick: Partial<Pick>;
+  userPick?: Partial<Pick>;
 }
 
 const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
   matchup,
   userPick,
 }) => {
+  if (!matchup) return null;
   const homeWinClass =
     matchup.winner_id === matchup.home_id
       ? "uppercase underline decoration-1 decoration-blue-500 font-bold"
@@ -54,10 +56,11 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
   return (
     <div className="grid grid-cols-4 items-center gap-2 p-1">
       <div className="col-span-1 flex items-center justify-center text-center">
-        {/* <PickButton
+        <PickButton
           teamImage={matchup.away_image}
           type={"AWAY"}
           disabled={disabled}
+          matchupId={matchup.game_id!}
           variant={
             userPick?.pick_type === "AWAY" &&
             (userPick?.pick_status === "WIN" ||
@@ -66,9 +69,7 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
               : matchup.status
           }
           selected={userPick?.pick_type === "AWAY"}
-          matchupId={matchup.id}
-        /> */}
-        <div className="aspect-square h-5/6 w-5/6 border">x</div>
+        />
       </div>
 
       <p
@@ -97,11 +98,11 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
       </p>
 
       <div className="col-span-1 flex items-center justify-center text-center">
-        <div className="aspect-square h-5/6 w-5/6 border">x</div>
-        {/* <PickButton
+        <PickButton
           teamImage={matchup.home_image}
           type={"HOME"}
           disabled={disabled}
+          matchupId={matchup.game_id!}
           variant={
             userPick?.pick_type === "HOME" &&
             (userPick?.pick_status === "WIN" ||
@@ -110,8 +111,7 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
               : matchup.status
           }
           selected={userPick?.pick_type === "HOME"}
-          matchupId={matchup.id}
-        /> */}
+        />
       </div>
     </div>
   );

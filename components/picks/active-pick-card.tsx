@@ -1,3 +1,9 @@
+"use client";
+
+import { useActivePickStore } from "@/lib/stores/active-pick-store";
+
 export function ActivePickCard() {
-  return <div>Active card</div>;
+  const { activePick } = useActivePickStore();
+
+  return <div>{activePick?.user_id}</div>;
 }

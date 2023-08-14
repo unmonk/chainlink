@@ -10,7 +10,7 @@ interface MatchupCardProps {
 
 const MatchupCard: FC<MatchupCardProps> = ({ matchup }) => {
   if (!matchup) return null;
-  const userPick = {};
+  const userPick = undefined;
   return (
     <div className="h-full w-full rounded-b-md border shadow-md">
       <MatchupCardHeader

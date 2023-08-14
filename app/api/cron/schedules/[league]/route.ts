@@ -76,6 +76,7 @@ export async function GET(
   return NextResponse.json(pipelineResults);
 }
 
+//TODO type schedule and competitor
 function getScheduleVariables(schedule: any, league: League) {
   const output = [];
   for (const day in schedule) {

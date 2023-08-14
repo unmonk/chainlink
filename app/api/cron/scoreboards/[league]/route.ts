@@ -1,10 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
 import { League, MatchupStatus, Matchup } from "@/drizzle/schema";
+import { supportedLeagues } from "@/lib/config";
 import { getPacifictime } from "@/lib/utils";
 import { Redis } from "@upstash/redis";
-import { supportedLeagues } from "@/lib/config";
+import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 export async function GET(
   request: Request,
@@ -31,12 +35,8 @@ export async function GET(
   const scoreboardPromise = fetch(url, { next: { revalidate: 0 } });
 
   //REDIS: setup redis client
-  const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-  });
+
   const redisPipeline = redis.pipeline();
-  //TEST DATE REMOVE LATER
   const currentMatchupsPromise = redis.hgetall(`MATCHUPS:${date.redis}`);
 
   const [scoreboardRes, currentMatchupsRes] = await Promise.allSettled([
@@ -63,6 +63,7 @@ export async function GET(
   for (const game_id in ourData) {
     let changed = false;
     const matchup = ourData[game_id] as Matchup;
+    //TODO: Type for event
     const dataMatchup = data.events.find(
       (event: any) => event.id === matchup.game_id,
     );
@@ -97,16 +98,20 @@ export async function GET(
   }
 
   //REDIS: update changed matchups
-  let results: any = [];
+  let results: unknown[] = [];
+  console.log(changedFields);
+  console.log(changedMatchups);
   if (changedMatchups.length > 0) {
     for (const matchup of changedMatchups) {
-      redisPipeline.hsetnx(`MATCHUPS:${date.redis}`, matchup.game_id, matchup);
+      redisPipeline.hset(`MATCHUPS:${date.redis}`, {
+        [matchup.game_id]: JSON.stringify(matchup),
+      });
     }
     //REDIS: do all redis writes
     results = await redisPipeline.exec();
   }
 
-  return NextResponse.json({ results }, { status: 200 });
+  return NextResponse.json(results, { status: 200 });
 }
 
 function getScoreboardUrl(league: League, param: string | number) {

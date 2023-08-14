@@ -1,32 +1,10 @@
-import MatchupCard from "@/components/picks/matchup-card";
+import { ActivePickCard } from "@/components/picks/active-pick-card";
+import MatchupListCards from "@/components/picks/matchup-list-cards";
 import StreakDisplay from "@/components/streaks/streak-display";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Matchup } from "@/drizzle/schema";
 import { HistoryIcon } from "lucide-react";
 import Link from "next/link";
-
-const exampleMatchup = {
-  status: "STATUS_IN_PROGRESS",
-  start_time: new Date(),
-  game_id: "401472659",
-  league: "MLB",
-  network: "N/A",
-  home_team: "Minnesota Twins",
-  home_id: "9",
-  winner_id: null,
-  home_image: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/min.png",
-  home_value: 3,
-  away_team: "Arizona Diamondbacks",
-  away_id: "29",
-  away_image: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/ari.png",
-  away_value: 1,
-  question:
-    "Who will win this matchup? Arizona Diamondbacks @ Minnesota Twins?",
-  home_win_condition: "score",
-  away_win_condition: "score",
-  operator: "GREATER_THAN",
-} as Partial<Matchup>;
 
 export default function Page() {
   return (
@@ -44,7 +22,7 @@ export default function Page() {
           <div className="rounded-xl border p-2">
             <h3 className="text-lg font-semibold">{`Your Active Pick`}</h3>
             <Separator className="my-2" />
-            <div className="mt-4">x</div>
+            <ActivePickCard />
           </div>
         </div>
 
@@ -64,32 +42,7 @@ export default function Page() {
             </Button>
           </div>
           <Separator className="my-2" />
-          <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-            <MatchupCard matchup={exampleMatchup} />
-          </div>
+          <MatchupListCards />
         </div>
       </div>
     </section>

@@ -1,4 +1,3 @@
-import { connect } from "@planetscale/database";
 import { InferModel, relations, sql } from "drizzle-orm";
 import {
   int,
@@ -16,10 +15,8 @@ import {
   smallint,
   datetime,
 } from "drizzle-orm/mysql-core";
-import { drizzle } from "drizzle-orm/planetscale-serverless";
 
 //Enums
-
 export const leagues = mysqlEnum("leagues", [
   "NFL",
   "NBA",
@@ -82,6 +79,7 @@ export type Operator =
   | "GREATER_THAN_OR_EQUAL_TO";
 
 const pick_type = mysqlEnum("pick_type", ["HOME", "AWAY"]);
+export type PickType = "HOME" | "AWAY";
 
 const pick_status = mysqlEnum("pick_status", [
   "PENDING",
@@ -325,10 +323,3 @@ export type PickWithMatchupAndStreak = Pick & {
   matchup: Matchup;
   streak: Streak;
 };
-
-//Database
-const connection = connect({
-  url: process.env["DATABASE_URL"],
-});
-
-export const db = drizzle(connection);
