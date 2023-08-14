@@ -5,8 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getPacifictime() {
-  let america_datetime_str = new Date().toLocaleString("en-US", {
+export function getPacifictime(date?: Date) {
+  if (!date) {
+    date = new Date();
+  }
+  let america_datetime_str = new Date(date).toLocaleString("en-US", {
     timeZone: "America/Los_Angeles",
   });
   let date_america = new Date(america_datetime_str);

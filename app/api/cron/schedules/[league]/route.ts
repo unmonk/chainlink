@@ -1,5 +1,6 @@
 import { League, NewMatchup, MatchupStatus } from "@/drizzle/schema";
 import { supportedLeagues } from "@/lib/config";
+import { getPacifictime } from "@/lib/utils";
 import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 
@@ -36,15 +37,9 @@ export async function GET(
   //get yesterday's date
   const previousDate = new Date(date);
   previousDate.setDate(previousDate.getDate() - 1);
-  const previousDateString = previousDate.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "America/Chicago",
-  });
-
+  const previousDateString = getPacifictime(previousDate);
   //REDIS: Delete yesterday's matchups from redis
-  redisPipeline.del(`MATCHUPS:${previousDateString}`);
+  redisPipeline.del(`MATCHUPS:${previousDateString.redis}`);
 
   //Fetch schedule data
   const url = `http://cdn.espn.com/core/${league.toLowerCase()}/schedule?dates=${year}&xhr=1&render=false&device=desktop&userab=18`;
@@ -71,12 +66,7 @@ export async function GET(
   //Transform Matchups into Redis Hash
   for (const matchup of formattedMatchups) {
     //group matchups by date
-    const dateKey = matchup.start_time.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      timeZone: "America/Los_Angeles",
-    });
+    const dateKey = getPacifictime(matchup.start_time!).redis;
     redisPipeline.hsetnx(`MATCHUPS:${dateKey}`, matchup.game_id!, matchup);
   }
 
