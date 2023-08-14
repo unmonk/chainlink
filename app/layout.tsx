@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={cn("antialiased bg-background", inter.className)}>
+        <body className={cn("bg-background antialiased", inter.className)}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Navbar />
             {children}

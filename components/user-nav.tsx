@@ -34,7 +34,7 @@ export function UserNav() {
             <div className="flex flex-col">
               <StreakDisplay />
             </div>
-            <Avatar className="h-7 w-7 mx-2">
+            <Avatar className="mx-2 h-7 w-7">
               <AvatarImage src={user?.imageUrl} alt="User Profile Picture" />
               <AvatarFallback>
                 <span>
@@ -48,7 +48,7 @@ export function UserNav() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="flex flex-row items-center justify-center p-2 gap-2">
+          <SheetTitle className="flex flex-row items-center justify-center gap-2 p-2">
             <Avatar className="h-8 w-8">
               <AvatarImage src={user?.imageUrl} alt="User Profile Picture" />
               <AvatarFallback>
@@ -131,8 +131,8 @@ export function UserNav() {
 
         <Separator className="my-4" />
         <div className="flex flex-col">
-          <p className="text-xs underline mb-2 px-4">Announcements</p>
-          <p className="bg-accent p-2 rounded text-sm mb-2">
+          <p className="mb-2 px-4 text-xs underline">Announcements</p>
+          <p className="mb-2 rounded bg-accent p-2 text-sm">
             Welcome to the Alpha, Join the Discord community to get involved!
           </p>
           <ThemeToggle />

@@ -52,8 +52,8 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
     disabled = true;
   }
   return (
-    <div className="grid grid-cols-5 gap-2 p-1 items-center">
-      <div className="col-span-1 items-center text-center flex justify-center">
+    <div className="grid grid-cols-5 items-center gap-2 p-1">
+      <div className="col-span-1 flex items-center justify-center text-center">
         {/* <PickButton
           teamImage={matchup.away_image}
           type={"AWAY"}
@@ -73,29 +73,29 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
 
       <p
         className={cn(
-          "text-xs sm:text-sm md:text-base col-span-1 text-center",
+          "col-span-1 text-center text-xs sm:text-sm md:text-base",
           userAwayWinClass,
           userAwayLossClass,
           awayWinClass,
-          awaySelectedClass
+          awaySelectedClass,
         )}
       >
         {matchup.away_team}
       </p>
-      <span className="text-primary text-center text-xs">@</span>
+      <span className="text-center text-xs text-primary">@</span>
       <p
         className={cn(
-          "text-xs sm:text-sm md:text-base col-span-1  text-center",
+          "col-span-1 text-center text-xs sm:text-sm  md:text-base",
           userHomeWinClass,
           userHomeLossClass,
           homeWinClass,
-          homeSelectedClass
+          homeSelectedClass,
         )}
       >
         {matchup.home_team}
       </p>
 
-      <div className="col-span-1 items-center text-center flex justify-center">
+      <div className="col-span-1 flex items-center justify-center text-center">
         <div className="aspect-square h-5/6 w-5/6 border">x</div>
         {/* <PickButton
           teamImage={matchup.home_image}

@@ -26,8 +26,8 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
       ? "overline decoration-4 decoration-blue-500 font-bold"
       : "";
   return (
-    <div className="grid grid-cols-3 under ">
-      <div className="col-span-1 text-left ml-4">
+    <div className="under grid grid-cols-3 ">
+      <div className="col-span-1 ml-4 text-left">
         {matchup.status === "STATUS_SCHEDULED" && <p>{awayPercent}%</p>}
         {(matchup.status === "STATUS_FINAL" ||
           matchup.status === "STATUS_IN_PROGRESS") &&
@@ -70,19 +70,19 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
           </Button>
         )}
         {matchup.status === "STATUS_POSTPONED" && (
-          <p className="text-xs text-amber-400 px-4 py-2">Postponed</p>
+          <p className="px-4 py-2 text-xs text-amber-400">Postponed</p>
         )}
         {matchup.status === "STATUS_CANCELED" && (
-          <p className="text-xs text-rose-600 px-4 py-2">Canceled</p>
+          <p className="px-4 py-2 text-xs text-rose-600">Canceled</p>
         )}
         {matchup.status === "STATUS_SUSPENDED" && (
-          <p className="text-xs text-amber-400 px-4 py-2">Suspended</p>
+          <p className="px-4 py-2 text-xs text-amber-400">Suspended</p>
         )}
         {matchup.status === "STATUS_DELAYED" && (
-          <p className="text-xs text-amber-400 px-4 py-2">Delayed</p>
+          <p className="px-4 py-2 text-xs text-amber-400">Delayed</p>
         )}
       </div>
-      <div className="col-span-1 text-right mr-4">
+      <div className="col-span-1 mr-4 text-right">
         {matchup.status === "STATUS_SCHEDULED" && <p>{homePercent}%</p>}
         {(matchup.status === "STATUS_FINAL" ||
           matchup.status === "STATUS_IN_PROGRESS") &&

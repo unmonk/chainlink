@@ -2,6 +2,7 @@ import { FC } from "react";
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import ClientTime from "../ui/client-time";
+import { Matchup } from "@/drizzle/schema";
 export type PickCardVariant =
   | "WIN"
   | "LOSS"
@@ -17,17 +18,13 @@ export type PickCardVariant =
   | "STATUS_UNKNOWN";
 
 interface PickCardHeaderProps {
-  league: string;
-  startTime: string;
-  network: string;
+  matchup: Partial<Matchup>;
   status: PickCardVariant;
   active?: boolean;
 }
 
 const MatchupCardHeader: FC<PickCardHeaderProps> = ({
-  league,
-  startTime,
-  network,
+  matchup,
   status,
   active,
 }) => {
@@ -63,9 +60,11 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
     <div className="flex flex-col">
       <div className={cn(pickCardHeaderVariants({ status }))}>
         <div className="grid grid-cols-2 p-2">
-          <h3 className="text-sm text-start">
-            <span className="font-semibold">{league} </span> |&nbsp;
-            {status === "STATUS_SCHEDULED" && <ClientTime time={startTime} />}
+          <h3 className="text-start text-sm">
+            <span className="font-semibold">{matchup.league} </span> |&nbsp;
+            {status === "STATUS_SCHEDULED" && (
+              <ClientTime time={matchup.start_time!} />
+            )}
             {status === "STATUS_IN_PROGRESS" && "In Progress"}
             {status === "STATUS_FINAL" && "Final"}
             {status === "STATUS_POSTPONED" && "Postponed"}
@@ -79,17 +78,17 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
             {status === "PUSH" && "Push"}
           </h3>
 
-          <h3 className="text-sm text-end">{network}</h3>
+          <h3 className="text-end text-sm">{matchup.network}</h3>
         </div>
-        <div className="flex flex-row justify-center m-0 text-center items-center h-0">
+        <div className="m-0 flex h-0 flex-row items-center justify-center text-center">
           {active && (
             <div
               className={cn(
                 pickCardHeaderVariants({ status }),
-                "rounded-b-md p-1 -mt-0.5"
+                "-mt-0.5 rounded-b-md p-1",
               )}
             >
-              <h3 className="text-xs text-center animate-pulse text-primary">
+              <h3 className="animate-pulse text-center text-xs text-primary">
                 ACTIVE PICK
               </h3>
             </div>

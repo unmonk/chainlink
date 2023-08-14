@@ -31,28 +31,28 @@ const exampleMatchup = {
 export default function Page() {
   return (
     <section className="flex flex-col items-center gap-4 py-4 md:py-6 ">
-      <h1 className="font-bold text-xl underline underline-offset-8 decoration-primary">
+      <h1 className="text-xl font-bold underline decoration-primary underline-offset-8">
         Dashboard
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-8 gap-4 w-full px-2 lg:px-4 xl:px-6">
-        <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
-          <div className="border rounded-xl">
-            <div className="flex flex-col justify-center items-center">
+      <div className="grid w-full grid-cols-1 gap-4 px-2 md:grid-cols-8 lg:px-4 xl:px-6">
+        <div className="col-span-1 flex flex-col gap-2 md:col-span-2">
+          <div className="rounded-xl border">
+            <div className="flex flex-col items-center justify-center">
               <StreakDisplay size="xl" />
             </div>
           </div>
-          <div className="p-2 border rounded-xl">
+          <div className="rounded-xl border p-2">
             <h3 className="text-lg font-semibold">{`Your Active Pick`}</h3>
             <Separator className="my-2" />
             <div className="mt-4">x</div>
           </div>
         </div>
 
-        <div className="col-span-1 md:col-span-6  flex flex-col gap-2">
+        <div className="col-span-1 flex  flex-col gap-2 md:col-span-6">
           <div className="flex flex-row items-center px-2">
             <h3 className="text-lg font-semibold ">{`Today's Picks`}</h3>
             <Button
-              className="ml-auto text-xs flex flex-col"
+              className="ml-auto flex flex-col text-xs"
               size={"icon"}
               variant={"link"}
               asChild
@@ -64,7 +64,7 @@ export default function Page() {
             </Button>
           </div>
           <Separator className="my-2" />
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             <MatchupCard matchup={exampleMatchup} />
             <MatchupCard matchup={exampleMatchup} />
             <MatchupCard matchup={exampleMatchup} />

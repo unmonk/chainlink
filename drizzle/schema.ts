@@ -106,7 +106,7 @@ export const campaigns = mysqlTable(
   {
     id: serial("id").primaryKey().autoincrement(),
     created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`
+      sql`(now(2))`,
     ),
     name: varchar("name", {
       length: 128,
@@ -132,7 +132,7 @@ export const campaigns = mysqlTable(
       activeIdx: index("active_idx").on(table.active),
       startDateIdx: index("start_date_idx").on(table.start_date),
     };
-  }
+  },
 );
 
 export const matchups = mysqlTable(
@@ -187,10 +187,10 @@ export const matchups = mysqlTable(
       length: 64,
     }),
     created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`
+      sql`(now(2))`,
     ),
     updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`(now(2))`
+      sql`(now(2))`,
     ),
     start_time: datetime("start_time", { mode: "date" }).notNull(),
   },
@@ -200,7 +200,7 @@ export const matchups = mysqlTable(
       status_idx: index("status_idx").on(table.status),
       league_idx: index("league_idx").on(table.league),
     };
-  }
+  },
 );
 
 export const streaks = mysqlTable(
@@ -215,10 +215,10 @@ export const streaks = mysqlTable(
     }).notNull(),
     streak: smallint("streak").notNull().default(0),
     created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`
+      sql`(now(2))`,
     ),
     updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`(now(2))`
+      sql`(now(2))`,
     ),
     active: boolean("active").notNull().default(true),
   },
@@ -226,7 +226,7 @@ export const streaks = mysqlTable(
     return {
       user_active_idx: index("user_active_idx").on(table.user_id, table.active),
     };
-  }
+  },
 );
 
 export const picks = mysqlTable(
@@ -245,10 +245,10 @@ export const picks = mysqlTable(
     pick_type: pick_type.notNull(),
     active: boolean("active").notNull().default(true),
     created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`
+      sql`(now(2))`,
     ),
     updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`(now(2))`
+      sql`(now(2))`,
     ),
     pick_status: pick_status.notNull().default("PENDING"),
   },
@@ -256,7 +256,7 @@ export const picks = mysqlTable(
     return {
       user_active_idx: index("user_active_idx").on(table.user_id, table.active),
     };
-  }
+  },
 );
 
 //Relationships

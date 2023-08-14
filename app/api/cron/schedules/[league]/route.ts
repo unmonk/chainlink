@@ -7,7 +7,7 @@ export const runtime = "edge";
 
 export async function GET(
   request: Request,
-  { params }: { params: { league: string } }
+  { params }: { params: { league: string } },
 ) {
   //valid league present
   //check if league exists on League type
@@ -100,7 +100,7 @@ function getScheduleVariables(schedule: any, league: League) {
 }
 
 function makeWhoWillWinQuestions(
-  matchups: Partial<NewMatchup>[]
+  matchups: Partial<NewMatchup>[],
 ): Partial<NewMatchup>[] {
   return matchups.map((matchup) => {
     matchup.question = `Who will win this matchup? ${matchup.away_team} @ ${matchup.home_team}?`;

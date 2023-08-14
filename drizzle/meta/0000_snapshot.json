@@ -69,16 +69,12 @@
       "indexes": {
         "active_idx": {
           "name": "active_idx",
-          "columns": [
-            "active"
-          ],
+          "columns": ["active"],
           "isUnique": false
         },
         "start_date_idx": {
           "name": "start_date_idx",
-          "columns": [
-            "start_date"
-          ],
+          "columns": ["start_date"],
           "isUnique": false
         }
       },
@@ -86,9 +82,7 @@
       "compositePrimaryKeys": {
         "campaigns_id": {
           "name": "campaigns_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {}
@@ -267,23 +261,17 @@
       "indexes": {
         "start_date_idx": {
           "name": "start_date_idx",
-          "columns": [
-            "start_time"
-          ],
+          "columns": ["start_time"],
           "isUnique": false
         },
         "status_idx": {
           "name": "status_idx",
-          "columns": [
-            "matchup_status"
-          ],
+          "columns": ["matchup_status"],
           "isUnique": false
         },
         "league_idx": {
           "name": "league_idx",
-          "columns": [
-            "leagues"
-          ],
+          "columns": ["leagues"],
           "isUnique": false
         }
       },
@@ -291,9 +279,7 @@
       "compositePrimaryKeys": {
         "matchups_id": {
           "name": "matchups_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {}
@@ -372,10 +358,7 @@
       "indexes": {
         "user_active_idx": {
           "name": "user_active_idx",
-          "columns": [
-            "user_id",
-            "active"
-          ],
+          "columns": ["user_id", "active"],
           "isUnique": false
         }
       },
@@ -383,9 +366,7 @@
       "compositePrimaryKeys": {
         "picks_id": {
           "name": "picks_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {}
@@ -450,10 +431,7 @@
       "indexes": {
         "user_active_idx": {
           "name": "user_active_idx",
-          "columns": [
-            "user_id",
-            "active"
-          ],
+          "columns": ["user_id", "active"],
           "isUnique": false
         }
       },
@@ -461,9 +439,7 @@
       "compositePrimaryKeys": {
         "streaks_id": {
           "name": "streaks_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {}
