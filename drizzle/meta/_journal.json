@@ -1,0 +1,13 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1691885466992,
+      "tag": "0000_harsh_gamora",
+      "breakpoints": true
+    }
+  ]
+}
