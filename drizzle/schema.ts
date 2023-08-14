@@ -1,5 +1,5 @@
+import { connect } from "@planetscale/database";
 import { InferModel, relations, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/planetscale-serverless";
 import {
   int,
   text,
@@ -16,7 +16,7 @@ import {
   smallint,
   datetime,
 } from "drizzle-orm/mysql-core";
-import { connect } from "@planetscale/database";
+import { drizzle } from "drizzle-orm/planetscale-serverless";
 
 //Enums
 

@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { League, NewMatchup, MatchupStatus } from "@/drizzle/schema";
-import { Redis } from "@upstash/redis";
 import { supportedLeagues } from "@/lib/config";
+import { Redis } from "@upstash/redis";
+import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 

@@ -1,12 +1,12 @@
 import "./globals.css";
+import { Navbar } from "@/components/navbar";
+import { ThemeProvider } from "@/components/theme-provider";
+import { siteConfig } from "@/lib/config";
+import { cn } from "@/lib/utils";
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
-import { ThemeProvider } from "@/components/theme-provider";
-import { cn } from "@/lib/utils";
-import { Navbar } from "@/components/navbar";
 import { Toaster } from "sonner";
-import { siteConfig } from "@/lib/config";
 
 const inter = Inter({ subsets: ["latin"] });
 

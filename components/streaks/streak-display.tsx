@@ -1,8 +1,8 @@
 "use client";
 
-import { FC } from "react";
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
+import { FC } from "react";
 
 interface StreakDisplayProps {
   size?: "default" | "sm" | "lg" | "xl";

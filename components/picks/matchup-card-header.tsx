@@ -1,8 +1,9 @@
-import { FC } from "react";
-import { cn } from "@/lib/utils";
-import { cva } from "class-variance-authority";
 import ClientTime from "../ui/client-time";
 import { Matchup } from "@/drizzle/schema";
+import { cn } from "@/lib/utils";
+import { cva } from "class-variance-authority";
+import { FC } from "react";
+
 export type PickCardVariant =
   | "WIN"
   | "LOSS"

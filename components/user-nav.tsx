@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  BookOpenCheck,
-  Home,
-  LayoutDashboard,
-  Trophy,
-  User,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import StreakDisplay from "./streaks/streak-display";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
@@ -16,12 +11,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
-import { usePathname } from "next/navigation";
-import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import StreakDisplay from "./streaks/streak-display";
+import { useUser } from "@clerk/nextjs";
+import {
+  BookOpenCheck,
+  Home,
+  LayoutDashboard,
+  Trophy,
+  User,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function UserNav() {
   const { user } = useUser();

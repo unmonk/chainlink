@@ -1,7 +1,7 @@
+import { Button } from "../ui/button";
 import { Matchup, MatchupStatus, Pick, PickStatus } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { FC } from "react";
-import { Button } from "../ui/button";
 
 interface MatchupCardButtonProps {
   matchup: Partial<Matchup>;

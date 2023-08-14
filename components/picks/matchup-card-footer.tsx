@@ -1,8 +1,7 @@
-import { FC } from "react";
-import Link from "next/link";
-import { Matchup, MatchupStatus } from "@/drizzle/schema";
-
 import { Button } from "@/components/ui/button";
+import { Matchup, MatchupStatus } from "@/drizzle/schema";
+import Link from "next/link";
+import { FC } from "react";
 
 interface MatchupCardFooterProps {
   homePercent?: number;
