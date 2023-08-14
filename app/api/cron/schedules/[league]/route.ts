@@ -9,8 +9,14 @@ export async function GET(
   request: Request,
   { params }: { params: { league: string } },
 ) {
+  //Check for cron key
+  const { searchParams } = new URL(request.url);
+  const key = searchParams.get("key");
+  if (key !== process.env.CRON_SECRET) {
+    return NextResponse.json({ status: 401, message: "Unauthorized" });
+  }
+
   //valid league present
-  //check if league exists on League type
   const league = params.league.toUpperCase() as League;
   if (!supportedLeagues.includes(league)) {
     return NextResponse.json({ status: 400, message: "Invalid league" });
@@ -47,6 +53,7 @@ export async function GET(
       revalidate: 0,
     },
   });
+
   const resJson = await res.json();
   const schedule = resJson.content?.schedule;
   if (!schedule) {
@@ -61,6 +68,22 @@ export async function GET(
       ...matchup,
     } as NewMatchup;
   });
+  //Transform Matchups into Redis Hash
+  for (const matchup of formattedMatchups) {
+    //group matchups by date
+    const dateKey = matchup.start_time.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      timeZone: "America/Los_Angeles",
+    });
+    redisPipeline.hsetnx(`MATCHUPS:${dateKey}`, matchup.game_id!, matchup);
+  }
+
+  //REDIS: do all redis writes
+  const pipelineResults = await redisPipeline.exec();
+
+  return NextResponse.json(pipelineResults);
 }
 
 function getScheduleVariables(schedule: any, league: League) {

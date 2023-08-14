@@ -64,7 +64,7 @@ export default function Page() {
             </Button>
           </div>
           <Separator className="my-2" />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
             <MatchupCard matchup={exampleMatchup} />
             <MatchupCard matchup={exampleMatchup} />
             <MatchupCard matchup={exampleMatchup} />
