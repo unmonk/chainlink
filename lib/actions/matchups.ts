@@ -1,5 +1,11 @@
 import { Matchup } from "@/drizzle/schema";
 
+export function handleStatusFinal(matchup: Matchup) {
+  if (matchup.status !== "STATUS_FINAL") return matchup;
+  matchup = handleScorevsScoreMatchup(matchup);
+  return matchup;
+}
+
 /**
  * Handles a score vs score matchup by updating the matchup status, scores, winner, and picks in the database.
  * @param matchup - The matchup object to handle.

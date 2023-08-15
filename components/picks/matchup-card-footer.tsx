@@ -33,7 +33,7 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
           (matchup.away_value ? (
             <p className={awayWinClass}>{matchup.away_value}</p>
           ) : (
-            <p className="text-xs">0</p>
+            <p className={awayWinClass}>0</p>
           ))}
       </div>
       <div className="col-span-1 text-center">
@@ -88,7 +88,7 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
           (matchup.home_value ? (
             <p className={homeWinClass}>{matchup.home_value}</p>
           ) : (
-            <p className="text-xs">0</p>
+            <p className={homeWinClass}>0</p>
           ))}
       </div>
     </div>

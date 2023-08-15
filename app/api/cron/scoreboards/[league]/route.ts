@@ -1,4 +1,6 @@
-import { League, MatchupStatus, Matchup } from "@/drizzle/schema";
+import { db } from "@/drizzle/db";
+import { League, MatchupStatus, Matchup, matchups } from "@/drizzle/schema";
+import { handleStatusFinal } from "@/lib/actions/matchups";
 import { supportedLeagues } from "@/lib/config";
 import { getPacifictime } from "@/lib/utils";
 import { Redis } from "@upstash/redis";
@@ -28,7 +30,7 @@ export async function GET(
     return NextResponse.json({ status: 400, message: "Invalid league" });
   }
 
-  //Get current chicago date
+  //Get current date
   const date = getPacifictime();
 
   //Fetch Scoreboard and currentMatchups Data
@@ -99,16 +101,21 @@ export async function GET(
     }
   }
 
-  //REDIS: update changed matchups
   let results: unknown[] = [];
   if (changedMatchups.length > 0) {
-    for (const matchup of changedMatchups) {
+    const dbPromises = [];
+    for (let matchup of changedMatchups) {
+      if (matchup.status === "STATUS_FINAL") {
+        matchup = handleStatusFinal(matchup);
+        const dbPromise = db.update(matchups).set(matchup);
+        dbPromises.push(dbPromise);
+      }
       redisPipeline.hset(`MATCHUPS:${date.redis}`, {
         [matchup.game_id]: JSON.stringify(matchup),
       });
     }
     //REDIS: do all redis writes
-    results = await redisPipeline.exec();
+    results = await Promise.all([redisPipeline.exec(), ...dbPromises]);
   }
 
   return NextResponse.json(results, { status: 200 });
