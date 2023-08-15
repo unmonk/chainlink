@@ -6,7 +6,9 @@ import { Separator } from "@/components/ui/separator";
 import { HistoryIcon } from "lucide-react";
 import Link from "next/link";
 
-export default function Page() {
+export const dynamic = "force-dynamic";
+
+export default async function Page() {
   return (
     <section className="flex flex-col items-center gap-4 py-4 md:py-6 ">
       <h1 className="text-xl font-bold underline decoration-primary underline-offset-8">

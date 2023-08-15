@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
+export const runtime = "edge";
+
 export default function RootLayout({
   children,
 }: {

@@ -1,7 +1,15 @@
-import { League, NewMatchup, MatchupStatus } from "@/drizzle/schema";
+import { db } from "@/drizzle/db";
+import {
+  League,
+  NewMatchup,
+  MatchupStatus,
+  matchups,
+  Matchup,
+} from "@/drizzle/schema";
 import { supportedLeagues } from "@/lib/config";
 import { getPacifictime } from "@/lib/utils";
 import { Redis } from "@upstash/redis";
+import { and, gte, lte } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -63,11 +71,59 @@ export async function GET(
       ...matchup,
     } as NewMatchup;
   });
-  //Transform Matchups into Redis Hash
-  for (const matchup of formattedMatchups) {
-    //group matchups by date
+
+  //get the date range of formattedMatchups
+  const firstStartTime = formattedMatchups[0].start_time;
+  const lastStartTime =
+    formattedMatchups[formattedMatchups.length - 1].start_time;
+
+  //get all matchups from database that are within the date range
+  const dbMatchups: Matchup[] = await db.query.matchups.findMany({
+    where: and(
+      gte(matchups.start_time, firstStartTime),
+      lte(matchups.start_time, lastStartTime),
+    ),
+  });
+
+  //compare dbMatchups and formattedMatchups only keep matchups that are not in db or have different any different key/value pairs
+  const updatedMatchups: Matchup[] = [];
+  const newMatchups = formattedMatchups.filter((formattedMatchup) => {
+    let isUpdated = false;
+    const dbMatchup = dbMatchups.find(
+      (dbMatchup) => dbMatchup.game_id === formattedMatchup.game_id,
+    );
+    if (!dbMatchup) return true;
+    //Check for updated matchups
+    //TODO: Check start time
+    if (formattedMatchup.status !== dbMatchup.status) {
+      dbMatchup.status = formattedMatchup.status!;
+      console.log("status updated");
+      isUpdated = true;
+    }
+    if (formattedMatchup.network !== dbMatchup.network) {
+      dbMatchup.network = formattedMatchup.network!;
+      console.log("network updated");
+      isUpdated = true;
+    }
+    if (isUpdated) updatedMatchups.push(dbMatchup);
+    return false;
+  });
+
+  console.log(updatedMatchups);
+  console.log(newMatchups);
+
+  for (let matchup of newMatchups) {
+    //write to database and get database id
+    const matchup_id = (await db.insert(matchups).values(matchup)).insertId;
+    matchup.id = Number(matchup_id);
+  }
+
+  //REDIS: write to redis pipeline
+  for (const matchup of [...updatedMatchups, ...newMatchups]) {
     const dateKey = getPacifictime(matchup.start_time!).redis;
-    redisPipeline.hsetnx(`MATCHUPS:${dateKey}`, matchup.game_id!, matchup);
+    redisPipeline.hset(`MATCHUPS:${dateKey}`, {
+      [matchup.game_id]: JSON.stringify(matchup),
+    });
   }
 
   //REDIS: do all redis writes

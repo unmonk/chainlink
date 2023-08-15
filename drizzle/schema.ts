@@ -14,6 +14,7 @@ import {
   mediumint,
   smallint,
   datetime,
+  unique,
 } from "drizzle-orm/mysql-core";
 
 //Enums
@@ -103,9 +104,7 @@ export const campaigns = mysqlTable(
   "campaigns",
   {
     id: serial("id").primaryKey().autoincrement(),
-    created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`,
-    ),
+    created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
     name: varchar("name", {
       length: 128,
     }).notNull(),
@@ -184,12 +183,8 @@ export const matchups = mysqlTable(
     winner_id: varchar("winner_id", {
       length: 64,
     }),
-    created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`,
-    ),
-    updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`(now(2))`,
-    ),
+    created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
+    updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
     start_time: datetime("start_time", { mode: "date" }).notNull(),
   },
   (table) => {
@@ -197,6 +192,11 @@ export const matchups = mysqlTable(
       start_date_idx: index("start_date_idx").on(table.start_time),
       status_idx: index("status_idx").on(table.status),
       league_idx: index("league_idx").on(table.league),
+      unique_matchup_idx: unique("unique_matchup_idx").on(
+        table.start_time,
+        table.game_id,
+        table.league,
+      ),
     };
   },
 );
@@ -212,12 +212,8 @@ export const streaks = mysqlTable(
       mode: "bigint",
     }).notNull(),
     streak: smallint("streak").notNull().default(0),
-    created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`,
-    ),
-    updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`(now(2))`,
-    ),
+    created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
+    updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
     active: boolean("active").notNull().default(true),
   },
   (table) => {
@@ -242,12 +238,8 @@ export const picks = mysqlTable(
     }),
     pick_type: pick_type.notNull(),
     active: boolean("active").notNull().default(true),
-    created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`(now(2))`,
-    ),
-    updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`(now(2))`,
-    ),
+    created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
+    updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
     pick_status: pick_status.notNull().default("PENDING"),
   },
   (table) => {

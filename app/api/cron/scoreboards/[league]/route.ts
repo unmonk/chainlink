@@ -5,6 +5,7 @@ import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
+//REDIS: setup redis client
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
@@ -34,8 +35,9 @@ export async function GET(
   const url = getScoreboardUrl(league, date.url);
   const scoreboardPromise = fetch(url, { next: { revalidate: 0 } });
 
-  //REDIS: setup redis client
+  //Fetch
 
+  //Setup Redis Pipeline
   const redisPipeline = redis.pipeline();
   const currentMatchupsPromise = redis.hgetall(`MATCHUPS:${date.redis}`);
 
@@ -99,8 +101,6 @@ export async function GET(
 
   //REDIS: update changed matchups
   let results: unknown[] = [];
-  console.log(changedFields);
-  console.log(changedMatchups);
   if (changedMatchups.length > 0) {
     for (const matchup of changedMatchups) {
       redisPipeline.hset(`MATCHUPS:${date.redis}`, {
