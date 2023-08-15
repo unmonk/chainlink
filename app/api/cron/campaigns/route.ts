@@ -1,5 +1,6 @@
+import { db } from "@/drizzle/db";
+import { NewCampaign, campaigns } from "@/drizzle/schema";
 import { NextResponse } from "next/server";
-import { NewCampaign, campaigns, db } from "@/drizzle/schema";
 
 export async function GET(request: Request) {
   // const cronSecret = request.headers.get("x-merc-cron-secret");
