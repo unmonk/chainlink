@@ -5,15 +5,20 @@ import { campaigns } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 
 export async function getActiveCampaign() {
+  const campaign = await db.query.campaigns.findFirst({
+    where: eq(campaigns.active, true),
+  });
+  return campaign;
+}
+
+export async function getActiveCampaignId() {
   const campaign = await db
-    .select()
+    .select({
+      id: campaigns.id,
+    })
     .from(campaigns)
     .where(eq(campaigns.active, true))
     .limit(1);
 
-  if (campaign.length === 0) {
-    return null;
-  }
-
-  return campaign[0];
+  return campaign[0].id;
 }

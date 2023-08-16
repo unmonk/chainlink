@@ -209,9 +209,12 @@ export const streaks = mysqlTable(
       length: 64,
     }).notNull(),
     campaign_id: bigint("campaign_id", {
-      mode: "bigint",
+      mode: "number",
     }).notNull(),
     streak: smallint("streak").notNull().default(0),
+    wins: smallint("streak").notNull().default(0),
+    losses: smallint("streak").notNull().default(0),
+    pushes: smallint("streak").notNull().default(0),
     created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
     updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
     active: boolean("active").notNull().default(true),
@@ -231,10 +234,10 @@ export const picks = mysqlTable(
       length: 64,
     }).notNull(),
     matchup_id: bigint("matchup_id", {
-      mode: "bigint",
+      mode: "number",
     }).notNull(),
     streak_id: bigint("streak_id", {
-      mode: "bigint",
+      mode: "number",
     }),
     pick_type: pick_type.notNull(),
     active: boolean("active").notNull().default(true),
@@ -245,6 +248,10 @@ export const picks = mysqlTable(
   (table) => {
     return {
       user_active_idx: index("user_active_idx").on(table.user_id, table.active),
+      unique_user_active: unique("unique_user_active").on(
+        table.user_id,
+        table.active,
+      ),
     };
   },
 );

@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     active: true,
   };
 
-  const response = db.insert(campaigns).values(campaign);
+  const response = await db.insert(campaigns).values(campaign);
 
   return NextResponse.json(response, { status: 200 });
 }

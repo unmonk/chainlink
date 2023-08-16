@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
-import { PickType } from "@/drizzle/schema";
+import { NewPick, PickType } from "@/drizzle/schema";
 import { useActivePickStore } from "@/lib/stores/active-pick-store";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
@@ -69,19 +69,20 @@ const PickButton: FC<PickButtonProps> = ({
   type,
 }) => {
   const [loading, setLoading] = useState(false);
-  const { activePick, setActivePick } = useActivePickStore();
+  const { activePick, setActivePick, getActivePick } = useActivePickStore();
   const { userId } = useAuth();
-  const handlePick = () => {
+  const handlePick = async () => {
     if (!userId) return;
     console.log("pick");
     setLoading(true);
-    setActivePick({
-      matchup_id: BigInt(matchupId),
+    const newPick: NewPick = {
+      matchup_id: Number(matchupId),
       pick_type: type,
       active: true,
       pick_status: "PENDING",
       user_id: userId,
-    });
+    };
+    await setActivePick(newPick);
     setLoading(false);
     console.log(activePick);
   };
