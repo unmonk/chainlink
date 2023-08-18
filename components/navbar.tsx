@@ -1,5 +1,6 @@
 import { Logo } from "@/components/ui/logo";
 import { UserNav } from "@/components/user-nav";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import Link from "next/link";
 
 export function Navbar() {
@@ -10,7 +11,9 @@ export function Navbar() {
         ChainLink
       </Link>
       <div className="ml-auto flex items-center space-x-4">
-        <UserNav />
+        <SignedIn>
+          <UserNav />
+        </SignedIn>
       </div>
     </nav>
   );
