@@ -15,13 +15,20 @@ import { redis } from "@/lib/redis";
 import { getPacifictime } from "@/lib/utils";
 import { auth, redirectToSignIn } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
-import { HistoryIcon, LockIcon } from "lucide-react";
+import { EyeIcon, HistoryIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-export default async function Page() {
+type DashboardPageParams = {
+  searchParams: {
+    f: string;
+  };
+};
+
+export default async function Page({ searchParams }: DashboardPageParams) {
+  const { f } = searchParams;
   const { userId } = auth();
   if (!userId) {
     return redirectToSignIn();
@@ -35,7 +42,7 @@ export default async function Page() {
   const date = getPacifictime();
   const key = `MATCHUPS:${date.redis}`;
   const matchups = await redis.hgetall(key);
-  const matchupsArray: Matchup[] = Object.values(
+  let matchupsArray: Matchup[] = Object.values(
     matchups ? matchups : [],
   ) as Matchup[];
 
@@ -53,6 +60,11 @@ export default async function Page() {
       pick.matchup = matchup;
     }
   }
+
+  if (f === "inprogress") {
+  }
+
+  const showHideInProgress = () => {};
 
   return (
     <section className="flex flex-col items-center py-4 md:py-6 ">
@@ -120,20 +132,37 @@ export default async function Page() {
                 </Tooltip>
               </TooltipProvider>
             )}
-            <Button
-              className="ml-auto flex flex-col text-xs"
-              size={"icon"}
-              variant={"link"}
-              asChild
-            >
-              <Link href="/picks">
-                <HistoryIcon />
-                History
-              </Link>
-            </Button>
+            <div className="ml-auto flex flex-row gap-10">
+              <Button
+                className="flex flex-col text-xs whitespace-nowrap"
+                size={"icon"}
+                variant={"link"}
+                asChild
+              >
+                <Link href={f ? "/dashboard" : "/dashboard?f=inprogress"}>
+                  <EyeIcon />
+                  {f ? "Show All" : "Hide In Progress"}
+                </Link>
+              </Button>
+              <Button
+                className="flex flex-col text-xs whitespace-nowrap"
+                size={"icon"}
+                variant={"link"}
+                asChild
+              >
+                <Link href="picks">
+                  <HistoryIcon />
+                  History
+                </Link>
+              </Button>
+            </div>
           </div>
           <Separator className="my-2" />
-          <MatchupListCards matchups={matchupsArray} activePick={pick} />
+          <MatchupListCards
+            matchups={matchupsArray}
+            activePick={pick}
+            filter={f}
+          />
         </div>
       </div>
     </section>

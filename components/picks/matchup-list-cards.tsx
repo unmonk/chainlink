@@ -5,15 +5,24 @@ import { FC } from "react";
 interface MatchupListCardsProps {
   matchups: Matchup[];
   activePick?: Pick;
+  filter?: string;
 }
 
 const MatchupListCards: FC<MatchupListCardsProps> = async ({
   matchups,
   activePick,
+  filter,
 }) => {
   if (!matchups) return <div>No More Matchups</div>;
 
-  const sortedMatchups = sortMatchups(matchups);
+  let sortedMatchups = sortMatchups(matchups);
+  if (filter === "inprogress") {
+    console.log("HERE");
+    //remove matches that are inprogress from sortedmatchups
+    sortedMatchups = sortedMatchups.filter(
+      (matchup) => matchup.status !== "STATUS_IN_PROGRESS",
+    );
+  }
 
   return (
     <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
@@ -38,14 +47,7 @@ function sortMatchups(matchupsArray: Matchup[]): Matchup[] {
     const aStartTime = new Date(a.start_time);
     const bStartTime = new Date(b.start_time);
 
-    if (a.status === "STATUS_SCHEDULED" && b.status !== "STATUS_SCHEDULED") {
-      return -1;
-    } else if (
-      b.status === "STATUS_SCHEDULED" &&
-      a.status !== "STATUS_SCHEDULED"
-    ) {
-      return 1;
-    } else if (a.status === "STATUS_FINAL" && b.status !== "STATUS_FINAL") {
+    if (a.status === "STATUS_FINAL" && b.status !== "STATUS_FINAL") {
       return 1;
     } else if (b.status === "STATUS_FINAL" && a.status !== "STATUS_FINAL") {
       return -1;
