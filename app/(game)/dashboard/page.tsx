@@ -116,12 +116,11 @@ export default async function Page({ searchParams }: DashboardPageParams) {
             />
           </div>
         </div>
-
-        <div className="col-span-1 flex flex-col gap-2 2xl:col-span-6">
-          <div className="flex flex-row items-center px-2 h-8">
-            <h3 className="text-lg font-semibold ">{`Today's Picks`}</h3>
-            {pick && pick.pick_status !== "PENDING" && (
-              <TooltipProvider>
+        <TooltipProvider>
+          <div className="col-span-1 flex flex-col gap-2 2xl:col-span-6">
+            <div className="flex flex-row items-center px-2 h-8">
+              <h3 className="text-lg font-semibold ">{`Today's Picks`}</h3>
+              {pick && pick.pick_status !== "PENDING" && (
                 <Tooltip>
                   <TooltipTrigger>
                     <LockIcon className="w-6 h-6 ml-2 text-destructive" />
@@ -130,40 +129,40 @@ export default async function Page({ searchParams }: DashboardPageParams) {
                     <p>Locked until pick completion</p>
                   </TooltipContent>
                 </Tooltip>
-              </TooltipProvider>
-            )}
-            <div className="ml-auto flex flex-row gap-10">
-              <Button
-                className="flex flex-col text-xs whitespace-nowrap"
-                size={"icon"}
-                variant={"link"}
-                asChild
-              >
-                <Link href={f ? "/dashboard" : "/dashboard?f=inprogress"}>
-                  <EyeIcon />
-                  {f ? "Show All" : "Hide In Progress"}
-                </Link>
-              </Button>
-              <Button
-                className="flex flex-col text-xs whitespace-nowrap"
-                size={"icon"}
-                variant={"link"}
-                asChild
-              >
-                <Link href="picks">
-                  <HistoryIcon />
-                  History
-                </Link>
-              </Button>
+              )}
+              <div className="ml-auto flex flex-row gap-4">
+                <Button
+                  className="flex flex-col text-xs whitespace-nowrap"
+                  variant={"link"}
+                  size={"icon"}
+                  asChild
+                >
+                  <Link href={f ? "/dashboard" : "/dashboard?f=inprogress"}>
+                    <EyeIcon />
+                    {f ? "Show All" : "Hide"}
+                  </Link>
+                </Button>
+                <Button
+                  className="flex flex-col text-xs whitespace-nowrap"
+                  size={"icon"}
+                  variant={"link"}
+                  asChild
+                >
+                  <Link href="picks">
+                    <HistoryIcon />
+                    History
+                  </Link>
+                </Button>
+              </div>
             </div>
+            <Separator className="my-2" />
+            <MatchupListCards
+              matchups={matchupsArray}
+              activePick={pick}
+              filter={f}
+            />
           </div>
-          <Separator className="my-2" />
-          <MatchupListCards
-            matchups={matchupsArray}
-            activePick={pick}
-            filter={f}
-          />
-        </div>
+        </TooltipProvider>
       </div>
     </section>
   );
