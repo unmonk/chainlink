@@ -15,7 +15,12 @@ import { redis } from "@/lib/redis";
 import { getPacifictime } from "@/lib/utils";
 import { auth, redirectToSignIn } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
-import { EyeIcon, HistoryIcon, LockIcon } from "lucide-react";
+import {
+  CalendarClockIcon,
+  EyeIcon,
+  HistoryIcon,
+  LockIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -60,11 +65,6 @@ export default async function Page({ searchParams }: DashboardPageParams) {
       pick.matchup = matchup;
     }
   }
-
-  if (f === "inprogress") {
-  }
-
-  const showHideInProgress = () => {};
 
   return (
     <section className="flex flex-col items-center py-4 md:py-6 ">
@@ -138,7 +138,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
                   asChild
                 >
                   <Link href={f ? "/dashboard" : "/dashboard?f=inprogress"}>
-                    <EyeIcon />
+                    <CalendarClockIcon />
                     {f ? "Show All" : "Hide"}
                   </Link>
                 </Button>

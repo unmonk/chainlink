@@ -17,7 +17,6 @@ const MatchupListCards: FC<MatchupListCardsProps> = async ({
 
   let sortedMatchups = sortMatchups(matchups);
   if (filter === "inprogress") {
-    console.log("HERE");
     //remove matches that are inprogress from sortedmatchups
     sortedMatchups = sortedMatchups.filter(
       (matchup) => matchup.status !== "STATUS_IN_PROGRESS",
