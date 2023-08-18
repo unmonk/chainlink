@@ -59,6 +59,9 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
               {/* clock section start_time */}
               {pick.pick_status === "PENDING" && (
                 <div className="flex flex-col items-center justify-center bg-accent/40 rounded-sm p-2">
+                  <span className="text-xs font-bold text-center text-primary">
+                    Locks at:
+                  </span>
                   <Logo size={50} />
                   <span className="text-xs font-bold text-center text-primary">
                     <ClientTime time={pick.matchup.start_time} />
