@@ -6,8 +6,9 @@ import MatchupCardHeader from "./matchup-card-header";
 import CancelPickButton from "@/components/picks/cancel-pick-button";
 import { PickWithMatchup } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
-import { CalendarClock, CheckIcon } from "lucide-react";
+import { CalendarClock, CheckIcon, Link2Icon, Lock } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ActivePickCardProps {
   pick: PickWithMatchup | undefined;
@@ -27,11 +28,6 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
 
           <div className="flex flex-col gap-2 items-center p-2">
             <div className="grid grid-cols-3 gap-4">
-              {pick.pick_status !== "PENDING" && (
-                <div className="flex justify-center items-center">
-                  <p className="text-lg">{pick.matchup.away_value}</p>
-                </div>
-              )}
               <div
                 className={cn(
                   "flex flex-col items-center justify-center rounded-sm p-2 relative",
@@ -67,6 +63,12 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                   </span>
                 </div>
               )}
+              {/* clock section start_time */}
+              {pick.pick_status === "STATUS_IN_PROGRESS" && (
+                <div className="flex flex-col items-center justify-center bg-accent/40 rounded-sm p-2">
+                  <Lock size={50} className="animate-pulse text-accent" />
+                </div>
+              )}
               <div
                 className={cn(
                   "flex flex-col items-center justify-center rounded-sm p-2 relative",
@@ -93,6 +95,26 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                   </Badge>
                 )}
               </div>
+            </div>
+            <div className="flex flex-row  justify-evenly gap-4 w-1/2">
+              {pick.pick_status !== "PENDING" && (
+                <div className="flex justify-center items-center">
+                  <p className="text-lg">{pick.matchup.away_value}</p>
+                </div>
+              )}
+              {pick.pick_status !== "PENDING" && (
+                <div className="flex justify-center items-center">
+                  <Button variant="link" size="sm" asChild>
+                    <Link
+                      href={`/gamedetails/${pick.matchup.league}/${pick.matchup.game_id}`}
+                      className=""
+                      prefetch={false}
+                    >
+                      Live
+                    </Link>
+                  </Button>
+                </div>
+              )}
               {pick.pick_status !== "PENDING" && (
                 <div className="flex justify-center items-center">
                   <p className="text-lg">{pick.matchup.home_value}</p>
