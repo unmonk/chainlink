@@ -131,6 +131,14 @@ function getScoreboardUrl(league: League, param: string | number) {
   switch (league) {
     case "MLB":
       return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${param}&limit=${limit}`;
+    case "WNBA":
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=${param}&limit=${limit}`;
+    case "NFL":
+      return `http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${param}&limit=${limit}`;
+    case "NBA":
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${param}&limit=${limit}`;
+    case "NHL":
+      return `http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=${param}&limit=${limit}`;
     default:
       throw new Error("Invalid league");
   }
