@@ -61,11 +61,15 @@ export default async function Page() {
             <StreakDisplay />
           </div>
 
-          <div className="flex flex-row px-2 h-8 mt-2">
-            <h3 className="text-lg font-semibold">My Pick</h3>
-          </div>
-          <Separator className="my-2 hidden xl:flex" />
-          <ActivePickCard pick={pick} />
+          {pick && (
+            <>
+              <div className="flex flex-row px-2 h-8 mt-2">
+                <h3 className="text-lg font-semibold">My Pick</h3>
+              </div>
+              <Separator className="my-2 hidden xl:flex" />
+              <ActivePickCard pick={pick} />
+            </>
+          )}
 
           <div className=" flex-row px-2 h-8 mt-2 hidden xl:flex">
             <h3 className="text-lg font-semibold ">Our Other Games</h3>

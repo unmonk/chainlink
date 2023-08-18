@@ -20,9 +20,10 @@ export const PickModal = () => {
 
   const handleConfirm = async () => {
     setLoading(true);
-    if (!newPick) return;
     await deletePick();
-    await makePick(newPick);
+    if (newPick) {
+      await makePick(newPick);
+    }
     setLoading(false);
     window.scrollTo(0, 0);
     closeModal();
@@ -35,9 +36,9 @@ export const PickModal = () => {
     <Dialog open={modalOpen} onOpenChange={handleCancel}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Overwrite Pick</DialogTitle>
+          <DialogTitle>Remove Active Pick?</DialogTitle>
           <DialogDescription>
-            Are you sure you want to overwrite your pick?
+            Are you sure you want to remove your active pick?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

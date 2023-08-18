@@ -58,43 +58,41 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
     },
   });
   return (
-    <div className="flex flex-col">
-      <div className={cn(pickCardHeaderVariants({ status }))}>
-        <div className="grid grid-cols-2 p-2">
-          <h3 className="text-start text-sm">
-            <span className="font-semibold">{matchup.league} </span> |&nbsp;
-            {status === "STATUS_SCHEDULED" && (
-              <ClientTime time={matchup.start_time!} />
-            )}
-            {status === "STATUS_IN_PROGRESS" && "In Progress"}
-            {status === "STATUS_FINAL" && "Final"}
-            {status === "STATUS_POSTPONED" && "Postponed"}
-            {status === "STATUS_CANCELED" && "Canceled"}
-            {status === "STATUS_SUSPENDED" && "Suspended"}
-            {status === "STATUS_DELAYED" && "Delayed"}
-            {status === "STATUS_UNKNOWN" && "Unknown"}
-            {status === "LOSS" && "Final | Loss"}
-            {status === "WIN" && "Final | Win"}
-            {status === "PENDING" && "Pending"}
-            {status === "PUSH" && "Push"}
-          </h3>
-
-          <h3 className="text-end text-sm">{matchup.network}</h3>
-        </div>
-        <div className="m-0 flex h-0 flex-row items-center justify-center text-center">
-          {active && (
-            <div
-              className={cn(
-                pickCardHeaderVariants({ status }),
-                "-mt-0.5 rounded-b-md p-1",
-              )}
-            >
-              <h3 className="animate-pulse text-center text-xs text-primary">
-                ACTIVE PICK
-              </h3>
-            </div>
+    <div className={cn(pickCardHeaderVariants({ status }))}>
+      <div className="grid grid-cols-2 p-2">
+        <h3 className="text-start text-sm">
+          <span className="font-semibold">{matchup.league} </span> |&nbsp;
+          {status === "STATUS_SCHEDULED" && (
+            <ClientTime time={matchup.start_time!} />
           )}
-        </div>
+          {status === "STATUS_IN_PROGRESS" && "In Progress"}
+          {status === "STATUS_FINAL" && "Final"}
+          {status === "STATUS_POSTPONED" && "Postponed"}
+          {status === "STATUS_CANCELED" && "Canceled"}
+          {status === "STATUS_SUSPENDED" && "Suspended"}
+          {status === "STATUS_DELAYED" && "Delayed"}
+          {status === "STATUS_UNKNOWN" && "Unknown"}
+          {status === "LOSS" && "Final | Loss"}
+          {status === "WIN" && "Final | Win"}
+          {status === "PENDING" && "Pending"}
+          {status === "PUSH" && "Push"}
+        </h3>
+
+        <h3 className="text-end text-sm">{matchup.network}</h3>
+      </div>
+      <div className="m-0 flex h-0 flex-row items-center justify-center text-center">
+        {active && (
+          <div
+            className={cn(
+              pickCardHeaderVariants({ status }),
+              "-mt-0.5 rounded-b-md p-1",
+            )}
+          >
+            <h3 className="animate-pulse text-center text-xs text-primary">
+              ACTIVE PICK
+            </h3>
+          </div>
+        )}
       </div>
     </div>
   );

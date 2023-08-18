@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import ClientTime from "../ui/client-time";
 import { Separator } from "../ui/separator";
 import MatchupCardHeader from "./matchup-card-header";
+import CancelPickButton from "@/components/picks/cancel-pick-button";
 import { PickWithMatchup } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { CalendarClock, CheckIcon } from "lucide-react";
@@ -61,7 +62,7 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
               {pick.pick_status === "PENDING" && (
                 <div className="flex flex-col items-center justify-center bg-accent/40 rounded-sm p-2">
                   <CalendarClock size={50} />
-                  <span className="text-xs font-bold text-center">
+                  <span className="text-xs font-bold text-center text-primary">
                     <ClientTime time={pick.matchup.start_time} />
                   </span>
                 </div>
@@ -98,11 +99,7 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                 </div>
               )}
             </div>
-            {pick.pick_status === "PENDING" && (
-              <Button variant="destructive" className="text-xs" size={"sm"}>
-                Cancel
-              </Button>
-            )}
+            {pick.pick_status === "PENDING" && <CancelPickButton />}
           </div>
         </div>
       </div>

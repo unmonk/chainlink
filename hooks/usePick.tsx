@@ -14,6 +14,6 @@ interface usePickStore {
 export const usePick = create<usePickStore>((set) => ({
   modalOpen: false,
   openModal: (newPick?: NewPick) => set({ modalOpen: true, newPick: newPick }),
-  closeModal: () => set({ modalOpen: false }),
+  closeModal: () => set({ modalOpen: false, newPick: undefined }),
   setPick: (pick: Pick) => set({ pick }),
 }));

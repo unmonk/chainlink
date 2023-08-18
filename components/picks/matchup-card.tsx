@@ -18,7 +18,7 @@ const MatchupCard: FC<MatchupCardProps> = ({ matchup }) => {
         status={matchup.status as PickCardVariant}
       />
       <div className="mb-2 flex flex-row justify-between p-2">
-        <h4 className="pr-1 text-sm font-bold md:text-base">
+        <h4 className="pr-1 text-sm font-bold md:text-base h-8">
           {matchup.question}
         </h4>
       </div>
