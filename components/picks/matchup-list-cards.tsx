@@ -1,12 +1,16 @@
 import MatchupCard from "./matchup-card";
-import { Matchup } from "@/drizzle/schema";
+import { Matchup, Pick } from "@/drizzle/schema";
 import { FC } from "react";
 
 interface MatchupListCardsProps {
   matchups: Matchup[];
+  activePick?: Pick;
 }
 
-const MatchupListCards: FC<MatchupListCardsProps> = async ({ matchups }) => {
+const MatchupListCards: FC<MatchupListCardsProps> = async ({
+  matchups,
+  activePick,
+}) => {
   if (!matchups) return <div>No More Matchups</div>;
 
   const sortedMatchups = sortMatchups(matchups);
@@ -14,7 +18,14 @@ const MatchupListCards: FC<MatchupListCardsProps> = async ({ matchups }) => {
   return (
     <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
       {sortedMatchups.map((matchup: Matchup) => (
-        <MatchupCard key={matchup.id} matchup={matchup} />
+        <MatchupCard
+          key={matchup.id}
+          matchup={matchup}
+          disabled={activePick ? true : false}
+          activePick={
+            matchup.id === activePick?.matchup_id ? activePick : undefined
+          }
+        />
       ))}
     </div>
   );

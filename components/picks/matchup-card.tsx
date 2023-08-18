@@ -1,16 +1,21 @@
 import MatchupCardButtons from "./matchup-card-buttons";
 import MatchupCardFooter from "./matchup-card-footer";
 import MatchupCardHeader, { PickCardVariant } from "./matchup-card-header";
-import { Matchup } from "@/drizzle/schema";
+import { Matchup, Pick } from "@/drizzle/schema";
 import { FC } from "react";
 
 interface MatchupCardProps {
-  matchup: Partial<Matchup>;
+  matchup: Matchup;
+  activePick?: Pick;
+  disabled?: boolean;
 }
 
-const MatchupCard: FC<MatchupCardProps> = ({ matchup }) => {
+const MatchupCard: FC<MatchupCardProps> = ({
+  matchup,
+  activePick,
+  disabled,
+}) => {
   if (!matchup) return null;
-  const userPick = undefined;
   return (
     <div className="h-full w-full rounded-b-md border shadow-md">
       <MatchupCardHeader
@@ -22,7 +27,11 @@ const MatchupCard: FC<MatchupCardProps> = ({ matchup }) => {
           {matchup.question}
         </h4>
       </div>
-      <MatchupCardButtons matchup={matchup} userPick={userPick} />
+      <MatchupCardButtons
+        matchup={matchup}
+        activePick={activePick}
+        disabled={disabled}
+      />
       <MatchupCardFooter matchup={matchup} homePercent={0} awayPercent={0} />
     </div>
   );

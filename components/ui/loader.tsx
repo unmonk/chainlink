@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Link2Icon } from "@radix-ui/react-icons";
+import { LinkIcon } from "lucide-react";
 
 interface LoaderProps {
   className?: string;
 }
 
 export const Loader = ({ className }: { className?: string }) => {
-  return <Link2Icon className={cn("animate-spin", className)} />;
+  return <LinkIcon className={cn("animate-spin", className)} />;
 };

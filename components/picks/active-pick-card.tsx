@@ -1,12 +1,13 @@
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import ClientTime from "../ui/client-time";
+import { Loader } from "../ui/loader";
 import { Separator } from "../ui/separator";
 import MatchupCardHeader from "./matchup-card-header";
 import CancelPickButton from "@/components/picks/cancel-pick-button";
 import { PickWithMatchup } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
-import { CalendarClock, CheckIcon, Link2Icon, Lock } from "lucide-react";
+import { CalendarClock, CheckIcon, LinkIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -66,7 +67,7 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
               {/* clock section start_time */}
               {pick.pick_status === "STATUS_IN_PROGRESS" && (
                 <div className="flex flex-col items-center justify-center bg-accent/40 rounded-sm p-2">
-                  <Lock size={50} className="animate-pulse text-accent" />
+                  <Loader />
                 </div>
               )}
               <div

@@ -3,14 +3,19 @@ import MatchupListCards from "@/components/picks/matchup-list-cards";
 import StreakDisplay from "@/components/streaks/streak-display";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { db } from "@/drizzle/db";
-import { Matchup, matchups, picks } from "@/drizzle/schema";
-import { getPick } from "@/lib/actions/picks";
+import { Matchup, picks } from "@/drizzle/schema";
 import { redis } from "@/lib/redis";
-import { absoluteUrl, getPacifictime } from "@/lib/utils";
+import { getPacifictime } from "@/lib/utils";
 import { auth, redirectToSignIn } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
-import { HistoryIcon } from "lucide-react";
+import { HistoryIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -103,6 +108,18 @@ export default async function Page() {
         <div className="col-span-1 flex flex-col gap-2 2xl:col-span-6">
           <div className="flex flex-row items-center px-2 h-8">
             <h3 className="text-lg font-semibold ">{`Today's Picks`}</h3>
+            {pick && pick.pick_status !== "PENDING" && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <LockIcon className="w-6 h-6 ml-2 text-destructive" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Locked until pick completion</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             <Button
               className="ml-auto flex flex-col text-xs"
               size={"icon"}
@@ -116,7 +133,7 @@ export default async function Page() {
             </Button>
           </div>
           <Separator className="my-2" />
-          <MatchupListCards matchups={matchupsArray} />
+          <MatchupListCards matchups={matchupsArray} activePick={pick} />
         </div>
       </div>
     </section>
