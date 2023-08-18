@@ -1,17 +1,13 @@
 import { db } from "@/drizzle/db";
 import { League, MatchupStatus, Matchup, matchups } from "@/drizzle/schema";
-import { handleStatusFinal } from "@/lib/actions/matchups";
 import { supportedLeagues } from "@/lib/config";
+import { handleStatusFinal, handleStatusInProgress } from "@/lib/matchupUtils";
+import { redis } from "@/lib/redis";
 import { getPacifictime } from "@/lib/utils";
-import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
 //REDIS: setup redis client
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
 
 export async function GET(
   request: Request,
@@ -105,9 +101,18 @@ export async function GET(
   if (changedMatchups.length > 0) {
     const dbPromises = [];
     for (let matchup of changedMatchups) {
+      if (matchup.status === "STATUS_IN_PROGRESS") {
+        const pickUpdates = handleStatusInProgress(matchup);
+        dbPromises.push(pickUpdates);
+      }
       if (matchup.status === "STATUS_FINAL") {
-        matchup = handleStatusFinal(matchup);
-        const dbPromise = db.update(matchups).set(matchup);
+        const updateMatchup = handleStatusFinal(matchup);
+        const dbPromise = db.update(matchups).set({
+          away_value: updateMatchup.away_value,
+          home_value: updateMatchup.home_value,
+          status: updateMatchup.status,
+          winner_id: updateMatchup.winner_id,
+        });
         dbPromises.push(dbPromise);
       }
       redisPipeline.hset(`MATCHUPS:${date.redis}`, {

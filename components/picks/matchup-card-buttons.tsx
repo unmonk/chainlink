@@ -60,7 +60,7 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
           teamImage={matchup.away_image}
           type={"AWAY"}
           disabled={disabled}
-          matchupId={matchup.game_id!}
+          matchupId={matchup.id!}
           variant={
             userPick?.pick_type === "AWAY" &&
             (userPick?.pick_status === "WIN" ||
@@ -102,7 +102,7 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
           teamImage={matchup.home_image}
           type={"HOME"}
           disabled={disabled}
-          matchupId={matchup.game_id!}
+          matchupId={matchup.id!}
           variant={
             userPick?.pick_type === "HOME" &&
             (userPick?.pick_status === "WIN" ||

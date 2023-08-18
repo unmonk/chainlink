@@ -117,11 +117,11 @@ export const campaigns = mysqlTable(
     }),
     start_date: datetime("start_date", {
       mode: "date",
-      fsp: 6,
+      fsp: 2,
     }).notNull(),
     end_date: datetime("end_date", {
       mode: "date",
-      fsp: 6,
+      fsp: 2,
     }).notNull(),
   },
   (table) => {
@@ -183,9 +183,9 @@ export const matchups = mysqlTable(
     winner_id: varchar("winner_id", {
       length: 64,
     }),
-    created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
-    updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
-    start_time: datetime("start_time", { mode: "date" }).notNull(),
+    created_at: timestamp("created_at", { mode: "date", fsp: 2 }).defaultNow(),
+    updated_at: timestamp("updated_at", { mode: "date", fsp: 2 }).defaultNow(),
+    start_time: datetime("start_time", { mode: "date", fsp: 2 }).notNull(),
   },
   (table) => {
     return {

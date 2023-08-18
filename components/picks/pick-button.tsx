@@ -1,9 +1,22 @@
 "use client";
 
+import { PickModal } from "../modals/pick-modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { NewPick, PickType } from "@/drizzle/schema";
-import { useActivePickStore } from "@/lib/stores/active-pick-store";
+import { usePick } from "@/hooks/usePick";
+import { getPick, makePick } from "@/lib/actions/picks";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
 import { cva } from "class-variance-authority";
@@ -31,7 +44,7 @@ interface PickButtonProps {
   teamImage?: string | null;
   type: PickType;
   disabled?: boolean;
-  matchupId: string;
+  matchupId: number;
 }
 
 const pickButtonVariants = cva(
@@ -69,12 +82,11 @@ const PickButton: FC<PickButtonProps> = ({
   type,
 }) => {
   const [loading, setLoading] = useState(false);
-  const { activePick, setActivePick, getActivePick } = useActivePickStore();
+  const { openModal, closeModal, setPick } = usePick();
   const { userId } = useAuth();
   const handlePick = async () => {
-    if (!userId) return;
-    console.log("pick");
     setLoading(true);
+    if (!userId) return;
     const newPick: NewPick = {
       matchup_id: Number(matchupId),
       pick_type: type,
@@ -82,46 +94,55 @@ const PickButton: FC<PickButtonProps> = ({
       pick_status: "PENDING",
       user_id: userId,
     };
-    await setActivePick(newPick);
+    const existingPick = await getPick();
+    if (existingPick) {
+      openModal(newPick);
+      setLoading(false);
+      return;
+    }
+    await makePick(newPick);
     setLoading(false);
-    console.log(activePick);
+    scrollTo(0, 0);
   };
 
   const handleDeSelect = () => {
     console.log("deselect");
   };
   return (
-    <Button
-      variant={"outline"}
-      className={cn(pickButtonVariants({ variant, className }), {
-        "border-4 animate-border-pulse":
-          selected && variant !== "WIN" && variant !== "LOSS",
-      })}
-      disabled={
-        (disabled && !selected) || loading || variant !== "STATUS_SCHEDULED"
-      }
-      onClick={selected ? handleDeSelect : handlePick}
-    >
-      {loading ? (
-        <Loader className="w-full h-full" />
-      ) : (
-        <Image
-          src={teamImage ?? "/images/alert-octagon.svg"}
-          fill
-          sizes={"100%"}
-          alt={teamImage ?? "Missing Team Data"}
-          className={cn("", {
-            "opacity-80 hover:scale-125 hover:opacity-90  hover:animate-tada-slow":
-              !selected,
-            "opacity-30": disabled,
-            " hover:bg-red-400 dark:hover:bg-red-900 opacity-100": selected,
-            "bg-accent": selected && variant !== "WIN" && variant !== "LOSS",
-            "animate-pulse": variant === "STATUS_SCHEDULED" && selected,
-          })}
-        />
-      )}
-      <span className="sr-only">{type}</span>
-    </Button>
+    <>
+      <Button
+        variant={"outline"}
+        className={cn(pickButtonVariants({ variant, className }), {
+          "border-4 animate-border-pulse":
+            selected && variant !== "WIN" && variant !== "LOSS",
+        })}
+        disabled={
+          (disabled && !selected) || loading || variant !== "STATUS_SCHEDULED"
+        }
+        onClick={selected ? handleDeSelect : handlePick}
+      >
+        {loading ? (
+          <Loader className="w-full h-full" />
+        ) : (
+          <Image
+            src={teamImage ?? "/images/alert-octagon.svg"}
+            fill
+            sizes={"100%"}
+            alt={teamImage ?? "Missing Team Data"}
+            className={cn("", {
+              "opacity-80 hover:scale-125 hover:opacity-90  hover:animate-tada-slow":
+                !selected,
+              "opacity-30": disabled,
+              " hover:bg-red-400 dark:hover:bg-red-900 opacity-100": selected,
+              "bg-accent": selected && variant !== "WIN" && variant !== "LOSS",
+              "animate-pulse": variant === "STATUS_SCHEDULED" && selected,
+            })}
+          />
+        )}
+        <span className="sr-only">{type}</span>
+      </Button>
+      <PickModal />
+    </>
   );
 };
 

@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
       //create streak
       const newStreak: NewStreak = {
-        campaign_id: BigInt(campaignId),
+        campaign_id: campaignId,
         user_id: userId,
         active: true,
         streak: 0,

@@ -2,30 +2,42 @@
 
 import { db } from "@/drizzle/db";
 import { NewPick, picks } from "@/drizzle/schema";
+import { auth } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export async function makePick(pick: NewPick) {
-  try {
-    pick.active = true;
-    const insertPick = await db.insert(picks).values(pick);
-    const fetchedPick = await db.query.picks.findFirst({
-      where: eq(picks.id, Number(insertPick.insertId)),
-    });
-
-    return fetchedPick;
-  } catch (err) {
-    console.log(err);
-  }
+  pick.active = true;
+  await db.insert(picks).values(pick);
+  revalidatePath(`/dashboard`);
 }
 
-export async function getPick(userId: string) {
-  try {
-    const pick = await db.query.picks.findFirst({
-      where: and(eq(picks.user_id, userId), eq(picks.active, true)),
-    });
+export async function getPick() {
+  const { userId } = auth();
+  if (!userId) return null;
+  const pick = await db.query.picks.findFirst({
+    where: and(eq(picks.user_id, userId), eq(picks.active, true)),
+    with: {
+      matchup: true,
+    },
+  });
+  return pick;
+}
 
-    return pick;
-  } catch (err) {
-    console.log(err);
-  }
+export async function deletePick() {
+  const { userId } = auth();
+  if (!userId) return null;
+  await db
+    .delete(picks)
+    .where(and(eq(picks.user_id, userId), eq(picks.active, true)));
+  revalidatePath(`/dashboard`);
+}
+
+export async function setPicksInProgress(matchupId: number) {
+  await db
+    .update(picks)
+    .set({
+      pick_status: "STATUS_IN_PROGRESS",
+    })
+    .where(eq(picks.matchup_id, matchupId));
 }

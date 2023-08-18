@@ -12,7 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignOutButton, UserButton } from "@clerk/nextjs";
 import {
   BookOpenCheck,
   Home,
@@ -25,6 +25,7 @@ import { usePathname } from "next/navigation";
 
 export function UserNav() {
   const { user } = useUser();
+
   const pathname = usePathname();
   return (
     <Sheet>
@@ -126,6 +127,8 @@ export function UserNav() {
                 Home
               </Link>
             </Button>
+            <SignOutButton />
+            <UserButton />
           </div>
         </nav>
 

@@ -1,12 +1,10 @@
 import { db } from "@/drizzle/db";
-import {
-  League,
-  NewMatchup,
-  MatchupStatus,
-  matchups,
-  Matchup,
-} from "@/drizzle/schema";
+import { League, NewMatchup, matchups, Matchup } from "@/drizzle/schema";
 import { supportedLeagues } from "@/lib/config";
+import {
+  getScheduleVariables,
+  makeWhoWillWinQuestions,
+} from "@/lib/matchupUtils";
 import { getPacifictime } from "@/lib/utils";
 import { Redis } from "@upstash/redis";
 import { and, gte, lte } from "drizzle-orm";
@@ -97,20 +95,15 @@ export async function GET(
     //TODO: Check start time
     if (formattedMatchup.status !== dbMatchup.status) {
       dbMatchup.status = formattedMatchup.status!;
-      console.log("status updated");
       isUpdated = true;
     }
     if (formattedMatchup.network !== dbMatchup.network) {
       dbMatchup.network = formattedMatchup.network!;
-      console.log("network updated");
       isUpdated = true;
     }
     if (isUpdated) updatedMatchups.push(dbMatchup);
     return false;
   });
-
-  console.log(updatedMatchups);
-  console.log(newMatchups);
 
   for (let matchup of newMatchups) {
     //write to database and get database id
@@ -130,53 +123,4 @@ export async function GET(
   const pipelineResults = await redisPipeline.exec();
 
   return NextResponse.json(pipelineResults);
-}
-
-//TODO type schedule and competitor
-function getScheduleVariables(schedule: any, league: League) {
-  const output = [];
-  for (const day in schedule) {
-    if (!schedule[day].games) continue;
-    for (const game of schedule[day].games) {
-      const matchup: Partial<NewMatchup> = {};
-      const competition = game.competitions[0];
-      //Skip if no competition data or if game is not scheduled
-      if (!competition) continue;
-      matchup.status =
-        (competition.status.type.name as MatchupStatus) ?? "STATUS_SCHEDULED";
-      if (matchup.status !== "STATUS_SCHEDULED") continue;
-
-      matchup.start_time = new Date(competition.startDate);
-      matchup.game_id = game.id as string;
-      matchup.league = league;
-      matchup.network = competition.geoBroadcasts[0]?.media?.shortName ?? "N/A";
-      competition.competitors.forEach((competitor: any) => {
-        if (competitor.homeAway === "home") {
-          matchup.home_team = competitor.team.displayName;
-          matchup.home_id = competitor.id;
-          matchup.home_image = competitor.team.logo;
-          matchup.home_value = 0;
-        } else if (competitor.homeAway === "away") {
-          matchup.away_team = competitor.team.displayName;
-          matchup.away_id = competitor.id;
-          matchup.away_image = competitor.team.logo;
-          matchup.away_value = 0;
-        }
-      });
-      output.push(matchup);
-    }
-  }
-  return output;
-}
-
-function makeWhoWillWinQuestions(
-  matchups: Partial<NewMatchup>[],
-): Partial<NewMatchup>[] {
-  return matchups.map((matchup) => {
-    matchup.question = `Who will win this matchup? ${matchup.away_team} @ ${matchup.home_team}?`;
-    matchup.home_win_condition = "score";
-    matchup.away_win_condition = "score";
-    matchup.operator = "GREATER_THAN";
-    return matchup;
-  });
 }

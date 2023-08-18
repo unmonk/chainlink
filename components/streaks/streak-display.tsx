@@ -27,7 +27,7 @@ const StreakDisplay: FC<StreakDisplayProps> = ({ size }) => {
   const wins = 0;
   const losses = 0;
   const pushes = 0;
-  const streak = -3;
+  const streak = 0;
   const streakPrefix = streak >= 0 ? "W" : "L";
   const streakColor = streak >= 0 ? "text-green-500" : "text-red-500";
   const streakText = `${streakPrefix}${Math.abs(streak)}`;

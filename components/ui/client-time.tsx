@@ -12,6 +12,7 @@ const ClientTime: FC<ClientTimeProps> = ({ time }) => {
     minute: "numeric",
     hour12: true,
     timeZoneName: "short",
+    timeZone: "UTC",
   });
   return <>{localTime}</>;
 };
