@@ -92,7 +92,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
             <h3 className="text-lg font-semibold ">Our Other Games</h3>
           </div>
           <Separator className="my-2 hidden xl:flex" />
-          <div className="text-xl hidden xl:flex gap-2 items-center justify-between">
+          <div className="text-xl hidden xl:grid xl:grid-cols-3 gap-2 items-center justify-between">
             <Image
               src="/images/test.jpg"
               width={200}
