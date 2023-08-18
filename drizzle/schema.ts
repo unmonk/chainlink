@@ -256,6 +256,22 @@ export const picks = mysqlTable(
   },
 );
 
+export const profiles = mysqlTable(
+  "profiles",
+  {
+    user_id: varchar("user_id", {
+      length: 64,
+    })
+      .notNull()
+      .primaryKey(),
+  },
+  (table) => {
+    return {
+      user_id_idx: index("user_id_idx").on(table.user_id),
+    };
+  },
+);
+
 //Relationships
 export const campaignRelations = relations(campaigns, ({ one, many }) => ({
   streaks: many(streaks),

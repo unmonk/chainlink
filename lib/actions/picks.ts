@@ -1,5 +1,6 @@
 "use server";
 
+import { getStreak } from "./streaks";
 import { db } from "@/drizzle/db";
 import { NewPick, picks } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
@@ -7,7 +8,12 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function makePick(pick: NewPick) {
+  const streak = await getStreak();
+  if (!streak) {
+    throw new Error("No active streak");
+  }
   pick.active = true;
+  pick.streak_id = streak.id;
   await db.insert(picks).values(pick);
   revalidatePath(`/dashboard`);
 }
