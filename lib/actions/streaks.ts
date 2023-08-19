@@ -2,7 +2,7 @@
 
 import { getActiveCampaign } from "./campaign";
 import { db } from "@/drizzle/db";
-import { NewStreak, streaks } from "@/drizzle/schema";
+import { NewStreak, PickWithStreak, streaks } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
 
@@ -61,4 +61,30 @@ export async function adjustStreak(type: "WIN" | "LOSS" | "PUSH") {
     streak.pushes = streak.pushes + 1;
   }
   await db.update(streaks).set(streak).where(eq(streaks.id, streak.id));
+}
+
+export async function getPromiseByPick(pick: PickWithStreak) {
+  if (pick.pick_status === "WIN") {
+    //if streak is negative, reset to 1, otherwise increment by 1
+    //Increment wins by 1
+    pick.streak.streak = pick.streak.streak < 0 ? 1 : pick.streak.streak + 1;
+  }
+  if (pick.pick_status === "LOSS") {
+    //if streak is positive, reset to -1, otherwise decrement by 1
+    //Increment losses by 1
+    pick.streak.streak = pick.streak.streak > 0 ? -1 : pick.streak.streak - 1;
+    pick.streak.losses = pick.streak.losses + 1;
+  }
+  if (pick.pick_status === "PUSH") {
+    pick.streak.pushes = pick.streak.pushes + 1;
+  }
+  return db
+    .update(streaks)
+    .set({
+      streak: pick.streak.streak,
+      wins: pick.streak.wins,
+      losses: pick.streak.losses,
+      pushes: pick.streak.pushes,
+    })
+    .where(eq(streaks.id, pick.streak.id));
 }

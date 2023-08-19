@@ -1,5 +1,13 @@
 import { db } from "@/drizzle/db";
-import { League, MatchupStatus, Matchup, matchups } from "@/drizzle/schema";
+import {
+  League,
+  MatchupStatus,
+  Matchup,
+  matchups,
+  picks,
+} from "@/drizzle/schema";
+import { getMatchupPicks } from "@/lib/actions/picks";
+import { getPromiseByPick } from "@/lib/actions/streaks";
 import { supportedLeagues } from "@/lib/config";
 import { handleStatusFinal, handleStatusInProgress } from "@/lib/matchupUtils";
 import { redis } from "@/lib/redis";
@@ -97,8 +105,6 @@ export async function GET(
     }
   }
 
-  console.log(changedMatchups);
-
   let results: unknown[] = [];
   if (changedMatchups.length > 0) {
     const dbPromises = [];
@@ -109,6 +115,37 @@ export async function GET(
       }
       if (matchup.status === "STATUS_FINAL") {
         const updateMatchup = handleStatusFinal(matchup);
+        //handle picks per matchup
+        const fetchedPicks = await getMatchupPicks(matchup.id);
+        const pickUpdates = fetchedPicks.map((pick) => {
+          if (
+            (pick.pick_type === "AWAY" &&
+              matchup.winner_id === matchup.away_id) ||
+            (pick.pick_type === "HOME" && matchup.winner_id === matchup.home_id)
+          ) {
+            pick.pick_status = "WIN";
+          }
+          if (
+            (pick.pick_type === "AWAY" &&
+              matchup.winner_id === matchup.home_id) ||
+            (pick.pick_type === "HOME" && matchup.winner_id === matchup.away_id)
+          ) {
+            pick.pick_status = "LOSS";
+          }
+          if (matchup.winner_id === null) {
+            pick.pick_status = "PUSH";
+          }
+          const streakPromise = getPromiseByPick(pick);
+          dbPromises.push(streakPromise);
+
+          return db.update(picks).set({
+            pick_status: pick.pick_status,
+            active: false,
+          });
+        });
+
+        dbPromises.push(...pickUpdates);
+
         const dbPromise = db.update(matchups).set({
           away_value: updateMatchup.away_value,
           home_value: updateMatchup.home_value,
@@ -121,6 +158,7 @@ export async function GET(
         [matchup.game_id]: JSON.stringify(matchup),
       });
     }
+    console.log(dbPromises.length);
     //REDIS: do all redis writes
     results = await Promise.all([redisPipeline.exec(), ...dbPromises]);
   }

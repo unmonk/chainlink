@@ -2,7 +2,12 @@
 
 import { getStreak } from "./streaks";
 import { db } from "@/drizzle/db";
-import { NewPick, picks } from "@/drizzle/schema";
+import {
+  NewPick,
+  PickWithMatchupAndStreak,
+  PickWithStreak,
+  picks,
+} from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -39,6 +44,18 @@ export async function deletePick() {
     .delete(picks)
     .where(and(eq(picks.user_id, userId), eq(picks.active, true)));
   revalidatePath(`/dashboard`);
+}
+
+export async function getMatchupPicks(
+  matchupId: number,
+): Promise<PickWithStreak[]> {
+  const matchupPicks = await db.query.picks.findMany({
+    where: eq(picks.matchup_id, matchupId),
+    with: {
+      streak: true,
+    },
+  });
+  return matchupPicks as PickWithStreak[];
 }
 
 export async function setPicksInProgress(matchupId: number) {

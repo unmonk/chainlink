@@ -212,9 +212,9 @@ export const streaks = mysqlTable(
       mode: "number",
     }).notNull(),
     streak: smallint("streak").notNull().default(0),
-    wins: smallint("streak").notNull().default(0),
-    losses: smallint("streak").notNull().default(0),
-    pushes: smallint("streak").notNull().default(0),
+    wins: smallint("wins").notNull().default(0),
+    losses: smallint("losses").notNull().default(0),
+    pushes: smallint("pushes").notNull().default(0),
     created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
     updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
     active: boolean("active").notNull().default(true),
@@ -248,26 +248,6 @@ export const picks = mysqlTable(
   (table) => {
     return {
       user_active_idx: index("user_active_idx").on(table.user_id, table.active),
-      unique_user_active: unique("unique_user_active").on(
-        table.user_id,
-        table.active,
-      ),
-    };
-  },
-);
-
-export const profiles = mysqlTable(
-  "profiles",
-  {
-    user_id: varchar("user_id", {
-      length: 64,
-    })
-      .notNull()
-      .primaryKey(),
-  },
-  (table) => {
-    return {
-      user_id_idx: index("user_id_idx").on(table.user_id),
     };
   },
 );
