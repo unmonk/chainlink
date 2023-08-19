@@ -97,6 +97,8 @@ export async function GET(
     }
   }
 
+  console.log(changedMatchups);
+
   let results: unknown[] = [];
   if (changedMatchups.length > 0) {
     const dbPromises = [];

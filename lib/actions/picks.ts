@@ -20,7 +20,9 @@ export async function makePick(pick: NewPick) {
 
 export async function getPick() {
   const { userId } = auth();
-  if (!userId) return null;
+  if (!userId) {
+    throw new Error("No user id");
+  }
   const pick = await db.query.picks.findFirst({
     where: and(eq(picks.user_id, userId), eq(picks.active, true)),
     with: {

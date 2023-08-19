@@ -1,6 +1,6 @@
 import { ActivePickCard } from "@/components/picks/active-pick-card";
 import MatchupListCards from "@/components/picks/matchup-list-cards";
-import StreakDisplay from "@/components/streaks/streak-display";
+import { StreakDisplay } from "@/components/streaks/streak-display";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/tooltip";
 import { db } from "@/drizzle/db";
 import { Matchup, picks } from "@/drizzle/schema";
+import { getMatchups } from "@/lib/actions/matchups";
+import { getPick } from "@/lib/actions/picks";
 import { redis } from "@/lib/redis";
 import { getPacifictime } from "@/lib/utils";
 import { auth, redirectToSignIn } from "@clerk/nextjs";
@@ -38,26 +40,14 @@ export default async function Page({ searchParams }: DashboardPageParams) {
   if (!userId) {
     return redirectToSignIn();
   }
-  const pick = await db.query.picks.findFirst({
-    where: and(eq(picks.user_id, userId), eq(picks.active, true)),
-    with: {
-      matchup: true,
-    },
-  });
-  const date = getPacifictime();
-  const key = `MATCHUPS:${date.redis}`;
-  const matchups = await redis.hgetall(key);
-  let matchupsArray: Matchup[] = Object.values(
-    matchups ? matchups : [],
-  ) as Matchup[];
+  const pick = await getPick();
+  const matchups = await getMatchups();
 
   if (pick && matchups) {
-    const matchup = matchupsArray.find(
-      (matchup) => matchup.id === pick.matchup_id,
-    );
+    const matchup = matchups.find((matchup) => matchup.id === pick.matchup_id);
     //REMOVE pick.matchup.id from matchupsArray
-    matchupsArray.splice(
-      matchupsArray.findIndex((matchup) => matchup.id === pick.matchup_id),
+    matchups.splice(
+      matchups.findIndex((matchup) => matchup.id === pick.matchup_id),
       1,
     );
 
@@ -157,7 +147,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
             </div>
             <Separator className="my-2" />
             <MatchupListCards
-              matchups={matchupsArray}
+              matchups={matchups}
               activePick={pick}
               filter={f}
             />
