@@ -9,7 +9,7 @@ import {
   picks,
 } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function makePick(pick: NewPick) {
@@ -64,5 +64,8 @@ export async function setPicksInProgress(matchupId: number) {
     .set({
       pick_status: "STATUS_IN_PROGRESS",
     })
-    .where(eq(picks.matchup_id, matchupId));
+    .where(
+      eq(picks.matchup_id, matchupId) &&
+        ne(picks.pick_status, "STATUS_IN_PROGRESS"),
+    );
 }
