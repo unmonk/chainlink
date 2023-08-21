@@ -80,48 +80,45 @@ export async function GET(
     }
     //compare status, score, push to changedMatchups if changed
     if (matchup.status.toString() !== dataMatchup.status.type.name.toString()) {
-      matchup.status = dataMatchup.status.type.name as MatchupStatus;
-      changed = true;
-      changedFields.push("status");
       console.log(
         "status changed",
         matchup.status,
         dataMatchup.status.type.name,
       );
+      matchup.status = dataMatchup.status.type.name as MatchupStatus;
+      changed = true;
+      changedFields.push("status");
     }
     if (
       matchup.home_value !=
       parseInt(dataMatchup.competitions[0].competitors[0].score)
     ) {
-      matchup.home_value = dataMatchup.competitions[0].competitors[0].score;
-      changed = true;
-      changedFields.push("home_value");
       console.log(
         "home_value changed",
         matchup.home_value,
         dataMatchup.competitions[0].competitors[0].score,
       );
+      matchup.home_value = dataMatchup.competitions[0].competitors[0].score;
+      changed = true;
+      changedFields.push("home_value");
     }
     if (
       matchup.away_value !=
       parseInt(dataMatchup.competitions[0].competitors[1].score)
     ) {
-      matchup.away_value = dataMatchup.competitions[0].competitors[1].score;
-      changed = true;
-      changedFields.push("away_value");
       console.log(
         "away_value changed",
         matchup.away_value,
         dataMatchup.competitions[0].competitors[1].score,
       );
+      matchup.away_value = dataMatchup.competitions[0].competitors[1].score;
+      changed = true;
+      changedFields.push("away_value");
     }
     if (changed) {
       changedMatchups.push(matchup);
     }
   }
-
-  console.log(changedMatchups.length);
-  console.log(changedFields);
 
   let results: unknown[] = [];
   if (changedMatchups.length > 0) {
@@ -176,7 +173,7 @@ export async function GET(
         [matchup.game_id]: JSON.stringify(matchup),
       });
     }
-    console.log(dbPromises.length);
+    console.log("Promises for DB:", dbPromises.length);
     //REDIS: do all redis writes
     results = await Promise.all([redisPipeline.exec(), ...dbPromises]);
   } else {

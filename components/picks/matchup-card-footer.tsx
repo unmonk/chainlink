@@ -27,7 +27,6 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
   return (
     <div className="under grid grid-cols-3 ">
       <div className="col-span-1 ml-4 text-left">
-        {matchup.status === "STATUS_SCHEDULED" && <p>{awayPercent}%</p>}
         {(matchup.status === "STATUS_FINAL" ||
           matchup.status === "STATUS_IN_PROGRESS") &&
           (matchup.away_value ? (
@@ -82,7 +81,6 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
         )}
       </div>
       <div className="col-span-1 mr-4 text-right">
-        {matchup.status === "STATUS_SCHEDULED" && <p>{homePercent}%</p>}
         {(matchup.status === "STATUS_FINAL" ||
           matchup.status === "STATUS_IN_PROGRESS") &&
           (matchup.home_value ? (
