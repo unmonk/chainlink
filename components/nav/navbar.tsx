@@ -12,10 +12,10 @@ export function Navbar() {
         ChainLink
       </Link>
       <div className="ml-auto flex items-center space-x-4">
+        <Button asChild>
+          <Link href={"/play"}>Play ⚾</Link>
+        </Button>
         <SignedIn>
-          <Button asChild>
-            <Link href={"/play"}>Play ⚾</Link>
-          </Button>
           <UserNav />
         </SignedIn>
       </div>
