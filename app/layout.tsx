@@ -1,5 +1,5 @@
 import "./globals.css";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/nav/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";

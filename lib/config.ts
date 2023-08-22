@@ -1,4 +1,5 @@
 export const siteConfig = {
+  name: "ChainLink",
   title: "ChainLink - Win with the highest chain.",
   description:
     "A game that puts your love for sports up against the whole world!",
@@ -16,6 +17,7 @@ export const siteConfig = {
   twitterUrl: "https://chainlink.st",
   twitterDomain: "chainlink.st",
   twitterType: "website",
+  discordInvite: "https://discord.gg/gQ6qBwHS9B",
 };
 
 export const supportedLeagues = [

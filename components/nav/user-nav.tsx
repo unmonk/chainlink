@@ -1,4 +1,3 @@
-import UserAvatar from "./user-avatar";
 import UserNavLinks from "@/components/nav/user-nav-links";
 import { StreakDisplay } from "@/components/streaks/streak-display";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import UserAvatar from "@/components/user-avatar";
 
 export async function UserNav() {
   return (

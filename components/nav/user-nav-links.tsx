@@ -9,6 +9,8 @@ import {
   BookOpenCheck,
   User,
   Home,
+  CalendarSearchIcon,
+  LogOutIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -31,7 +33,7 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
         >
           <Link href="/dashboard" prefetch={false}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
+            Play
           </Link>
         </Button>
         <Button
@@ -42,6 +44,16 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           <Link href="/leaderboards">
             <Trophy className="mr-2 h-4 w-4" />
             Leaderboards
+          </Link>
+        </Button>
+        <Button
+          variant={pathname === "/picks" ? "secondary" : "ghost"}
+          className="w-full justify-start"
+          asChild
+        >
+          <Link href="/picks">
+            <CalendarSearchIcon className="mr-2 h-4 w-4" />
+            My Picks
           </Link>
         </Button>
         <Button
@@ -80,7 +92,12 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
             Home
           </Link>
         </Button>
-        <SignOutButton />
+        <SignOutButton>
+          <Button variant={"ghost"} className="w-full justify-start">
+            <LogOutIcon className="mr-2 h-4 w-4" />
+            Sign Out
+          </Button>
+        </SignOutButton>
       </div>
     </nav>
   );
