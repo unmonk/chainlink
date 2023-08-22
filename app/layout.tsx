@@ -5,6 +5,7 @@ import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
@@ -36,6 +37,7 @@ export default function RootLayout({
             {children}
             <Toaster />
           </ThemeProvider>
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
