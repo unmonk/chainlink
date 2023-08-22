@@ -26,6 +26,7 @@ export default async function UserPicksPage() {
             <TableHead>Matchup</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Your Pick</TableHead>
+            <TableHead>League</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -73,6 +74,7 @@ export default async function UserPicksPage() {
                     : pick.matchup.away_team}
                 </p>
               </TableCell>
+              <TableCell>{pick.matchup.league}</TableCell>
             </TableRow>
           ))}
         </TableBody>

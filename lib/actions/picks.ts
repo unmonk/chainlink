@@ -65,8 +65,10 @@ export async function setPicksInProgress(matchupId: number) {
       pick_status: "STATUS_IN_PROGRESS",
     })
     .where(
-      eq(picks.matchup_id, matchupId) &&
+      and(
+        eq(picks.matchup_id, matchupId),
         ne(picks.pick_status, "STATUS_IN_PROGRESS"),
+      ),
     );
 }
 
