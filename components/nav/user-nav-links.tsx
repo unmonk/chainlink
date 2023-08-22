@@ -45,11 +45,11 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           </Link>
         </Button>
         <Button
-          variant={pathname === "/leaderboards" ? "secondary" : "ghost"}
+          variant={pathname === "/howtoplay" ? "secondary" : "ghost"}
           className="w-full justify-start"
           asChild
         >
-          <Link href="/leaderboards">
+          <Link href="/howtoplay">
             <BookOpenCheck className="mr-2 h-4 w-4" />
             How to Play
           </Link>

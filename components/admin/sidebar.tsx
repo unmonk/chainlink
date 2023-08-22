@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -5,6 +7,8 @@ import {
   CalendarClockIcon,
   CalendarSearchIcon,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FC } from "react";
 
 interface AdminSidebarProps {
@@ -33,6 +37,7 @@ const GAME_INFO_LINKS = [
 ];
 
 const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
+  const pathname = usePathname();
   return (
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
@@ -44,11 +49,14 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
             {ADMIN_LINKS.map((link) => (
               <Button
                 key={link.name}
-                variant="ghost"
+                variant={pathname === link.href ? "secondary" : "ghost"}
                 className="w-full justify-start"
+                asChild
               >
-                <link.icon className="mr-2 h-4 w-4" />
-                {link.name}
+                <Link href={link.href}>
+                  <link.icon className="mr-2 h-4 w-4" />
+                  {link.name}
+                </Link>
               </Button>
             ))}
           </div>
@@ -61,11 +69,14 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
             {GAME_INFO_LINKS.map((link) => (
               <Button
                 key={link.name}
-                variant="ghost"
+                variant={pathname === link.href ? "secondary" : "ghost"}
                 className="w-full justify-start"
+                asChild
               >
-                <link.icon className="mr-2 h-4 w-4" />
-                {link.name}
+                <Link href={link.href}>
+                  <link.icon className="mr-2 h-4 w-4" />
+                  {link.name}
+                </Link>
               </Button>
             ))}
           </div>
