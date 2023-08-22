@@ -63,6 +63,7 @@ export async function setPicksInProgress(matchupId: number) {
     .update(picks)
     .set({
       pick_status: "STATUS_IN_PROGRESS",
+      updated_at: new Date(),
     })
     .where(
       and(
