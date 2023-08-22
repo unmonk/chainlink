@@ -73,16 +73,6 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
       </h2>
       <div className="space-y-1">
         <Button
-          variant={pathname === "/profile" ? "secondary" : "ghost"}
-          className="w-full justify-start"
-          asChild
-        >
-          <Link href="/" prefetch={false}>
-            <User className="mr-2 h-4 w-4" />
-            Profile
-          </Link>
-        </Button>
-        <Button
           variant={pathname === "/" ? "secondary" : "ghost"}
           className="w-full justify-start"
           asChild
@@ -90,6 +80,16 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           <Link href="/">
             <Home className="mr-2 h-4 w-4" />
             Home
+          </Link>
+        </Button>
+        <Button
+          variant={pathname === "/profile" ? "secondary" : "ghost"}
+          className="w-full justify-start"
+          asChild
+        >
+          <Link href="/" prefetch={false}>
+            <User className="mr-2 h-4 w-4" />
+            Profile
           </Link>
         </Button>
         <SignOutButton>
