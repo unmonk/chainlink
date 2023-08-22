@@ -84,6 +84,7 @@ export async function GET(
         "status changed",
         matchup.status,
         dataMatchup.status.type.name,
+        matchup.game_id,
       );
       matchup.status = dataMatchup.status.type.name as MatchupStatus;
       changed = true;
@@ -97,6 +98,7 @@ export async function GET(
         "home_value changed",
         matchup.home_value,
         dataMatchup.competitions[0].competitors[0].score,
+        matchup.game_id,
       );
       matchup.home_value = dataMatchup.competitions[0].competitors[0].score;
       changed = true;
@@ -110,6 +112,7 @@ export async function GET(
         "away_value changed",
         matchup.away_value,
         dataMatchup.competitions[0].competitors[1].score,
+        matchup.game_id,
       );
       matchup.away_value = dataMatchup.competitions[0].competitors[1].score;
       changed = true;
