@@ -83,8 +83,11 @@ export async function GET(
     if (matchup.status.toString() !== dataMatchup.status.type.name.toString()) {
       console.log(
         "status changed",
+        "OLD:",
         matchup.status,
+        "NEW:",
         dataMatchup.status.type.name,
+        "GAME ID:",
         matchup.game_id,
       );
       matchup.status = dataMatchup.status.type.name as MatchupStatus;
@@ -97,8 +100,11 @@ export async function GET(
     ) {
       console.log(
         "home_value changed",
+        "OLD:",
         matchup.home_value,
+        "NEW:",
         dataMatchup.competitions[0].competitors[0].score,
+        "GAME ID:",
         matchup.game_id,
       );
       matchup.home_value = dataMatchup.competitions[0].competitors[0].score;
@@ -111,8 +117,11 @@ export async function GET(
     ) {
       console.log(
         "away_value changed",
+        "OLD:",
         matchup.away_value,
+        "NEW:",
         dataMatchup.competitions[0].competitors[1].score,
+        "GAME ID:",
         matchup.game_id,
       );
       matchup.away_value = dataMatchup.competitions[0].competitors[1].score;
@@ -183,13 +192,9 @@ export async function GET(
         [matchup.game_id]: JSON.stringify(matchup),
       });
     }
-    console.log("Promises for DB:", dbPromises.length);
     //REDIS: do all redis writes
     results = await Promise.all([redisPipeline.exec(), ...dbPromises]);
-  } else {
-    console.log("No Changes, skipped DB writes");
   }
-
   return NextResponse.json(results, { status: 200 });
 }
 
