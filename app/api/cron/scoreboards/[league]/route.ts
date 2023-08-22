@@ -160,6 +160,7 @@ export async function GET(
             .set({
               pick_status: pick.pick_status,
               active: false,
+              updated_at: new Date(),
             })
             .where(eq(picks.id, pick.id));
           dbPromises.push(streakPromise);
@@ -173,6 +174,7 @@ export async function GET(
             home_value: updateMatchup.home_value,
             status: updateMatchup.status,
             winner_id: updateMatchup.winner_id,
+            updated_at: new Date(),
           })
           .where(eq(matchups.id, updateMatchup.id));
         dbPromises.push(dbPromise);

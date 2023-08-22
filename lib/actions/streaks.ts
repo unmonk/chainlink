@@ -69,6 +69,7 @@ export async function adjustStreak(type: "WIN" | "LOSS" | "PUSH") {
       wins: streak.wins,
       losses: streak.losses,
       pushes: streak.pushes,
+      updated_at: new Date(),
     })
     .where(eq(streaks.id, streak.id));
 }
@@ -98,6 +99,7 @@ export async function getPromiseByPick(pick: PickWithStreak) {
       wins: pick.streak.wins,
       losses: pick.streak.losses,
       pushes: pick.streak.pushes,
+      updated_at: new Date(),
     })
     .where(eq(streaks.id, pick.streak.id));
 }
