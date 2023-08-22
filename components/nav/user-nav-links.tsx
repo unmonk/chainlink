@@ -27,11 +27,11 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
       </h2>
       <div className="space-y-1">
         <Button
-          variant={pathname === "/dashboard" ? "secondary" : "ghost"}
+          variant={pathname === "/play" ? "secondary" : "ghost"}
           className="w-full justify-start"
           asChild
         >
-          <Link href="/dashboard" prefetch={false}>
+          <Link href="/play" prefetch={false}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Play
           </Link>

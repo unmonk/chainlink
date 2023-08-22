@@ -34,7 +34,7 @@ export async function UserNav() {
         <Separator className="my-4" />
         <UserNavLinks />
         <Separator className="my-4" />
-        <div className="flex flex-col">
+        <div className="flex flex-col items-center">
           <p className="mb-2 px-4 text-xs underline">Announcements</p>
           <p className="mb-2 rounded bg-accent p-2 text-sm">
             Welcome to the Alpha, Join the Discord community to get involved!
