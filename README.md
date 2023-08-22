@@ -1,16 +1,25 @@
 # ChainLink
 
 An open source clone of a popular streak game. Currently in development.
-Choose a team to win a game. If they win, you keep your streak going. If they lose, you start over. How long can you go?
+The objective of the game is to either link together the longest win Chain in a month by selecting consecutive winners OR Win the most matchups in a month, regardless of the length of your Chain.
 
 ## Features
 
-- New Next.js app dir,
-- Server and Client Components
-- API Routes and Middlewares
+- Daily generated matchups from the NBA, WNBA, NHL, MLB, NFL, College Football, and College Basketball.
+- Matchup picks are locked after the game starts.
+- Score updates are provided every 2 minutes.
+- Leaderboard to see how you stack up against the competition.
+- Streaks are tracked and displayed on the leaderboard, and your profile.
+
+[![Preview](/public/images/screenshot.png "Preview")](https://chainlink.st)
+
+## Tech Stack
+
+- Built using **Next.js**
 - Authentication using **Clerk**
 - ORM using **Drizzle**
 - Database on **Planetscale**
+- Caching using **Upstash Redis**
 - UI Components built using **Radix UI** and **Shadcn/ui**
 - Styled using **Tailwind CSS**
 - Written in **TypeScript** ... mostly
@@ -19,22 +28,14 @@ Choose a team to win a game. If they win, you keep your streak going. If they lo
 - CRON Jobs
 - Webhooks
 
-## Running Locally
+### Roadmap
 
-1. Install dependencies using npm:
-
-```sh
-npm install
-```
-
-2. Copy `.env.example` to `.env.local` and update the variables.
-
-```sh
-cp .env.example .env.local
-```
-
-3. Start the development server:
-
-```sh
-npm run dev
-```
+- [ ] Groups
+- [ ] Group Leaderboards
+- [ ] Notifications
+- [ ] Pick Temperature Gauge
+- [ ] Pick Confidence
+- [ ] Admin Panel: Control Crons
+- [ ] Admin Panel: CRUD Matchups
+- [ ] Admin Panel: View Active Picks
+- [ ] Groups: Create Custom Streak Campaign
