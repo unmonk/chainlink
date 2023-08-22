@@ -9,7 +9,7 @@ import {
   picks,
 } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
-import { and, eq, ne } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function makePick(pick: NewPick) {
@@ -68,4 +68,16 @@ export async function setPicksInProgress(matchupId: number) {
       eq(picks.matchup_id, matchupId) &&
         ne(picks.pick_status, "STATUS_IN_PROGRESS"),
     );
+}
+
+export async function getUserPicks(userId: string) {
+  const userPicks = await db.query.picks.findMany({
+    where: eq(picks.user_id, userId),
+    with: {
+      matchup: true,
+    },
+    limit: 10,
+    orderBy: desc(picks.updated_at),
+  });
+  return userPicks;
 }

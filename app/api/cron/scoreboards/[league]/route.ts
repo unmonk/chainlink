@@ -12,6 +12,7 @@ import { supportedLeagues } from "@/lib/config";
 import { handleStatusFinal, handleStatusInProgress } from "@/lib/matchupUtils";
 import { redis } from "@/lib/redis";
 import { getPacifictime } from "@/lib/utils";
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -135,7 +136,7 @@ export async function GET(
         const updateMatchup = handleStatusFinal(matchup);
         //handle picks per matchup
         const fetchedPicks = await getMatchupPicks(matchup.id);
-        const pickUpdates = fetchedPicks.map((pick) => {
+        fetchedPicks.forEach((pick) => {
           if (
             (pick.pick_type === "AWAY" &&
               matchup.winner_id === matchup.away_id) ||
@@ -154,22 +155,26 @@ export async function GET(
             pick.pick_status = "PUSH";
           }
           const streakPromise = getPromiseByPick(pick);
+          const pickPromise = db
+            .update(picks)
+            .set({
+              pick_status: pick.pick_status,
+              active: false,
+            })
+            .where(eq(picks.id, pick.id));
           dbPromises.push(streakPromise);
-
-          return db.update(picks).set({
-            pick_status: pick.pick_status,
-            active: false,
-          });
+          dbPromises.push(pickPromise);
         });
 
-        dbPromises.push(...pickUpdates);
-
-        const dbPromise = db.update(matchups).set({
-          away_value: updateMatchup.away_value,
-          home_value: updateMatchup.home_value,
-          status: updateMatchup.status,
-          winner_id: updateMatchup.winner_id,
-        });
+        const dbPromise = db
+          .update(matchups)
+          .set({
+            away_value: updateMatchup.away_value,
+            home_value: updateMatchup.home_value,
+            status: updateMatchup.status,
+            winner_id: updateMatchup.winner_id,
+          })
+          .where(eq(matchups.id, updateMatchup.id));
         dbPromises.push(dbPromise);
       }
       redisPipeline.hset(`MATCHUPS:${date.redis}`, {
