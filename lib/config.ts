@@ -25,7 +25,7 @@ export const supportedLeagues = [
   "NBA",
   "MLB",
   "NHL",
-  "CFB",
+  "COLLEGE-FOOTBALL",
   "MBB",
   "WBB",
   "WNBA",

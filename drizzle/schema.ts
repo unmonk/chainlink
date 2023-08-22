@@ -23,7 +23,7 @@ export const leagues = mysqlEnum("leagues", [
   "NBA",
   "MLB",
   "NHL",
-  "CFB",
+  "COLLEGE-FOOTBALL",
   "MBB",
   "WBB",
   "WNBA",
@@ -35,7 +35,7 @@ export type League =
   | "NBA"
   | "MLB"
   | "NHL"
-  | "CFB"
+  | "COLLEGE-FOOTBALL"
   | "MBB"
   | "WBB"
   | "WNBA"
