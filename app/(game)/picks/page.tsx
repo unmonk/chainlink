@@ -22,37 +22,16 @@ export default async function UserPicksPage() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Matchup</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead>Your Pick</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Matchup</TableHead>
+            <TableHead>Date</TableHead>
             <TableHead>League</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {picks.map((pick) => (
             <TableRow key={pick.id}>
-              <TableCell>
-                {pick.matchup.start_time.toLocaleDateString("en-US", {
-                  timeZone: "America/Los_Angeles",
-                })}
-              </TableCell>
-              <TableCell>{pick.matchup.question}</TableCell>
-              <TableCell
-                className={
-                  pick.pick_status === "WIN"
-                    ? "text-green-500"
-                    : pick.pick_status === "LOSS"
-                    ? "text-red-500"
-                    : pick.pick_status === "STATUS_IN_PROGRESS"
-                    ? "text-yellow-500"
-                    : "text-sm"
-                }
-              >
-                {pick.pick_status === "STATUS_IN_PROGRESS"
-                  ? "In Progress..."
-                  : pick.pick_status}
-              </TableCell>
               <TableCell className="flex flex-row items-center gap-2 text-left">
                 <Image
                   src={
@@ -73,6 +52,27 @@ export default async function UserPicksPage() {
                     ? pick.matchup.home_team
                     : pick.matchup.away_team}
                 </p>
+              </TableCell>
+              <TableCell
+                className={
+                  pick.pick_status === "WIN"
+                    ? "text-green-500"
+                    : pick.pick_status === "LOSS"
+                    ? "text-red-500"
+                    : pick.pick_status === "STATUS_IN_PROGRESS"
+                    ? "text-yellow-500"
+                    : "text-sm"
+                }
+              >
+                {pick.pick_status === "STATUS_IN_PROGRESS"
+                  ? "In Progress..."
+                  : pick.pick_status}
+              </TableCell>
+              <TableCell>{pick.matchup.question}</TableCell>
+              <TableCell>
+                {pick.matchup.start_time.toLocaleDateString("en-US", {
+                  timeZone: "America/Los_Angeles",
+                })}
               </TableCell>
               <TableCell>{pick.matchup.league}</TableCell>
             </TableRow>

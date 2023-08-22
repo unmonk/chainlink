@@ -14,7 +14,7 @@ export default function Home() {
         </h1>
       </div>
       <div className="flex gap-3">
-        <Link href={"/dashboard"}>
+        <Link href={"/play"}>
           <Button>Play Now</Button>
         </Link>
         <Link href={siteConfig.discordInvite}>

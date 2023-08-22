@@ -37,16 +37,6 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           </Link>
         </Button>
         <Button
-          variant={pathname === "/leaderboards" ? "secondary" : "ghost"}
-          className="w-full justify-start"
-          asChild
-        >
-          <Link href="/leaderboards">
-            <Trophy className="mr-2 h-4 w-4" />
-            Leaderboards
-          </Link>
-        </Button>
-        <Button
           variant={pathname === "/picks" ? "secondary" : "ghost"}
           className="w-full justify-start"
           asChild
@@ -54,6 +44,16 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           <Link href="/picks">
             <CalendarSearchIcon className="mr-2 h-4 w-4" />
             My Picks
+          </Link>
+        </Button>
+        <Button
+          variant={pathname === "/leaderboards" ? "secondary" : "ghost"}
+          className="w-full justify-start"
+          asChild
+        >
+          <Link href="/leaderboards">
+            <Trophy className="mr-2 h-4 w-4" />
+            Leaderboards
           </Link>
         </Button>
         <Button

@@ -59,7 +59,7 @@ export async function getMatchupPicks(
 }
 
 export async function setPicksInProgress(matchupId: number) {
-  await db
+  return db
     .update(picks)
     .set({
       pick_status: "STATUS_IN_PROGRESS",
