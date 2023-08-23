@@ -17,87 +17,6 @@ import {
   unique,
 } from "drizzle-orm/mysql-core";
 
-//Enums
-export const leagues = mysqlEnum("leagues", [
-  "NFL",
-  "NBA",
-  "MLB",
-  "NHL",
-  "COLLEGE-FOOTBALL",
-  "MBB",
-  "WBB",
-  "WNBA",
-  "NCAA",
-  "OTHER",
-]);
-export type League =
-  | "NFL"
-  | "NBA"
-  | "MLB"
-  | "NHL"
-  | "COLLEGE-FOOTBALL"
-  | "MBB"
-  | "WBB"
-  | "WNBA"
-  | "NCAA";
-
-const matchup_status = mysqlEnum("matchup_status", [
-  "STATUS_IN_PROGRESS",
-  "STATUS_FINAL",
-  "STATUS_SCHEDULED",
-  "STATUS_POSTPONED",
-  "STATUS_CANCELED",
-  "STATUS_SUSPENDED",
-  "STATUS_DELAYED",
-  "STATUS_UNKNOWN",
-]);
-
-export type MatchupStatus =
-  | "STATUS_IN_PROGRESS"
-  | "STATUS_FINAL"
-  | "STATUS_SCHEDULED"
-  | "STATUS_POSTPONED"
-  | "STATUS_CANCELED"
-  | "STATUS_SUSPENDED"
-  | "STATUS_DELAYED"
-  | "STATUS_UNKNOWN";
-
-const operators = mysqlEnum("operators", [
-  "LESS_THAN",
-  "GREATER_THAN",
-  "EQUAL_TO",
-  "NOT_EQUAL_TO",
-  "LESS_THAN_OR_EQUAL_TO",
-  "GREATER_THAN_OR_EQUAL_TO",
-]);
-
-export type Operator =
-  | "LESS_THAN"
-  | "GREATER_THAN"
-  | "EQUAL_TO"
-  | "NOT_EQUAL_TO"
-  | "LESS_THAN_OR_EQUAL_TO"
-  | "GREATER_THAN_OR_EQUAL_TO";
-
-const pick_type = mysqlEnum("pick_type", ["HOME", "AWAY"]);
-export type PickType = "HOME" | "AWAY";
-
-const pick_status = mysqlEnum("pick_status", [
-  "PENDING",
-  "WIN",
-  "LOSS",
-  "PUSH",
-  "STATUS_IN_PROGRESS",
-  "STATUS_UNKNOWN",
-]);
-export type PickStatus =
-  | "PENDING"
-  | "WIN"
-  | "LOSS"
-  | "PUSH"
-  | "STATUS_IN_PROGRESS"
-  | "STATUS_UNKNOWN";
-
 //Tables
 
 export const campaigns = mysqlTable(
@@ -142,9 +61,36 @@ export const matchups = mysqlTable(
     game_id: varchar("game_id", {
       length: 64,
     }).notNull(),
-    status: matchup_status.notNull().default("STATUS_SCHEDULED"),
-    league: leagues.notNull(),
-    operator: operators.notNull(),
+    status: mysqlEnum("status", [
+      "STATUS_IN_PROGRESS",
+      "STATUS_FINAL",
+      "STATUS_SCHEDULED",
+      "STATUS_POSTPONED",
+      "STATUS_CANCELED",
+      "STATUS_SUSPENDED",
+      "STATUS_DELAYED",
+      "STATUS_UNKNOWN",
+    ]).notNull(),
+    league: mysqlEnum("leagues", [
+      "NFL",
+      "NBA",
+      "MLB",
+      "NHL",
+      "COLLEGE-FOOTBALL",
+      "MBB",
+      "WBB",
+      "WNBA",
+      "NCAA",
+      "OTHER",
+    ]).notNull(),
+    operator: mysqlEnum("operator", [
+      "LESS_THAN",
+      "GREATER_THAN",
+      "EQUAL_TO",
+      "NOT_EQUAL_TO",
+      "LESS_THAN_OR_EQUAL_TO",
+      "GREATER_THAN_OR_EQUAL_TO",
+    ]).notNull(),
     network: varchar("network", {
       length: 32,
     })
@@ -163,7 +109,14 @@ export const matchups = mysqlTable(
     home_win_condition: varchar("home_win_condition", {
       length: 64,
     }).notNull(),
-    home_win_condition_operator: operators,
+    home_win_condition_operator: mysqlEnum("home_win_condition_operator", [
+      "LESS_THAN",
+      "GREATER_THAN",
+      "EQUAL_TO",
+      "NOT_EQUAL_TO",
+      "LESS_THAN_OR_EQUAL_TO",
+      "GREATER_THAN_OR_EQUAL_TO",
+    ]),
     home_win_condition_value: mediumint("home_win_condition_value"),
     away_value: mediumint("away_value").notNull().default(0),
     away_team: varchar("away_team", {
@@ -178,7 +131,14 @@ export const matchups = mysqlTable(
     away_win_condition: varchar("away_win_condition", {
       length: 64,
     }).notNull(),
-    away_win_condition_operator: operators,
+    away_win_condition_operator: mysqlEnum("away_win_condition_operator", [
+      "LESS_THAN",
+      "GREATER_THAN",
+      "EQUAL_TO",
+      "NOT_EQUAL_TO",
+      "LESS_THAN_OR_EQUAL_TO",
+      "GREATER_THAN_OR_EQUAL_TO",
+    ]),
     away_win_condition_value: mediumint("away_win_condition_value"),
     winner_id: varchar("winner_id", {
       length: 64,
@@ -239,11 +199,20 @@ export const picks = mysqlTable(
     streak_id: bigint("streak_id", {
       mode: "number",
     }),
-    pick_type: pick_type.notNull(),
+    pick_type: mysqlEnum("pick_type", ["HOME", "AWAY"]).notNull(),
     active: boolean("active").notNull().default(true),
     created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
     updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
-    pick_status: pick_status.notNull().default("PENDING"),
+    pick_status: mysqlEnum("pick_status", [
+      "PENDING",
+      "WIN",
+      "LOSS",
+      "PUSH",
+      "STATUS_IN_PROGRESS",
+      "STATUS_UNKNOWN",
+    ])
+      .notNull()
+      .default("PENDING"),
   },
   (table) => {
     return {
@@ -318,3 +287,42 @@ export type PickWithMatchupAndStreak = Pick & {
   matchup: Matchup;
   streak: Streak;
 };
+
+export type League =
+  | "NFL"
+  | "NBA"
+  | "MLB"
+  | "NHL"
+  | "COLLEGE-FOOTBALL"
+  | "MBB"
+  | "WBB"
+  | "WNBA"
+  | "NCAA";
+
+export type MatchupStatus =
+  | "STATUS_IN_PROGRESS"
+  | "STATUS_FINAL"
+  | "STATUS_SCHEDULED"
+  | "STATUS_POSTPONED"
+  | "STATUS_CANCELED"
+  | "STATUS_SUSPENDED"
+  | "STATUS_DELAYED"
+  | "STATUS_UNKNOWN";
+
+export type Operator =
+  | "LESS_THAN"
+  | "GREATER_THAN"
+  | "EQUAL_TO"
+  | "NOT_EQUAL_TO"
+  | "LESS_THAN_OR_EQUAL_TO"
+  | "GREATER_THAN_OR_EQUAL_TO";
+
+export type PickType = "HOME" | "AWAY";
+
+export type PickStatus =
+  | "PENDING"
+  | "WIN"
+  | "LOSS"
+  | "PUSH"
+  | "STATUS_IN_PROGRESS"
+  | "STATUS_UNKNOWN";
