@@ -9,15 +9,9 @@ import { and, eq } from "drizzle-orm";
 export async function getStreak() {
   const { userId } = auth();
   if (!userId) return null;
-  let streak = await db.query.streaks.findFirst({
+  const streak = await db.query.streaks.findFirst({
     where: and(eq(streaks.user_id, userId), eq(streaks.active, true)),
   });
-  if (!streak) {
-    await createStreak();
-    streak = await db.query.streaks.findFirst({
-      where: and(eq(streaks.user_id, userId), eq(streaks.active, true)),
-    });
-  }
   return streak;
 }
 
@@ -28,11 +22,17 @@ export async function createStreak(userId?: string | null) {
   if (!userId) {
     throw new Error("No user id");
   }
+  const streak = await db.query.streaks.findFirst({
+    where: and(eq(streaks.user_id, userId), eq(streaks.active, true)),
+  });
+  if (streak) {
+    console.log("STREAK ALREADY EXISTS");
+    return;
+  }
   const campaign = await getActiveCampaign();
   if (!campaign) {
     throw new Error("No active campaign");
   }
-
   const newStreak: NewStreak = {
     campaign_id: campaign.id,
     user_id: userId,
