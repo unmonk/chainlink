@@ -1,4 +1,4 @@
-# ChainLink
+# 🔗ChainLink🔗
 
 An open source clone of a popular streak game. Currently in development.
 The objective of the game is to either link together the longest win Chain in a month by selecting consecutive winners OR Win the most matchups in a month, regardless of the length of your Chain.
