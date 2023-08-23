@@ -9,20 +9,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { db } from "@/drizzle/db";
-import { Matchup, picks } from "@/drizzle/schema";
 import { getMatchups } from "@/lib/actions/matchups";
 import { getPick } from "@/lib/actions/picks";
-import { redis } from "@/lib/redis";
-import { getPacifictime } from "@/lib/utils";
 import { auth, redirectToSignIn } from "@clerk/nextjs";
-import { and, eq } from "drizzle-orm";
-import {
-  CalendarClockIcon,
-  EyeIcon,
-  HistoryIcon,
-  LockIcon,
-} from "lucide-react";
+import { CalendarClockIcon, HistoryIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
