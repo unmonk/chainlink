@@ -33,7 +33,7 @@ export default function HowToPlayPage() {
           </p>
         </div>
 
-        <ul className="list-disc my-4 p-4">
+        <ul className="list-disc my-4 p-4 text-sm">
           <li className="list-item my-2 shadow-md rounded-md p-1">
             Pick the winner on matchups drawn from different sports and events
             from around the world, including NFL, MLB, MLS, WNBA, and College

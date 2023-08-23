@@ -27,6 +27,10 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
     !matchup.away_win_condition_operator &&
     matchup.home_win_condition === matchup.away_win_condition
   ) {
+    console.log("Score vs Score Matchup", matchup.id);
+    console.log("HOME:", matchup.home_id, matchup.home_value);
+    console.log("AWAY:", matchup.away_id, matchup.away_value);
+
     switch (matchup.operator) {
       case "GREATER_THAN": {
         if (matchup.home_value > matchup.away_value) {
@@ -74,6 +78,7 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
       }
     }
   }
+  console.log("Winner: ", matchup.winner_id);
   return matchup;
 }
 
