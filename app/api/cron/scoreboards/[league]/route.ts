@@ -64,14 +64,14 @@ export async function GET(
   }
 
   const data = await scoreboardRes.value.json();
-  const ourData = currentMatchupsRes.value;
+  const redisData = currentMatchupsRes.value;
 
   //loop through our data and update with espn data
   const changedMatchups: Matchup[] = [];
   const changedFields = [];
-  for (const game_id in ourData) {
+  for (const game_id in redisData) {
     let changed = false;
-    const matchup = ourData[game_id] as Matchup;
+    const matchup = redisData[game_id] as Matchup;
     //TODO: Type for event
     const dataMatchup = data.events.find(
       (event: any) => event.id === matchup.game_id,
@@ -137,10 +137,13 @@ export async function GET(
   if (changedMatchups.length > 0) {
     const dbPromises = [];
     for (let matchup of changedMatchups) {
+      //HANDLE MATCHUPS THAT RE STATUS_IN_PROGRESS
       if (matchup.status === "STATUS_IN_PROGRESS") {
         const pickUpdates = handleStatusInProgress(matchup);
         dbPromises.push(pickUpdates);
       }
+
+      //HANDLE MATCHUPS THAT ARE STATUS_FINAL
       if (matchup.status === "STATUS_FINAL") {
         const updateMatchup = handleStatusFinal(matchup);
         //handle picks per matchup
@@ -187,7 +190,10 @@ export async function GET(
           })
           .where(eq(matchups.id, updateMatchup.id));
         dbPromises.push(dbPromise);
+        //END FINAL MATCHUP HANDLING
       }
+
+      //REDIS SET MATCHUP
       redisPipeline.hset(`MATCHUPS:${date.redis}`, {
         [matchup.game_id]: JSON.stringify(matchup),
       });
