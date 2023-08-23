@@ -5,8 +5,8 @@ import {
   getScheduleVariables,
   makeWhoWillWinQuestions,
 } from "@/lib/matchupUtils";
+import { redis } from "@/lib/redis";
 import { getPacifictime } from "@/lib/utils";
-import { Redis } from "@upstash/redis";
 import { and, gte, lte } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -30,10 +30,6 @@ export async function GET(
   }
 
   //REDIS: setup redis client
-  const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL!,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-  });
   const redisPipeline = redis.pipeline();
 
   //Get current date
@@ -63,11 +59,12 @@ export async function GET(
 
   //Transform Schedule Data into Matchups
   let formattedSchedules = getScheduleVariables(schedule, league);
-  formattedSchedules = makeWhoWillWinQuestions(formattedSchedules);
-  const formattedMatchups = formattedSchedules.map((matchup) => {
-    return {
-      ...matchup,
-    } as NewMatchup;
+  const formattedMatchups = makeWhoWillWinQuestions(
+    formattedSchedules,
+  ) as NewMatchup[];
+
+  formattedMatchups.sort((a, b) => {
+    return a.start_time!.getTime() - b.start_time!.getTime();
   });
 
   //get the date range of formattedMatchups
@@ -87,10 +84,13 @@ export async function GET(
   const updatedMatchups: Matchup[] = [];
   const newMatchups = formattedMatchups.filter((formattedMatchup) => {
     let isUpdated = false;
+    //Check if matchup exists in db
     const dbMatchup = dbMatchups.find(
       (dbMatchup) => dbMatchup.game_id === formattedMatchup.game_id,
     );
+    //If not, add to newMatchups
     if (!dbMatchup) return true;
+
     //Check for updated matchups
     //TODO: Check start time
     if (formattedMatchup.status !== dbMatchup.status) {

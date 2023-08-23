@@ -31,7 +31,7 @@ export async function getAllTimeWinsLeaderboard() {
     .from(streaks)
     .groupBy(streaks.user_id)
     .orderBy(desc(sql<number>`sum(${streaks.wins})`))
-    .limit(10)) as AllTimeWithUsers[];
+    .limit(25)) as AllTimeWithUsers[];
 
   const userIds = result.map((streak) => streak.user_id);
   //get matching users from clerk
@@ -58,7 +58,7 @@ export async function getCurrentLeaderboardByStreak() {
   const result = (await db.query.streaks.findMany({
     where: eq(streaks.active, true),
     orderBy: desc(streaks.streak),
-    limit: 10,
+    limit: 25,
   })) as StreakWithUsers[];
 
   const userIds = result.map((streak) => streak.user_id);
@@ -86,7 +86,7 @@ export async function getCurrentLeaderboardByWins() {
   const result = (await db.query.streaks.findMany({
     where: eq(streaks.active, true),
     orderBy: desc(streaks.wins),
-    limit: 10,
+    limit: 25,
   })) as StreakWithUsers[];
 
   const userIds = result.map((streak) => streak.user_id);
