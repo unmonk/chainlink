@@ -127,7 +127,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
                   size={"icon"}
                   asChild
                 >
-                  <Link href={f ? "/dashboard" : "/dashboard?f=inprogress"}>
+                  <Link href={f ? "/play" : "/play?f=inprogress"}>
                     <CalendarClockIcon />
                     {f ? "Show All" : "Hide"}
                   </Link>
