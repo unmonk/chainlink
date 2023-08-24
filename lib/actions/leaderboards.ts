@@ -38,6 +38,7 @@ export async function getAllTimeWinsLeaderboard() {
   const users = await clerkClient.users.getUserList({
     userId: userIds,
   });
+  console.log(users);
   result.forEach((streak) => {
     const user = users.find((user) => user.id === streak.user_id);
     streak.user = {
