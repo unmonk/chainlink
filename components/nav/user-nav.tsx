@@ -1,3 +1,5 @@
+"use client";
+
 import UserNavLinks from "@/components/nav/user-nav-links";
 import { StreakDisplay } from "@/components/streaks/streak-display";
 import { Button } from "@/components/ui/button";
@@ -11,15 +13,18 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import UserAvatar from "@/components/user-avatar";
+import { useNav } from "@/hooks/useNav";
 
-export async function UserNav() {
+export function UserNav() {
+  const { open, setOpen } = useNav();
+
   return (
-    <Sheet>
+    <Sheet onOpenChange={setOpen} open={open}>
       <SheetTrigger asChild>
         <Button variant={"secondary"}>
           <div className="flex flex-row items-center">
             <div className="flex flex-col">
-              <StreakDisplay />
+              <StreakDisplay size="default" />
             </div>
             <UserAvatar />
           </div>

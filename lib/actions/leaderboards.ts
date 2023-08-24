@@ -35,6 +35,7 @@ export async function getAllTimeWinsLeaderboard() {
     .limit(25)) as AllTimeWithUsers[];
 
   const userIds = result.map((streak) => streak.user_id);
+
   //get matching users from clerk
   const users = await clerkClient.users.getUserList({
     userId: userIds,
@@ -53,6 +54,8 @@ export async function getAllTimeWinsLeaderboard() {
       image: user?.imageUrl ?? "",
     };
   });
+
+  //Remove Test Account
 
   return result;
 }
@@ -95,6 +98,7 @@ export async function getCurrentLeaderboardByWins() {
   })) as StreakWithUsers[];
 
   const userIds = result.map((streak) => streak.user_id);
+
   //get matching users from clerk
   const users = await clerkClient.users.getUserList({
     userId: userIds,

@@ -55,7 +55,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
           </div>
           <Separator className="my-2 hidden xl:flex" />
           <div className="hidden lg:flex flex-col justify-center text-center text-xl">
-            <StreakDisplay />
+            <StreakDisplay size="xl" />
           </div>
 
           {pick && (
