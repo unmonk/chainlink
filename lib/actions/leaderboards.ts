@@ -45,9 +45,11 @@ export async function getAllTimeWinsLeaderboard() {
         user?.username ||
         user?.externalAccounts[0]?.username ||
         user?.firstName ||
+        user?.id ||
         "",
-      image: user?.imageUrl || "",
+      image: user?.imageUrl ?? "",
     };
+    console.log(streak.user);
   });
 
   return result;
@@ -73,11 +75,11 @@ export async function getCurrentLeaderboardByStreak() {
         user?.username ||
         user?.externalAccounts[0]?.username ||
         user?.firstName ||
+        user?.id ||
         "",
-      image: user?.imageUrl || "",
+      image: user?.imageUrl ?? "",
     };
   });
-  console.log(result);
   return result;
 }
 
@@ -102,7 +104,7 @@ export async function getCurrentLeaderboardByWins() {
         user?.externalAccounts[0]?.username ||
         user?.firstName ||
         "",
-      image: user?.imageUrl || "",
+      image: user?.imageUrl ?? "",
     };
   });
 

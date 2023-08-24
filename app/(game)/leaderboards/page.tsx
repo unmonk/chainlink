@@ -40,6 +40,7 @@ export default async function Leaderboards() {
       <h1 className="w-full text-center text-4xl text-primary font-semibold">
         Leaderboards
       </h1>
+      <h4 className="w-full text-center ">Top 25</h4>
       <Tabs defaultValue="streak" className="w-full mt-2">
         <TabsList className="grid w-full md:w-5/6 xl:w-2/3 m-auto grid-cols-3">
           <TabsTrigger value="streak">Current Streak</TabsTrigger>
