@@ -35,15 +35,11 @@ export async function getAllTimeWinsLeaderboard() {
     .limit(25)) as AllTimeWithUsers[];
 
   const userIds = result.map((streak) => streak.user_id);
-  console.log(userIds);
-  console.log(userIds.length);
   //get matching users from clerk
   const users = await clerkClient.users.getUserList({
     userId: userIds,
     limit: 25,
   });
-
-  console.log(users.length);
 
   result.forEach((streak) => {
     const user = users.find((user) => user.id === streak.user_id);
@@ -73,6 +69,7 @@ export async function getCurrentLeaderboardByStreak() {
   //get matching users from clerk
   const users = await clerkClient.users.getUserList({
     userId: userIds,
+    limit: 25,
   });
   result.forEach((streak) => {
     const user = users.find((user) => user.id === streak.user_id);
@@ -101,6 +98,7 @@ export async function getCurrentLeaderboardByWins() {
   //get matching users from clerk
   const users = await clerkClient.users.getUserList({
     userId: userIds,
+    limit: 25,
   });
   result.forEach((streak) => {
     const user = users.find((user) => user.id === streak.user_id);
