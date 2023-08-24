@@ -50,14 +50,6 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
             matchup.away_value > matchup.home_value,
           );
           matchup.winner_id = matchup.away_id;
-        } else {
-          console.log(
-            "TIE",
-            matchup.home_value,
-            matchup.away_value,
-            matchup.home_value === matchup.away_value,
-          );
-          matchup.winner_id = null;
         }
         break;
       }
@@ -68,8 +60,6 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
         }
         if (matchup.away_value < matchup.home_value) {
           matchup.winner_id = matchup.away_id;
-        } else {
-          matchup.winner_id = null;
         }
         break;
       }
@@ -80,8 +70,6 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
         }
         if (matchup.away_value >= matchup.home_value) {
           matchup.winner_id = matchup.away_id;
-        } else {
-          matchup.winner_id = null;
         }
         break;
       }
@@ -92,8 +80,6 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
         }
         if (matchup.away_value <= matchup.home_value) {
           matchup.winner_id = matchup.away_id;
-        } else {
-          matchup.winner_id = null;
         }
         break;
       }

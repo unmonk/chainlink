@@ -77,7 +77,7 @@ export async function getCurrentLeaderboardByStreak() {
       image: user?.imageUrl || "",
     };
   });
-
+  console.log(result);
   return result;
 }
 

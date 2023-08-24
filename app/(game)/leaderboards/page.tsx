@@ -17,8 +17,10 @@ import {
   getCurrentLeaderboardByWins,
 } from "@/lib/actions/leaderboards";
 import { cn } from "@/lib/utils";
+import { auth } from "@clerk/nextjs";
 
 export default async function Leaderboards() {
+  const { userId } = auth();
   const leaderboardByStreakPromise = getCurrentLeaderboardByStreak();
   const leaderboardByWinsPromise = getCurrentLeaderboardByWins();
   const allTimeWinsPromise = getAllTimeWinsLeaderboard();
@@ -41,7 +43,7 @@ export default async function Leaderboards() {
       <Tabs defaultValue="streak" className="w-full mt-2">
         <TabsList className="grid w-full md:w-5/6 xl:w-2/3 m-auto grid-cols-3">
           <TabsTrigger value="streak">Current Streak</TabsTrigger>
-          <TabsTrigger value="wins">Current Wins</TabsTrigger>
+          <TabsTrigger value="wins">Campaign Wins</TabsTrigger>
           <TabsTrigger value="alltime">All Time Wins</TabsTrigger>
         </TabsList>
         <TabsContent value="streak">
@@ -59,7 +61,10 @@ export default async function Leaderboards() {
             </TableHeader>
             <TableBody>
               {streakLeaderboard.map((leaderboard, idx) => (
-                <TableRow key={leaderboard.id}>
+                <TableRow
+                  key={leaderboard.id}
+                  className={leaderboard.user_id === userId ? "bg-accent" : ""}
+                >
                   <TableCell className="lg:text-xl font-bold">
                     {idx + 1}
                   </TableCell>
