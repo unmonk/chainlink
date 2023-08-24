@@ -32,17 +32,37 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
 
     switch (matchup.operator) {
       case "GREATER_THAN": {
+        console.log("GREATER_THAN");
         if (matchup.home_value > matchup.away_value) {
+          console.log(
+            "HOME WINS",
+            matchup.home_value,
+            matchup.away_value,
+            matchup.home_value > matchup.away_value,
+          );
           matchup.winner_id = matchup.home_id;
         }
         if (matchup.away_value > matchup.home_value) {
+          console.log(
+            "AWAY WINS",
+            matchup.away_value,
+            matchup.home_value,
+            matchup.away_value > matchup.home_value,
+          );
           matchup.winner_id = matchup.away_id;
         } else {
+          console.log(
+            "TIE",
+            matchup.home_value,
+            matchup.away_value,
+            matchup.home_value === matchup.away_value,
+          );
           matchup.winner_id = null;
         }
         break;
       }
       case "LESS_THAN": {
+        console.log("LESS_THAN");
         if (matchup.home_value < matchup.away_value) {
           matchup.winner_id = matchup.home_id;
         }
@@ -54,6 +74,7 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
         break;
       }
       case "GREATER_THAN_OR_EQUAL_TO": {
+        console.log("GREATER_THAN_OR_EQUAL_TO");
         if (matchup.home_value >= matchup.away_value) {
           matchup.winner_id = matchup.home_id;
         }
@@ -65,6 +86,7 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
         break;
       }
       case "LESS_THAN_OR_EQUAL_TO": {
+        console.log("LESS_THAN_OR_EQUAL_TO");
         if (matchup.home_value <= matchup.away_value) {
           matchup.winner_id = matchup.home_id;
         }
