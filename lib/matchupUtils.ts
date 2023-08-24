@@ -23,8 +23,8 @@ export function handleStatusFinal(matchup: Matchup) {
 export function handleScorevsScoreMatchup(matchup: Matchup) {
   if (
     matchup.operator &&
-    matchup.home_win_condition === matchup.away_win_condition &&
-    matchup.home_win_condition === "score"
+    matchup.home_win_condition === "score" &&
+    matchup.home_win_condition === matchup.away_win_condition
   ) {
     console.log("Score vs Score Matchup", matchup.id);
     console.log("HOME:", matchup.home_id, matchup.home_value);
@@ -73,10 +73,6 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
         } else {
           matchup.winner_id = null;
         }
-        break;
-      }
-      default: {
-        matchup.winner_id = null;
         break;
       }
     }
