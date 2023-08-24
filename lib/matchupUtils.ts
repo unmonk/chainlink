@@ -23,9 +23,8 @@ export function handleStatusFinal(matchup: Matchup) {
 export function handleScorevsScoreMatchup(matchup: Matchup) {
   if (
     matchup.operator &&
-    !matchup.home_win_condition_operator &&
-    !matchup.away_win_condition_operator &&
-    matchup.home_win_condition === matchup.away_win_condition
+    matchup.home_win_condition === matchup.away_win_condition &&
+    matchup.home_win_condition === "score"
   ) {
     console.log("Score vs Score Matchup", matchup.id);
     console.log("HOME:", matchup.home_id, matchup.home_value);
@@ -35,7 +34,8 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
       case "GREATER_THAN": {
         if (matchup.home_value > matchup.away_value) {
           matchup.winner_id = matchup.home_id;
-        } else if (matchup.away_value > matchup.home_value) {
+        }
+        if (matchup.away_value > matchup.home_value) {
           matchup.winner_id = matchup.away_id;
         } else {
           matchup.winner_id = null;
@@ -45,7 +45,8 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
       case "LESS_THAN": {
         if (matchup.home_value < matchup.away_value) {
           matchup.winner_id = matchup.home_id;
-        } else if (matchup.away_value < matchup.home_value) {
+        }
+        if (matchup.away_value < matchup.home_value) {
           matchup.winner_id = matchup.away_id;
         } else {
           matchup.winner_id = null;
@@ -55,7 +56,8 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
       case "GREATER_THAN_OR_EQUAL_TO": {
         if (matchup.home_value >= matchup.away_value) {
           matchup.winner_id = matchup.home_id;
-        } else if (matchup.away_value >= matchup.home_value) {
+        }
+        if (matchup.away_value >= matchup.home_value) {
           matchup.winner_id = matchup.away_id;
         } else {
           matchup.winner_id = null;
@@ -65,7 +67,8 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
       case "LESS_THAN_OR_EQUAL_TO": {
         if (matchup.home_value <= matchup.away_value) {
           matchup.winner_id = matchup.home_id;
-        } else if (matchup.away_value <= matchup.home_value) {
+        }
+        if (matchup.away_value <= matchup.home_value) {
           matchup.winner_id = matchup.away_id;
         } else {
           matchup.winner_id = null;
