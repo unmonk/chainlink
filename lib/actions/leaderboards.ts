@@ -1,6 +1,7 @@
+import { redis } from "../redis";
 import { db } from "@/drizzle/db";
 import { Campaign, Streak, streaks } from "@/drizzle/schema";
-import { clerkClient } from "@clerk/nextjs";
+import { clerkClient, redirectToSignIn } from "@clerk/nextjs";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 
 export type StreakWithUsers = Streak & {
@@ -38,6 +39,9 @@ export async function getAllTimeWinsLeaderboard() {
   const users = await clerkClient.users.getUserList({
     userId: userIds,
   });
+  redis.hset("CLERK_DEBUG", {
+    users: JSON.stringify(users),
+  });
   console.log(users);
   result.forEach((streak) => {
     const user = users.find((user) => user.id === streak.user_id);
@@ -50,6 +54,7 @@ export async function getAllTimeWinsLeaderboard() {
         "",
       image: user?.imageUrl ?? "",
     };
+
     console.log(streak.user);
   });
 
