@@ -35,14 +35,16 @@ export async function getAllTimeWinsLeaderboard() {
     .limit(25)) as AllTimeWithUsers[];
 
   const userIds = result.map((streak) => streak.user_id);
+  console.log(userIds);
+  console.log(userIds.length);
   //get matching users from clerk
   const users = await clerkClient.users.getUserList({
     userId: userIds,
+    limit: 25,
   });
-  redis.hset("CLERK_DEBUG", {
-    users: JSON.stringify(users),
-  });
-  console.log(users);
+
+  console.log(users.length);
+
   result.forEach((streak) => {
     const user = users.find((user) => user.id === streak.user_id);
     streak.user = {
@@ -54,8 +56,6 @@ export async function getAllTimeWinsLeaderboard() {
         "",
       image: user?.imageUrl ?? "",
     };
-
-    console.log(streak.user);
   });
 
   return result;
