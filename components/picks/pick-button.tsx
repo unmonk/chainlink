@@ -1,17 +1,6 @@
 "use client";
 
 import { PickModal } from "../modals/pick-modal";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { NewPick, PickType } from "@/drizzle/schema";
@@ -45,6 +34,7 @@ interface PickButtonProps {
   type: PickType;
   disabled?: boolean;
   matchupId: number;
+  winner: boolean;
 }
 
 const pickButtonVariants = cva(
@@ -80,6 +70,7 @@ const PickButton: FC<PickButtonProps> = ({
   disabled,
   matchupId,
   type,
+  winner,
 }) => {
   const [loading, setLoading] = useState(false);
   const { openModal, closeModal, setPick } = usePick();
@@ -115,6 +106,7 @@ const PickButton: FC<PickButtonProps> = ({
         className={cn(pickButtonVariants({ variant, className }), {
           "border-4 animate-border-pulse":
             selected && variant !== "WIN" && variant !== "LOSS",
+          "border-2 border-blue-500": variant === "STATUS_FINAL" && winner,
         })}
         disabled={
           (disabled && !selected) || loading || variant !== "STATUS_SCHEDULED"

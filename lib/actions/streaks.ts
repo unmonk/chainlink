@@ -4,7 +4,7 @@ import { getActiveCampaign } from "./campaign";
 import { db } from "@/drizzle/db";
 import { NewStreak, PickWithStreak, streaks } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
-import { and, eq } from "drizzle-orm";
+import { and, eq, gt } from "drizzle-orm";
 
 export async function getStreak() {
   const { userId } = auth();

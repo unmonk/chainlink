@@ -246,6 +246,7 @@ export const streakRelations = relations(streaks, ({ one, many }) => ({
     fields: [streaks.campaign_id],
     references: [campaigns.id],
   }),
+  picks: many(picks),
 }));
 
 //Types

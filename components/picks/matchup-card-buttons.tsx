@@ -71,6 +71,7 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
               : matchup.status
           }
           selected={activePick?.pick_type === "AWAY"}
+          winner={matchup.winner_id === matchup.away_id}
         />
       </div>
 
@@ -113,6 +114,7 @@ const MatchupCardButtons: FC<MatchupCardButtonProps> = ({
               : matchup.status
           }
           selected={activePick?.pick_type === "HOME"}
+          winner={matchup.winner_id === matchup.home_id}
         />
       </div>
     </div>

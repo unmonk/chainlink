@@ -69,23 +69,23 @@ export function StreakDisplay({ size }: StreakDisplayProps) {
             <Skeleton
               className={
                 size === "sm"
-                  ? "h-3 w-3"
+                  ? "h-2 w-1"
                   : size === "default"
-                  ? "h-4 w-4"
+                  ? "h-4 w-2"
                   : size === "lg"
                   ? "h-5 w-5"
-                  : "h-12 w-12"
+                  : "h-12 w-6"
               }
             />
             <Skeleton
               className={
                 size === "sm"
-                  ? "h-3 w-3"
+                  ? "h-2 w-1"
                   : size === "default"
-                  ? "h-4 w-4"
+                  ? "h-4 w-2"
                   : size === "lg"
                   ? "h-5 w-5"
-                  : "h-12 w-12"
+                  : "h-12 w-6"
               }
             />
           </>
@@ -100,17 +100,17 @@ export function StreakDisplay({ size }: StreakDisplayProps) {
           "font-mono flex flex-row justify-center items-center",
         )}
       >
-        <div>
+        <div className={cn(streakVariants({ size }))}>
           {streakData.streak === null ? (
             <Skeleton
               className={
                 size === "sm"
-                  ? "h-3 w-3"
+                  ? "h-2 w-1"
                   : size === "default"
-                  ? "h-4 w-4"
+                  ? "h-4 w-2"
                   : size === "lg"
                   ? "h-5 w-5"
-                  : "h-12 w-12"
+                  : "h-12 w-6"
               }
             />
           ) : (
@@ -118,17 +118,17 @@ export function StreakDisplay({ size }: StreakDisplayProps) {
           )}
         </div>
         -
-        <div>
+        <div className={cn(streakVariants({ size }))}>
           {streakData.streak === null ? (
             <Skeleton
               className={
                 size === "sm"
-                  ? "h-3 w-3"
+                  ? "h-2 w-1"
                   : size === "default"
-                  ? "h-4 w-4"
+                  ? "h-4 w-2"
                   : size === "lg"
                   ? "h-5 w-5"
-                  : "h-12 w-12"
+                  : "h-12 w-6"
               }
             />
           ) : (
@@ -136,17 +136,17 @@ export function StreakDisplay({ size }: StreakDisplayProps) {
           )}
         </div>
         -
-        <div>
+        <div className={cn(streakVariants({ size }))}>
           {streakData.streak === null ? (
             <Skeleton
               className={
                 size === "sm"
-                  ? "h-3 w-3"
+                  ? "h-2 w-1"
                   : size === "default"
-                  ? "h-4 w-4"
+                  ? "h-4 w-2"
                   : size === "lg"
                   ? "h-5 w-5"
-                  : "h-12 w-12"
+                  : "h-12 w-6"
               }
             />
           ) : (
