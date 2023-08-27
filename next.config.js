@@ -9,6 +9,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.espncdn.com/**",
       },
+      {
+        protocol: "https",
+        hostname: "uploadthing.com",
+      },
     ],
   },
 };
