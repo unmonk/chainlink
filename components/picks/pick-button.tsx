@@ -24,7 +24,8 @@ export type PickCardVariant =
   | "STATUS_CANCELED"
   | "STATUS_SUSPENDED"
   | "STATUS_DELAYED"
-  | "STATUS_UNKNOWN";
+  | "STATUS_UNKNOWN"
+  | "STATUS_END_PERIOD";
 
 interface PickButtonProps {
   className?: string;
@@ -54,6 +55,7 @@ const pickButtonVariants = cva(
         STATUS_SUSPENDED: "",
         STATUS_DELAYED: "",
         STATUS_UNKNOWN: "",
+        STATUS_END_PERIOD: "",
       },
       defaultVariants: {
         variant: "STATUS_SCHEDULED",
