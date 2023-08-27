@@ -7,20 +7,10 @@ export async function handleStatusInProgress(matchup: Matchup) {
 }
 
 export function handleStatusFinal(matchup: Matchup) {
-  if (matchup.status !== "STATUS_FINAL") return matchup;
-  matchup = handleScorevsScoreMatchup(matchup);
-  console.log(
-    "Winner Determined: ",
-    matchup.winner_id,
-    "Home: ",
-    matchup.home_id,
-    "Away: ",
-    matchup.away_id,
-  );
-  return matchup;
+  return handleScorevsScoreMatchup(matchup);
 }
 
-export function handleScorevsScoreMatchup(matchup: Matchup) {
+export function handleScorevsScoreMatchup(matchup: Matchup): Matchup {
   if (
     matchup.operator &&
     matchup.home_win_condition === "score" &&
@@ -85,7 +75,14 @@ export function handleScorevsScoreMatchup(matchup: Matchup) {
       }
     }
   }
-  console.log("Winner: ", matchup.winner_id);
+  console.log(
+    "Winner Determined: ",
+    matchup.winner_id,
+    "Home: ",
+    matchup.home_id,
+    "Away: ",
+    matchup.away_id,
+  );
   return matchup;
 }
 

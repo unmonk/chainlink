@@ -66,7 +66,7 @@ export async function GET(
   const data = await scoreboardRes.value.json();
   const redisData = currentMatchupsRes.value;
 
-  //loop through our data and update with espn data
+  //loop through our redis matchups and compare with scoreboard matchups
   const changedMatchups: Matchup[] = [];
   const changedFields = [];
   for (const game_id in redisData) {
@@ -77,10 +77,23 @@ export async function GET(
       (event: any) => event.id === matchup.game_id,
     );
     if (!dataMatchup) {
+      //no scoreboard matchup found, skip
       continue;
     }
+
+    //Variables from scoreboard matchup
+    const homeTeam = dataMatchup.competitions[0].find(
+      (team: any) => team.homeAway === "home",
+    );
+    const awayTeam = dataMatchup.competitions[0].find(
+      (team: any) => team.homeAway === "away",
+    );
+    const dataStatus = dataMatchup.status.type.name as MatchupStatus;
+    const homeScore = homeTeam.score as number;
+    const awayScore = awayTeam.score as number;
+
     //compare status, score, push to changedMatchups if changed
-    if (matchup.status.toString() !== dataMatchup.status.type.name.toString()) {
+    if (matchup.status !== dataStatus) {
       console.log(
         "status changed",
         "OLD:",
@@ -90,41 +103,35 @@ export async function GET(
         "GAME ID:",
         matchup.game_id,
       );
-      matchup.status = dataMatchup.status.type.name as MatchupStatus;
+      matchup.status = dataStatus;
       changed = true;
       changedFields.push("status");
     }
-    if (
-      matchup.home_value !=
-      parseInt(dataMatchup.competitions[0].competitors[0].score)
-    ) {
+    if (matchup.home_value !== homeScore) {
       console.log(
         "home_value changed",
         "OLD:",
         matchup.home_value,
         "NEW:",
-        dataMatchup.competitions[0].competitors[0].score,
+        homeScore,
         "GAME ID:",
         matchup.game_id,
       );
-      matchup.home_value = dataMatchup.competitions[0].competitors[0].score;
+      matchup.home_value = homeScore;
       changed = true;
       changedFields.push("home_value");
     }
-    if (
-      matchup.away_value !=
-      parseInt(dataMatchup.competitions[0].competitors[1].score)
-    ) {
+    if (matchup.away_value !== awayScore) {
       console.log(
         "away_value changed",
         "OLD:",
         matchup.away_value,
         "NEW:",
-        dataMatchup.competitions[0].competitors[1].score,
+        awayScore,
         "GAME ID:",
         matchup.game_id,
       );
-      matchup.away_value = dataMatchup.competitions[0].competitors[1].score;
+      matchup.away_value = awayScore;
       changed = true;
       changedFields.push("away_value");
     }
@@ -133,6 +140,7 @@ export async function GET(
     }
   }
 
+  //LOOP THROUGH CHANGED MATCHUPS ONLY
   let results: unknown[] = [];
   if (changedMatchups.length > 0) {
     const dbPromises = [];
@@ -145,25 +153,28 @@ export async function GET(
 
       //HANDLE MATCHUPS THAT ARE STATUS_FINAL
       if (matchup.status === "STATUS_FINAL") {
+        //GET UPDATED MATCHUP
         const updateMatchup = handleStatusFinal(matchup);
         //handle picks per matchup
         const fetchedPicks = await getMatchupPicks(matchup.id);
         fetchedPicks.forEach((pick) => {
           if (
             (pick.pick_type === "AWAY" &&
-              matchup.winner_id === matchup.away_id) ||
-            (pick.pick_type === "HOME" && matchup.winner_id === matchup.home_id)
+              updateMatchup.winner_id === updateMatchup.away_id) ||
+            (pick.pick_type === "HOME" &&
+              updateMatchup.winner_id === updateMatchup.home_id)
           ) {
             pick.pick_status = "WIN";
           }
           if (
             (pick.pick_type === "AWAY" &&
-              matchup.winner_id === matchup.home_id) ||
-            (pick.pick_type === "HOME" && matchup.winner_id === matchup.away_id)
+              updateMatchup.winner_id === updateMatchup.home_id) ||
+            (pick.pick_type === "HOME" &&
+              updateMatchup.winner_id === updateMatchup.away_id)
           ) {
             pick.pick_status = "LOSS";
           }
-          if (matchup.winner_id === null) {
+          if (updateMatchup.winner_id === null) {
             pick.pick_status = "PUSH";
           }
           const streakPromise = getPromiseByPick(pick);
