@@ -2,12 +2,7 @@
 
 import { getStreak } from "./streaks";
 import { db } from "@/drizzle/db";
-import {
-  NewPick,
-  PickWithMatchupAndStreak,
-  PickWithStreak,
-  picks,
-} from "@/drizzle/schema";
+import { NewPick, PickWithStreak, picks } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
 import { and, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -20,7 +15,7 @@ export async function makePick(pick: NewPick) {
   pick.active = true;
   pick.streak_id = streak.id;
   await db.insert(picks).values(pick);
-  revalidatePath(`/dashboard`);
+  revalidatePath(`/play`);
 }
 
 export async function getPick() {
@@ -43,7 +38,7 @@ export async function deletePick() {
   await db
     .delete(picks)
     .where(and(eq(picks.user_id, userId), eq(picks.active, true)));
-  revalidatePath(`/dashboard`);
+  revalidatePath(`/play`);
 }
 
 export async function getMatchupPicks(

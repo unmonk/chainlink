@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/tooltip";
 import { getMatchups } from "@/lib/actions/matchups";
 import { getPick } from "@/lib/actions/picks";
-import { getUserProfile } from "@/lib/actions/profiles";
 import { auth, redirectToSignIn } from "@clerk/nextjs";
 import { CalendarClockIcon, HistoryIcon, LockIcon } from "lucide-react";
 import Image from "next/image";
@@ -31,8 +30,6 @@ export default async function Page({ searchParams }: DashboardPageParams) {
   if (!userId) {
     return redirectToSignIn();
   }
-  const profile = await getUserProfile();
-  console.log(profile);
   const pick = await getPick();
   const matchups = await getMatchups();
 
