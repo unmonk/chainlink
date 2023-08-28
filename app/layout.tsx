@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Navbar } from "@/components/nav/navbar";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ModalProvider } from "@/components/providers/modal-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -36,6 +37,7 @@ export default function RootLayout({
             <Navbar />
             {children}
             <Toaster />
+            <ModalProvider />
           </ThemeProvider>
           <Analytics />
         </body>

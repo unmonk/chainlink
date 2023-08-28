@@ -9,9 +9,16 @@ import { and, eq, gt } from "drizzle-orm";
 export async function getStreak() {
   const { userId } = auth();
   if (!userId) return null;
-  const streak = await db.query.streaks.findFirst({
+  let streak = await db.query.streaks.findFirst({
     where: and(eq(streaks.user_id, userId), eq(streaks.active, true)),
   });
+  if (!streak) {
+    await createStreak(userId);
+  }
+  streak = await db.query.streaks.findFirst({
+    where: and(eq(streaks.user_id, userId), eq(streaks.active, true)),
+  });
+
   return streak;
 }
 

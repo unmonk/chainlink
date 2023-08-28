@@ -1,3 +1,11 @@
+import PickDetails from "@/components/picks/pick-details";
+import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Table,
   TableBody,
@@ -10,6 +18,7 @@ import {
 import { getUserPicks } from "@/lib/actions/picks";
 import { auth } from "@clerk/nextjs";
 import Image from "next/image";
+import { format } from "timeago.js";
 
 export default async function UserPicksPage() {
   const { userId } = auth();
@@ -22,61 +31,74 @@ export default async function UserPicksPage() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Your Pick</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Matchup</TableHead>
+            <TableHead>My Pick</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>League</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {picks.map((pick) => (
-            <TableRow key={pick.id}>
-              <TableCell className="flex flex-row items-center gap-2 text-left">
-                <Image
-                  src={
-                    (pick.pick_type === "HOME"
-                      ? pick.matchup.home_image
-                      : pick.matchup.away_image) || ""
+          {picks.map((pick) => {
+            return (
+              <TableRow key={pick.id}>
+                <TableCell
+                  className={
+                    pick.pick_status === "WIN"
+                      ? "text-green-500"
+                      : pick.pick_status === "LOSS"
+                      ? "text-red-500"
+                      : pick.pick_status === "STATUS_IN_PROGRESS"
+                      ? "text-yellow-500"
+                      : "text-sm"
                   }
-                  width={50}
-                  height={50}
-                  alt={
-                    pick.pick_type === "HOME"
-                      ? pick.matchup.home_team
-                      : pick.matchup.away_team
-                  }
-                />
-                <p>
-                  {pick.pick_type === "HOME"
-                    ? pick.matchup.home_team
-                    : pick.matchup.away_team}
-                </p>
-              </TableCell>
-              <TableCell
-                className={
-                  pick.pick_status === "WIN"
-                    ? "text-green-500"
-                    : pick.pick_status === "LOSS"
-                    ? "text-red-500"
-                    : pick.pick_status === "STATUS_IN_PROGRESS"
-                    ? "text-yellow-500"
-                    : "text-sm"
-                }
-              >
-                {pick.pick_status === "STATUS_IN_PROGRESS"
-                  ? "In Progress..."
-                  : pick.pick_status}
-              </TableCell>
-              <TableCell>{pick.matchup.question}</TableCell>
-              <TableCell>
-                {pick.matchup.start_time.toLocaleDateString("en-US", {
-                  timeZone: "America/Los_Angeles",
-                })}
-              </TableCell>
-              <TableCell>{pick.matchup.league}</TableCell>
-            </TableRow>
-          ))}
+                >
+                  {pick.pick_status === "STATUS_IN_PROGRESS" ? (
+                    <Loader />
+                  ) : (
+                    pick.pick_status
+                  )}
+                </TableCell>
+                <TableCell className="">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"secondary"}
+                        size={"lg"}
+                        className="flex flex-row items-center p-2 w-full"
+                      >
+                        <Image
+                          src={
+                            (pick.pick_type === "HOME"
+                              ? pick.matchup.home_image
+                              : pick.matchup.away_image) || ""
+                          }
+                          width={40}
+                          height={40}
+                          alt={
+                            pick.pick_type === "HOME"
+                              ? pick.matchup.home_team
+                              : pick.matchup.away_team
+                          }
+                        />
+                        <p>
+                          {pick.pick_type === "HOME"
+                            ? pick.matchup.home_team
+                            : pick.matchup.away_team}
+                        </p>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <PickDetails pick={pick} />
+                    </PopoverContent>
+                  </Popover>
+                </TableCell>
+                <TableCell>
+                  {format(pick.matchup.created_at!, "en_US")}
+                </TableCell>
+                <TableCell>{pick.matchup.league}</TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>

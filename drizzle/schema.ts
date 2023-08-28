@@ -15,6 +15,7 @@ import {
   smallint,
   datetime,
   unique,
+  primaryKey,
 } from "drizzle-orm/mysql-core";
 
 //Tables
@@ -70,6 +71,7 @@ export const matchups = mysqlTable(
       "STATUS_SUSPENDED",
       "STATUS_DELAYED",
       "STATUS_UNKNOWN",
+      "STATUS_END_PERIOD",
     ]).notNull(),
     league: mysqlEnum("leagues", [
       "NFL",
@@ -221,7 +223,176 @@ export const picks = mysqlTable(
   },
 );
 
+export const profiles = mysqlTable("profiles", {
+  user_id: varchar("user_id", {
+    length: 64,
+  })
+    .primaryKey()
+    .unique(),
+  created_at: timestamp("created_at", { mode: "date" }).default(
+    sql`current_timestamp()`,
+  ),
+  updated_at: timestamp("updated_at", { mode: "date" }).default(
+    sql`current_timestamp()`,
+  ),
+});
+
+export const squads = mysqlTable(
+  "squads",
+  {
+    id: serial("id").primaryKey().autoincrement(),
+    name: varchar("name", {
+      length: 128,
+    }).notNull(),
+    owner_id: varchar("owner_id", {
+      length: 64,
+    }).notNull(),
+    created_at: timestamp("created_at", { mode: "date" }).default(
+      sql`current_timestamp()`,
+    ),
+    updated_at: timestamp("updated_at", { mode: "date" }).default(
+      sql`current_timestamp()`,
+    ),
+  },
+  (table) => {
+    return {
+      name_idx: index("name_idx").on(table.name),
+    };
+  },
+);
+
+export const achievements = mysqlTable("achievements", {
+  id: serial("id").primaryKey().autoincrement(),
+  name: varchar("name", {
+    length: 128,
+  }).notNull(),
+  description: varchar("description", {
+    length: 128,
+  }).notNull(),
+  image: varchar("image", {
+    length: 512,
+  }).notNull(),
+  created_at: timestamp("created_at", { mode: "date" }).default(
+    sql`current_timestamp()`,
+  ),
+});
+
+export const profileAchievements = mysqlTable(
+  "profile_achievements",
+  {
+    profile_id: varchar("profile_id", {
+      length: 64,
+    }).notNull(),
+    achievement_id: bigint("achievement_id", {
+      mode: "number",
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      profile_id_idx: index("profile_id_idx").on(table.profile_id),
+      profile_achievement_idx: primaryKey(
+        table.profile_id,
+        table.achievement_id,
+      ),
+    };
+  },
+);
+
+export const ownedSquads = mysqlTable(
+  "owned_squads",
+  {
+    squad_id: bigint("squad_id", {
+      mode: "number",
+    }).notNull(),
+    profile_id: varchar("profile_id", {
+      length: 64,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      squad_id_idx: index("squad_id_idx").on(table.squad_id),
+      profile_id_idx: index("profile_id_idx").on(table.profile_id),
+      unique_owned_squads_idx: primaryKey(table.squad_id, table.profile_id),
+    };
+  },
+);
+
+export const squadMembers = mysqlTable(
+  "squad_members",
+  {
+    squad_id: bigint("squad_id", {
+      mode: "number",
+    }).notNull(),
+    profile_id: varchar("profile_id", {
+      length: 64,
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      squad_id_idx: index("squad_id_idx").on(table.squad_id),
+      profile_id_idx: index("profile_id_idx").on(table.profile_id),
+      unique_squad_member_idx: primaryKey(table.squad_id, table.profile_id),
+    };
+  },
+);
+
 //Relationships
+
+export const ownedSquadRelations = relations(ownedSquads, ({ one, many }) => ({
+  profile: one(profiles, {
+    fields: [ownedSquads.profile_id],
+    references: [profiles.user_id],
+  }),
+  squad: one(squads, {
+    fields: [ownedSquads.squad_id],
+    references: [squads.id],
+  }),
+}));
+
+export const squadMemberRelations = relations(
+  squadMembers,
+  ({ one, many }) => ({
+    profile: one(profiles, {
+      fields: [squadMembers.profile_id],
+      references: [profiles.user_id],
+    }),
+    squad: one(squads, {
+      fields: [squadMembers.squad_id],
+      references: [squads.id],
+    }),
+  }),
+);
+
+export const squadRelations = relations(squads, ({ one, many }) => ({
+  owner: one(profiles, {
+    fields: [squads.owner_id],
+    references: [profiles.user_id],
+  }),
+  members: many(squadMembers),
+}));
+
+export const profileAchievementRelations = relations(
+  profileAchievements,
+  ({ one, many }) => ({
+    profile: one(profiles, {
+      fields: [profileAchievements.profile_id],
+      references: [profiles.user_id],
+    }),
+    achievement: one(achievements, {
+      fields: [profileAchievements.achievement_id],
+      references: [achievements.id],
+    }),
+  }),
+);
+
+export const profileRelations = relations(profiles, ({ one, many }) => ({
+  streaks: many(streaks),
+  picks: many(picks),
+  squads: many(squads),
+  ownedSquads: many(ownedSquads),
+  achievements: many(profileAchievements),
+}));
+
 export const campaignRelations = relations(campaigns, ({ one, many }) => ({
   streaks: many(streaks),
 }));
@@ -239,12 +410,20 @@ export const pickRelations = relations(picks, ({ one, many }) => ({
     fields: [picks.streak_id],
     references: [streaks.id],
   }),
+  profile: one(profiles, {
+    fields: [picks.user_id],
+    references: [profiles.user_id],
+  }),
 }));
 
 export const streakRelations = relations(streaks, ({ one, many }) => ({
   campaign: one(campaigns, {
     fields: [streaks.campaign_id],
     references: [campaigns.id],
+  }),
+  profile: one(profiles, {
+    fields: [streaks.user_id],
+    references: [profiles.user_id],
   }),
   picks: many(picks),
 }));
@@ -254,11 +433,25 @@ export type Campaign = InferModel<typeof campaigns>;
 export type Matchup = InferModel<typeof matchups>;
 export type Pick = InferModel<typeof picks>;
 export type Streak = InferModel<typeof streaks>;
+export type Profile = InferModel<typeof profiles>;
+export type Squad = InferModel<typeof squads>;
+export type Achievement = InferModel<typeof achievements>;
 
 export type NewCampaign = InferModel<typeof campaigns, "insert">;
 export type NewMatchup = InferModel<typeof matchups, "insert">;
 export type NewPick = InferModel<typeof picks, "insert">;
 export type NewStreak = InferModel<typeof streaks, "insert">;
+export type NewProfile = InferModel<typeof profiles, "insert">;
+export type NewSquad = InferModel<typeof squads, "insert">;
+export type NewAchievement = InferModel<typeof achievements, "insert">;
+
+export type FullProfile = Profile & {
+  streaks: Streak[];
+  picks: Pick[];
+  squads: Squad[];
+  ownedSquads: Squad[];
+  achievements: Achievement[];
+};
 
 export type CampaignWithMatchups = Campaign & {
   matchups: Matchup[];
@@ -308,7 +501,8 @@ export type MatchupStatus =
   | "STATUS_CANCELED"
   | "STATUS_SUSPENDED"
   | "STATUS_DELAYED"
-  | "STATUS_UNKNOWN";
+  | "STATUS_UNKNOWN"
+  | "STATUS_END_PERIOD";
 
 export type Operator =
   | "LESS_THAN"

@@ -7,8 +7,103 @@ export async function handleStatusInProgress(matchup: Matchup) {
 }
 
 export function handleStatusFinal(matchup: Matchup) {
-  if (matchup.status !== "STATUS_FINAL") return matchup;
-  matchup = handleScorevsScoreMatchup(matchup);
+  return handleScorevsScoreMatchup(matchup);
+}
+
+export function handleScorevsScoreMatchup(matchup: Matchup): Matchup {
+  if (
+    matchup.operator &&
+    matchup.home_win_condition === "score" &&
+    matchup.home_win_condition === matchup.away_win_condition
+  ) {
+    console.log("Score vs Score Matchup", matchup.id);
+    console.log(
+      "HOME:",
+      matchup.home_id,
+      matchup.home_team,
+      matchup.home_value,
+    );
+    console.log(
+      "AWAY:",
+      matchup.away_id,
+      matchup.away_team,
+      matchup.away_value,
+    );
+
+    switch (matchup.operator) {
+      case "GREATER_THAN": {
+        console.log("GREATER_THAN");
+        if (matchup.home_value > matchup.away_value) {
+          console.log(
+            "HOME WINS",
+            matchup.home_team,
+            matchup.home_value,
+            matchup.home_value > matchup.away_value,
+          );
+          //set winner to home
+          matchup.winner_id = matchup.home_id;
+        } else if (matchup.away_value > matchup.home_value) {
+          console.log(
+            "AWAY WINS",
+            matchup.away_team,
+            matchup.away_value,
+            matchup.away_value > matchup.home_value,
+          );
+          //set winner to away
+          matchup.winner_id = matchup.away_id;
+        }
+        break;
+      }
+      case "LESS_THAN": {
+        console.log("LESS_THAN");
+        if (matchup.home_value < matchup.away_value) {
+          console.log(
+            "HOME WINS",
+            matchup.home_value,
+            matchup.away_value,
+            matchup.home_value < matchup.away_value,
+          );
+          //set winner to home
+          matchup.winner_id = matchup.home_id;
+        }
+        if (matchup.away_value < matchup.home_value) {
+          console.log(
+            "AWAY WINS",
+            matchup.away_value,
+            matchup.home_value,
+            matchup.away_value < matchup.home_value,
+          );
+          //set winner to away
+          matchup.winner_id = matchup.away_id;
+        }
+        break;
+      }
+      case "GREATER_THAN_OR_EQUAL_TO": {
+        console.log("GREATER_THAN_OR_EQUAL_TO");
+        if (matchup.home_value >= matchup.away_value) {
+          //set winner to home
+          matchup.winner_id = matchup.home_id;
+        }
+        if (matchup.away_value >= matchup.home_value) {
+          //set winner to away
+          matchup.winner_id = matchup.away_id;
+        }
+        break;
+      }
+      case "LESS_THAN_OR_EQUAL_TO": {
+        console.log("LESS_THAN_OR_EQUAL_TO");
+        if (matchup.home_value <= matchup.away_value) {
+          //set winner to home
+          matchup.winner_id = matchup.home_id;
+        }
+        if (matchup.away_value <= matchup.home_value) {
+          //set winner to away
+          matchup.winner_id = matchup.away_id;
+        }
+        break;
+      }
+    }
+  }
   console.log(
     "Winner Determined: ",
     matchup.winner_id,
@@ -17,75 +112,6 @@ export function handleStatusFinal(matchup: Matchup) {
     "Away: ",
     matchup.away_id,
   );
-  return matchup;
-}
-
-export function handleScorevsScoreMatchup(matchup: Matchup) {
-  if (
-    matchup.operator &&
-    matchup.home_win_condition === "score" &&
-    matchup.home_win_condition === matchup.away_win_condition
-  ) {
-    console.log("Score vs Score Matchup", matchup.id);
-    console.log("HOME:", matchup.home_id, matchup.home_value);
-    console.log("AWAY:", matchup.away_id, matchup.away_value);
-
-    switch (matchup.operator) {
-      case "GREATER_THAN": {
-        console.log("GREATER_THAN");
-        if (matchup.home_value > matchup.away_value) {
-          console.log(
-            "HOME WINS",
-            matchup.home_value,
-            matchup.away_value,
-            matchup.home_value > matchup.away_value,
-          );
-          matchup.winner_id = matchup.home_id;
-        }
-        if (matchup.away_value > matchup.home_value) {
-          console.log(
-            "AWAY WINS",
-            matchup.away_value,
-            matchup.home_value,
-            matchup.away_value > matchup.home_value,
-          );
-          matchup.winner_id = matchup.away_id;
-        }
-        break;
-      }
-      case "LESS_THAN": {
-        console.log("LESS_THAN");
-        if (matchup.home_value < matchup.away_value) {
-          matchup.winner_id = matchup.home_id;
-        }
-        if (matchup.away_value < matchup.home_value) {
-          matchup.winner_id = matchup.away_id;
-        }
-        break;
-      }
-      case "GREATER_THAN_OR_EQUAL_TO": {
-        console.log("GREATER_THAN_OR_EQUAL_TO");
-        if (matchup.home_value >= matchup.away_value) {
-          matchup.winner_id = matchup.home_id;
-        }
-        if (matchup.away_value >= matchup.home_value) {
-          matchup.winner_id = matchup.away_id;
-        }
-        break;
-      }
-      case "LESS_THAN_OR_EQUAL_TO": {
-        console.log("LESS_THAN_OR_EQUAL_TO");
-        if (matchup.home_value <= matchup.away_value) {
-          matchup.winner_id = matchup.home_id;
-        }
-        if (matchup.away_value <= matchup.home_value) {
-          matchup.winner_id = matchup.away_id;
-        }
-        break;
-      }
-    }
-  }
-  console.log("Winner: ", matchup.winner_id);
   return matchup;
 }
 

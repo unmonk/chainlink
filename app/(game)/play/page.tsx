@@ -73,13 +73,15 @@ export default async function Page({ searchParams }: DashboardPageParams) {
           </div>
           <Separator className="my-2 hidden xl:flex" />
           <div className="text-xl hidden xl:grid xl:grid-cols-3 gap-2 items-center justify-between">
-            <Image
-              src="/images/test.jpg"
-              width={200}
-              height={200}
-              alt="test"
-              className="rounded-lg shadow-md border-slate-500"
-            />
+            <Link href="https://www.theroseleague.com" target="_blank">
+              <Image
+                src="/images/ad1.png"
+                width={200}
+                height={200}
+                alt="test"
+                className="rounded-lg shadow-md border-slate-500"
+              />
+            </Link>
             <Image
               src="/images/test2.png"
               width={200}
@@ -88,7 +90,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
               className="rounded-lg shadow-md border-slate-500"
             />
             <Image
-              src="/images/test.jpg"
+              src="/images/ad3.png"
               width={200}
               height={200}
               alt="test"

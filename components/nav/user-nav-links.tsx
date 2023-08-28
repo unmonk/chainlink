@@ -12,6 +12,7 @@ import {
   Home,
   CalendarSearchIcon,
   LogOutIcon,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -41,46 +42,42 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
         <Button
           variant={pathname === "/play" ? "secondary" : "ghost"}
           className="w-full justify-start"
-          asChild
           onClick={() => handleLinkClick("/play")}
         >
-          <Link href="/play" prefetch={false}>
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Play
-          </Link>
+          <LayoutDashboard className="mr-2 h-4 w-4" />
+          Play
         </Button>
         <Button
           variant={pathname === "/picks" ? "secondary" : "ghost"}
           className="w-full justify-start"
-          asChild
           onClick={() => handleLinkClick("/picks")}
         >
-          <Link href="/picks">
-            <CalendarSearchIcon className="mr-2 h-4 w-4" />
-            My Picks
-          </Link>
+          <CalendarSearchIcon className="mr-2 h-4 w-4" />
+          My Picks
         </Button>
         <Button
           variant={pathname === "/leaderboards" ? "secondary" : "ghost"}
           className="w-full justify-start"
-          asChild
           onClick={() => handleLinkClick("/leaderboards")}
         >
-          <Link href="/leaderboards">
-            <Trophy className="mr-2 h-4 w-4" />
-            Leaderboards
-          </Link>
+          <Trophy className="mr-2 h-4 w-4" />
+          Leaderboards
         </Button>
+        {/* <Button
+          variant={pathname === "/squads" ? "secondary" : "ghost"}
+          className="w-full justify-start"
+          onClick={() => handleLinkClick("/squads")}
+        >
+          <Users className="mr-2 h-4 w-4" />
+          Squads
+        </Button> */}
         <Button
           variant={pathname === "/howtoplay" ? "secondary" : "ghost"}
           className="w-full justify-start"
-          asChild
           onClick={() => handleLinkClick("/howtoplay")}
         >
-          <Link href="/howtoplay">
-            <BookOpenCheck className="mr-2 h-4 w-4" />
-            How to Play
-          </Link>
+          <BookOpenCheck className="mr-2 h-4 w-4" />
+          How to Play
         </Button>
       </div>
       <Separator className="my-4" />
@@ -91,24 +88,18 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
         <Button
           variant={pathname === "/" ? "secondary" : "ghost"}
           className="w-full justify-start"
-          asChild
           onClick={() => handleLinkClick("/")}
         >
-          <Link href="/">
-            <Home className="mr-2 h-4 w-4" />
-            Home
-          </Link>
+          <Home className="mr-2 h-4 w-4" />
+          Home
         </Button>
         <Button
-          variant={pathname === "/profile" ? "secondary" : "ghost"}
+          variant={pathname === "/account" ? "secondary" : "ghost"}
           className="w-full justify-start"
-          asChild
-          onClick={() => handleLinkClick("/profile")}
+          onClick={() => handleLinkClick("/account")}
         >
-          <Link href="/" prefetch={false}>
-            <User className="mr-2 h-4 w-4" />
-            Profile
-          </Link>
+          <User className="mr-2 h-4 w-4" />
+          Account
         </Button>
         <SignOutButton>
           <Button variant={"ghost"} className="w-full justify-start">
