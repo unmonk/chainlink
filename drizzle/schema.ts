@@ -223,33 +223,19 @@ export const picks = mysqlTable(
   },
 );
 
-export const profiles = mysqlTable(
-  "profiles",
-  {
-    user_id: varchar("user_id", {
-      length: 64,
-    })
-      .primaryKey()
-      .unique(),
-    username: varchar("username", {
-      length: 64,
-    })
-      .notNull()
-      .unique(),
-    created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`current_timestamp()`,
-    ),
-    updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`current_timestamp()`,
-    ),
-  },
-
-  (table) => {
-    return {
-      username_idx: index("username_idx").on(table.username),
-    };
-  },
-);
+export const profiles = mysqlTable("profiles", {
+  user_id: varchar("user_id", {
+    length: 64,
+  })
+    .primaryKey()
+    .unique(),
+  created_at: timestamp("created_at", { mode: "date" }).default(
+    sql`current_timestamp()`,
+  ),
+  updated_at: timestamp("updated_at", { mode: "date" }).default(
+    sql`current_timestamp()`,
+  ),
+});
 
 export const squads = mysqlTable(
   "squads",
