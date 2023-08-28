@@ -93,7 +93,7 @@ export default async function UserPicksPage() {
                   </Popover>
                 </TableCell>
                 <TableCell>
-                  {format(pick.matchup.created_at!, "en_US")}
+                  {format(pick.matchup.start_time!, "en_US")}
                 </TableCell>
                 <TableCell>{pick.matchup.league}</TableCell>
               </TableRow>
