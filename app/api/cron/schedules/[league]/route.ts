@@ -22,6 +22,11 @@ export async function GET(
   if (key !== process.env.CRON_SECRET) {
     return NextResponse.json({ status: 401, message: "Unauthorized" });
   }
+  let localTesting = false;
+  const test = searchParams.get("test");
+  if (test) {
+    localTesting = true;
+  }
 
   //valid league present
   const league = params.league.toUpperCase() as League;
@@ -120,7 +125,14 @@ export async function GET(
   }
 
   //REDIS: do all redis writes
-  const pipelineResults = await redisPipeline.exec();
+  if (!localTesting) {
+    await redisPipeline.exec();
+  }
 
-  return NextResponse.json(pipelineResults);
+  return NextResponse.json({
+    status: 200,
+    message: "Success",
+    newMatchups,
+    updatedMatchups,
+  });
 }

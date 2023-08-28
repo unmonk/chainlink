@@ -17,8 +17,18 @@ export function handleScorevsScoreMatchup(matchup: Matchup): Matchup {
     matchup.home_win_condition === matchup.away_win_condition
   ) {
     console.log("Score vs Score Matchup", matchup.id);
-    console.log("HOME:", matchup.home_id, matchup.home_value);
-    console.log("AWAY:", matchup.away_id, matchup.away_value);
+    console.log(
+      "HOME:",
+      matchup.home_id,
+      matchup.home_team,
+      matchup.home_value,
+    );
+    console.log(
+      "AWAY:",
+      matchup.away_id,
+      matchup.away_team,
+      matchup.away_value,
+    );
 
     switch (matchup.operator) {
       case "GREATER_THAN": {
@@ -26,19 +36,20 @@ export function handleScorevsScoreMatchup(matchup: Matchup): Matchup {
         if (matchup.home_value > matchup.away_value) {
           console.log(
             "HOME WINS",
+            matchup.home_team,
             matchup.home_value,
-            matchup.away_value,
             matchup.home_value > matchup.away_value,
           );
+          //set winner to home
           matchup.winner_id = matchup.home_id;
-        }
-        if (matchup.away_value > matchup.home_value) {
+        } else if (matchup.away_value > matchup.home_value) {
           console.log(
             "AWAY WINS",
+            matchup.away_team,
             matchup.away_value,
-            matchup.home_value,
             matchup.away_value > matchup.home_value,
           );
+          //set winner to away
           matchup.winner_id = matchup.away_id;
         }
         break;
@@ -46,9 +57,23 @@ export function handleScorevsScoreMatchup(matchup: Matchup): Matchup {
       case "LESS_THAN": {
         console.log("LESS_THAN");
         if (matchup.home_value < matchup.away_value) {
+          console.log(
+            "HOME WINS",
+            matchup.home_value,
+            matchup.away_value,
+            matchup.home_value < matchup.away_value,
+          );
+          //set winner to home
           matchup.winner_id = matchup.home_id;
         }
         if (matchup.away_value < matchup.home_value) {
+          console.log(
+            "AWAY WINS",
+            matchup.away_value,
+            matchup.home_value,
+            matchup.away_value < matchup.home_value,
+          );
+          //set winner to away
           matchup.winner_id = matchup.away_id;
         }
         break;
@@ -56,9 +81,11 @@ export function handleScorevsScoreMatchup(matchup: Matchup): Matchup {
       case "GREATER_THAN_OR_EQUAL_TO": {
         console.log("GREATER_THAN_OR_EQUAL_TO");
         if (matchup.home_value >= matchup.away_value) {
+          //set winner to home
           matchup.winner_id = matchup.home_id;
         }
         if (matchup.away_value >= matchup.home_value) {
+          //set winner to away
           matchup.winner_id = matchup.away_id;
         }
         break;
@@ -66,9 +93,11 @@ export function handleScorevsScoreMatchup(matchup: Matchup): Matchup {
       case "LESS_THAN_OR_EQUAL_TO": {
         console.log("LESS_THAN_OR_EQUAL_TO");
         if (matchup.home_value <= matchup.away_value) {
+          //set winner to home
           matchup.winner_id = matchup.home_id;
         }
         if (matchup.away_value <= matchup.home_value) {
+          //set winner to away
           matchup.winner_id = matchup.away_id;
         }
         break;
