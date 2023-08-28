@@ -63,14 +63,14 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           <Trophy className="mr-2 h-4 w-4" />
           Leaderboards
         </Button>
-        <Button
+        {/* <Button
           variant={pathname === "/squads" ? "secondary" : "ghost"}
           className="w-full justify-start"
           onClick={() => handleLinkClick("/squads")}
         >
           <Users className="mr-2 h-4 w-4" />
           Squads
-        </Button>
+        </Button> */}
         <Button
           variant={pathname === "/howtoplay" ? "secondary" : "ghost"}
           className="w-full justify-start"

@@ -9,7 +9,7 @@ export function Navbar() {
     <nav className="flex h-16 items-center px-4">
       <Logo />
       <SignedIn>
-        <Link href="/play" className="text-primary">
+        <Link href="/play" className="text-primary" prefetch={false}>
           ChainLink
         </Link>
       </SignedIn>

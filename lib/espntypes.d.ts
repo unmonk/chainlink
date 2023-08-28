@@ -19,8 +19,14 @@ export type Competition = {
   conferenceCompetition?: boolean;
   playByPlayAvailable?: boolean;
   recent?: boolean;
+  neutralSite?: boolean;
+  conferenceCompetition?: boolean;
+  boxscoreAvailable?: boolean;
+  recent?: boolean;
+  onWatchEspn?: boolean;
+
   wasSuspended?: boolean;
-  competitors: EventCompetitor[];
+  competitors: Competitor[];
   venue?: Venue;
   status?: EventStatus;
   notes?: any[];
@@ -34,9 +40,10 @@ export type Competition = {
   startDate?: string;
   geoBroadcasts?: GeoBroadcast[];
   headlines?: EventHeadline[];
+  series?: any[];
 };
 
-export type EventCompetitor = {
+export type Competitor = {
   id: string;
   uid?: string;
   type?: string;
@@ -62,6 +69,11 @@ export type Statistic = {
   name?: string;
   displayValue?: string;
   appreviation?: string;
+  value?: number;
+  description?: string;
+  displayName?: string;
+  shortDisplayName?: string;
+  stats?: Statistic[];
 };
 
 export type Record = {
@@ -83,7 +95,7 @@ export type CompetitorTeam = {
   alternateColor?: string;
   isActive?: boolean;
   logo?: string;
-  links: EventLink[];
+  links: Link[];
 };
 
 export type Venue = {
@@ -124,7 +136,7 @@ export type GeoBroadcast = {
   region?: string;
 };
 
-export type EventLink = {
+export type Link = {
   language?: string;
   text?: string;
   shortText?: string;
@@ -156,13 +168,14 @@ export type EventStatus = {
   featuredAthletes?: any[];
 };
 
-export type EventLeague = {
+type ELeague = {
   id?: string;
   uid?: string;
   name?: string;
   abbreviation?: string;
   midsizeName?: string;
   slug?: string;
+  isTournament?: boolean;
   season?: Season;
   calendarType?: string;
   calendarIsWhitelist?: boolean;
@@ -172,5 +185,118 @@ export type EventLeague = {
 
 export type ScoreboardResponse = {
   events: Event[];
-  leagues?: EventLeague[];
+  leagues?: ELeague[];
+};
+
+export type SummaryTeam = {
+  team?: CompetitorTeam;
+  statistics: Statistic[];
+  details: Statistic[];
+};
+
+export type SummaryResponse = {
+  notes?: string[];
+  boxscore?: BoxScore;
+  ganeInfo?: {
+    venue?: Venue;
+    attendance?: number;
+    gameDuration?: string;
+  };
+  predictor?: {
+    header?: string;
+    homeTeam?: Predictor;
+    awayTeam?: Predictor;
+  };
+  pickcenter?: PickCenter;
+  header?: {
+    id?: string;
+    uid?: string;
+    timeValid?: boolean;
+    competitions?: Competition[];
+    links?: Link[];
+    league?: ELeague;
+  };
+  news?: {
+    header?: string;
+    link?: Link;
+    articles?: any[];
+  };
+  article?: any;
+  videos?: any[];
+  plays?: any[];
+  playsMap?: any[];
+  atBats?: any[];
+  standings?: any[];
+  seasonSeries?: any[];
+  rosters?: any[];
+};
+
+export type PickCenter = {
+  provider?: {
+    id?: string;
+    name?: string;
+    priority?: number;
+  };
+  details?: string;
+  overUnder?: number;
+  spread?: number;
+  awayTeamOdds?: TeamOdds;
+  homeTeamOdds?: TeamOdds;
+};
+
+type TeamOdds = {
+  favorite?: boolean;
+  underdog?: boolean;
+  moneyLine?: number;
+  teamId?: string;
+};
+
+export type BoxScore = {
+  teams: SummaryTeam[];
+  players: SummaryPlayer[];
+};
+
+export type SummaryPlayer = {
+  team?: CompetitorTeam;
+  statistics?: PlayerStatistics;
+};
+
+export type PlayerStatistics = {
+  type?: string;
+  names?: string[];
+  keys?: string[];
+  labels?: string[];
+  descriptions?: string[];
+  totals?: string[];
+  athletes?: any[];
+};
+
+export type Athlete = {
+  active?: boolean;
+  starter?: boolean;
+  athlete?: any;
+  batOrder?: number;
+  position?: AthletePosition;
+  positions?: AthletePosition[];
+  atBats?: AtBats[];
+  stats?: string[];
+};
+
+export type AthletePosition = {
+  id?: string;
+  name?: string;
+  abbreviation?: string;
+  displayName?: string;
+};
+
+export type AtBats = {
+  id?: string;
+  atBatId?: string;
+  playId?: string;
+};
+
+export type Predictor = {
+  id?: string;
+  gameProjection?: string;
+  teamChangeLoss?: string;
 };
