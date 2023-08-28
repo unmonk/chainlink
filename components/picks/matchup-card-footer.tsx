@@ -12,7 +12,6 @@ interface MatchupCardFooterProps {
 const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
   matchup,
   homePercent,
-
   awayPercent,
 }) => {
   const homeWinClass =
@@ -36,7 +35,7 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
           ))}
       </div>
       <div className="col-span-1 text-center">
-        {matchup.status === "STATUS_SCHEDULED" && (
+        {/* {matchup.status === "STATUS_SCHEDULED" && (
           <Button variant="link" size="sm" asChild>
             <Link
               prefetch={false}
@@ -45,8 +44,8 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
               Preview
             </Link>
           </Button>
-        )}
-        {matchup.status === "STATUS_FINAL" && (
+        )} */}
+        {/* {matchup.status === "STATUS_FINAL" && (
           <Button variant="link" size="sm" asChild>
             <Link
               prefetch={false}
@@ -55,8 +54,8 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
               Recap
             </Link>
           </Button>
-        )}
-        {matchup.status === "STATUS_IN_PROGRESS" && (
+        )} */}
+        {/* {matchup.status === "STATUS_IN_PROGRESS" && (
           <Button variant="link" size="sm" asChild>
             <Link
               href={`/gamedetails/${matchup.league}/${matchup.game_id}`}
@@ -66,7 +65,7 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
               Live
             </Link>
           </Button>
-        )}
+        )} */}
         {matchup.status === "STATUS_POSTPONED" && (
           <p className="px-4 py-2 text-xs text-amber-400">Postponed</p>
         )}
