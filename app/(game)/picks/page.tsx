@@ -58,13 +58,13 @@ export default async function UserPicksPage() {
                     pick.pick_status
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant={"secondary"}
                         size={"lg"}
-                        className="flex flex-row items-center p-2"
+                        className="flex flex-row items-center p-2 w-full"
                       >
                         <Image
                           src={

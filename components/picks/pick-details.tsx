@@ -1,4 +1,5 @@
 import { PickWithMatchup } from "@/drizzle/schema";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { FC } from "react";
 
@@ -11,7 +12,17 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
     <div className="p-2 flex flex-col gap-2 items-center">
       <p className="text-lg">{pick.matchup.question}</p>
       <div className="grid grid-cols-2 gap-2">
-        <div className="flex flex-col gap-2 items-center">
+        <div
+          className={cn("flex flex-col gap-2 items-center rounded-md p-2", {
+            "border border-green-500":
+              pick.pick_type === "AWAY" && pick.pick_status === "WIN",
+            "border border-red-500":
+              pick.pick_type === "AWAY" && pick.pick_status === "LOSS",
+            "border border-yellow-400":
+              pick.pick_type === "AWAY" && pick.pick_status === "PUSH",
+            border: pick.pick_type === "AWAY",
+          })}
+        >
           <p className="text-sm h-8 text-center">{pick.matchup.away_team}</p>
           <Image
             src={pick.matchup.away_image!}
@@ -21,7 +32,17 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
           />
           <p>{pick.matchup.away_value}</p>
         </div>
-        <div className="flex flex-col gap-2 items-center">
+        <div
+          className={cn("flex flex-col gap-2 items-center rounded-md p-2", {
+            "border border-green-500":
+              pick.pick_type === "HOME" && pick.pick_status === "WIN",
+            "border border-red-500":
+              pick.pick_type === "HOME" && pick.pick_status === "LOSS",
+            "border border-yellow-400":
+              pick.pick_type === "HOME" && pick.pick_status === "PUSH",
+            border: pick.pick_type === "HOME",
+          })}
+        >
           <p className="text-sm h-8 text-center">{pick.matchup.home_team}</p>
           <Image
             src={pick.matchup.home_image!}
@@ -44,7 +65,9 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
             : "text-sm"
         }
       >
-        {pick.pick_status}
+        {pick.pick_status === "STATUS_IN_PROGRESS"
+          ? "In Progress..."
+          : pick.pick_status}
       </p>
     </div>
   );
