@@ -6,6 +6,8 @@ import {
   LayoutDashboardIcon,
   CalendarClockIcon,
   CalendarSearchIcon,
+  BusIcon,
+  CalendarDaysIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,7 +24,7 @@ const ADMIN_LINKS = [
     icon: LayoutDashboardIcon,
   },
   {
-    name: "Schedule Jobs",
+    name: "Daily Jobs",
     href: "/admin/crons",
     icon: CalendarClockIcon,
   },
@@ -33,6 +35,16 @@ const GAME_INFO_LINKS = [
     name: "Active Picks",
     href: "/admin/picks",
     icon: CalendarSearchIcon,
+  },
+  {
+    name: "Matchups",
+    href: "/admin/matchups",
+    icon: CalendarDaysIcon,
+  },
+  {
+    name: "Squads",
+    href: "/admin/squads",
+    icon: BusIcon,
   },
 ];
 

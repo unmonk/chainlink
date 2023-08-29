@@ -20,10 +20,13 @@ export default async function AdminLayout({
 
   return (
     <section>
-      <div className="flex flex-col md:flex-row md:1/5">
-        <AdminSidebar className="hidden md:block" />
+      <h2 className="w-full text-center font-mono text-red-500 md:hidden">
+        Admin
+      </h2>
+      <div className="flex flex-col md:flex-row">
+        <AdminSidebar className="hidden md:block md:w-1/6" />
         <AdminMobileTopBar className="md:hidden" />
-        <div className="md:w-4/5">{children}</div>
+        <div className="md:w-5/6 p-1">{children}</div>
       </div>
     </section>
   );
