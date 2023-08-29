@@ -94,7 +94,7 @@ export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
   className,
 }) => {
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div className={cn("flex flex-col px-2", className)}>
       <div className="flex flex-row">
         {ADMIN_LINKS.map((link) => (
           <Button key={link.name} variant="ghost" className="" asChild>
