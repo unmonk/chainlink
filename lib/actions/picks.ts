@@ -79,3 +79,13 @@ export async function getUserPicks(userId: string) {
   });
   return userPicks;
 }
+
+export async function getActivePicks() {
+  const activePicks = await db.query.picks.findMany({
+    where: eq(picks.active, true),
+    with: {
+      matchup: true,
+    },
+  });
+  return activePicks;
+}

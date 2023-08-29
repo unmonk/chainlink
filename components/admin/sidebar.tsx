@@ -93,11 +93,17 @@ interface AdminMobileTopBarProps {
 export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
   className,
 }) => {
+  const pathname = usePathname();
   return (
-    <div className={cn("flex flex-col px-2", className)}>
-      <div className="flex flex-row">
+    <div className={cn("flex flex-col px-2 gap-1", className)}>
+      <div className="flex flex-row gap-1">
         {ADMIN_LINKS.map((link) => (
-          <Button key={link.name} variant="ghost" className="" asChild>
+          <Button
+            key={link.name}
+            variant={pathname === link.href ? "secondary" : "outline"}
+            className=""
+            asChild
+          >
             <Link href={link.href}>
               <link.icon className="mr-2 h-4 w-4" />
               {link.name}
@@ -105,9 +111,14 @@ export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
           </Button>
         ))}
       </div>
-      <div className="flex flex-row">
+      <div className="flex flex-row gap-1">
         {GAME_INFO_LINKS.map((link) => (
-          <Button key={link.name} variant="ghost" className="" asChild>
+          <Button
+            key={link.name}
+            variant={pathname === link.href ? "secondary" : "outline"}
+            className=""
+            asChild
+          >
             <Link href={link.href}>
               <link.icon className="mr-2 h-4 w-4" />
               {link.name}
