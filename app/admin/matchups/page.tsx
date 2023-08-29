@@ -67,7 +67,7 @@ export default async function AdminMatchups() {
                     className="rounded-full"
                   />
 
-                  <p className="ml-1"> {matchup.home_team}</p>
+                  <p className="ml-1">@ {matchup.home_team}</p>
                 </div>
               </TableCell>
             </TableRow>

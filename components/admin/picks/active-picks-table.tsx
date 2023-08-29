@@ -53,17 +53,22 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
     <Table className={cn("w-full", className)}>
       <TableHeader>
         <TableRow>
+          <TableHead>Actions</TableHead>
           <TableHead className="text-center">User</TableHead>
           <TableHead className="text-center">Pick</TableHead>
           <TableHead className="text-center">Matchup</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {activePicks.map((pick) => {
           return (
             <TableRow key={pick.id}>
+              <TableCell>
+                <Button variant="outline" size={"icon"} disabled>
+                  <Edit2Icon className="h-4 w-4" />
+                </Button>
+              </TableCell>
               <TableCell>
                 <div className="flex flex-col items-center justify-start">
                   <Avatar className="mx-2 h-7 w-7">
@@ -97,11 +102,6 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
                 {pick.pick_status === "STATUS_IN_PROGRESS" && <Loader />}
                 {pick.pick_status === "PENDING" && "Pending"}
                 {pick.pick_status === "STATUS_UNKNOWN" && "ERROR"}
-              </TableCell>
-              <TableCell>
-                <Button variant="outline" size={"icon"} disabled>
-                  <Edit2Icon className="h-4 w-4" />
-                </Button>
               </TableCell>
             </TableRow>
           );
