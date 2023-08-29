@@ -50,8 +50,8 @@ export async function GET(
             <h3 tw="font-bold">{user.username}</h3>
           </div>
           <div tw="flex flex-col justify-center items-center">
-            <h3>Picks</h3>
-            <div tw="flex text-4xl">{wins + losses + pushes}</div>
+            <h3>Wins</h3>
+            <div tw="flex text-4xl">{wins}</div>
           </div>
         </div>
         <div tw={cn("flex justify-center w-full h-1/4", bannerColor)}>
