@@ -45,6 +45,10 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
     pick.user = user;
   });
 
+  activePicks.sort((a, b) => {
+    return a.matchup_id - b.matchup_id;
+  });
+
   return (
     <Table className={cn("w-full", className)}>
       <TableHeader>
