@@ -1,4 +1,6 @@
+import CronRow from "./cron-row";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -38,24 +40,13 @@ const CronList: FC<CronListProps> = async ({}) => {
             <TableHead>Failures</TableHead>
             <TableHead>Estimated Daily Runs</TableHead>
             <TableHead>Schedule</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Enabled</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {crons &&
             crons.map((cron: Cron) => {
-              return (
-                <TableRow key={cron.cron_job_id}>
-                  <TableCell className="font-bold">
-                    {cron.cron_job_name}
-                  </TableCell>
-                  <TableCell>{cron.total_successes}</TableCell>
-                  <TableCell>{cron.total_failures}</TableCell>
-                  <TableCell>{cron.epds_occupied}</TableCell>
-                  <TableCell>{cron.cron_expression}</TableCell>
-                  <TableCell>{cron.status ? "ENABLED" : "DISABLED"}</TableCell>
-                </TableRow>
-              );
+              return <CronRow cron={cron} key={cron.cron_job_id} />;
             })}
         </TableBody>
       </Table>
