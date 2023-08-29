@@ -39,7 +39,7 @@ const GAME_INFO_LINKS = [
 const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
   const pathname = usePathname();
   return (
-    <div className={cn("pb-12", className)}>
+    <div className={cn("pb-12 w-1/5", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
@@ -81,6 +81,39 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
             ))}
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+interface AdminMobileTopBarProps {
+  className?: string;
+}
+
+export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
+  className,
+}) => {
+  return (
+    <div className={cn("flex flex-col", className)}>
+      <div className="flex flex-row">
+        {ADMIN_LINKS.map((link) => (
+          <Button key={link.name} variant="ghost" className="" asChild>
+            <Link href={link.href}>
+              <link.icon className="mr-2 h-4 w-4" />
+              {link.name}
+            </Link>
+          </Button>
+        ))}
+      </div>
+      <div className="flex flex-row">
+        {GAME_INFO_LINKS.map((link) => (
+          <Button key={link.name} variant="ghost" className="" asChild>
+            <Link href={link.href}>
+              <link.icon className="mr-2 h-4 w-4" />
+              {link.name}
+            </Link>
+          </Button>
+        ))}
       </div>
     </div>
   );

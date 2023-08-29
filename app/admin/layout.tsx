@@ -1,4 +1,4 @@
-import AdminSidebar from "@/components/admin/sidebar";
+import AdminSidebar, { AdminMobileTopBar } from "@/components/admin/sidebar";
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
@@ -20,9 +20,10 @@ export default async function AdminLayout({
 
   return (
     <section>
-      <div className="grid grid-cols-5">
-        <AdminSidebar />
-        <div className="col-span-3 lg:col-span-4 lg:border-1">{children}</div>
+      <div className="flex flex-col md:flex-row">
+        <AdminSidebar className="hidden md:block" />
+        <AdminMobileTopBar className="md:hidden" />
+        <div className="lg:border-1">{children}</div>
       </div>
     </section>
   );
