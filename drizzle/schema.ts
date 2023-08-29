@@ -56,6 +56,7 @@ export const matchups = mysqlTable(
   "matchups",
   {
     id: serial("id").primaryKey().autoincrement(),
+    active: boolean("active").notNull().default(true),
     question: varchar("question", {
       length: 255,
     }).notNull(),

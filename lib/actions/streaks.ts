@@ -6,8 +6,10 @@ import { NewStreak, PickWithStreak, streaks } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
 import { and, eq, gt } from "drizzle-orm";
 
-export async function getStreak() {
-  const { userId } = auth();
+export async function getStreak(userId?: string | null) {
+  if (!userId) {
+    userId = auth().userId;
+  }
   if (!userId) return null;
   let streak = await db.query.streaks.findFirst({
     where: and(eq(streaks.user_id, userId), eq(streaks.active, true)),

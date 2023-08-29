@@ -64,7 +64,10 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
     <div className={cn(pickCardHeaderVariants({ status }))}>
       <div className="grid grid-cols-2 p-2">
         <h3 className="text-start text-sm">
-          <span className="font-semibold">{matchup.league} </span> |&nbsp;
+          <span className="font-semibold">
+            {matchup.league === "COLLEGE-FOOTBALL" ? "CFB" : matchup.league}
+          </span>
+          &nbsp;|&nbsp;
           {status === "STATUS_SCHEDULED" && (
             <ClientTime time={matchup.start_time!} />
           )}

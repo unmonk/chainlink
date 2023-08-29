@@ -95,7 +95,11 @@ export default async function UserPicksPage() {
                 <TableCell>
                   {format(pick.matchup.start_time!, "en_US")}
                 </TableCell>
-                <TableCell>{pick.matchup.league}</TableCell>
+                <TableCell>
+                  {pick.matchup.league === "COLLEGE-FOOTBALL"
+                    ? "CFB"
+                    : pick.matchup.league}
+                </TableCell>
               </TableRow>
             );
           })}
