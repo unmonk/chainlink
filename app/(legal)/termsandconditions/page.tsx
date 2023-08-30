@@ -3,8 +3,9 @@ export default function Page() {
     <div className="p-8">
       <h1 className="text-4xl font-bold">Terms and Conditions</h1>
       <p className="mt-4">
-        Lorem ipsum dolor sit am et, consectetur adipiscing elit. Nulla eget,
-        tincidunt vel sapien. Ut a ugue. Ut auctor, nisl quis tempus
+        ChainLink is not affiliated with EPSN, ABC Entertainment, The Walt
+        Disney Company, or any of the teams, players, or organizations mentioned
+        on this site.
       </p>
     </div>
   );

@@ -14,6 +14,7 @@ import {
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import UserAvatar from "@/components/user-avatar";
 import { useNav } from "@/hooks/useNav";
+import Link from "next/link";
 
 export function UserNav() {
   const { open, setOpen } = useNav();
@@ -45,6 +46,32 @@ export function UserNav() {
             Welcome to the Beta, Join the Discord community to get involved!
           </p>
           <ThemeToggle />
+        </div>
+        <Separator className="my-4" />
+        <div className="flex flex-row items-center justify-center text-xs gap-2">
+          <Link
+            href={"/privacy"}
+            className="text-muted-foreground"
+            prefetch={false}
+          >
+            Privacy
+          </Link>
+          -
+          <Link
+            href={"/termsandconditions"}
+            className="text-muted-foreground"
+            prefetch={false}
+          >
+            Terms
+          </Link>
+          -
+          <Link
+            href={"/opensource"}
+            className="text-muted-foreground"
+            prefetch={false}
+          >
+            Open Source
+          </Link>
         </div>
       </SheetContent>
     </Sheet>
