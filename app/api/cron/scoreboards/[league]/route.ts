@@ -76,6 +76,7 @@ export async function GET(
   //loop through our redis matchups and compare with scoreboard matchups
   const changedMatchups: Matchup[] = [];
   const changedFields = [];
+  let notificationAttempts = 0;
   for (const game_id in redisData) {
     let changed = false;
     const matchup = redisData[game_id] as Matchup;
@@ -265,10 +266,12 @@ export async function GET(
         console.log("Failed to send push notification", result.reason);
       }
     });
+    notificationAttempts = notificationResults.length;
   }
   return NextResponse.json(
     {
       changedMatchups: changedMatchups.length,
+      notificationAttempts,
       changedFields,
       results,
     },

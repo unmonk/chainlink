@@ -14,11 +14,11 @@ export async function GET(
   const { userId } = params;
   const user = await clerkClient.users.getUser(userId);
   if (!user) {
-    return null;
+    throw Error("User not found");
   }
   const streakData = await getStreak(userId);
   if (!streakData) {
-    return null;
+    throw Error("Streak not found");
   }
 
   const wins = streakData?.wins || 0;
