@@ -16,9 +16,34 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: siteConfig.title,
   description: siteConfig.description,
+  themeColor: "#1f821f",
+  twitter: {
+    card: "summary_large_image",
+    site: siteConfig.twitterSite,
+    title: siteConfig.twitterTitle,
+    description: siteConfig.twitterDescription,
+    creator: siteConfig.twitterCreator,
+    creatorId: siteConfig.twitterCreatorId,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteConfig.url,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    images: [
+      {
+        url: `${siteConfig.url}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  applicationName: siteConfig.name,
+  keywords: siteConfig.keywords,
+  manifest: "/manifest.json",
 };
-
-export const runtime = "edge";
 
 export default function RootLayout({
   children,

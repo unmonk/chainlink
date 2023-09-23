@@ -11,6 +11,7 @@ import { getPromiseByPick } from "@/lib/actions/streaks";
 import { supportedLeagues } from "@/lib/config";
 import { ScoreboardResponse } from "@/lib/espntypes";
 import { handleStatusFinal, handleStatusInProgress } from "@/lib/matchupUtils";
+import { sendPushNotificationToUser } from "@/lib/notifications";
 import { redis } from "@/lib/redis";
 import { getPacifictime } from "@/lib/utils";
 import { eq } from "drizzle-orm";
@@ -152,6 +153,7 @@ export async function GET(
   let results: unknown[] = [];
   if (changedMatchups.length > 0) {
     const dbPromises = [];
+    const notificationPromises: Promise<void>[] = [];
     for (let matchup of changedMatchups) {
       //HANDLE MATCHUPS THAT RE STATUS_IN_PROGRESS
       if (matchup.status === "STATUS_IN_PROGRESS") {
@@ -172,6 +174,18 @@ export async function GET(
             (pick.pick_type === "HOME" && matchup.winner_id === matchup.home_id)
           ) {
             pick.pick_status = "WIN";
+            const notificationPromise = sendPushNotificationToUser(
+              pick.user_id,
+              {
+                title: "Pick Won!",
+                body: `Your pick: ${
+                  pick.pick_type === "HOME"
+                    ? matchup.home_team
+                    : matchup.away_team
+                } won!`,
+              },
+            );
+            notificationPromises.push(notificationPromise);
           }
           if (
             (pick.pick_type === "AWAY" &&
@@ -179,10 +193,35 @@ export async function GET(
             (pick.pick_type === "HOME" && matchup.winner_id === matchup.away_id)
           ) {
             pick.pick_status = "LOSS";
+            const notificationPromise = sendPushNotificationToUser(
+              pick.user_id,
+              {
+                title: "Pick Lost!",
+                body: `Your pick: ${
+                  pick.pick_type === "HOME"
+                    ? matchup.home_team
+                    : matchup.away_team
+                } lost!`,
+              },
+            );
+            notificationPromises.push(notificationPromise);
           }
           if (matchup.winner_id === null) {
             pick.pick_status = "PUSH";
+            const notificationPromise = sendPushNotificationToUser(
+              pick.user_id,
+              {
+                title: "Pick Pushed!",
+                body: `Your pick: ${
+                  pick.pick_type === "HOME"
+                    ? matchup.home_team
+                    : matchup.away_team
+                } Pushed!`,
+              },
+            );
+            notificationPromises.push(notificationPromise);
           }
+
           const streakPromise = getPromiseByPick(pick);
           const pickPromise = db
             .update(picks)
@@ -219,6 +258,8 @@ export async function GET(
     if (!localTesting) {
       results = await Promise.all([redisPipeline.exec(), ...dbPromises]);
     }
+    //PUSH NOTIFICATIONS
+    await Promise.all(notificationPromises);
   }
   return NextResponse.json(
     {

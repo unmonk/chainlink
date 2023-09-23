@@ -49,53 +49,19 @@ export async function createStreak(userId?: string | null) {
   await db.insert(streaks).values(newStreak);
 }
 
-export async function adjustStreak(type: "WIN" | "LOSS" | "PUSH") {
-  let streak = await getStreak();
-  if (!streak) {
-    throw new Error("No active streak");
-  }
-  if (type === "WIN") {
-    //if streak is negative, reset to 1, otherwise increment by 1
-    //Increment wins by 1
-    console.log("STREAK WIN", streak.wins, streak.wins + 1);
-    streak.streak = streak.streak < 0 ? 1 : streak.streak + 1;
-    streak.wins = streak.wins + 1;
-  }
-  if (type === "LOSS") {
-    //if streak is positive, reset to -1, otherwise decrement by 1
-    //Increment losses by 1
-    console.log("STREAK LOSS", streak.losses, streak.losses + 1);
-    streak.streak = streak.streak > 0 ? -1 : streak.streak - 1;
-    streak.losses = streak.losses + 1;
-  }
-  if (type === "PUSH") {
-    streak.pushes = streak.pushes + 1;
-  }
-  await db
-    .update(streaks)
-    .set({
-      streak: streak.streak,
-      wins: streak.wins,
-      losses: streak.losses,
-      pushes: streak.pushes,
-      updated_at: new Date(),
-    })
-    .where(eq(streaks.id, streak.id));
-}
-
 export async function getPromiseByPick(pick: PickWithStreak) {
   if (pick.pick_status === "WIN") {
-    //if streak is negative, reset to 1, otherwise increment by 1
-    //Increment wins by 1
     console.log("PICK WIN", pick.streak.wins, pick.streak.wins + 1);
+    //if streak is less than 0, reset to 1, otherwise increment by 1
     pick.streak.streak = pick.streak.streak < 0 ? 1 : pick.streak.streak + 1;
+    //Increment wins by 1
     pick.streak.wins = pick.streak.wins + 1;
   }
   if (pick.pick_status === "LOSS") {
     console.log("PICK LOSS", pick.streak.losses, pick.streak.losses + 1);
-    //if streak is positive, reset to -1, otherwise decrement by 1
-    //Increment losses by 1
+    //if streak is greater than 0, reset to -1, otherwise decrement by 1
     pick.streak.streak = pick.streak.streak > 0 ? -1 : pick.streak.streak - 1;
+    //Increment losses by 1
     pick.streak.losses = pick.streak.losses + 1;
   }
   if (pick.pick_status === "PUSH") {

@@ -8,7 +8,7 @@ import MatchupCardHeader from "./matchup-card-header";
 import CancelPickButton from "@/components/picks/cancel-pick-button";
 import { PickWithMatchup } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
-import { CalendarClock, CheckIcon, Disc3Icon, LinkIcon } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,7 +17,7 @@ interface ActivePickCardProps {
 }
 
 export function ActivePickCard({ pick }: ActivePickCardProps) {
-  if (!pick) return null;
+  if (!pick || !pick.matchup) return null;
   return (
     <section>
       <div className="flex flex-col gap-2 w-full justify-center items-center">

@@ -64,7 +64,7 @@
 
   /* Track */
   ::-webkit-scrollbar-track {
-    background: black;
+    background: transparent;
     opacity: 0.2;
   }
 

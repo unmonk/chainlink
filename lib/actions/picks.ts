@@ -1,5 +1,6 @@
 "use server";
 
+import { sendPushNotificationToUser } from "../notifications";
 import { getStreak } from "./streaks";
 import { db } from "@/drizzle/db";
 import { NewPick, PickWithStreak, picks } from "@/drizzle/schema";
@@ -14,6 +15,7 @@ export async function makePick(pick: NewPick) {
   }
   pick.active = true;
   pick.streak_id = streak.id;
+
   await db.insert(picks).values(pick);
   revalidatePath(`/play`);
 }

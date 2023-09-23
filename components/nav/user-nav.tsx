@@ -1,5 +1,6 @@
 "use client";
 
+import NotificationToggle from "@/components/nav/notificationtoggle";
 import UserNavLinks from "@/components/nav/user-nav-links";
 import { StreakDisplay } from "@/components/streaks/streak-display";
 import { Button } from "@/components/ui/button";
@@ -14,10 +15,25 @@ import {
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import UserAvatar from "@/components/user-avatar";
 import { useNav } from "@/hooks/useNav";
+import { registerServiceWorker } from "@/lib/notifications";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export function UserNav() {
   const { open, setOpen } = useNav();
+  const { user } = useUser();
+
+  useEffect(() => {
+    async function setUpServiceWorker() {
+      try {
+        await registerServiceWorker();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    setUpServiceWorker();
+  }, []);
 
   return (
     <Sheet onOpenChange={setOpen} open={open}>
@@ -45,7 +61,27 @@ export function UserNav() {
           <p className="mb-2 rounded bg-accent p-2 text-sm">
             Welcome to the Beta, Join the Discord community to get involved!
           </p>
-          <ThemeToggle />
+          <div className="flex flex-row gap-2">
+            <ThemeToggle />
+            <NotificationToggle />
+            {/* <Button
+              onClick={() => {
+                fetch("/api/notifications/push", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    userId: user?.id,
+                    notification: {
+                      title: "You've Won!",
+                      body: "Your Pick: Green Bay Packers has won!",
+                    },
+                  }),
+                });
+              }}
+            /> */}
+          </div>
         </div>
         <Separator className="my-4" />
         <div className="flex flex-row items-center justify-center text-xs gap-2">
