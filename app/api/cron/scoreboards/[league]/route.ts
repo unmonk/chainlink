@@ -259,7 +259,12 @@ export async function GET(
       results = await Promise.all([redisPipeline.exec(), ...dbPromises]);
     }
     //PUSH NOTIFICATIONS
-    await Promise.all(notificationPromises);
+    const notificationResults = await Promise.allSettled(notificationPromises);
+    notificationResults.forEach((result) => {
+      if (result.status !== "fulfilled") {
+        console.log("Failed to send push notification", result.reason);
+      }
+    });
   }
   return NextResponse.json(
     {
