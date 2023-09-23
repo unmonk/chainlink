@@ -32,10 +32,10 @@ The objective of the game is to either link together the longest win Chain in a 
 
 - [ ] Groups
 - [ ] Group Leaderboards
-- [ ] Notifications
+- [x] Notifications
 - [ ] Pick Temperature Gauge
 - [ ] Pick Confidence
 - [ ] Admin Panel: Control Crons
 - [ ] Admin Panel: CRUD Matchups
-- [ ] Admin Panel: View Active Picks
+- [x] Admin Panel: View Active Picks
 - [ ] Groups: Create Custom Streak Campaign
