@@ -12,30 +12,28 @@ interface ProfileDetailsProps {
 
 const ProfileDetails: FC<ProfileDetailsProps> = ({ user }) => {
   return (
-    <div className="h-full w-full flex flex-col gap-4">
-      <div className="flex flex-col md:flex-row p-4 gap-4">
-        <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-          <Avatar className="h-20 w-20">
-            <AvatarImage src={user?.imageUrl} alt="User Profile Picture" />
-            <AvatarFallback className="bg-slate-500">
-              {user?.username?.substring(0, 2) ??
-                user?.emailAddresses[0].emailAddress?.substring(0, 2)}
-            </AvatarFallback>
-          </Avatar>
-          <h1 className="text-2xl font-bold">{user.username}</h1>
+    <div className="flex flex-col md:flex-row p-4 gap-4 items-center justify-center w-full">
+      <div className="flex flex-col items-center justify-center w-full md:w-1/3">
+        <Avatar className="h-20 w-20">
+          <AvatarImage src={user?.imageUrl} alt="User Profile Picture" />
+          <AvatarFallback className="bg-slate-500">
+            {user?.username?.substring(0, 2) ??
+              user?.emailAddresses[0].emailAddress?.substring(0, 2)}
+          </AvatarFallback>
+        </Avatar>
+        <h1 className="text-2xl font-bold">{user.username}</h1>
 
-          <p className="text-sm text-muted-foreground">
-            Joined: <span>{format(user?.createdAt)}</span>
-          </p>
+        <p className="text-sm text-muted-foreground">
+          Joined: <span>{format(user?.createdAt)}</span>
+        </p>
 
-          <ProfileStreakDisplay size="lg" userId={user?.id} />
-        </div>
-        <div className="w-full md:w-2/3 p-4 border rounded-md">
-          <ProfileAchievements />
-        </div>
+        <ProfileStreakDisplay size="lg" userId={user?.id} />
       </div>
-      <div className="p-4 flex flex-col items-center justify-center">
-        <div className="p-4 border rounded-md w-full">
+      <div className="w-full md:w-2/3 p-4 border rounded-md">
+        <ProfileAchievements />
+      </div>
+      <div className="flex flex-col w-full items-center">
+        <div className="p-4 border rounded-md w-5/6">
           <ProfileStats />
         </div>
       </div>
