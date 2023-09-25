@@ -33,7 +33,7 @@ const ProfileDetails: FC<ProfileDetailsProps> = ({ user }) => {
         <ProfileAchievements />
       </div>
       <div className="flex flex-col w-full items-center">
-        <div className="p-4 border rounded-md w-5/6">
+        <div className="p-4 border rounded-md w-full md:w-5/6">
           <ProfileStats />
         </div>
       </div>
