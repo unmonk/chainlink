@@ -1,17 +1,14 @@
 import ProfileDetails from "@/components/profile/profiledetails";
-import {
-  getUserAndStreakByUsername,
-  getUserByUsername,
-} from "@/lib/actions/users";
+import { getUserByUsername } from "@/lib/actions/users";
 import { Metadata, ResolvingMetadata } from "next";
 
-type ProfilePageProps = {
+type Props = {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
 export async function generateMetadata(
-  { params, searchParams }: ProfilePageProps,
+  { params, searchParams }: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const id = params.id;
@@ -21,13 +18,16 @@ export async function generateMetadata(
     description: `View ${user.username}'s ChainLink profile.`,
     openGraph: {
       images: [`https://chainlink.st/api/share/streak/${user.id}`],
+      title: `${user.username} | ChainLink`,
+      description: `View ${user.username}'s ChainLink profile.`,
+      username: user.username,
+      type: "profile",
+      url: `https://chainlink.st/u/${user.username}`,
     },
   };
 }
 
-export default async function IdUserProfilePage({
-  params: { id },
-}: ProfilePageProps) {
+export default async function IdUserProfilePage({ params: { id } }: Props) {
   const user = await getUserByUsername(id);
 
   if (!user) {
