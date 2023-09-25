@@ -34,7 +34,7 @@ const ProfileDetails: FC<ProfileDetailsProps> = ({ user }) => {
       </div>
       <div className="flex flex-col w-full items-center">
         <div className="p-4 border rounded-md w-full md:w-5/6">
-          <ProfileStats />
+          <ProfileStats userId={user.id} />
         </div>
       </div>
     </div>

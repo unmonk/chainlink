@@ -3,11 +3,11 @@ import { getUserStats } from "@/lib/actions/profiles";
 import { auth } from "@clerk/nextjs";
 import { FC } from "react";
 
-interface ProfileStatsProps {}
+interface ProfileStatsProps {
+  userId: string;
+}
 
-const ProfileStats: FC<ProfileStatsProps> = async ({}) => {
-  const { userId } = auth();
-  if (!userId) return null;
+const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
   const stats = await getUserStats(userId);
   return (
     <div>
