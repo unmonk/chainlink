@@ -8,6 +8,7 @@ import {
   CalendarSearchIcon,
   BusIcon,
   CalendarDaysIcon,
+  AwardIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -45,6 +46,11 @@ const GAME_INFO_LINKS = [
     name: "Squads",
     href: "/admin/squads",
     icon: BusIcon,
+  },
+  {
+    name: "Achievements",
+    href: "/admin/achievements",
+    icon: AwardIcon,
   },
 ];
 
@@ -107,7 +113,7 @@ export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
 }) => {
   const pathname = usePathname();
   return (
-    <div className={cn("flex flex-col px-2 gap-1", className)}>
+    <div className={cn("flex flex-col px-2 gap-1 w-5/6", className)}>
       <div className="flex flex-row gap-1">
         {ADMIN_LINKS.map((link) => (
           <Button
@@ -123,7 +129,7 @@ export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
           </Button>
         ))}
       </div>
-      <div className="flex flex-row gap-1">
+      <div className="flex flex-row flex-wrap gap-1">
         {GAME_INFO_LINKS.map((link) => (
           <Button
             key={link.name}
