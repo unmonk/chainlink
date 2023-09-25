@@ -73,6 +73,7 @@ export const matchups = mysqlTable(
       "STATUS_DELAYED",
       "STATUS_UNKNOWN",
       "STATUS_END_PERIOD",
+      "STATUS_HALFTIME",
     ]).notNull(),
     league: mysqlEnum("leagues", [
       "NFL",
@@ -503,7 +504,8 @@ export type MatchupStatus =
   | "STATUS_SUSPENDED"
   | "STATUS_DELAYED"
   | "STATUS_UNKNOWN"
-  | "STATUS_END_PERIOD";
+  | "STATUS_END_PERIOD"
+  | "STATUS_HALFTIME";
 
 export type Operator =
   | "LESS_THAN"

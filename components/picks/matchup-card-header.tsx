@@ -17,7 +17,8 @@ export type PickCardVariant =
   | "STATUS_SUSPENDED"
   | "STATUS_DELAYED"
   | "STATUS_UNKNOWN"
-  | "STATUS_END_PERIOD";
+  | "STATUS_END_PERIOD"
+  | "STATUS_HALFTIME";
 
 interface PickCardHeaderProps {
   matchup: Partial<Matchup>;
@@ -41,7 +42,9 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
         STATUS_POSTPONED:
           "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600  to-bg-secondary",
         STATUS_END_PERIOD:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600  to-bg-secondary",
+          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800 to-bg-secondary",
+        STATUS_HALFTIME:
+          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800 to-bg-secondary",
         STATUS_CANCELED:
           "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-rose-300 dark:from-rose-800 to-bg-secondary",
         STATUS_SUSPENDED:
@@ -75,6 +78,7 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
           {status === "STATUS_FINAL" && "Final"}
           {status === "STATUS_POSTPONED" && "Postponed"}
           {status === "STATUS_END_PERIOD" && "Period Ended"}
+          {status === "STATUS_HALFTIME" && "Halftime"}
           {status === "STATUS_CANCELED" && "Canceled"}
           {status === "STATUS_SUSPENDED" && "Suspended"}
           {status === "STATUS_DELAYED" && "Delayed"}
