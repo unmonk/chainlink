@@ -12,7 +12,7 @@
     "db:push": "drizzle-kit push:mysql"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.23.2",
+    "@clerk/nextjs": "^4.24.1",
     "@clerk/themes": "^1.7.5",
     "@hookform/resolvers": "^3.2.0",
     "@planetscale/database": "^1.10.0",
