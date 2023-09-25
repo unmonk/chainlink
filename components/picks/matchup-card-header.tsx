@@ -1,24 +1,8 @@
 import ClientTime from "../ui/client-time";
-import { Matchup } from "@/drizzle/schema";
+import { Matchup, PickCardVariant } from "@/drizzle/schema";
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { FC } from "react";
-
-export type PickCardVariant =
-  | "WIN"
-  | "LOSS"
-  | "PENDING"
-  | "PUSH"
-  | "STATUS_SCHEDULED"
-  | "STATUS_IN_PROGRESS"
-  | "STATUS_FINAL"
-  | "STATUS_POSTPONED"
-  | "STATUS_CANCELED"
-  | "STATUS_SUSPENDED"
-  | "STATUS_DELAYED"
-  | "STATUS_UNKNOWN"
-  | "STATUS_END_PERIOD"
-  | "STATUS_HALFTIME";
 
 interface PickCardHeaderProps {
   matchup: Partial<Matchup>;

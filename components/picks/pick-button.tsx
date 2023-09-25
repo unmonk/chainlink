@@ -3,7 +3,7 @@
 import { PickModal } from "../modals/pick-modal";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
-import { NewPick, PickType } from "@/drizzle/schema";
+import { NewPick, PickCardVariant, PickType } from "@/drizzle/schema";
 import { usePick } from "@/hooks/usePick";
 import { getPick, makePick } from "@/lib/actions/picks";
 import { cn } from "@/lib/utils";
@@ -11,21 +11,6 @@ import { useAuth } from "@clerk/nextjs";
 import { cva } from "class-variance-authority";
 import Image from "next/image";
 import { FC, useState } from "react";
-
-export type PickCardVariant =
-  | "WIN"
-  | "LOSS"
-  | "PENDING"
-  | "PUSH"
-  | "STATUS_SCHEDULED"
-  | "STATUS_IN_PROGRESS"
-  | "STATUS_FINAL"
-  | "STATUS_POSTPONED"
-  | "STATUS_CANCELED"
-  | "STATUS_SUSPENDED"
-  | "STATUS_DELAYED"
-  | "STATUS_UNKNOWN"
-  | "STATUS_END_PERIOD";
 
 interface PickButtonProps {
   className?: string;
@@ -56,6 +41,7 @@ const pickButtonVariants = cva(
         STATUS_DELAYED: "",
         STATUS_UNKNOWN: "",
         STATUS_END_PERIOD: "",
+        STATUS_HALFTIME: "",
       },
       defaultVariants: {
         variant: "STATUS_SCHEDULED",

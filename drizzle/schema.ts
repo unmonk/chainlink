@@ -507,6 +507,22 @@ export type MatchupStatus =
   | "STATUS_END_PERIOD"
   | "STATUS_HALFTIME";
 
+export type PickCardVariant =
+  | "WIN"
+  | "LOSS"
+  | "PENDING"
+  | "PUSH"
+  | "STATUS_SCHEDULED"
+  | "STATUS_IN_PROGRESS"
+  | "STATUS_FINAL"
+  | "STATUS_POSTPONED"
+  | "STATUS_CANCELED"
+  | "STATUS_SUSPENDED"
+  | "STATUS_DELAYED"
+  | "STATUS_UNKNOWN"
+  | "STATUS_END_PERIOD"
+  | "STATUS_HALFTIME";
+
 export type Operator =
   | "LESS_THAN"
   | "GREATER_THAN"
