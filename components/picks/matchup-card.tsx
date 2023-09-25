@@ -1,6 +1,7 @@
 import MatchupCardButtons from "./matchup-card-buttons";
 import MatchupCardFooter from "./matchup-card-footer";
-import MatchupCardHeader, { PickCardVariant } from "./matchup-card-header";
+import MatchupCardHeader from "./matchup-card-header";
+import { PickCardVariant } from "@/drizzle/schema";
 import { Matchup, Pick } from "@/drizzle/schema";
 import { FC } from "react";
 
