@@ -165,31 +165,6 @@ export const matchups = mysqlTable(
   },
 );
 
-export const streaks = mysqlTable(
-  "streaks",
-  {
-    id: serial("id").primaryKey().autoincrement(),
-    user_id: varchar("user_id", {
-      length: 64,
-    }).notNull(),
-    campaign_id: bigint("campaign_id", {
-      mode: "number",
-    }).notNull(),
-    streak: smallint("streak").notNull().default(0),
-    wins: smallint("wins").notNull().default(0),
-    losses: smallint("losses").notNull().default(0),
-    pushes: smallint("pushes").notNull().default(0),
-    created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
-    updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
-    active: boolean("active").notNull().default(true),
-  },
-  (table) => {
-    return {
-      user_active_idx: index("user_active_idx").on(table.user_id, table.active),
-    };
-  },
-);
-
 export const picks = mysqlTable(
   "picks",
   {
@@ -217,6 +192,31 @@ export const picks = mysqlTable(
     ])
       .notNull()
       .default("PENDING"),
+  },
+  (table) => {
+    return {
+      user_active_idx: index("user_active_idx").on(table.user_id, table.active),
+    };
+  },
+);
+
+export const streaks = mysqlTable(
+  "streaks",
+  {
+    id: serial("id").primaryKey().autoincrement(),
+    user_id: varchar("user_id", {
+      length: 64,
+    }).notNull(),
+    campaign_id: bigint("campaign_id", {
+      mode: "number",
+    }).notNull(),
+    streak: smallint("streak").notNull().default(0),
+    wins: smallint("wins").notNull().default(0),
+    losses: smallint("losses").notNull().default(0),
+    pushes: smallint("pushes").notNull().default(0),
+    created_at: timestamp("created_at", { mode: "date" }).defaultNow(),
+    updated_at: timestamp("updated_at", { mode: "date" }).defaultNow(),
+    active: boolean("active").notNull().default(true),
   },
   (table) => {
     return {
@@ -288,6 +288,9 @@ export const profileAchievements = mysqlTable(
     achievement_id: bigint("achievement_id", {
       mode: "number",
     }).notNull(),
+    created_at: timestamp("created_at", { mode: "date" }).default(
+      sql`current_timestamp()`,
+    ),
   },
   (table) => {
     return {
