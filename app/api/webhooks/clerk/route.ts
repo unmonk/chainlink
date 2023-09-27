@@ -11,13 +11,10 @@ export async function POST(req: Request) {
 
   if (eventType === "user.created") {
     const profilePromise = createProfile(userId);
-    const streakPromise = createStreak(userId);
-    const [profile, streak] = await Promise.all([
-      profilePromise,
-      streakPromise,
-    ]);
 
-    return new NextResponse(JSON.stringify({ profile, streak }), {
+    const [profile] = await Promise.all([profilePromise]);
+
+    return new NextResponse(JSON.stringify({ profile }), {
       status: 200,
     });
   }

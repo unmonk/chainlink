@@ -20,7 +20,7 @@ export type CronResponse = {
 
 export async function getCronsList() {
   const cronRes: CronResponse = await fetch(
-    `https://www.easycron.com/rest/list?token=${process.env.EASY_CRON_SECRET}&sortby=cronId&order=desc`,
+    `https://www.easycron.com/rest/list?token=${process.env.EASY_CRON_SECRET}&sortby=cronId&order=desc&size=100`,
     {
       next: {
         revalidate: 0,

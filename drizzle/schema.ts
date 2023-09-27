@@ -271,6 +271,17 @@ export const achievements = mysqlTable("achievements", {
   description: varchar("description", {
     length: 128,
   }).notNull(),
+  type: mysqlEnum("type", [
+    "STREAKWIN",
+    "STREAKLOSS",
+    "MONTHLYWIN",
+    "MONTHLYSTREAKWIN",
+    "SQUAD",
+    "OTHER",
+  ])
+    .notNull()
+    .default("OTHER"),
+  value: mediumint("value").notNull().default(0),
   image: varchar("image", {
     length: 512,
   }).notNull(),
@@ -543,3 +554,11 @@ export type PickStatus =
   | "PUSH"
   | "STATUS_IN_PROGRESS"
   | "STATUS_UNKNOWN";
+
+export type AchievementType =
+  | "STREAKWIN"
+  | "STREAKLOSS"
+  | "MONTHLYWIN"
+  | "MONTHLYSTREAKWIN"
+  | "SQUAD"
+  | "OTHER";

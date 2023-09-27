@@ -9,8 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import UserAvatar from "@/components/user-avatar";
-import { Pick, PickWithMatchup } from "@/drizzle/schema";
+import { PickWithMatchup } from "@/drizzle/schema";
 import { getActivePicks } from "@/lib/actions/picks";
 import { cn } from "@/lib/utils";
 import { clerkClient } from "@clerk/nextjs";
@@ -86,8 +85,8 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
                   <Image
                     src={
                       pick.pick_type === "HOME"
-                        ? pick.matchup.home_image || ""
-                        : pick.matchup.away_image || ""
+                        ? pick.matchup?.home_image || ""
+                        : pick.matchup?.away_image || ""
                     }
                     className="h-7 w-7"
                     width={28}
@@ -97,7 +96,9 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
                   {pick.pick_type}
                 </div>
               </TableCell>
-              <TableCell className="text-xs">{pick.matchup.question}</TableCell>
+              <TableCell className="text-xs">
+                {pick.matchup?.question}
+              </TableCell>
               <TableCell>
                 {pick.pick_status === "STATUS_IN_PROGRESS" && <Loader />}
                 {pick.pick_status === "PENDING" && "Pending"}
