@@ -9,12 +9,12 @@ export default async function AdminAchievmentPage() {
   return (
     <div className="p-2 items-center justify-center flex flex-col">
       <h1 className="text-xl font-bold">Achievements</h1>
-      <div className="flex flex-col md:flex-row gap-4 w-full">
-        <div className="w-full md:w-1/2 border rounded-md p-2">
+      <div className="lg:flex lg:flex-row gap-4">
+        <div className="w-full lg:w-1/2 border rounded-md p-2">
           <NewAchievementForm />
         </div>
-        <div className="w-full md:w-1/2 border rounded-md p-2">
-          <ScrollArea className="h-96">
+        <div className="w-full lg:w-1/2 border rounded-md p-2">
+          <ScrollArea className="h-full">
             {achievements.map((achievement) => (
               <AchievementListItem
                 achievement={achievement}

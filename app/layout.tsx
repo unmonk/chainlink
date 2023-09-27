@@ -58,6 +58,12 @@ export default function RootLayout({
       }}
     >
       <html lang="en" suppressHydrationWarning>
+        <head>
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          ></meta>
+        </head>
         <body className={cn("bg-background antialiased", inter.className)}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Navbar />

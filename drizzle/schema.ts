@@ -17,6 +17,7 @@ import {
   unique,
   primaryKey,
 } from "drizzle-orm/mysql-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 //Tables
 
@@ -555,10 +556,11 @@ export type PickStatus =
   | "STATUS_IN_PROGRESS"
   | "STATUS_UNKNOWN";
 
-export type AchievementType =
-  | "STREAKWIN"
-  | "STREAKLOSS"
-  | "MONTHLYWIN"
-  | "MONTHLYSTREAKWIN"
-  | "SQUAD"
-  | "OTHER";
+export enum AchievementType {
+  STREAKWIN = "STREAKWIN",
+  STREAKLOSS = "STREAKLOSS",
+  MONTHLYWIN = "MONTHLYWIN",
+  MONTHLYSTREAKWIN = "MONTHLYSTREAKWIN",
+  SQUAD = "SQUAD",
+  OTHER = "OTHER",
+}

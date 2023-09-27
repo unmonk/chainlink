@@ -23,7 +23,7 @@ export async function POST(req: Request) {
           title: notification.title,
           body: notification.body,
           icon: notification.icon ?? "/icon-512x512.png",
-          badge: notification.badge ?? "/android-chrome-192x192.png",
+          badge: notification.badge ?? "/logo.svg",
           image: notification.image ?? "/images/notification.png",
           vibrate: notification.vibrate ?? [100, 50, 100],
           tag: notification.tag ?? "default",

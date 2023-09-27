@@ -12,17 +12,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AchievementType, achievements } from "@/drizzle/schema";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createInsertSchema } from "drizzle-zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-const formSchema = z.object({
-  name: z.string().min(2).max(128),
-  description: z.string().min(2).max(128),
-  image: z.string().min(2).max(512),
-});
+const formSchema = createInsertSchema(achievements);
 
 export function NewAchievementForm() {
   // 1. Define your form.
@@ -31,6 +36,8 @@ export function NewAchievementForm() {
     defaultValues: {
       name: "",
       description: "",
+      type: AchievementType.OTHER,
+      value: 0,
       image: "",
     },
   });
@@ -75,6 +82,54 @@ export function NewAchievementForm() {
               </FormControl>
               <FormDescription>
                 The public description of the achievement.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Achievement Type</FormLabel>
+              <FormControl>
+                <Select {...field}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Achievement Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(AchievementType).map(([key, value]) => (
+                      <SelectItem key={key} value={value}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormDescription>
+                The type of achievement. This will determine how it is awarded.
+                OTHER should be used for all non-sequential achievements.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="value"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Achievement Weight</FormLabel>
+              <FormControl>
+                <Input placeholder="0" {...field} />
+              </FormControl>
+              <FormDescription>
+                The higher weight for the same type will be displayed on the
+                profile. Ex: 5 weight for 5 win chain, 10 weight for 10 win
+                chain, only 10 will show on profile if both are awarded. 0
+                weight is for non-sequential achievements.
               </FormDescription>
               <FormMessage />
             </FormItem>

@@ -16,12 +16,9 @@ const TestNotificationButton: FC<TestNotificationButtonProps> = ({}) => {
     await sendPushNotificationToUser(userId, {
       title: "Test Push Notification",
       body: "This is a test push notification from ChainLink",
-      icon: "/android-chrome-192x192.png",
-      badge: "/android-chrome-512x512.png",
       data: {
         url: "https://chainlink.st/play",
       },
-      tag: "open",
       vibrate: [200, 100, 200, 200, 100, 200],
     });
     return;

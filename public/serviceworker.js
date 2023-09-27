@@ -10,7 +10,7 @@ const sw = /** @type {ServiceWorkerGlobalScope & typeof globalThis} */ (
 
 sw.addEventListener("push", (event) => {
   const message = event.data?.json();
-  const { title, body, icon, image, badge, vibrate } = message;
+  const { title, body, icon, image, badge, vibrate, data } = message;
   console.log("Push received", message);
 
   async function handlePushEvent() {
@@ -20,9 +20,7 @@ sw.addEventListener("push", (event) => {
       image,
       badge,
       vibrate,
-      data: {
-        url: "/play",
-      },
+      data,
       actions: [
         {
           action: "open",
@@ -53,7 +51,9 @@ sw.addEventListener("notificationclick", async (event) => {
         url: event.notification.data.url,
       });
     } else {
-      sw.clients.openWindow("/play");
+      sw.clients.openWindow(
+        event.notification.data.url || "https://chainlink.st",
+      );
     }
   }
 
