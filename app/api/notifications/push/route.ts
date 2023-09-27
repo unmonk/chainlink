@@ -22,8 +22,8 @@ export async function POST(req: Request) {
         JSON.stringify({
           title: notification.title,
           body: notification.body,
-          icon: notification.icon ?? "/favicon.ico",
-          badge: notification.badge ?? "/images/notification.png",
+          icon: notification.icon ?? "/icon-512x512.png",
+          badge: notification.badge ?? "/android-chrome-192x192.png",
           image: notification.image ?? "/images/notification.png",
           vibrate: notification.vibrate ?? [100, 50, 100],
           tag: notification.tag ?? "default",
