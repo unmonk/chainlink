@@ -1,3 +1,4 @@
+import TestNotificationButton from "@/components/admin/testnotificationbutton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAdminDashboard } from "@/lib/actions/admin-dashboard";
 import {
@@ -13,6 +14,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="p-8">
+      <TestNotificationButton />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <Link href="/admin/users">

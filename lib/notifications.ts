@@ -102,7 +102,9 @@ export async function sendPushNotificationToUser(
       notification,
     }),
   });
+  console.log(response);
   if (!response.ok) {
     throw Error("Could not send push subscription to server");
   }
+  console.log("sendPushNotificationToUser");
 }
