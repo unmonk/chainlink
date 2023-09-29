@@ -65,12 +65,12 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
             <TableRow key={pick.id}>
               <TableCell>
                 <Button variant="outline" size={"icon"} disabled>
-                  <Edit2Icon className="h-4 w-4" />
+                  <Edit2Icon className="w-4 h-4" />
                 </Button>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col items-center justify-start">
-                  <Avatar className="mx-2 h-7 w-7">
+                <div className="flex flex-col justify-start items-center">
+                  <Avatar className="w-7 h-7 mx-2">
                     <AvatarImage
                       src={pick.user?.imageUrl}
                       alt={pick.user?.username || "User"}
@@ -81,14 +81,14 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col items-center justify-start">
+                <div className="flex flex-col justify-start items-center">
                   <Image
                     src={
                       pick.pick_type === "HOME"
                         ? pick.matchup?.home_image || ""
                         : pick.matchup?.away_image || ""
                     }
-                    className="h-7 w-7"
+                    className="w-7 h-7"
                     width={28}
                     height={28}
                     alt={pick.pick_type}

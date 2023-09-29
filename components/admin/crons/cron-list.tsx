@@ -29,7 +29,7 @@ const CronList: FC<CronListProps> = async ({}) => {
   });
 
   return (
-    <div className="border rounded-md p-4 flex flex-col gap-2">
+    <div className="flex flex-col gap-2 p-4 border rounded-md">
       <h2 className="text-2xl font-semibold text-primary">Scheduled Jobs</h2>
       <Separator />
       <Table>

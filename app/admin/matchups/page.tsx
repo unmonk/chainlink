@@ -21,8 +21,8 @@ export default async function AdminMatchups({
   const matchups = await getMatchupsWithPicks();
 
   return (
-    <div className="border rounded-md flex flex-col gap-2 mt-2">
-      <div className="flex flex-row gap-4 items-center justify-center">
+    <div className="flex flex-col gap-2 mt-2 border rounded-md">
+      <div className="flex flex-row justify-center items-center gap-4">
         <h1 className="p-4 text-xl text-primary">Matchups</h1>
 
         <DatePicker />
@@ -45,7 +45,7 @@ export default async function AdminMatchups({
             <TableRow key={matchup.id}>
               <TableCell>
                 <Button variant="outline" size={"icon"} disabled>
-                  <Edit2Icon className="h-4 w-4" />
+                  <Edit2Icon className="w-4 h-4" />
                 </Button>
               </TableCell>
               <TableCell>{matchup.picks.length}</TableCell>

@@ -1,3 +1,7 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "plugins": ["@aacn.eu/tailwind-classname-order"],
+  "rules": {
+    "@aacn.eu/tailwind-classname-order/order": 2
+  }
 }

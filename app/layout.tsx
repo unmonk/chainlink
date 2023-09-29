@@ -64,7 +64,7 @@ export default function RootLayout({
             content="width=device-width, initial-scale=1.0"
           ></meta>
         </head>
-        <body className={cn("bg-background antialiased", inter.className)}>
+        <body className={cn("antialiased bg-background", inter.className)}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Navbar />
             {children}

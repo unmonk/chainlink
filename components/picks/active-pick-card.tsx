@@ -20,19 +20,19 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
   if (!pick || !pick.matchup) return null;
   return (
     <section>
-      <div className="flex flex-col gap-2 w-full justify-center items-center">
-        <div className="h-full w-full rounded-b-md border shadow-md">
+      <div className="w-full flex flex-col justify-center items-center gap-2">
+        <div className="w-full h-full border rounded-b-md shadow-md">
           <MatchupCardHeader matchup={pick.matchup} status={pick.pick_status} />
 
-          <h4 className="pr-1 text-sm font-bold md:text-base p-2 md:text-center">
+          <h4 className="p-2 pr-1 text-sm font-bold md:text-base md:text-center">
             {pick.matchup.question}
           </h4>
 
-          <div className="flex flex-col gap-2 items-center p-2">
+          <div className="flex flex-col items-center gap-2 p-2">
             <div className="grid grid-cols-3 gap-4">
               <div
                 className={cn(
-                  "flex flex-col items-center justify-center rounded-sm p-2 relative",
+                  "relative flex flex-col justify-center items-center p-2 rounded-sm",
                   pick.pick_type === "AWAY"
                     ? "bg-accent"
                     : "bg-accent/40 opacity-30",
@@ -58,7 +58,7 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
               </div>
               {/* clock section start_time */}
               {pick.pick_status === "PENDING" && (
-                <div className="flex flex-col items-center justify-center bg-accent/40 rounded-sm p-2">
+                <div className="flex flex-col justify-center items-center p-2 bg-accent/40 rounded-sm">
                   <span className="text-xs font-bold text-center text-primary">
                     Locks at:
                   </span>
@@ -70,13 +70,13 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
               )}
               {/* clock section start_time */}
               {pick.pick_status === "STATUS_IN_PROGRESS" && (
-                <div className="flex flex-col items-center justify-center bg-accent/40 rounded-sm p-2">
+                <div className="flex flex-col justify-center items-center p-2 bg-accent/40 rounded-sm">
                   <Loader />
                 </div>
               )}
               <div
                 className={cn(
-                  "flex flex-col items-center justify-center rounded-sm p-2 relative",
+                  "relative flex flex-col justify-center items-center p-2 rounded-sm",
                   pick.pick_type === "HOME"
                     ? "bg-accent"
                     : "bg-accent/40 opacity-30",
@@ -101,7 +101,7 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                 )}
               </div>
             </div>
-            <div className="flex flex-row  justify-evenly gap-4 w-1/2">
+            <div className="w-1/2 flex flex-row justify-evenly gap-4">
               {pick.pick_status !== "PENDING" && (
                 <div className="flex justify-center items-center">
                   <p className="text-lg">{pick.matchup.away_value}</p>

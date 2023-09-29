@@ -49,7 +49,7 @@ export function UserNav() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="flex flex-row items-center justify-center gap-2 p-2">
+          <SheetTitle className="flex flex-row justify-center items-center gap-2 p-2">
             <UserAvatar />
           </SheetTitle>
         </SheetHeader>
@@ -57,8 +57,8 @@ export function UserNav() {
         <UserNavLinks />
         <Separator className="my-4" />
         <div className="flex flex-col items-center">
-          <p className="mb-2 px-4 text-xs underline">Announcements</p>
-          <p className="mb-2 rounded bg-accent p-2 text-sm">
+          <p className="px-4 mb-2 text-xs underline">Announcements</p>
+          <p className="p-2 mb-2 text-sm bg-accent rounded">
             Welcome to the Beta, Join the Discord community to get involved!
           </p>
           <div className="flex flex-row gap-2">
@@ -84,7 +84,7 @@ export function UserNav() {
           </div>
         </div>
         <Separator className="my-4" />
-        <div className="flex flex-row items-center justify-center text-xs gap-2">
+        <div className="flex flex-row justify-center items-center gap-2 text-xs">
           <Link
             href={"/privacy"}
             className="text-muted-foreground"

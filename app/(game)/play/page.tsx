@@ -48,38 +48,38 @@ export default async function Page({ searchParams }: DashboardPageParams) {
 
   return (
     <section className="flex flex-col items-center py-4 md:py-6 ">
-      <div className="grid w-full grid-cols-1 gap-4 lg:gap-8 px-2 2xl:grid-cols-8 lg:px-4 xl:px-6">
-        <div className="col-span-1 flex flex-col gap-2 2xl:col-span-2 xl:border-r-2 lg:px-4 xl:px-6">
-          <div className=" flex-row px-2 h-8 hidden lg:flex">
+      <div className="w-full grid grid-cols-1 gap-4 px-2 lg:gap-8 lg:px-4 xl:px-6 2xl:grid-cols-8">
+        <div className="flex flex-col col-span-1 gap-2 lg:px-4 xl:px-6 xl:border-r-2 2xl:col-span-2">
+          <div className="h-8 hidden flex-row px-2 lg:flex">
             <h3 className="text-lg font-semibold">My Streak</h3>
           </div>
-          <Separator className="my-2 hidden xl:flex" />
-          <div className="hidden lg:flex flex-col justify-center text-center text-xl">
+          <Separator className="hidden my-2 xl:flex" />
+          <div className="hidden flex-col justify-center text-xl text-center lg:flex">
             <StreakDisplay size="xl" />
           </div>
 
           {pick && (
             <>
-              <div className="flex flex-row px-2 h-8 mt-2">
+              <div className="h-8 flex flex-row px-2 mt-2">
                 <h3 className="text-lg font-semibold">My Pick</h3>
               </div>
-              <Separator className="my-2 hidden xl:flex" />
+              <Separator className="hidden my-2 xl:flex" />
               <ActivePickCard pick={pick} />
             </>
           )}
 
-          <div className=" flex-row px-2 h-8 mt-2 hidden xl:flex">
+          <div className="h-8 hidden flex-row px-2 mt-2 xl:flex">
             <h3 className="text-lg font-semibold ">Our Other Games</h3>
           </div>
-          <Separator className="my-2 hidden xl:flex" />
-          <div className="text-xl hidden xl:grid xl:grid-cols-3 gap-2 items-center justify-between">
+          <Separator className="hidden my-2 xl:flex" />
+          <div className="hidden justify-between items-center gap-2 text-xl xl:grid xl:grid-cols-3">
             <Link href="https://www.theroseleague.com" target="_blank">
               <Image
                 src="/images/ad1.png"
                 width={200}
                 height={200}
                 alt="test"
-                className="rounded-lg shadow-md border-slate-500"
+                className="rounded-lg border-slate-500 shadow-md"
               />
             </Link>
             <Image
@@ -87,20 +87,20 @@ export default async function Page({ searchParams }: DashboardPageParams) {
               width={200}
               height={200}
               alt="test"
-              className="rounded-lg shadow-md border-slate-500"
+              className="rounded-lg border-slate-500 shadow-md"
             />
             <Image
               src="/images/ad3.png"
               width={200}
               height={200}
               alt="test"
-              className="rounded-lg shadow-md border-slate-500"
+              className="rounded-lg border-slate-500 shadow-md"
             />
           </div>
         </div>
         <TooltipProvider>
-          <div className="col-span-1 flex flex-col gap-2 2xl:col-span-6">
-            <div className="flex flex-row items-center px-2 h-8">
+          <div className="flex flex-col col-span-1 gap-2 2xl:col-span-6">
+            <div className="h-8 flex flex-row items-center px-2">
               <h3 className="text-lg font-semibold ">{`Today's Picks`}</h3>
               {pick && pick.pick_status !== "PENDING" && (
                 <Tooltip>
@@ -112,9 +112,9 @@ export default async function Page({ searchParams }: DashboardPageParams) {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <div className="ml-auto flex flex-row gap-4">
+              <div className="flex flex-row gap-4 ml-auto">
                 <Button
-                  className="flex flex-col text-xs whitespace-nowrap"
+                  className="flex flex-col whitespace-nowrap text-xs"
                   variant={"link"}
                   size={"icon"}
                   asChild
@@ -125,7 +125,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
                   </Link>
                 </Button>
                 <Button
-                  className="flex flex-col text-xs whitespace-nowrap"
+                  className="flex flex-col whitespace-nowrap text-xs"
                   size={"icon"}
                   variant={"link"}
                   asChild

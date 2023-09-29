@@ -12,9 +12,9 @@ interface ProfileDetailsProps {
 
 const ProfileDetails: FC<ProfileDetailsProps> = ({ user }) => {
   return (
-    <div className="flex flex-col md:flex-row p-4 gap-4 items-center justify-center w-full">
-      <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-        <Avatar className="h-20 w-20">
+    <div className="w-full flex flex-col justify-center items-center gap-4 p-4 md:flex-row">
+      <div className="w-full flex flex-col justify-center items-center md:w-1/3">
+        <Avatar className="w-20 h-20">
           <AvatarImage src={user?.imageUrl} alt="User Profile Picture" />
           <AvatarFallback className="bg-slate-500">
             {user?.username?.substring(0, 2) ??
@@ -29,11 +29,11 @@ const ProfileDetails: FC<ProfileDetailsProps> = ({ user }) => {
 
         <ProfileStreakDisplay size="lg" userId={user?.id} />
       </div>
-      <div className="w-full md:w-2/3 p-4 border rounded-md">
+      <div className="w-full p-4 border rounded-md md:w-2/3">
         <ProfileAchievements />
       </div>
-      <div className="flex flex-col w-full items-center">
-        <div className="p-4 border rounded-md w-full md:w-5/6">
+      <div className="w-full flex flex-col items-center">
+        <div className="w-full p-4 border rounded-md md:w-5/6">
           <ProfileStats userId={user.id} />
         </div>
       </div>

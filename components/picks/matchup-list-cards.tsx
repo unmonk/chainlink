@@ -24,7 +24,7 @@ const MatchupListCards: FC<MatchupListCardsProps> = async ({
   }
 
   return (
-    <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-4">
       {sortedMatchups.map((matchup: Matchup) => (
         <MatchupCard
           key={matchup.id}

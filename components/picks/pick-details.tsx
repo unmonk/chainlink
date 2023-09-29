@@ -9,11 +9,11 @@ interface PickDetailsProps {
 
 const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
   return (
-    <div className="p-2 flex flex-col gap-2 items-center">
+    <div className="flex flex-col items-center gap-2 p-2">
       <p className="text-lg">{pick.matchup.question}</p>
       <div className="grid grid-cols-2 gap-2">
         <div
-          className={cn("flex flex-col gap-2 items-center rounded-md p-2", {
+          className={cn("flex flex-col items-center gap-2 p-2 rounded-md", {
             "border border-green-500":
               pick.pick_type === "AWAY" && pick.pick_status === "WIN",
             "border border-red-500":
@@ -23,7 +23,7 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
             border: pick.pick_type === "AWAY",
           })}
         >
-          <p className="text-sm h-8 text-center">{pick.matchup.away_team}</p>
+          <p className="h-8 text-sm text-center">{pick.matchup.away_team}</p>
           <Image
             src={pick.matchup.away_image!}
             width={40}
@@ -33,7 +33,7 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
           <p>{pick.matchup.away_value}</p>
         </div>
         <div
-          className={cn("flex flex-col gap-2 items-center rounded-md p-2", {
+          className={cn("flex flex-col items-center gap-2 p-2 rounded-md", {
             "border border-green-500":
               pick.pick_type === "HOME" && pick.pick_status === "WIN",
             "border border-red-500":
@@ -43,7 +43,7 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
             border: pick.pick_type === "HOME",
           })}
         >
-          <p className="text-sm h-8 text-center">{pick.matchup.home_team}</p>
+          <p className="h-8 text-sm text-center">{pick.matchup.home_team}</p>
           <Image
             src={pick.matchup.home_image!}
             width={40}

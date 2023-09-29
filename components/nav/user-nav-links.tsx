@@ -35,7 +35,7 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
 
   return (
     <nav className="py-2">
-      <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight underline">
+      <h2 className="px-4 mb-2 text-lg font-semibold tracking-tight underline">
         Play
       </h2>
       <div className="space-y-1">
@@ -44,7 +44,7 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           className="w-full justify-start"
           onClick={() => handleLinkClick("/play")}
         >
-          <LayoutDashboard className="mr-2 h-4 w-4" />
+          <LayoutDashboard className="w-4 h-4 mr-2" />
           Play
         </Button>
         <Button
@@ -52,7 +52,7 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           className="w-full justify-start"
           onClick={() => handleLinkClick("/picks")}
         >
-          <CalendarSearchIcon className="mr-2 h-4 w-4" />
+          <CalendarSearchIcon className="w-4 h-4 mr-2" />
           My Picks
         </Button>
         <Button
@@ -60,7 +60,7 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           className="w-full justify-start"
           onClick={() => handleLinkClick("/leaderboards")}
         >
-          <Trophy className="mr-2 h-4 w-4" />
+          <Trophy className="w-4 h-4 mr-2" />
           Leaderboards
         </Button>
         {/* <Button
@@ -76,12 +76,12 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           className="w-full justify-start"
           onClick={() => handleLinkClick("/howtoplay")}
         >
-          <BookOpenCheck className="mr-2 h-4 w-4" />
+          <BookOpenCheck className="w-4 h-4 mr-2" />
           How to Play
         </Button>
       </div>
       <Separator className="my-4" />
-      <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight underline">
+      <h2 className="px-4 mb-2 text-lg font-semibold tracking-tight underline">
         Everything Else
       </h2>
       <div className="space-y-1">
@@ -90,7 +90,7 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           className="w-full justify-start"
           onClick={() => handleLinkClick("/")}
         >
-          <Home className="mr-2 h-4 w-4" />
+          <Home className="w-4 h-4 mr-2" />
           Home
         </Button>
         <Button
@@ -98,12 +98,12 @@ const UserNavLinks: FC<UserNavLinksProps> = ({}) => {
           className="w-full justify-start"
           onClick={() => handleLinkClick("/account")}
         >
-          <User className="mr-2 h-4 w-4" />
+          <User className="w-4 h-4 mr-2" />
           Account
         </Button>
         <SignOutButton>
           <Button variant={"ghost"} className="w-full justify-start">
-            <LogOutIcon className="mr-2 h-4 w-4" />
+            <LogOutIcon className="w-4 h-4 mr-2" />
             Sign Out
           </Button>
         </SignOutButton>

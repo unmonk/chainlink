@@ -71,9 +71,9 @@ export const CreateSquadModal = () => {
 
   return (
     <Dialog>
-      <DialogContent className="bg-background p-0 overflow-hidden rounded-lg">
-        <DialogHeader className="pt-8 px-6">
-          <DialogTitle className="text-2xl text-center font-bold">
+      <DialogContent className="p-0 overflow-hidden bg-background rounded-lg">
+        <DialogHeader className="px-6 pt-8">
+          <DialogTitle className="text-2xl font-bold text-center">
             Customize your Squad
           </DialogTitle>
           <DialogDescription className="text-center text-muted-foreground">
@@ -82,8 +82,8 @@ export const CreateSquadModal = () => {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="space-y-8 px-6">
-              <div className="flex items-center justify-center text-center">
+            <div className="px-6 space-y-8">
+              <div className="flex justify-center items-center text-center">
                 <FormField
                   control={form.control}
                   name="imageUrl"
@@ -106,7 +106,7 @@ export const CreateSquadModal = () => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="uppercase text-xs font-bold ">
+                    <FormLabel className="text-xs font-bold uppercase">
                       Squad name
                     </FormLabel>
                     <FormControl>
@@ -122,7 +122,7 @@ export const CreateSquadModal = () => {
                 )}
               />
             </div>
-            <DialogFooter className="bg-accent px-6 py-4">
+            <DialogFooter className="px-6 py-4 bg-accent">
               <Button variant="default" disabled={isLoading}>
                 Create
               </Button>

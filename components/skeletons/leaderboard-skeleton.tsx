@@ -17,9 +17,9 @@ const LeaderboardSkeleton: FC<LeaderboardSkeletonProps> = ({}) => {
     for (let i = 0; i < rows; i++) {
       skeletonRows.push(
         <TableRow key={i}>
-          <TableCell className="lg:text-xl font-bold">{i + 1}</TableCell>
-          <TableCell className="flex flex-row gap-2 items-center">
-            <Skeleton className="h-8 w-8 rounded-full" />
+          <TableCell className="font-bold lg:text-xl">{i + 1}</TableCell>
+          <TableCell className="flex flex-row items-center gap-2">
+            <Skeleton className="w-8 h-8 rounded-full" />
             <span className="w-14" />
           </TableCell>
           <TableCell className="lg:text-lg">0</TableCell>
@@ -34,7 +34,7 @@ const LeaderboardSkeleton: FC<LeaderboardSkeletonProps> = ({}) => {
 
   return (
     <div className="w-full mt-2">
-      <Skeleton className="h-9 md:w-5/6 xl:w-2/3 m-auto rounded-lg" />
+      <Skeleton className="h-9 m-auto rounded-lg md:w-5/6 xl:w-2/3" />
       <div className="flex flex-col gap-2 mt-2">
         <Table>
           <TableHeader>

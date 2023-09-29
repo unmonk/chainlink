@@ -7,13 +7,13 @@ export default async function AdminAchievmentPage() {
   const achievements = await getAchievementList();
 
   return (
-    <div className="p-2 items-center justify-center flex flex-col">
+    <div className="flex flex-col justify-center items-center p-2">
       <h1 className="text-xl font-bold">Achievements</h1>
-      <div className="lg:flex lg:flex-row gap-4">
-        <div className="w-full lg:w-1/2 border rounded-md p-2">
+      <div className="gap-4 lg:flex lg:flex-row">
+        <div className="w-full p-2 border rounded-md lg:w-1/2">
           <NewAchievementForm />
         </div>
-        <div className="w-full lg:w-1/2 border rounded-md p-2">
+        <div className="w-full p-2 border rounded-md lg:w-1/2">
           <ScrollArea className="h-full">
             {achievements.map((achievement) => (
               <AchievementListItem

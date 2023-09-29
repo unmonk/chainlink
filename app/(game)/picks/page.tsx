@@ -26,7 +26,7 @@ export default async function UserPicksPage() {
   const picks = await getUserPicks(userId);
 
   return (
-    <div className="px-2 mt-2 flex flex-col items-center justify-center">
+    <div className="flex flex-col justify-center items-center px-2 mt-2">
       <h1 className="text-2xl font-bold text-primary">My Picks</h1>
       <Table>
         <TableHeader>
@@ -65,7 +65,7 @@ export default async function UserPicksPage() {
                         <Button
                           variant={"secondary"}
                           size={"lg"}
-                          className="flex flex-row items-center p-2 w-full"
+                          className="w-full flex flex-row items-center p-2"
                         >
                           <Image
                             src={

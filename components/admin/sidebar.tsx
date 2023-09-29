@@ -57,10 +57,10 @@ const GAME_INFO_LINKS = [
 const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
   const pathname = usePathname();
   return (
-    <div className={cn("pb-12 w-1/5", className)}>
-      <div className="space-y-4 py-4">
+    <div className={cn("w-1/5 pb-12", className)}>
+      <div className="py-4 space-y-4">
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+          <h2 className="px-4 mb-2 text-lg font-semibold tracking-tight">
             Admin
           </h2>
           <div className="space-y-1">
@@ -72,7 +72,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
                 asChild
               >
                 <Link href={link.href}>
-                  <link.icon className="mr-2 h-4 w-4" />
+                  <link.icon className="w-4 h-4 mr-2" />
                   {link.name}
                 </Link>
               </Button>
@@ -80,7 +80,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
           </div>
         </div>
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+          <h2 className="px-4 mb-2 text-lg font-semibold tracking-tight">
             Game Info
           </h2>
           <div className="space-y-1">
@@ -92,7 +92,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ className }) => {
                 asChild
               >
                 <Link href={link.href}>
-                  <link.icon className="mr-2 h-4 w-4" />
+                  <link.icon className="w-4 h-4 mr-2" />
                   {link.name}
                 </Link>
               </Button>
@@ -113,7 +113,7 @@ export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
 }) => {
   const pathname = usePathname();
   return (
-    <div className={cn("flex flex-col px-2 gap-1 w-5/6", className)}>
+    <div className={cn("w-5/6 flex flex-col gap-1 px-2", className)}>
       <div className="flex flex-row gap-1">
         {ADMIN_LINKS.map((link) => (
           <Button
@@ -123,7 +123,7 @@ export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
             asChild
           >
             <Link href={link.href}>
-              <link.icon className="mr-2 h-4 w-4" />
+              <link.icon className="w-4 h-4 mr-2" />
               {link.name}
             </Link>
           </Button>
@@ -138,7 +138,7 @@ export const AdminMobileTopBar: FC<AdminMobileTopBarProps> = ({
             asChild
           >
             <Link href={link.href}>
-              <link.icon className="mr-2 h-4 w-4" />
+              <link.icon className="w-4 h-4 mr-2" />
               {link.name}
             </Link>
           </Button>

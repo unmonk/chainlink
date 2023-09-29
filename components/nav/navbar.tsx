@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export function Navbar() {
   return (
-    <nav className="flex h-16 items-center px-4">
+    <nav className="h-16 flex items-center px-4">
       <Logo />
       <SignedIn>
         <Link href="/play" className="text-primary" prefetch={false}>
@@ -19,7 +19,7 @@ export function Navbar() {
         </Link>
       </SignedOut>
 
-      <div className="ml-auto flex items-center space-x-4">
+      <div className="flex items-center ml-auto space-x-4">
         <Button asChild>
           <Link href={"/play"}>Play ⚾</Link>
         </Button>

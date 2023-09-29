@@ -18,9 +18,9 @@ export default async function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <Link href="/admin/users">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
               <CardTitle className="text-sm font-medium">Users</CardTitle>
-              <Users2Icon className="h-4 w-4 text-muted-foreground" />
+              <Users2Icon className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboardData.users}</div>
@@ -30,11 +30,11 @@ export default async function AdminDashboard() {
         </Card>
         <Card>
           <Link href="/admin/picks">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
               <CardTitle className="text-sm font-medium">
                 Active Picks
               </CardTitle>
-              <PictureInPicture className="h-4 w-4 text-muted-foreground" />
+              <PictureInPicture className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -46,11 +46,11 @@ export default async function AdminDashboard() {
         </Card>
         <Card>
           <Link href="/admin/crons">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
               <CardTitle className="text-sm font-medium">
                 Daily Automations
               </CardTitle>
-              <CalendarRangeIcon className="h-4 w-4 text-muted-foreground" />
+              <CalendarRangeIcon className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
@@ -65,11 +65,11 @@ export default async function AdminDashboard() {
 
         <Card>
           <Link href="/admin/crons">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
               <CardTitle className="text-sm font-medium">
                 Total Squads
               </CardTitle>
-              <BusIcon className="h-4 w-4 text-muted-foreground" />
+              <BusIcon className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboardData.squads}</div>

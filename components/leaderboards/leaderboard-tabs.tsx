@@ -34,7 +34,7 @@ export async function LeaderboardTabs() {
     ]);
   return (
     <Tabs defaultValue="streak" className="w-full mt-2">
-      <TabsList className="grid w-full md:w-5/6 xl:w-2/3 m-auto grid-cols-3">
+      <TabsList className="w-full grid grid-cols-3 m-auto md:w-5/6 xl:w-2/3">
         <TabsTrigger value="streak">Current Streak</TabsTrigger>
         <TabsTrigger value="wins">Campaign Wins</TabsTrigger>
         <TabsTrigger value="alltime">All Time Wins</TabsTrigger>
@@ -58,20 +58,20 @@ export async function LeaderboardTabs() {
                 key={leaderboard.id}
                 className={leaderboard.user_id === userId ? "bg-accent" : ""}
               >
-                <TableCell className="lg:text-xl font-bold">
+                <TableCell className="font-bold lg:text-xl">
                   {idx + 1}
                 </TableCell>
-                <TableCell className="flex flex-row gap-2 items-center">
+                <TableCell className="flex flex-row items-center gap-2">
                   <Avatar>
                     <AvatarImage src={leaderboard.user.image} />
                     <AvatarFallback>{leaderboard.user.username}</AvatarFallback>
                   </Avatar>
-                  <p className="lg:text-lg font-semibold">
+                  <p className="font-semibold lg:text-lg">
                     {leaderboard.user.username}
                   </p>
                 </TableCell>
                 <TableCell
-                  className={cn("lg:text-lg font-semibold", {
+                  className={cn("font-semibold lg:text-lg", {
                     "text-green-500": leaderboard.streak > 0,
                     "text-red-500": leaderboard.streak < 0,
                   })}
@@ -106,21 +106,21 @@ export async function LeaderboardTabs() {
           <TableBody>
             {winsLeaderboard.map((leaderboard, idx) => (
               <TableRow key={leaderboard.id}>
-                <TableCell className="lg:text-xl font-bold">
+                <TableCell className="font-bold lg:text-xl">
                   {idx + 1}
                 </TableCell>
-                <TableCell className="flex flex-row gap-2 items-center">
+                <TableCell className="flex flex-row items-center gap-2">
                   <Avatar>
                     <AvatarImage src={leaderboard.user.image} />
                     <AvatarFallback>{leaderboard.user.username}</AvatarFallback>
                   </Avatar>
-                  <p className="lg:text-lg font-semibold">
+                  <p className="font-semibold lg:text-lg">
                     {leaderboard.user.username}
                   </p>
                 </TableCell>
                 <TableCell className="lg:text-lg">{leaderboard.wins}</TableCell>
                 <TableCell
-                  className={cn("lg:text-lg font-semibold", {
+                  className={cn("font-semibold lg:text-lg", {
                     "text-green-500": leaderboard.streak > 0,
                     "text-red-500": leaderboard.streak < 0,
                   })}
@@ -151,15 +151,15 @@ export async function LeaderboardTabs() {
           <TableBody>
             {allTimeLeaderboard.map((leaderboard, idx) => (
               <TableRow key={leaderboard.user_id}>
-                <TableCell className="lg:text-xl font-bold">
+                <TableCell className="font-bold lg:text-xl">
                   {idx + 1}
                 </TableCell>
-                <TableCell className="flex flex-row gap-2 items-center">
+                <TableCell className="flex flex-row items-center gap-2">
                   <Avatar>
                     <AvatarImage src={leaderboard.user.image} />
                     <AvatarFallback>{leaderboard.user.username}</AvatarFallback>
                   </Avatar>
-                  <p className="lg:text-lg font-semibold">
+                  <p className="font-semibold lg:text-lg">
                     {leaderboard.user.username}
                   </p>
                 </TableCell>

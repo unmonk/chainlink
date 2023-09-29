@@ -10,9 +10,9 @@ const AchievementListItem: FC<AchievementListItemProps> = ({ achievement }) => {
   return (
     <div
       key={achievement.id}
-      className="flex flex-row p-2 border-y-2 items-center justify-center cursor-pointer"
+      className="flex flex-row justify-center items-center p-2 border-y-2 cursor-pointer"
     >
-      <div className="w-1/3 flex flex-row gap-4 items-center justify-center">
+      <div className="w-1/3 flex flex-row justify-center items-center gap-4">
         <Image
           src={"/images/testbadge.png"}
           alt={achievement.name}
