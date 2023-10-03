@@ -56,33 +56,12 @@ export function UserNav() {
         <Separator className="my-4" />
         <UserNavLinks />
         <Separator className="my-4" />
-        <div className="flex flex-col items-center">
-          <p className="px-4 mb-2 text-xs underline">Announcements</p>
-          <p className="p-2 mb-2 text-sm bg-accent rounded">
-            Welcome to the Beta, Join the Discord community to get involved!
-          </p>
-          <div className="flex flex-row gap-2">
-            <ThemeToggle />
-            <NotificationToggle />
-            {/* <Button
-              onClick={() => {
-                fetch("/api/notifications/push", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    userId: user?.id,
-                    notification: {
-                      title: "You've Won!",
-                      body: "Your Pick: Green Bay Packers has won!",
-                    },
-                  }),
-                });
-              }}
-            /> */}
-          </div>
+
+        <div className="flex flex-row justify-center items-center gap-2">
+          <ThemeToggle />
+          <NotificationToggle />
         </div>
+
         <Separator className="my-4" />
         <div className="flex flex-row justify-center items-center gap-2 text-xs">
           <Link

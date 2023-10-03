@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "db:migrate": "drizzle-kit generate:mysql",
     "db:push": "drizzle-kit push:mysql",
-    "email": "email dev"
+    "email": "email dev",
+    "studio": "drizzle-kit studio --host 127.0.0.1"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.24.2",

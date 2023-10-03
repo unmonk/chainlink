@@ -61,7 +61,12 @@ const NotificationToggle: FC<NotificationToggleProps> = ({}) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" disabled={loading}>
+        <Button
+          variant="outline"
+          size="icon"
+          disabled={loading}
+          className={!loading && hasActivePushSubscription ? "bg-white/10" : ""}
+        >
           {loading ? (
             <Loader />
           ) : !loading && hasActivePushSubscription ? (
