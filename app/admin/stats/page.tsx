@@ -11,7 +11,7 @@ export default async function AdminStats({
 
     return (
         <div className="flex flex-col gap-2 mt-2 border rounded-md">
-      <div className="flex flex-row justify-center items-center gap-4">
+      <div className="flex flex-col justify-center items-center gap-4 md:flex-row">
         <h1 className="p-4 text-xl text-primary">All Time Wins By League</h1>
         <Table>
             <TableHeader>
