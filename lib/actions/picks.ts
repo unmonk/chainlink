@@ -76,7 +76,7 @@ export async function getUserPicks(userId: string) {
     with: {
       matchup: true,
     },
-    limit: 10,
+    limit: 30,
     orderBy: desc(picks.updated_at),
   });
   return userPicks;
