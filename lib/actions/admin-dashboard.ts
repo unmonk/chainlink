@@ -51,3 +51,72 @@ export async function getAdminDashboard() {
     },
   };
 }
+
+
+export async function getAdminStats(){
+  const winsByLeagueQuery = sql`SELECT
+    user_id,
+    SUM(CASE WHEN league = 'NFL' THEN 1 ELSE 0 END) AS NFL,
+    SUM(CASE WHEN league = 'NBA' THEN 1 ELSE 0 END) AS NBA,   SUM(CASE WHEN league = 'MLB' THEN 1 ELSE 0 END) AS MLB,
+    SUM(CASE WHEN league = 'NHL' THEN 1 ELSE 0 END) AS NHL,
+    SUM(CASE WHEN league = 'COLLEGE-FOOTBALL' THEN 1 ELSE 0 END) AS COLLEGE_FOOTBALL,
+    SUM(CASE WHEN league = 'MBB' THEN 1 ELSE 0 END) AS MBB,
+    SUM(CASE WHEN league = 'WBB' THEN 1 ELSE 0 END) AS WBB,
+    SUM(CASE WHEN league = 'WNBA' THEN 1 ELSE 0 END) AS WNBA,
+    SUM(CASE WHEN league = 'NCAA' THEN 1 ELSE 0 END) AS NCAA,
+    SUM(CASE WHEN league = 'OTHER' THEN 1 ELSE 0 END) AS OTHER
+FROM
+    (
+        SELECT
+            p.user_id,
+            m.leagues as league
+        FROM
+            picks AS p
+        JOIN
+            matchups AS m ON p.matchup_id = m.id
+        WHERE
+            p.pick_status = 'WIN'
+    ) AS subquery
+GROUP BY
+    user_id
+ORDER BY
+    user_id;`;
+
+  interface WinsByLeague {
+    user_id: string;
+    NFL: number;
+    NBA: number;
+    MLB: number;
+    NHL: number;
+    COLLEGE_FOOTBALL: number;
+    MBB: number;
+    WBB: number;
+    WNBA: number;
+    NCAA: number;
+    OTHER: number;
+  }
+
+  type UserWinsByLeague = WinsByLeague &  {
+    username: string;
+    imageUrl: string;
+  }
+
+
+  const winsByLeague = (await db.execute(winsByLeagueQuery)).rows as WinsByLeague[];
+  const userIds = winsByLeague.map(row => row.user_id);
+  const users = await clerkClient.users.getUserList({
+    userId: userIds,
+    limit: userIds.length,
+  });
+  //merge users and winsByLeague into UsersWinsByLeague
+  const usersWinsByLeague = winsByLeague.map(wins => {
+    const user = users.find(user => user.id === wins.user_id);
+    return {
+      ...wins,
+      username: user?.username,
+      imageUrl: user?.imageUrl
+    }
+  }) as UserWinsByLeague[];
+
+  return usersWinsByLeague;
+}

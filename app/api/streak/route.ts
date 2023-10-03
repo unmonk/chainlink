@@ -1,9 +1,5 @@
-import { db } from "@/drizzle/db";
-import { NewStreak, streaks } from "@/drizzle/schema";
-import { getActiveCampaign, getActiveCampaignId } from "@/lib/actions/campaign";
 import { getStreak } from "@/lib/actions/streaks";
 import { auth } from "@clerk/nextjs";
-import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
