@@ -92,7 +92,8 @@ export async function sendPushNotificationToUser(
     data?: any;
   },
 ) {
-  const response = await fetch("/api/notifications/push", {
+  const baseurl = process.env.NEXT_PUBLIC_APP_URL;
+  const response = await fetch(`${baseurl}/api/notifications/push`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -102,7 +103,6 @@ export async function sendPushNotificationToUser(
       notification,
     }),
   });
-  console.log(response);
   if (!response.ok) {
     throw Error("Could not send push subscription to server");
   }
