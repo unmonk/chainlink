@@ -27,7 +27,9 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
     <div className="under grid grid-cols-3 ">
       <div className="col-span-1 ml-4 text-left">
         {(matchup.status === "STATUS_FINAL" ||
-          matchup.status === "STATUS_IN_PROGRESS") &&
+          matchup.status === "STATUS_IN_PROGRESS" ||
+          matchup.status === "STATUS_END_PERIOD" ||
+          matchup.status === "STATUS_HALFTIME") &&
           (matchup.away_value ? (
             <p className={awayWinClass}>{matchup.away_value}</p>
           ) : (
@@ -81,7 +83,9 @@ const MatchupCardFooter: FC<MatchupCardFooterProps> = ({
       </div>
       <div className="col-span-1 mr-4 text-right">
         {(matchup.status === "STATUS_FINAL" ||
-          matchup.status === "STATUS_IN_PROGRESS") &&
+          matchup.status === "STATUS_IN_PROGRESS" ||
+          matchup.status === "STATUS_END_PERIOD" ||
+          matchup.status === "STATUS_HALFTIME") &&
           (matchup.home_value ? (
             <p className={homeWinClass}>{matchup.home_value}</p>
           ) : (
