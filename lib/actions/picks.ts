@@ -34,6 +34,7 @@ export async function getPick() {
   return pick;
 }
 
+//Used on the Play page to delete your own pick
 export async function deletePick() {
   const { userId } = auth();
   if (!userId) return null;
@@ -41,6 +42,15 @@ export async function deletePick() {
     .delete(picks)
     .where(and(eq(picks.user_id, userId), eq(picks.active, true)));
   revalidatePath(`/play`);
+}
+
+// Used on the admin page to delete any users pick
+export async function deleteActivePickByUserId(userId: string) {
+  if (!userId) return null;
+  await db
+    .delete(picks)
+    .where(and(eq(picks.user_id, userId), eq(picks.active, true)));
+  revalidatePath("/admin/picks");
 }
 
 export async function getMatchupPicks(

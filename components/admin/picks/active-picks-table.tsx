@@ -1,5 +1,15 @@
+import { AdminDeletePickModal } from "@/components/modals/admin-delete-pick-modal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Loader } from "@/components/ui/loader";
 import {
   Table,
@@ -14,7 +24,7 @@ import { getActivePicks } from "@/lib/actions/picks";
 import { cn } from "@/lib/utils";
 import { clerkClient } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
-import { Edit2Icon } from "lucide-react";
+import { Edit2Icon, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import { FC } from "react";
 
@@ -24,6 +34,14 @@ interface AdminActivePicksTableProps {
 
 type ActivePickWithUser = PickWithMatchup & {
   user?: User;
+};
+
+const isEditButtonDisabled = (pick: ActivePickWithUser) => {
+  return pick.pick_status === "STATUS_IN_PROGRESS";
+};
+
+const isDeleteButtonDisabled = (pick: ActivePickWithUser) => {
+  return false;
 };
 
 const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
@@ -63,8 +81,16 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
         {activePicks.map((pick) => {
           return (
             <TableRow key={pick.id}>
-              <TableCell>
-                <Button variant="outline" size={"icon"} disabled>
+              <TableCell className="flex flex-row gap-1">
+                <AdminDeletePickModal
+                  disabled={isDeleteButtonDisabled(pick)}
+                  userId={pick.user_id}
+                />
+                <Button
+                  variant="outline"
+                  size={"icon"}
+                  disabled={isEditButtonDisabled(pick)}
+                >
                   <Edit2Icon className="w-4 h-4" />
                 </Button>
               </TableCell>
