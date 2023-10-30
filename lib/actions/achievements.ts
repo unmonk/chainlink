@@ -10,7 +10,7 @@ export async function getAchievementList() {
   return achievements;
 }
 
-export async function addAchivement(achievement: NewAchievement) {
+export async function addAchievement(achievement: NewAchievement) {
   await db.insert(achievements).values(achievement);
   revalidatePath("/admin/achievements");
 }

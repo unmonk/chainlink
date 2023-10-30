@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { achievements } from "@/drizzle/schema";
-import { addAchivement } from "@/lib/actions/achievements";
+import { addAchievement } from "@/lib/actions/achievements";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
 import { useForm } from "react-hook-form";
@@ -53,7 +53,7 @@ export function NewAchievementForm() {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
-    await addAchivement(values);
+    await addAchievement(values);
     form.reset();
   }
 
