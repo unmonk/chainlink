@@ -1,5 +1,6 @@
 "use client";
 
+import { AlertDialogAction, AlertDialogCancel } from "../ui/alert-dialog";
 import { Loader } from "../ui/loader";
 import {
   Select,
@@ -27,21 +28,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  NewPick,
-  Pick,
-  PickType,
-  PickStatus,
-  PickWithMatchup,
-  picks,
-} from "@/drizzle/schema";
+import { NewPick, PickType, PickStatus, picks } from "@/drizzle/schema";
 import { updatePickById } from "@/lib/actions/picks";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { match } from "assert";
-import { Edit, Edit2Icon, Router } from "lucide-react";
+import { Edit2Icon } from "lucide-react";
+import { revalidatePath } from "next/cache";
+import { pages } from "next/dist/build/templates/app-page";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -80,8 +73,7 @@ export const AdminEditPickModal = ({
   };
 }) => {
   const [isMounted, setIsMounted] = useState(false);
-  const router = useRouter();
-
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -103,6 +95,7 @@ export const AdminEditPickModal = ({
         pick_status: values.pick_status,
       };
       await updatePickById(pick.pick_id, new_pick);
+      setIsOpen(false);
     } catch (error) {
       console.log(error);
     }
@@ -112,7 +105,7 @@ export const AdminEditPickModal = ({
     return null;
   }
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant={"secondary"} size={"icon"} disabled={disabled}>
           <Edit2Icon className="h-4 w-4" />
@@ -215,7 +208,7 @@ export const AdminEditPickModal = ({
                       <SelectContent>
                         {picks.pick_status.enumValues.map((pick_status) => {
                           return (
-                            <SelectItem value={pick_status}>
+                            <SelectItem key={pick_status} value={pick_status}>
                               {pick_status}
                             </SelectItem>
                           );
@@ -231,7 +224,7 @@ export const AdminEditPickModal = ({
               <DialogClose asChild>
                 <Button variant={"secondary"}>Cancel</Button>
               </DialogClose>
-              <Button variant="default" type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? <Loader className="h-5 w-5" /> : "Save"}
               </Button>
             </DialogFooter>
