@@ -28,8 +28,9 @@ export async function sendDiscordStreakNotification(
     message = `<@${discordId}> your last pick **PUSHED** 🫸. Make your next pick now!`;
   }
 
-  try {
-    await fetch(process.env.DISCORD_PICK_NOTIFICATIONS_WEBHOOK!, {
+  const response = await fetch(
+    process.env.DISCORD_PICK_NOTIFICATIONS_WEBHOOK!,
+    {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,8 +38,10 @@ export async function sendDiscordStreakNotification(
       body: JSON.stringify({
         content: message,
       }),
-    });
-  } catch (err: any) {
-    console.log(err);
+    },
+  );
+  if (!response.ok) {
+    throw Error("Could not send Discord Notification");
   }
+  return;
 }

@@ -6,6 +6,7 @@ import {
   matchups,
   picks,
 } from "@/drizzle/schema";
+import { sendDiscordStreakNotification } from "@/lib/actions/discord-notifications";
 import { getMatchupPicks } from "@/lib/actions/picks";
 import { getPromiseByPick } from "@/lib/actions/streaks";
 import { supportedLeagues } from "@/lib/config";
@@ -186,7 +187,11 @@ export async function GET(
                 } won!`,
               },
             );
-            notificationPromises.push(notificationPromise);
+            const discordPromise = sendDiscordStreakNotification(
+              pick.user_id,
+              pick.pick_status,
+            );
+            notificationPromises.push(notificationPromise, discordPromise);
           }
           if (
             (pick.pick_type === "AWAY" &&
@@ -205,7 +210,11 @@ export async function GET(
                 } lost!`,
               },
             );
-            notificationPromises.push(notificationPromise);
+            const discordPromise = sendDiscordStreakNotification(
+              pick.user_id,
+              pick.pick_status,
+            );
+            notificationPromises.push(notificationPromise, discordPromise);
           }
           if (matchup.winner_id === null) {
             pick.pick_status = "PUSH";
@@ -220,7 +229,11 @@ export async function GET(
                 } Pushed!`,
               },
             );
-            notificationPromises.push(notificationPromise);
+            const discordPromise = sendDiscordStreakNotification(
+              pick.user_id,
+              pick.pick_status,
+            );
+            notificationPromises.push(notificationPromise, discordPromise);
           }
 
           const streakPromise = getPromiseByPick(pick);
@@ -263,7 +276,7 @@ export async function GET(
     const notificationResults = await Promise.allSettled(notificationPromises);
     notificationResults.forEach((result) => {
       if (result.status !== "fulfilled") {
-        console.log("Failed to send push notification", result.reason);
+        console.log("Failed to send notification", result.reason);
       }
     });
     notificationAttempts = notificationResults.length;
