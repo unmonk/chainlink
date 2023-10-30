@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Loader } from "@/components/ui/loader";
 import {
   Select,
   SelectContent,
@@ -19,15 +20,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AchievementType, achievements } from "@/drizzle/schema";
-import { UploadDropzone } from "@/lib/uploadthing";
+import { achievements } from "@/drizzle/schema";
+import { addAchievement } from "@/lib/actions/achievements";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createInsertSchema } from "drizzle-zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-const formSchema = createInsertSchema(achievements);
+const formSchema = createInsertSchema(achievements).merge(
+  z.object({
+    value: z.coerce.number().int().positive(),
+  }),
+);
 
 export function NewAchievementForm() {
   // 1. Define your form.
@@ -36,17 +40,18 @@ export function NewAchievementForm() {
     defaultValues: {
       name: "",
       description: "",
-      type: AchievementType.OTHER,
+      type: achievements.type.enumValues[6],
       value: 0,
       image: "",
     },
   });
 
+  const isLoading = form.formState.isSubmitting;
+
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await addAchievement(values);
+    form.reset();
   }
 
   return (
@@ -94,16 +99,23 @@ export function NewAchievementForm() {
             <FormItem>
               <FormLabel>Achievement Type</FormLabel>
               <FormControl>
-                <Select {...field}>
+                <Select
+                  {...field}
+                  disabled={isLoading}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Achievement Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(AchievementType).map(([key, value]) => (
-                      <SelectItem key={key} value={value}>
-                        {value}
-                      </SelectItem>
-                    ))}
+                    {Object.entries(achievements.type.enumValues).map(
+                      ([key, value]) => (
+                        <SelectItem key={key} value={value}>
+                          {value}
+                        </SelectItem>
+                      ),
+                    )}
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -123,7 +135,7 @@ export function NewAchievementForm() {
             <FormItem>
               <FormLabel>Achievement Weight</FormLabel>
               <FormControl>
-                <Input placeholder="0" {...field} />
+                <Input placeholder="0" type="number" {...field} />
               </FormControl>
               <FormDescription>
                 The higher weight for the same type will be displayed on the
@@ -151,7 +163,9 @@ export function NewAchievementForm() {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? <Loader /> : "Submit"}
+        </Button>
       </form>
     </Form>
   );

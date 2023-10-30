@@ -1,9 +1,10 @@
 "use server";
 
 import { getActiveCampaign } from "./campaign";
+import { sendDiscordStreakNotification } from "./discord-notifications";
 import { db } from "@/drizzle/db";
 import { NewStreak, PickWithStreak, Streak, streaks } from "@/drizzle/schema";
-import { auth } from "@clerk/nextjs";
+import { auth, clerkClient } from "@clerk/nextjs";
 import { and, eq, gt } from "drizzle-orm";
 
 export async function getStreak(userId?: string | null) {
@@ -90,6 +91,7 @@ export async function incrementStreak(streak: Streak) {
       updated_at: new Date(),
     })
     .where(eq(streaks.id, streak.id));
+  await sendDiscordStreakNotification(streak.user_id, "WIN");
 }
 
 export async function decrementStreak(streak: Streak) {
@@ -103,6 +105,9 @@ export async function decrementStreak(streak: Streak) {
       updated_at: new Date(),
     })
     .where(eq(streaks.id, streak.id));
+
+  //do discord notification if user has connected account
+  await sendDiscordStreakNotification(streak.user_id, "LOSS");
 }
 
 export async function pushStreak(streak: Streak) {
@@ -114,4 +119,5 @@ export async function pushStreak(streak: Streak) {
       updated_at: new Date(),
     })
     .where(eq(streaks.id, streak.id));
+  await sendDiscordStreakNotification(streak.user_id, "PUSH");
 }
