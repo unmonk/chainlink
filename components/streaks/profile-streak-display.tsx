@@ -77,7 +77,7 @@ export async function ProfileStreakDisplay({
       <div
         className={cn(
           streakVariants({ size }),
-          "flex flex-row justify-center items-center font-mono",
+          "flex flex-row items-center justify-center font-mono",
         )}
       >
         <div className={cn(streakVariants({ size }))}>

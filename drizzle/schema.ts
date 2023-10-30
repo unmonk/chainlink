@@ -446,21 +446,21 @@ export const streakRelations = relations(streaks, ({ one, many }) => ({
 }));
 
 //Types
-export type Campaign = InferModel<typeof campaigns>;
-export type Matchup = InferModel<typeof matchups>;
-export type Pick = InferModel<typeof picks>;
-export type Streak = InferModel<typeof streaks>;
-export type Profile = InferModel<typeof profiles>;
-export type Squad = InferModel<typeof squads>;
-export type Achievement = InferModel<typeof achievements>;
+export type Campaign = typeof campaigns.$inferSelect;
+export type Matchup = typeof matchups.$inferSelect;
+export type Pick = typeof picks.$inferSelect;
+export type Streak = typeof streaks.$inferSelect;
+export type Profile = typeof profiles.$inferSelect;
+export type Squad = typeof squads.$inferSelect;
+export type Achievement = typeof achievements.$inferSelect;
 
-export type NewCampaign = InferModel<typeof campaigns, "insert">;
-export type NewMatchup = InferModel<typeof matchups, "insert">;
-export type NewPick = InferModel<typeof picks, "insert">;
-export type NewStreak = InferModel<typeof streaks, "insert">;
-export type NewProfile = InferModel<typeof profiles, "insert">;
-export type NewSquad = InferModel<typeof squads, "insert">;
-export type NewAchievement = InferModel<typeof achievements, "insert">;
+export type NewCampaign = typeof campaigns.$inferInsert;
+export type NewMatchup = typeof matchups.$inferInsert;
+export type NewPick = typeof picks.$inferInsert;
+export type NewStreak = typeof streaks.$inferInsert;
+export type NewProfile = typeof profiles.$inferInsert;
+export type NewSquad = typeof squads.$inferInsert;
+export type NewAchievement = typeof achievements.$inferInsert;
 
 export type FullProfile = Profile & {
   streaks: Streak[];

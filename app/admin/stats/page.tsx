@@ -10,9 +10,9 @@ export default async function AdminStats({
 
 
     return (
-        <div className="flex flex-col gap-2 mt-2 border rounded-md">
-      <div className="flex flex-col justify-center items-center gap-4 md:flex-row">
-        <h1 className="p-4 text-xl text-primary">All Time Wins By League</h1>
+        <div className="mt-2 flex flex-col gap-2 rounded-md border">
+      <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+        <h1 className="text-primary p-4 text-xl">All Time Wins By League</h1>
         <Table>
             <TableHeader>
             <TableRow>
@@ -32,8 +32,8 @@ export default async function AdminStats({
                 {stats.map((stat) => (
                     <TableRow key={stat.user_id}>
                         <TableCell>
-                            <div className="flex flex-col justify-start items-center">
-                  <Avatar className="w-7 h-7 mx-2">
+                            <div className="flex flex-col items-center justify-start">
+                  <Avatar className="mx-2 h-7 w-7">
                     <AvatarImage
                       src={stat.imageUrl}
                       alt={stat.username || "User"}

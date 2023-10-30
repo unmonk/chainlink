@@ -1,5 +1,16 @@
+import { AdminDeletePickModal } from "@/components/modals/admin-delete-pick-modal";
+import { AdminEditPickModal } from "@/components/modals/admin-edit-pick-modal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Loader } from "@/components/ui/loader";
 import {
   Table,
@@ -14,7 +25,7 @@ import { getActivePicks } from "@/lib/actions/picks";
 import { cn } from "@/lib/utils";
 import { clerkClient } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
-import { Edit2Icon } from "lucide-react";
+import { Edit2Icon, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import { FC } from "react";
 
@@ -24,6 +35,18 @@ interface AdminActivePicksTableProps {
 
 type ActivePickWithUser = PickWithMatchup & {
   user?: User;
+};
+
+const isEditButtonDisabled = (pick: ActivePickWithUser) => {
+  return (
+    pick.pick_status === "WIN" ||
+    pick.pick_status === "LOSS" ||
+    pick.pick_status === "PUSH"
+  );
+};
+
+const isDeleteButtonDisabled = (pick: ActivePickWithUser) => {
+  return false;
 };
 
 const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
@@ -63,14 +86,35 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
         {activePicks.map((pick) => {
           return (
             <TableRow key={pick.id}>
-              <TableCell>
-                <Button variant="outline" size={"icon"} disabled>
-                  <Edit2Icon className="w-4 h-4" />
-                </Button>
+              <TableCell className="flex flex-row gap-1">
+                <AdminDeletePickModal
+                  disabled={isDeleteButtonDisabled(pick)}
+                  userId={pick.user_id}
+                />
+                <AdminEditPickModal
+                  disabled={isEditButtonDisabled(pick)}
+                  pick={{
+                    pick_type: pick.pick_type,
+                    pick_id: pick.id,
+                    user_id: pick.user_id,
+                    pick_status: pick.pick_status,
+                    matchup: {
+                      home_team: {
+                        team_name: pick.matchup?.home_team,
+                        team_logo: pick.matchup?.home_image,
+                      },
+                      away_team: {
+                        team_name: pick.matchup?.away_team,
+                        team_logo: pick.matchup?.away_image,
+                      },
+                      question: pick.matchup?.question,
+                    },
+                  }}
+                />
               </TableCell>
               <TableCell>
-                <div className="flex flex-col justify-start items-center">
-                  <Avatar className="w-7 h-7 mx-2">
+                <div className="flex flex-col items-center justify-start">
+                  <Avatar className="mx-2 h-7 w-7">
                     <AvatarImage
                       src={pick.user?.imageUrl}
                       alt={pick.user?.username || "User"}
@@ -81,14 +125,16 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col justify-start items-center">
+                <div className="flex flex-col items-center justify-start">
                   <Image
                     src={
                       pick.pick_type === "HOME"
-                        ? pick.matchup?.home_image || ""
-                        : pick.matchup?.away_image || ""
+                        ? pick.matchup?.home_image ||
+                          "/images/alert-octagon.svg"
+                        : pick.matchup?.away_image ||
+                          "/images/alert-octagon.svg"
                     }
-                    className="w-7 h-7"
+                    className="h-7 w-7"
                     width={28}
                     height={28}
                     alt={pick.pick_type}

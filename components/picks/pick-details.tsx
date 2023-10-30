@@ -10,10 +10,12 @@ interface PickDetailsProps {
 const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
   return (
     <div className="flex flex-col items-center gap-2 p-2">
-      <p className="text-lg">{pick.matchup.question}</p>
+      <p className="text-lg">
+        {pick.matchup?.question || "Failed to fetch matchup details"}
+      </p>
       <div className="grid grid-cols-2 gap-2">
         <div
-          className={cn("flex flex-col items-center gap-2 p-2 rounded-md", {
+          className={cn("flex flex-col items-center gap-2 rounded-md p-2", {
             "border border-green-500":
               pick.pick_type === "AWAY" && pick.pick_status === "WIN",
             "border border-red-500":
@@ -23,17 +25,19 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
             border: pick.pick_type === "AWAY",
           })}
         >
-          <p className="h-8 text-sm text-center">{pick.matchup.away_team}</p>
+          <p className="h-8 text-center text-sm">
+            {pick.matchup?.away_team || "AWAY"}
+          </p>
           <Image
-            src={pick.matchup.away_image!}
+            src={pick.matchup?.away_image || "/images/alert-octagon.svg"}
             width={40}
             height={40}
-            alt={pick.matchup.away_team}
+            alt={pick.matchup?.away_team || "AWAY"}
           />
-          <p>{pick.matchup.away_value}</p>
+          <p>{pick.matchup?.away_value || "Unknown"}</p>
         </div>
         <div
-          className={cn("flex flex-col items-center gap-2 p-2 rounded-md", {
+          className={cn("flex flex-col items-center gap-2 rounded-md p-2", {
             "border border-green-500":
               pick.pick_type === "HOME" && pick.pick_status === "WIN",
             "border border-red-500":
@@ -43,17 +47,19 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
             border: pick.pick_type === "HOME",
           })}
         >
-          <p className="h-8 text-sm text-center">{pick.matchup.home_team}</p>
+          <p className="h-8 text-center text-sm">
+            {pick.matchup?.home_team || "HOME"}
+          </p>
           <Image
-            src={pick.matchup.home_image!}
+            src={pick.matchup?.home_image || "/images/alert-octagon.svg"}
             width={40}
             height={40}
-            alt={pick.matchup.home_team}
+            alt={pick.matchup?.home_team || "HOME"}
           />
-          <p>{pick.matchup.home_value}</p>
+          <p>{pick.matchup?.home_value || "Unknown"}</p>
         </div>
       </div>
-      <p className="text-sm">League: {pick.matchup.league}</p>
+      <p className="text-sm">League: {pick.matchup?.league || "Unknown"}</p>
       <p
         className={
           pick.pick_status === "WIN"

@@ -42,7 +42,7 @@ export const PickModal = () => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <div className="w-full flex flex-row justify-evenly">
+          <div className="flex w-full flex-row justify-evenly">
             <Button
               onClick={handleCancel}
               variant={"secondary"}
@@ -55,7 +55,7 @@ export const PickModal = () => {
               variant="destructive"
               className="w-1/3"
             >
-              {loading ? <Loader className="w-5 h-5" /> : "Confirm"}
+              {loading ? <Loader className="h-5 w-5" /> : "Confirm"}
             </Button>
           </div>
         </DialogFooter>

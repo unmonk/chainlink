@@ -33,8 +33,8 @@ export async function LeaderboardTabs() {
       campaignPromise,
     ]);
   return (
-    <Tabs defaultValue="streak" className="w-full mt-2">
-      <TabsList className="w-full grid grid-cols-3 m-auto md:w-5/6 xl:w-2/3">
+    <Tabs defaultValue="streak" className="mt-2 w-full">
+      <TabsList className="m-auto grid w-full grid-cols-3 md:w-5/6 xl:w-2/3">
         <TabsTrigger value="streak">Current Streak</TabsTrigger>
         <TabsTrigger value="wins">Campaign Wins</TabsTrigger>
         <TabsTrigger value="alltime">All Time Wins</TabsTrigger>

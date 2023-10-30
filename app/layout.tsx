@@ -7,17 +7,28 @@ import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Analytics } from "@vercel/analytics/react";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Inter as FontSans } from "next/font/google";
 import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"] });
+export const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+export const viewport: Viewport = {
+  themeColor: "#1f821f",
+  width: "device-width",
+  height: "device-height",
+  initialScale: 1,
+  maximumScale: 1,
+  minimumScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: siteConfig.title,
   description: siteConfig.description,
-  themeColor: "#1f821f",
   twitter: {
     card: "summary_large_image",
     site: siteConfig.twitterSite,
@@ -58,13 +69,12 @@ export default function RootLayout({
       }}
     >
       <html lang="en" suppressHydrationWarning>
-        <head>
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-          ></meta>
-        </head>
-        <body className={cn("antialiased bg-background", inter.className)}>
+        <body
+          className={cn(
+            "bg-background min-h-screen font-sans antialiased",
+            fontSans.variable,
+          )}
+        >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Navbar />
             {children}

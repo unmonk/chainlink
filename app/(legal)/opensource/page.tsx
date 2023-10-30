@@ -16,7 +16,7 @@ export default function Page() {
         </Button>
       </Link>
       <h3 className="mt-4 text-lg">Contributors:</h3>
-      <ul className="p-4 list-disc">
+      <ul className="list-disc p-4">
         <li>
           <Link href={"https://github.com/unmonk"}>Scott Weaver - unmonk</Link>
         </li>
@@ -27,7 +27,7 @@ export default function Page() {
       </p>
       <Card>
         <CardContent>
-          <ul className="p-4 list-disc">
+          <ul className="list-disc p-4">
             <li>@clerk/nextjs</li>
             <li>@upstash/redis</li>
             <li>@tanstack/react-table</li>

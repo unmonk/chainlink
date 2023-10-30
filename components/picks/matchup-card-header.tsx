@@ -50,7 +50,7 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
   return (
     <div className={cn(pickCardHeaderVariants({ status }))}>
       <div className="grid grid-cols-2 p-2">
-        <h3 className="text-sm text-start">
+        <h3 className="text-start text-sm">
           <span className="font-semibold">
             {matchup.league === "COLLEGE-FOOTBALL" ? "CFB" : matchup.league}
           </span>
@@ -73,17 +73,17 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
           {status === "PUSH" && "Push"}
         </h3>
 
-        <h3 className="text-sm text-end">{matchup.network}</h3>
+        <h3 className="text-end text-sm">{matchup.network}</h3>
       </div>
-      <div className="h-0 flex flex-row justify-center items-center m-0 text-center">
+      <div className="m-0 flex h-0 flex-row items-center justify-center text-center">
         {active && (
           <div
             className={cn(
               pickCardHeaderVariants({ status }),
-              "p-1 -mt-0.5 rounded-b-md",
+              "-mt-0.5 rounded-b-md p-1",
             )}
           >
-            <h3 className="text-xs text-center text-primary animate-pulse">
+            <h3 className="text-primary animate-pulse text-center text-xs">
               ACTIVE PICK
             </h3>
           </div>

@@ -2,7 +2,7 @@
 
 import { getActiveCampaign } from "./campaign";
 import { db } from "@/drizzle/db";
-import { NewStreak, PickWithStreak, streaks } from "@/drizzle/schema";
+import { NewStreak, PickWithStreak, Streak, streaks } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
 import { and, eq, gt } from "drizzle-orm";
 
@@ -77,4 +77,41 @@ export async function getPromiseByPick(pick: PickWithStreak) {
       updated_at: new Date(),
     })
     .where(eq(streaks.id, pick.streak.id));
+}
+
+export async function incrementStreak(streak: Streak) {
+  streak.streak = streak.streak < 0 ? 1 : streak.streak + 1;
+  streak.wins = streak.wins + 1;
+  await db
+    .update(streaks)
+    .set({
+      streak: streak.streak,
+      wins: streak.wins,
+      updated_at: new Date(),
+    })
+    .where(eq(streaks.id, streak.id));
+}
+
+export async function decrementStreak(streak: Streak) {
+  streak.streak = streak.streak > 0 ? -1 : streak.streak - 1;
+  streak.losses = streak.losses + 1;
+  await db
+    .update(streaks)
+    .set({
+      streak: streak.streak,
+      losses: streak.losses,
+      updated_at: new Date(),
+    })
+    .where(eq(streaks.id, streak.id));
+}
+
+export async function pushStreak(streak: Streak) {
+  streak.pushes = streak.pushes + 1;
+  await db
+    .update(streaks)
+    .set({
+      pushes: streak.pushes,
+      updated_at: new Date(),
+    })
+    .where(eq(streaks.id, streak.id));
 }

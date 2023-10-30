@@ -19,7 +19,7 @@ const LeaderboardSkeleton: FC<LeaderboardSkeletonProps> = ({}) => {
         <TableRow key={i}>
           <TableCell className="font-bold lg:text-xl">{i + 1}</TableCell>
           <TableCell className="flex flex-row items-center gap-2">
-            <Skeleton className="w-8 h-8 rounded-full" />
+            <Skeleton className="h-8 w-8 rounded-full" />
             <span className="w-14" />
           </TableCell>
           <TableCell className="lg:text-lg">0</TableCell>
@@ -33,9 +33,9 @@ const LeaderboardSkeleton: FC<LeaderboardSkeletonProps> = ({}) => {
   };
 
   return (
-    <div className="w-full mt-2">
-      <Skeleton className="h-9 m-auto rounded-lg md:w-5/6 xl:w-2/3" />
-      <div className="flex flex-col gap-2 mt-2">
+    <div className="mt-2 w-full">
+      <Skeleton className="m-auto h-9 rounded-lg md:w-5/6 xl:w-2/3" />
+      <div className="mt-2 flex flex-col gap-2">
         <Table>
           <TableHeader>
             <TableRow>
