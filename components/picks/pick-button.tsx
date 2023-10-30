@@ -102,7 +102,7 @@ const PickButton: FC<PickButtonProps> = ({
         onClick={selected ? handleDeSelect : handlePick}
       >
         {loading ? (
-          <Loader className="w-full h-full" />
+          <Loader className="h-full w-full" />
         ) : (
           <Image
             src={teamImage ?? "/images/alert-octagon.svg"}

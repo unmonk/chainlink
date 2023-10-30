@@ -1,4 +1,5 @@
 import { AdminDeletePickModal } from "@/components/modals/admin-delete-pick-modal";
+import { AdminEditPickModal } from "@/components/modals/admin-edit-pick-modal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,11 @@ type ActivePickWithUser = PickWithMatchup & {
 };
 
 const isEditButtonDisabled = (pick: ActivePickWithUser) => {
-  return pick.pick_status === "STATUS_IN_PROGRESS";
+  return (
+    pick.pick_status === "WIN" ||
+    pick.pick_status === "LOSS" ||
+    pick.pick_status === "PUSH"
+  );
 };
 
 const isDeleteButtonDisabled = (pick: ActivePickWithUser) => {
@@ -86,17 +91,30 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
                   disabled={isDeleteButtonDisabled(pick)}
                   userId={pick.user_id}
                 />
-                <Button
-                  variant="outline"
-                  size={"icon"}
+                <AdminEditPickModal
                   disabled={isEditButtonDisabled(pick)}
-                >
-                  <Edit2Icon className="w-4 h-4" />
-                </Button>
+                  pick={{
+                    pick_type: pick.pick_type,
+                    pick_id: pick.id,
+                    user_id: pick.user_id,
+                    pick_status: pick.pick_status,
+                    matchup: {
+                      home_team: {
+                        team_name: pick.matchup?.home_team,
+                        team_logo: pick.matchup?.home_image,
+                      },
+                      away_team: {
+                        team_name: pick.matchup?.away_team,
+                        team_logo: pick.matchup?.away_image,
+                      },
+                      question: pick.matchup?.question,
+                    },
+                  }}
+                />
               </TableCell>
               <TableCell>
-                <div className="flex flex-col justify-start items-center">
-                  <Avatar className="w-7 h-7 mx-2">
+                <div className="flex flex-col items-center justify-start">
+                  <Avatar className="mx-2 h-7 w-7">
                     <AvatarImage
                       src={pick.user?.imageUrl}
                       alt={pick.user?.username || "User"}
@@ -107,14 +125,16 @@ const AdminActivePicksTable: FC<AdminActivePicksTableProps> = async ({
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col justify-start items-center">
+                <div className="flex flex-col items-center justify-start">
                   <Image
                     src={
                       pick.pick_type === "HOME"
-                        ? pick.matchup?.home_image || ""
-                        : pick.matchup?.away_image || ""
+                        ? pick.matchup?.home_image ||
+                          "/images/alert-octagon.svg"
+                        : pick.matchup?.away_image ||
+                          "/images/alert-octagon.svg"
                     }
-                    className="w-7 h-7"
+                    className="h-7 w-7"
                     width={28}
                     height={28}
                     alt={pick.pick_type}

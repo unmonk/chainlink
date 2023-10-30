@@ -26,8 +26,8 @@ export default async function UserPicksPage() {
   const picks = await getUserPicks(userId);
 
   return (
-    <div className="flex flex-col justify-center items-center px-2 mt-2">
-      <h1 className="text-2xl font-bold text-primary">My Picks</h1>
+    <div className="mt-2 flex flex-col items-center justify-center px-2">
+      <h1 className="text-primary text-2xl font-bold">My Picks</h1>
       <Table>
         <TableHeader>
           <TableRow>
@@ -65,26 +65,27 @@ export default async function UserPicksPage() {
                         <Button
                           variant={"secondary"}
                           size={"lg"}
-                          className="w-full flex flex-row items-center p-2"
+                          className="flex w-full flex-row items-center p-2"
                         >
                           <Image
                             src={
                               (pick.pick_type === "HOME"
                                 ? pick.matchup?.home_image
-                                : pick.matchup?.away_image) || ""
+                                : pick.matchup?.away_image) ||
+                              "/images/alert-octagon.svg"
                             }
                             width={40}
                             height={40}
                             alt={
-                              pick.pick_type === "HOME"
+                              (pick.pick_type === "HOME"
                                 ? pick.matchup?.home_team
-                                : pick.matchup?.away_team
+                                : pick.matchup?.away_team) || "Unknown"
                             }
                           />
                           <p>
-                            {pick.pick_type === "HOME"
+                            {(pick.pick_type === "HOME"
                               ? pick.matchup?.home_team
-                              : pick.matchup?.away_team}
+                              : pick.matchup?.away_team) || "Unknown"}
                           </p>
                         </Button>
                       </PopoverTrigger>

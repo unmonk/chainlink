@@ -1,12 +1,17 @@
 "use server";
 
 import { sendPushNotificationToUser } from "../notifications";
-import { getStreak } from "./streaks";
+import {
+  decrementStreak,
+  getStreak,
+  incrementStreak,
+  pushStreak,
+} from "./streaks";
 import { db } from "@/drizzle/db";
 import { NewPick, PickWithStreak, picks } from "@/drizzle/schema";
 import { auth } from "@clerk/nextjs";
 import { and, desc, eq, ne } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function makePick(pick: NewPick) {
   const streak = await getStreak();
@@ -50,6 +55,32 @@ export async function deleteActivePickByUserId(userId: string) {
   await db
     .delete(picks)
     .where(and(eq(picks.user_id, userId), eq(picks.active, true)));
+  revalidatePath("/admin/picks");
+}
+
+export async function updatePickById(pickId: number, pick: Partial<NewPick>) {
+  if (
+    pick.pick_status === "LOSS" ||
+    pick.pick_status === "WIN" ||
+    pick.pick_status === "PUSH"
+  ) {
+    //handle streaks
+    const streak = await getStreak();
+    if (!streak) {
+      throw new Error("No active streak");
+    }
+    if (pick.pick_status === "LOSS") {
+      await decrementStreak(streak);
+    }
+    if (pick.pick_status === "WIN") {
+      await incrementStreak(streak);
+    }
+    if (pick.pick_status === "PUSH") {
+      await pushStreak(streak);
+    }
+    pick.active = false;
+  }
+  await db.update(picks).set(pick).where(eq(picks.id, pickId));
   revalidatePath("/admin/picks");
 }
 

@@ -70,9 +70,9 @@ const NotificationToggle: FC<NotificationToggleProps> = ({}) => {
           {loading ? (
             <Loader />
           ) : !loading && hasActivePushSubscription ? (
-            <BellRingIcon className="w-[1.2rem] h-[1.2rem]" />
+            <BellRingIcon className="h-[1.2rem] w-[1.2rem]" />
           ) : (
-            <BellOffIcon className="w-[1.2rem] h-[1.2rem]" />
+            <BellOffIcon className="h-[1.2rem] w-[1.2rem]" />
           )}
           <span className="sr-only">Toggle Notifications</span>
         </Button>

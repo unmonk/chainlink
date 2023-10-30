@@ -9,7 +9,7 @@ interface UserAvatarProps {}
 const UserAvatar: FC<UserAvatarProps> = ({}) => {
   const { user } = useUser();
   return (
-    <Avatar className="w-7 h-7 mx-2">
+    <Avatar className="mx-2 h-7 w-7">
       <AvatarImage src={user?.imageUrl} alt="User Profile Picture" />
       <AvatarFallback className="bg-slate-500">
         {user?.username?.substring(0, 2) ??

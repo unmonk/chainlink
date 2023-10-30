@@ -48,31 +48,31 @@ export default async function Page({ searchParams }: DashboardPageParams) {
 
   return (
     <section className="flex flex-col items-center py-4 md:py-6 ">
-      <div className="w-full grid grid-cols-1 gap-4 px-2 lg:gap-8 lg:px-4 xl:px-6 2xl:grid-cols-8">
-        <div className="flex flex-col col-span-1 gap-2 lg:px-4 xl:px-6 xl:border-r-2 2xl:col-span-2">
-          <div className="h-8 hidden flex-row px-2 lg:flex">
+      <div className="grid w-full grid-cols-1 gap-4 px-2 lg:gap-8 lg:px-4 xl:px-6 2xl:grid-cols-8">
+        <div className="col-span-1 flex flex-col gap-2 lg:px-4 xl:border-r-2 xl:px-6 2xl:col-span-2">
+          <div className="hidden h-8 flex-row px-2 lg:flex">
             <h3 className="text-lg font-semibold">My Streak</h3>
           </div>
-          <Separator className="hidden my-2 xl:flex" />
-          <div className="hidden flex-col justify-center text-xl text-center lg:flex">
+          <Separator className="my-2 hidden xl:flex" />
+          <div className="hidden flex-col justify-center text-center text-xl lg:flex">
             <StreakDisplay size="xl" />
           </div>
 
           {pick && (
             <>
-              <div className="h-8 flex flex-row px-2 mt-2">
+              <div className="mt-2 flex h-8 flex-row px-2">
                 <h3 className="text-lg font-semibold">My Pick</h3>
               </div>
-              <Separator className="hidden my-2 xl:flex" />
+              <Separator className="my-2 hidden xl:flex" />
               <ActivePickCard pick={pick} />
             </>
           )}
 
-          <div className="h-8 hidden flex-row px-2 mt-2 xl:flex">
+          <div className="mt-2 hidden h-8 flex-row px-2 xl:flex">
             <h3 className="text-lg font-semibold ">Our Other Games</h3>
           </div>
-          <Separator className="hidden my-2 xl:flex" />
-          <div className="hidden justify-between items-center gap-2 text-xl xl:grid xl:grid-cols-3">
+          <Separator className="my-2 hidden xl:flex" />
+          <div className="hidden items-center justify-between gap-2 text-xl xl:grid xl:grid-cols-3">
             <Link href="https://www.theroseleague.com" target="_blank">
               <Image
                 src="/images/ad1.png"
@@ -99,20 +99,20 @@ export default async function Page({ searchParams }: DashboardPageParams) {
           </div>
         </div>
         <TooltipProvider>
-          <div className="flex flex-col col-span-1 gap-2 2xl:col-span-6">
-            <div className="h-8 flex flex-row items-center px-2">
+          <div className="col-span-1 flex flex-col gap-2 2xl:col-span-6">
+            <div className="flex h-8 flex-row items-center px-2">
               <h3 className="text-lg font-semibold ">{`Today's Picks`}</h3>
               {pick && pick.pick_status !== "PENDING" && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <LockIcon className="w-6 h-6 ml-2 text-destructive" />
+                    <LockIcon className="text-destructive ml-2 h-6 w-6" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Locked until pick completion</p>
                   </TooltipContent>
                 </Tooltip>
               )}
-              <div className="flex flex-row gap-4 ml-auto">
+              <div className="ml-auto flex flex-row gap-4">
                 <Button
                   className="flex flex-col whitespace-nowrap text-xs"
                   variant={"link"}

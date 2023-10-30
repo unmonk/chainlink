@@ -16,14 +16,14 @@ export const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
 
   if (value && fileType !== "pdf") {
     return (
-      <div className="relative w-20 h-20">
+      <div className="relative h-20 w-20">
         <Image fill src={value} alt="Upload" className="rounded-full" />
         <button
           onClick={() => onChange("")}
-          className="absolute top-0 right-0 p-1 text-white bg-rose-500 rounded-full shadow-sm"
+          className="absolute right-0 top-0 rounded-full bg-rose-500 p-1 text-white shadow-sm"
           type="button"
         >
-          <X className="w-4 h-4" />
+          <X className="h-4 w-4" />
         </button>
       </div>
     );
@@ -31,8 +31,8 @@ export const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
 
   if (value && fileType === "pdf") {
     return (
-      <div className="relative flex items-center p-2 mt-2 bg-background/10 rounded-md">
-        <FileIcon className="w-10 h-10 fill-indigo-200 stroke-indigo-400" />
+      <div className="bg-background/10 relative mt-2 flex items-center rounded-md p-2">
+        <FileIcon className="h-10 w-10 fill-indigo-200 stroke-indigo-400" />
         <a
           href={value}
           target="_blank"
@@ -43,10 +43,10 @@ export const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
         </a>
         <button
           onClick={() => onChange("")}
-          className="absolute -top-2 -right-2 p-1 text-white bg-rose-500 rounded-full shadow-sm"
+          className="absolute -right-2 -top-2 rounded-full bg-rose-500 p-1 text-white shadow-sm"
           type="button"
         >
-          <X className="w-4 h-4" />
+          <X className="h-4 w-4" />
         </button>
       </div>
     );

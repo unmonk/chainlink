@@ -34,8 +34,8 @@ export const AdminDeletePickModal = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size={"icon"} disabled={disabled}>
-          <Trash2Icon className="w-4 h-4" />
+        <Button variant="destructive" size={"icon"} disabled={disabled}>
+          <Trash2Icon className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -45,7 +45,7 @@ export const AdminDeletePickModal = ({
           from the database. There is currently no notification to the user that
           this occured.
         </DialogDescription>
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <DialogClose asChild>
             <Button variant={"secondary"}>Cancel</Button>
           </DialogClose>
@@ -55,7 +55,7 @@ export const AdminDeletePickModal = ({
             type="submit"
             onClick={() => handleConfirm(userId)}
           >
-            {loading ? <Loader className="w-5 h-5" /> : "Confirm"}
+            {loading ? <Loader className="h-5 w-5" /> : "Confirm"}
           </Button>
         </DialogFooter>
       </DialogContent>

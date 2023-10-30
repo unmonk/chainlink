@@ -12,9 +12,9 @@ interface ProfileDetailsProps {
 
 const ProfileDetails: FC<ProfileDetailsProps> = ({ user }) => {
   return (
-    <div className="w-full flex flex-col justify-center items-center gap-4 p-4 md:flex-row">
-      <div className="w-full flex flex-col justify-center items-center md:w-1/3">
-        <Avatar className="w-20 h-20">
+    <div className="flex w-full flex-col items-center justify-center gap-4 p-4 md:flex-row">
+      <div className="flex w-full flex-col items-center justify-center md:w-1/3">
+        <Avatar className="h-20 w-20">
           <AvatarImage src={user?.imageUrl} alt="User Profile Picture" />
           <AvatarFallback className="bg-slate-500">
             {user?.username?.substring(0, 2) ??
@@ -23,17 +23,17 @@ const ProfileDetails: FC<ProfileDetailsProps> = ({ user }) => {
         </Avatar>
         <h1 className="text-2xl font-bold">{user.username}</h1>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Joined: <span>{format(user?.createdAt)}</span>
         </p>
 
         <ProfileStreakDisplay size="lg" userId={user?.id} />
       </div>
-      <div className="w-full p-4 border rounded-md md:w-2/3">
+      <div className="w-full rounded-md border p-4 md:w-2/3">
         <ProfileAchievements />
       </div>
-      <div className="w-full flex flex-col items-center">
-        <div className="w-full p-4 border rounded-md md:w-5/6">
+      <div className="flex w-full flex-col items-center">
+        <div className="w-full rounded-md border p-4 md:w-5/6">
           <ProfileStats userId={user.id} />
         </div>
       </div>

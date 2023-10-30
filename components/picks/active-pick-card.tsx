@@ -20,11 +20,11 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
   if (!pick || !pick.matchup) return null;
   return (
     <section>
-      <div className="w-full flex flex-col justify-center items-center gap-2">
-        <div className="w-full h-full border rounded-b-md shadow-md">
+      <div className="flex w-full flex-col items-center justify-center gap-2">
+        <div className="h-full w-full rounded-b-md border shadow-md">
           <MatchupCardHeader matchup={pick.matchup} status={pick.pick_status} />
 
-          <h4 className="p-2 pr-1 text-sm font-bold md:text-base md:text-center">
+          <h4 className="p-2 pr-1 text-sm font-bold md:text-center md:text-base">
             {pick.matchup.question}
           </h4>
 
@@ -32,7 +32,7 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
             <div className="grid grid-cols-3 gap-4">
               <div
                 className={cn(
-                  "relative flex flex-col justify-center items-center p-2 rounded-sm",
+                  "relative flex flex-col items-center justify-center rounded-sm p-2",
                   pick.pick_type === "AWAY"
                     ? "bg-accent"
                     : "bg-accent/40 opacity-30",
@@ -44,12 +44,12 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                   width={50}
                   height={50}
                 />
-                <span className="text-xs font-bold text-center">
+                <span className="text-center text-xs font-bold">
                   {pick.matchup.away_team}
                 </span>
                 {pick.pick_type === "AWAY" && (
                   <Badge
-                    className="absolute top-1 right-1"
+                    className="absolute right-1 top-1"
                     variant={"secondary"}
                   >
                     <CheckIcon size={12} />
@@ -58,25 +58,25 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
               </div>
               {/* clock section start_time */}
               {pick.pick_status === "PENDING" && (
-                <div className="flex flex-col justify-center items-center p-2 bg-accent/40 rounded-sm">
-                  <span className="text-xs font-bold text-center text-primary">
+                <div className="bg-accent/40 flex flex-col items-center justify-center rounded-sm p-2">
+                  <span className="text-primary text-center text-xs font-bold">
                     Locks at:
                   </span>
                   <Logo size={50} />
-                  <span className="text-xs font-bold text-center text-primary">
+                  <span className="text-primary text-center text-xs font-bold">
                     <ClientTime time={pick.matchup.start_time} />
                   </span>
                 </div>
               )}
               {/* clock section start_time */}
               {pick.pick_status === "STATUS_IN_PROGRESS" && (
-                <div className="flex flex-col justify-center items-center p-2 bg-accent/40 rounded-sm">
+                <div className="bg-accent/40 flex flex-col items-center justify-center rounded-sm p-2">
                   <Loader />
                 </div>
               )}
               <div
                 className={cn(
-                  "relative flex flex-col justify-center items-center p-2 rounded-sm",
+                  "relative flex flex-col items-center justify-center rounded-sm p-2",
                   pick.pick_type === "HOME"
                     ? "bg-accent"
                     : "bg-accent/40 opacity-30",
@@ -88,12 +88,12 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                   width={50}
                   height={50}
                 />
-                <span className="text-xs font-bold text-center">
+                <span className="text-center text-xs font-bold">
                   {pick.matchup.home_team}
                 </span>
                 {pick.pick_type === "HOME" && (
                   <Badge
-                    className="absolute top-1 right-1"
+                    className="absolute right-1 top-1"
                     variant={"secondary"}
                   >
                     <CheckIcon size={12} />
@@ -101,14 +101,14 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                 )}
               </div>
             </div>
-            <div className="w-1/2 flex flex-row justify-evenly gap-4">
+            <div className="flex w-1/2 flex-row justify-evenly gap-4">
               {pick.pick_status !== "PENDING" && (
-                <div className="flex justify-center items-center">
+                <div className="flex items-center justify-center">
                   <p className="text-lg">{pick.matchup.away_value}</p>
                 </div>
               )}
               {pick.pick_status !== "PENDING" && (
-                <div className="flex justify-center items-center">
+                <div className="flex items-center justify-center">
                   <Button variant="link" size="sm" asChild>
                     <Link
                       href={`/gamedetails/${pick.matchup.league}/${pick.matchup.game_id}`}
@@ -121,7 +121,7 @@ export function ActivePickCard({ pick }: ActivePickCardProps) {
                 </div>
               )}
               {pick.pick_status !== "PENDING" && (
-                <div className="flex justify-center items-center">
+                <div className="flex items-center justify-center">
                   <p className="text-lg">{pick.matchup.home_value}</p>
                 </div>
               )}
