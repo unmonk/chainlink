@@ -13,15 +13,17 @@ const AchievementListItem: FC<AchievementListItemProps> = ({ achievement }) => {
       className="flex cursor-pointer flex-row items-center justify-center border-y-2 p-2"
     >
       <div className="flex w-1/3 flex-row items-center justify-center gap-4">
-        <Image
-          src={"/images/testbadge.png"}
-          alt={achievement.name}
-          width={85}
-          height={85}
-        />
+        <div className="w-18 h-18 flex items-center justify-center rounded-full bg-neutral-900">
+          <Image
+            src={achievement.image || "/images/alert-octagon.svg"}
+            alt={achievement.name}
+            width={250}
+            height={250}
+          />
+        </div>
         <p className="font-bold">{achievement.name}</p>
       </div>
-      <div className="w-2/3">{achievement.description}</div>
+      <div className="w-2/3 text-sm">{achievement.description}</div>
     </div>
   );
 };

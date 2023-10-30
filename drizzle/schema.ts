@@ -278,6 +278,7 @@ export const achievements = mysqlTable("achievements", {
     "MONTHLYWIN",
     "MONTHLYSTREAKWIN",
     "SQUAD",
+    "REFERRAL",
     "OTHER",
   ])
     .notNull()
