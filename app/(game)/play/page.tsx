@@ -82,13 +82,15 @@ export default async function Page({ searchParams }: DashboardPageParams) {
                 className="rounded-lg border-slate-500 shadow-md"
               />
             </Link>
-            <Image
-              src="/images/test2.png"
-              width={200}
-              height={200}
-              alt="test"
-              className="rounded-lg border-slate-500 shadow-md"
-            />
+            <Link href="https://www.club602.com/flipcup" target="_blank">
+              <Image
+                src="/images/test2.png"
+                width={200}
+                height={200}
+                alt="test"
+                className="rounded-lg border-slate-500 shadow-md"
+              />
+            </Link>
             <Image
               src="/images/ad3.png"
               width={200}
