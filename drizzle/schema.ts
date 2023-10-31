@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm"
 import {
   int,
   text,
@@ -16,7 +16,7 @@ import {
   datetime,
   unique,
   primaryKey,
-} from "drizzle-orm/mysql-core";
+} from "drizzle-orm/mysql-core"
 
 //Tables
 
@@ -38,7 +38,7 @@ export const campaigns = mysqlTable(
     streak_winner_id: varchar("streak_winner_id", {
       length: 64,
     }),
-     squad_winner_id: bigint("squad_id", {
+    squad_winner_id: bigint("squad_winner_id", {
       mode: "number",
     }),
     start_date: datetime("start_date", {
@@ -54,9 +54,9 @@ export const campaigns = mysqlTable(
     return {
       activeIdx: index("active_idx").on(table.active),
       startDateIdx: index("start_date_idx").on(table.start_date),
-    };
-  },
-);
+    }
+  }
+)
 
 export const matchups = mysqlTable(
   "matchups",
@@ -165,11 +165,11 @@ export const matchups = mysqlTable(
       unique_matchup_idx: unique("unique_matchup_idx").on(
         table.start_time,
         table.game_id,
-        table.league,
+        table.league
       ),
-    };
-  },
-);
+    }
+  }
+)
 
 export const picks = mysqlTable(
   "picks",
@@ -202,9 +202,9 @@ export const picks = mysqlTable(
   (table) => {
     return {
       user_active_idx: index("user_active_idx").on(table.user_id, table.active),
-    };
-  },
-);
+    }
+  }
+)
 
 export const streaks = mysqlTable(
   "streaks",
@@ -227,9 +227,9 @@ export const streaks = mysqlTable(
   (table) => {
     return {
       user_active_idx: index("user_active_idx").on(table.user_id, table.active),
-    };
-  },
-);
+    }
+  }
+)
 
 export const profiles = mysqlTable("profiles", {
   user_id: varchar("user_id", {
@@ -238,12 +238,12 @@ export const profiles = mysqlTable("profiles", {
     .primaryKey()
     .unique(),
   created_at: timestamp("created_at", { mode: "date" }).default(
-    sql`current_timestamp()`,
+    sql`current_timestamp()`
   ),
   updated_at: timestamp("updated_at", { mode: "date" }).default(
-    sql`current_timestamp()`,
+    sql`current_timestamp()`
   ),
-});
+})
 
 export const squads = mysqlTable(
   "squads",
@@ -256,18 +256,18 @@ export const squads = mysqlTable(
       length: 64,
     }).notNull(),
     created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`current_timestamp()`,
+      sql`current_timestamp()`
     ),
     updated_at: timestamp("updated_at", { mode: "date" }).default(
-      sql`current_timestamp()`,
+      sql`current_timestamp()`
     ),
   },
   (table) => {
     return {
       name_idx: index("name_idx").on(table.name),
-    };
-  },
-);
+    }
+  }
+)
 
 export const achievements = mysqlTable("achievements", {
   id: serial("id").primaryKey().autoincrement(),
@@ -293,9 +293,9 @@ export const achievements = mysqlTable("achievements", {
     length: 512,
   }).notNull(),
   created_at: timestamp("created_at", { mode: "date" }).default(
-    sql`current_timestamp()`,
+    sql`current_timestamp()`
   ),
-});
+})
 
 export const profileAchievements = mysqlTable(
   "profile_achievements",
@@ -307,7 +307,7 @@ export const profileAchievements = mysqlTable(
       mode: "number",
     }).notNull(),
     created_at: timestamp("created_at", { mode: "date" }).default(
-      sql`current_timestamp()`,
+      sql`current_timestamp()`
     ),
   },
   (table) => {
@@ -315,11 +315,11 @@ export const profileAchievements = mysqlTable(
       profile_id_idx: index("profile_id_idx").on(table.profile_id),
       profile_achievement_idx: primaryKey(
         table.profile_id,
-        table.achievement_id,
+        table.achievement_id
       ),
-    };
-  },
-);
+    }
+  }
+)
 
 export const ownedSquads = mysqlTable(
   "owned_squads",
@@ -336,9 +336,9 @@ export const ownedSquads = mysqlTable(
       squad_id_idx: index("squad_id_idx").on(table.squad_id),
       profile_id_idx: index("profile_id_idx").on(table.profile_id),
       unique_owned_squads_idx: primaryKey(table.squad_id, table.profile_id),
-    };
-  },
-);
+    }
+  }
+)
 
 export const squadMembers = mysqlTable(
   "squad_members",
@@ -355,9 +355,9 @@ export const squadMembers = mysqlTable(
       squad_id_idx: index("squad_id_idx").on(table.squad_id),
       profile_id_idx: index("profile_id_idx").on(table.profile_id),
       unique_squad_member_idx: primaryKey(table.squad_id, table.profile_id),
-    };
-  },
-);
+    }
+  }
+)
 
 //Relationships
 
@@ -370,7 +370,7 @@ export const ownedSquadRelations = relations(ownedSquads, ({ one, many }) => ({
     fields: [ownedSquads.squad_id],
     references: [squads.id],
   }),
-}));
+}))
 
 export const squadMemberRelations = relations(
   squadMembers,
@@ -383,8 +383,8 @@ export const squadMemberRelations = relations(
       fields: [squadMembers.squad_id],
       references: [squads.id],
     }),
-  }),
-);
+  })
+)
 
 export const squadRelations = relations(squads, ({ one, many }) => ({
   owner: one(profiles, {
@@ -392,7 +392,7 @@ export const squadRelations = relations(squads, ({ one, many }) => ({
     references: [profiles.user_id],
   }),
   members: many(squadMembers),
-}));
+}))
 
 export const profileAchievementRelations = relations(
   profileAchievements,
@@ -405,8 +405,8 @@ export const profileAchievementRelations = relations(
       fields: [profileAchievements.achievement_id],
       references: [achievements.id],
     }),
-  }),
-);
+  })
+)
 
 export const profileRelations = relations(profiles, ({ one, many }) => ({
   streaks: many(streaks),
@@ -414,15 +414,15 @@ export const profileRelations = relations(profiles, ({ one, many }) => ({
   squads: many(squads),
   ownedSquads: many(ownedSquads),
   achievements: many(profileAchievements),
-}));
+}))
 
 export const campaignRelations = relations(campaigns, ({ one, many }) => ({
   streaks: many(streaks),
-}));
+}))
 
 export const matchupRelations = relations(matchups, ({ one, many }) => ({
   picks: many(picks),
-}));
+}))
 
 export const pickRelations = relations(picks, ({ one, many }) => ({
   matchup: one(matchups, {
@@ -437,7 +437,7 @@ export const pickRelations = relations(picks, ({ one, many }) => ({
     fields: [picks.user_id],
     references: [profiles.user_id],
   }),
-}));
+}))
 
 export const streakRelations = relations(streaks, ({ one, many }) => ({
   campaign: one(campaigns, {
@@ -449,61 +449,61 @@ export const streakRelations = relations(streaks, ({ one, many }) => ({
     references: [profiles.user_id],
   }),
   picks: many(picks),
-}));
+}))
 
 //Types
-export type Campaign = typeof campaigns.$inferSelect;
-export type Matchup = typeof matchups.$inferSelect;
-export type Pick = typeof picks.$inferSelect;
-export type Streak = typeof streaks.$inferSelect;
-export type Profile = typeof profiles.$inferSelect;
-export type Squad = typeof squads.$inferSelect;
-export type Achievement = typeof achievements.$inferSelect;
+export type Campaign = typeof campaigns.$inferSelect
+export type Matchup = typeof matchups.$inferSelect
+export type Pick = typeof picks.$inferSelect
+export type Streak = typeof streaks.$inferSelect
+export type Profile = typeof profiles.$inferSelect
+export type Squad = typeof squads.$inferSelect
+export type Achievement = typeof achievements.$inferSelect
 
-export type NewCampaign = typeof campaigns.$inferInsert;
-export type NewMatchup = typeof matchups.$inferInsert;
-export type NewPick = typeof picks.$inferInsert;
-export type NewStreak = typeof streaks.$inferInsert;
-export type NewProfile = typeof profiles.$inferInsert;
-export type NewSquad = typeof squads.$inferInsert;
-export type NewAchievement = typeof achievements.$inferInsert;
+export type NewCampaign = typeof campaigns.$inferInsert
+export type NewMatchup = typeof matchups.$inferInsert
+export type NewPick = typeof picks.$inferInsert
+export type NewStreak = typeof streaks.$inferInsert
+export type NewProfile = typeof profiles.$inferInsert
+export type NewSquad = typeof squads.$inferInsert
+export type NewAchievement = typeof achievements.$inferInsert
 
 export type FullProfile = Profile & {
-  streaks: Streak[];
-  picks: Pick[];
-  squads: Squad[];
-  ownedSquads: Squad[];
-  achievements: Achievement[];
-};
+  streaks: Streak[]
+  picks: Pick[]
+  squads: Squad[]
+  ownedSquads: Squad[]
+  achievements: Achievement[]
+}
 
 export type CampaignWithMatchups = Campaign & {
-  matchups: Matchup[];
-};
+  matchups: Matchup[]
+}
 
 export type CampaignWithStreaks = Campaign & {
-  streaks: Streak[];
-};
+  streaks: Streak[]
+}
 
 export type MatchupWithPicks = Matchup & {
-  picks: Pick[];
-};
+  picks: Pick[]
+}
 
 export type StreakWithPicks = Streak & {
-  picks: Pick[];
-};
+  picks: Pick[]
+}
 
 export type PickWithMatchup = Pick & {
-  matchup: Matchup;
-};
+  matchup: Matchup
+}
 
 export type PickWithStreak = Pick & {
-  streak: Streak;
-};
+  streak: Streak
+}
 
 export type PickWithMatchupAndStreak = Pick & {
-  matchup: Matchup;
-  streak: Streak;
-};
+  matchup: Matchup
+  streak: Streak
+}
 
 export type League =
   | "NFL"
@@ -514,7 +514,7 @@ export type League =
   | "MBB"
   | "WBB"
   | "WNBA"
-  | "NCAA";
+  | "NCAA"
 
 export type MatchupStatus =
   | "STATUS_IN_PROGRESS"
@@ -526,7 +526,7 @@ export type MatchupStatus =
   | "STATUS_DELAYED"
   | "STATUS_UNKNOWN"
   | "STATUS_END_PERIOD"
-  | "STATUS_HALFTIME";
+  | "STATUS_HALFTIME"
 
 export type PickCardVariant =
   | "WIN"
@@ -542,7 +542,7 @@ export type PickCardVariant =
   | "STATUS_DELAYED"
   | "STATUS_UNKNOWN"
   | "STATUS_END_PERIOD"
-  | "STATUS_HALFTIME";
+  | "STATUS_HALFTIME"
 
 export type Operator =
   | "LESS_THAN"
@@ -550,9 +550,9 @@ export type Operator =
   | "EQUAL_TO"
   | "NOT_EQUAL_TO"
   | "LESS_THAN_OR_EQUAL_TO"
-  | "GREATER_THAN_OR_EQUAL_TO";
+  | "GREATER_THAN_OR_EQUAL_TO"
 
-export type PickType = "HOME" | "AWAY";
+export type PickType = "HOME" | "AWAY"
 
 export type PickStatus =
   | "PENDING"
@@ -560,7 +560,7 @@ export type PickStatus =
   | "LOSS"
   | "PUSH"
   | "STATUS_IN_PROGRESS"
-  | "STATUS_UNKNOWN";
+  | "STATUS_UNKNOWN"
 
 export enum AchievementType {
   STREAKWIN = "STREAKWIN",
