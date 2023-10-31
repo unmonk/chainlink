@@ -49,7 +49,8 @@ export async function sendDiscordStreakNotification(
 export async function sendDiscordCampaignWinNotification(
   userId: string,
   campaign_name: string,
-  win_type: "streak" | "wins"
+  win_type: "streak" | "wins",
+  image_url: string
 ) {
   const user = await clerkClient.users.getUser(userId)
   if (!user) {
@@ -79,6 +80,13 @@ export async function sendDiscordCampaignWinNotification(
       },
       body: JSON.stringify({
         content: message,
+        embeds: [
+          {
+            thumbnail: {
+              url: image_url,
+            },
+          },
+        ],
       }),
     }
   )

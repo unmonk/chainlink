@@ -1,5 +1,10 @@
 import { db } from "@/drizzle/db"
-import { NewCampaign, campaigns } from "@/drizzle/schema"
+import { AchievementType, NewCampaign, campaigns } from "@/drizzle/schema"
+import {
+  assignAchievement,
+  createMonthlyAchievements,
+  getAchievementByWeightAndType,
+} from "@/lib/actions/achievements"
 import { completeActiveCampaign } from "@/lib/actions/campaign"
 import { NextResponse } from "next/server"
 
@@ -35,6 +40,9 @@ export async function GET(request: Request) {
   }
 
   const dbInsert = await db.insert(campaigns).values(campaign)
+
+  //Create Achievements for this month
+  await createMonthlyAchievements()
 
   const response = {
     completedCampaign,

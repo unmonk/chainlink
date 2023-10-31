@@ -2,8 +2,12 @@
 
 import { sendDiscordCampaignWinNotification } from "./discord-notifications"
 import { db } from "@/drizzle/db"
-import { campaigns, streaks } from "@/drizzle/schema"
+import { AchievementType, campaigns, streaks } from "@/drizzle/schema"
 import { desc, eq } from "drizzle-orm"
+import {
+  getAchievementByWeightAndType,
+  assignAchievement,
+} from "./achievements"
 
 export async function getActiveCampaign() {
   const campaign = await db.query.campaigns.findFirst({
@@ -27,7 +31,7 @@ export async function getActiveCampaignId() {
 export async function completeActiveCampaign() {
   const campaign = await getActiveCampaign()
   if (!campaign) {
-    throw new Error("No active campaign")
+    return
   }
   //Set inactive
   campaign.active = false
@@ -42,13 +46,46 @@ export async function completeActiveCampaign() {
 
   await db.update(campaigns).set(campaign).where(eq(campaigns.id, campaign.id))
 
-  //Send Discord Notifications
-  await sendDiscordCampaignWinNotification(
-    streak_winner_id,
-    campaign.name,
-    "streak"
-  )
-  await sendDiscordCampaignWinNotification(win_winner_id, campaign.name, "wins")
+  //Set all streaks to inactive
+  await db.update(streaks).set({ active: false })
+
+  //Assign Achievements
+  const lastMonth = new Date()
+  lastMonth.setMonth(lastMonth.getMonth() - 1)
+  const lastMonthYear = lastMonth.getFullYear()
+  const lastMonthNumber = lastMonth.getMonth() + 1
+  const weight = Number(`${lastMonthNumber}${lastMonthYear}`)
+  if (campaign.streak_winner_id) {
+    const lastMonthChainAchievement = await getAchievementByWeightAndType(
+      weight,
+      AchievementType.MONTHLYSTREAKWIN
+    )
+    if (lastMonthChainAchievement) {
+      await assignAchievement(streak_winner_id, lastMonthChainAchievement.id)
+      await sendDiscordCampaignWinNotification(
+        streak_winner_id,
+        campaign.name,
+        "streak",
+        lastMonthChainAchievement?.image || ""
+      )
+    }
+  }
+
+  if (campaign.winner_id) {
+    const lastMonthWinAchievement = await getAchievementByWeightAndType(
+      weight,
+      AchievementType.MONTHLYWIN
+    )
+    if (lastMonthWinAchievement) {
+      await assignAchievement(win_winner_id, lastMonthWinAchievement.id)
+      await sendDiscordCampaignWinNotification(
+        win_winner_id,
+        campaign.name,
+        "wins",
+        lastMonthWinAchievement?.image || ""
+      )
+    }
+  }
 
   return campaign
 }
