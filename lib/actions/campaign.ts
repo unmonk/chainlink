@@ -1,14 +1,15 @@
-"use server";
+"use server"
 
-import { db } from "@/drizzle/db";
-import { campaigns } from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { sendDiscordCampaignWinNotification } from "./discord-notifications"
+import { db } from "@/drizzle/db"
+import { campaigns, streaks } from "@/drizzle/schema"
+import { desc, eq } from "drizzle-orm"
 
 export async function getActiveCampaign() {
   const campaign = await db.query.campaigns.findFirst({
     where: eq(campaigns.active, true),
-  });
-  return campaign;
+  })
+  return campaign
 }
 
 export async function getActiveCampaignId() {
@@ -18,7 +19,58 @@ export async function getActiveCampaignId() {
     })
     .from(campaigns)
     .where(eq(campaigns.active, true))
-    .limit(1);
+    .limit(1)
 
-  return campaign[0].id;
+  return campaign[0].id
+}
+
+export async function completeActiveCampaign() {
+  const campaign = await getActiveCampaign()
+  if (!campaign) {
+    throw new Error("No active campaign")
+  }
+  //Set inactive
+  campaign.active = false
+
+  //Determine Winners
+  const streak_winner_id = await getStreakWinner(campaign.id)
+  const win_winner_id = await getWinWinner(campaign.id)
+
+  //set winners
+  campaign.streak_winner_id = streak_winner_id
+  campaign.winner_id = win_winner_id
+
+  await db.update(campaigns).set(campaign).where(eq(campaigns.id, campaign.id))
+
+  //Send Discord Notifications
+  await sendDiscordCampaignWinNotification(
+    streak_winner_id,
+    campaign.name,
+    "streak"
+  )
+  await sendDiscordCampaignWinNotification(win_winner_id, campaign.name, "wins")
+
+  return campaign
+}
+
+async function getStreakWinner(campaign_id: number) {
+  const winning_streak = await db
+    .select()
+    .from(streaks)
+    .where(eq(streaks.campaign_id, campaign_id))
+    .orderBy(desc(streaks.streak), desc(streaks.wins), desc(streaks.pushes))
+    .limit(1)
+
+  return winning_streak[0].user_id
+}
+
+async function getWinWinner(campaign_id: number) {
+  const winning_streak = await db
+    .select()
+    .from(streaks)
+    .where(eq(streaks.campaign_id, campaign_id))
+    .orderBy(desc(streaks.wins), desc(streaks.streak), desc(streaks.pushes))
+    .limit(1)
+
+  return winning_streak[0].user_id
 }

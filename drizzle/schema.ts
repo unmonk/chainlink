@@ -1,4 +1,4 @@
-import { InferModel, relations, sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   int,
   text,
@@ -17,7 +17,6 @@ import {
   unique,
   primaryKey,
 } from "drizzle-orm/mysql-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 //Tables
 
@@ -35,6 +34,12 @@ export const campaigns = mysqlTable(
     }),
     winner_id: varchar("winner_id", {
       length: 64,
+    }),
+    streak_winner_id: varchar("streak_winner_id", {
+      length: 64,
+    }),
+     squad_winner_id: bigint("squad_id", {
+      mode: "number",
     }),
     start_date: datetime("start_date", {
       mode: "date",
