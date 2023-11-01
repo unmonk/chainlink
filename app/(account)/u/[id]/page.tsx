@@ -19,6 +19,7 @@ export async function generateMetadata(
   return {
     title: `${user.username} | ChainLink`,
     description: `View ${user.username}'s ChainLink profile.`,
+    category: "profile",
     openGraph: {
       title: `${user.username} | ChainLink`,
       siteName: "ChainLink",
