@@ -17,7 +17,7 @@ const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
       <h2 className="mb-2 text-xl font-bold">Stats</h2>
       <div className="flex flex-col items-center justify-center rounded-md border p-2 ">
         <h3 className="p-2 text-center text-xl">Wins By League</h3>
-        <div className="grid grid-cols-3 gap-2 p-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+        <div className="grid w-full grid-cols-3 gap-2 p-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
           {stats.length > 0 ? (
             stats?.map((stat) => (
               <div
@@ -31,8 +31,9 @@ const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
                   height={100}
                   className="h-3/4 w-3/4 object-cover transition-all hover:scale-110"
                 />
-                <p className="text-center">
-                  {stat.leagues}: {stat.win_count}
+                <p className="min-y-12 text-center">
+                  {stat.leagues === "COLLEGE-FOOTBALL" ? "CFB" : stat.leagues}:{" "}
+                  {stat.win_count}
                 </p>
               </div>
             ))
