@@ -28,7 +28,7 @@ export const siteConfig = {
     "streak game",
     "streak app",
   ],
-};
+}
 
 export const supportedLeagues = [
   "NFL",
@@ -40,4 +40,19 @@ export const supportedLeagues = [
   "WBB",
   "WNBA",
   "NCAA",
-];
+]
+
+export const leagueLogos: {
+  [key: string]: string
+} = {
+  NFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nfl.png?w=100&h=100&transparent=true",
+  NBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png?w=100&h=100&transparent=true",
+  MLB: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mlb.png?w=100&h=100&transparent=true",
+  NHL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nhl.png?w=100&h=100&transparent=true",
+  "COLLEGE-FOOTBALL":
+    "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-football-college.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
+  MBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
+  WBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
+  WNBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/wnba.png?w=100&h=100&transparent=true",
+  NCAA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/ncaa.png?w=100&h=100&transparent=true",
+}

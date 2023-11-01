@@ -459,6 +459,7 @@ export type Streak = typeof streaks.$inferSelect
 export type Profile = typeof profiles.$inferSelect
 export type Squad = typeof squads.$inferSelect
 export type Achievement = typeof achievements.$inferSelect
+export type ProfileAchievement = typeof profileAchievements.$inferSelect
 
 export type NewCampaign = typeof campaigns.$inferInsert
 export type NewMatchup = typeof matchups.$inferInsert
@@ -474,6 +475,10 @@ export type FullProfile = Profile & {
   squads: Squad[]
   ownedSquads: Squad[]
   achievements: Achievement[]
+}
+
+export type ProfileAchievementWithAchievement = ProfileAchievement & {
+  achievement: Achievement
 }
 
 export type CampaignWithMatchups = Campaign & {
