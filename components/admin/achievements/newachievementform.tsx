@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { FileUpload } from "@/components/file-upload";
-import { Button } from "@/components/ui/button";
+import { FileUpload } from "@/components/file-upload"
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -10,28 +10,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Loader } from "@/components/ui/loader";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Loader } from "@/components/ui/loader"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { achievements } from "@/drizzle/schema";
-import { addAchievement } from "@/lib/actions/achievements";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createInsertSchema } from "drizzle-zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+} from "@/components/ui/select"
+import { achievements } from "@/drizzle/schema"
+import { addAchievement } from "@/lib/actions/achievements"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { createInsertSchema } from "drizzle-zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 const formSchema = createInsertSchema(achievements).merge(
   z.object({
-    value: z.coerce.number().int().positive(),
-  }),
-);
+    value: z.coerce.number().int().gte(0),
+  })
+)
 
 export function NewAchievementForm() {
   // 1. Define your form.
@@ -44,14 +44,14 @@ export function NewAchievementForm() {
       value: 0,
       image: "",
     },
-  });
+  })
 
-  const isLoading = form.formState.isSubmitting;
+  const isLoading = form.formState.isSubmitting
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    await addAchievement(values);
-    form.reset();
+    await addAchievement(values)
+    form.reset()
   }
 
   return (
@@ -114,7 +114,7 @@ export function NewAchievementForm() {
                         <SelectItem key={key} value={value}>
                           {value}
                         </SelectItem>
-                      ),
+                      )
                     )}
                   </SelectContent>
                 </Select>
@@ -168,5 +168,5 @@ export function NewAchievementForm() {
         </Button>
       </form>
     </Form>
-  );
+  )
 }
