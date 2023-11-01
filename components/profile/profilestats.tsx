@@ -1,14 +1,17 @@
-import { Separator } from "../ui/separator";
-import { getUserStats } from "@/lib/actions/profiles";
-import { auth } from "@clerk/nextjs";
-import { FC } from "react";
+import { Separator } from "../ui/separator"
+import { getUserStats } from "@/lib/actions/profiles"
+import { auth } from "@clerk/nextjs"
+import Image from "next/image"
+import { FC } from "react"
+import { leagueLogos } from "@/lib/config"
 
 interface ProfileStatsProps {
-  userId: string;
+  userId: string
 }
 
 const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
-  const stats = await getUserStats(userId);
+  const stats = await getUserStats(userId)
+  console.log(stats)
   return (
     <div>
       <h2 className="mb-2 text-xl font-bold">Stats</h2>
@@ -17,11 +20,20 @@ const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
         <div className="grid grid-cols-2 p-2 md:grid-cols-4 xl:grid-cols-6">
           {stats.length > 0 ? (
             stats?.map((stat) => (
-              <div key={stat.leagues} className="flex flex-row gap-2">
-                <Separator orientation="vertical" />
-                <p>{stat.leagues}:</p>
-                <p>{stat.win_count}</p>
-                <Separator orientation="vertical" />
+              <div
+                key={stat.leagues}
+                className="flex h-20 w-20 flex-col items-center"
+              >
+                <Image
+                  src={leagueLogos[stat.leagues] || "images/alert-octagon.svg"}
+                  alt={stat.leagues}
+                  width={100}
+                  height={100}
+                  className="h-3/4 w-3/4 object-cover transition-all hover:scale-110"
+                />
+                <p className="pb-4 text-center">
+                  {stat.leagues}: {stat.win_count}
+                </p>
               </div>
             ))
           ) : (
@@ -30,7 +42,7 @@ const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProfileStats;
+export default ProfileStats
