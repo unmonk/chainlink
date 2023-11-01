@@ -1,5 +1,6 @@
 import { db } from "@/drizzle/db"
 import {
+  ProfileAchievementWithAchievement,
   matchups,
   profileAchievements,
   profiles,
@@ -74,7 +75,79 @@ export const getUserAchievements = async (userId: string) => {
       achievement: true,
     },
   })
-  return achievements
+
+  if (!achievements) {
+    return []
+  }
+
+  const filteredAchievements = []
+
+  //filter to the highest value achievement in each type
+  const monthlyStreakWins = achievements
+    .filter(
+      (achievement: ProfileAchievementWithAchievement) =>
+        achievement.achievement.type === "MONTHLYSTREAKWIN"
+    )
+    .sort((a, b) => b.achievement.value - a.achievement.value)
+
+  if (monthlyStreakWins.length > 0) {
+    filteredAchievements.push(monthlyStreakWins[0])
+  }
+
+  const monthlyWins = achievements
+    .filter(
+      (achievement: ProfileAchievementWithAchievement) =>
+        achievement.achievement.type === "MONTHLYWIN"
+    )
+    .sort((a, b) => b.achievement.value - a.achievement.value)
+  if (monthlyWins.length > 0) {
+    filteredAchievements.push(monthlyWins[0])
+  }
+
+  const streakWins = achievements
+    .filter(
+      (achievement: ProfileAchievementWithAchievement) =>
+        achievement.achievement.type === "STREAKWIN"
+    )
+    .sort((a, b) => b.achievement.value - a.achievement.value)
+  if (streakWins.length > 0) {
+    filteredAchievements.push(streakWins[0])
+  }
+
+  const streakLosses = achievements
+    .filter(
+      (achievement: ProfileAchievementWithAchievement) =>
+        achievement.achievement.type === "STREAKLOSS"
+    )
+    .sort((a, b) => b.achievement.value - a.achievement.value)
+  if (streakLosses.length > 0) {
+    filteredAchievements.push(streakLosses[0])
+  }
+
+  const referrals = achievements
+    .filter(
+      (achievement: ProfileAchievementWithAchievement) =>
+        achievement.achievement.type === "REFERRAL"
+    )
+    .sort((a, b) => b.achievement.value - a.achievement.value)
+  if (referrals.length > 0) {
+    filteredAchievements.push(referrals[0])
+  }
+
+  const otherAchievements = achievements.filter(
+    (achievement: ProfileAchievementWithAchievement) =>
+      achievement.achievement.type !== "MONTHLYSTREAKWIN" &&
+      achievement.achievement.type !== "MONTHLYWIN" &&
+      achievement.achievement.type !== "STREAKWIN" &&
+      achievement.achievement.type !== "STREAKLOSS" &&
+      achievement.achievement.type !== "REFERRAL"
+  )
+
+  //push remaining achievements not already pushed
+  filteredAchievements.push(...otherAchievements)
+
+  // return the highest value achievement in each type and then the remaining achievements
+  return filteredAchievements
 }
 
 export const getUserStats = async (userId: string) => {

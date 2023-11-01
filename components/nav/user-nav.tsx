@@ -1,39 +1,49 @@
-"use client";
+"use client"
 
-import NotificationToggle from "@/components/nav/notificationtoggle";
-import UserNavLinks from "@/components/nav/user-nav-links";
-import { StreakDisplay } from "@/components/streaks/streak-display";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import NotificationToggle from "@/components/nav/notificationtoggle"
+import UserNavLinks from "@/components/nav/user-nav-links"
+import { StreakDisplay } from "@/components/streaks/streak-display"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import UserAvatar from "@/components/user-avatar";
-import { useNav } from "@/hooks/useNav";
-import { registerServiceWorker } from "@/lib/notifications";
-import { useUser } from "@clerk/nextjs";
-import Link from "next/link";
-import { useEffect } from "react";
+} from "@/components/ui/sheet"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
+import UserAvatar from "@/components/user-avatar"
+import { useNav } from "@/hooks/useNav"
+import { registerServiceWorker } from "@/lib/notifications"
+import { useUser } from "@clerk/nextjs"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { startTransition, useEffect } from "react"
 
 export function UserNav() {
-  const { open, setOpen } = useNav();
-  const { user } = useUser();
+  const pathname = usePathname()
+  const { open, setOpen } = useNav()
+  const router = useRouter()
+  const { user } = useUser()
+
+  const handleLinkClick = (path: string) => {
+    startTransition(() => {
+      router.push(path)
+      setOpen(false)
+    })
+  }
 
   useEffect(() => {
     async function setUpServiceWorker() {
       try {
-        await registerServiceWorker();
+        await registerServiceWorker()
       } catch (err) {
-        console.error(err);
+        console.error(err)
       }
     }
-    setUpServiceWorker();
-  }, []);
+    setUpServiceWorker()
+  }, [])
 
   return (
     <Sheet onOpenChange={setOpen} open={open}>
@@ -49,8 +59,22 @@ export function UserNav() {
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle className="flex flex-row items-center justify-center gap-2 p-2">
-            <UserAvatar />
+          <SheetTitle>
+            <Button
+              asChild
+              className="w-full"
+              variant={"ghost"}
+              onClick={() => handleLinkClick("/privacy")}
+            >
+              <Link
+                href={`/u/${user?.username}`}
+                prefetch={false}
+                className="flex flex-row items-center justify-center gap-1"
+              >
+                <UserAvatar />
+                {user?.username}
+              </Link>
+            </Button>
           </SheetTitle>
         </SheetHeader>
         <Separator className="my-4" />
@@ -64,31 +88,52 @@ export function UserNav() {
 
         <Separator className="my-4" />
         <div className="flex flex-row items-center justify-center gap-2 text-xs">
-          <Link
-            href={"/privacy"}
-            className="text-muted-foreground"
-            prefetch={false}
+          <Button
+            asChild
+            size={"sm"}
+            variant={pathname === "/privacy" ? "secondary" : "ghost"}
+            onClick={() => handleLinkClick("/privacy")}
           >
-            Privacy
-          </Link>
+            <Link
+              href={"/privacy"}
+              className="text-muted-foreground"
+              prefetch={false}
+            >
+              Privacy
+            </Link>
+          </Button>
           -
-          <Link
-            href={"/termsandconditions"}
-            className="text-muted-foreground"
-            prefetch={false}
+          <Button
+            asChild
+            size={"sm"}
+            variant={pathname === "/termsandconditions" ? "secondary" : "ghost"}
+            onClick={() => handleLinkClick("/privacy")}
           >
-            Terms
-          </Link>
+            <Link
+              href={"/termsandconditions"}
+              className="text-muted-foreground"
+              prefetch={false}
+            >
+              Terms
+            </Link>
+          </Button>
           -
-          <Link
-            href={"/opensource"}
-            className="text-muted-foreground"
-            prefetch={false}
+          <Button
+            asChild
+            variant={pathname === "/opensource" ? "secondary" : "ghost"}
+            size={"sm"}
+            onClick={() => handleLinkClick("/privacy")}
           >
-            Open Source
-          </Link>
+            <Link
+              href={"/opensource"}
+              className="text-muted-foreground whitespace-nowrap"
+              prefetch={false}
+            >
+              Open Source
+            </Link>
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
-  );
+  )
 }

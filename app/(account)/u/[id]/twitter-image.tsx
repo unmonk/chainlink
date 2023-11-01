@@ -1,6 +1,5 @@
 import { getStreak } from "@/lib/actions/streaks"
 import { cn } from "@/lib/utils"
-import { clerkClient } from "@clerk/nextjs"
 import { ImageResponse } from "next/og"
 import { getUserByUsername } from "@/lib/actions/users"
 

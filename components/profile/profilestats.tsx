@@ -11,7 +11,6 @@ interface ProfileStatsProps {
 
 const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
   const stats = await getUserStats(userId)
-  console.log(stats)
   return (
     <div>
       <h2 className="mb-2 text-xl font-bold">Stats</h2>
