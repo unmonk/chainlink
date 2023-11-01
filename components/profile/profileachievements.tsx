@@ -21,7 +21,7 @@ const ProfileAchievements: FC<ProfileAchievementsProps> = async ({
   return (
     <div>
       <h2 className="mb-2 text-xl font-bold">Achievements</h2>
-      {!achievements && (
+      {achievements.length === 0 && (
         <p className="text-muted-foreground">None Yet. Play to unlock more.</p>
       )}
       <div className="mb-4 grid grid-cols-4 gap-2 md:grid-cols-8 xl:grid-cols-12">
