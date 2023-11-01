@@ -15,14 +15,14 @@ const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
   return (
     <div>
       <h2 className="mb-2 text-xl font-bold">Stats</h2>
-      <div className="rounded-md border">
+      <div className="flex flex-col items-center justify-center rounded-md border p-2 ">
         <h3 className="p-2 text-center text-xl">Wins By League</h3>
-        <div className="grid grid-cols-2 p-2 md:grid-cols-4 xl:grid-cols-6">
+        <div className="grid grid-cols-3 gap-2 p-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
           {stats.length > 0 ? (
             stats?.map((stat) => (
               <div
                 key={stat.leagues}
-                className="flex h-20 w-20 flex-col items-center"
+                className="flex h-20 w-20 flex-col items-center pb-4"
               >
                 <Image
                   src={leagueLogos[stat.leagues] || "images/alert-octagon.svg"}
@@ -31,7 +31,7 @@ const ProfileStats: FC<ProfileStatsProps> = async ({ userId }) => {
                   height={100}
                   className="h-3/4 w-3/4 object-cover transition-all hover:scale-110"
                 />
-                <p className="pb-4 text-center">
+                <p className="text-center">
                   {stat.leagues}: {stat.win_count}
                 </p>
               </div>
