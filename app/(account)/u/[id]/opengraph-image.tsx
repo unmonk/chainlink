@@ -5,6 +5,7 @@ import { getUserByUsername } from "@/lib/actions/users"
 
 export const runtime = "edge"
 export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export const alt = "ChainLink Profile"
 export const size = {
@@ -63,13 +64,17 @@ export default async function Image({ params }: { params: { id: string } }) {
           </div>
         </div>
         <div tw={cn("flex h-1/4 w-full justify-center", bannerColor)}>
-          <h4 tw="text-4xl font-bold"> Build your chain at ChainLink.st 🔗</h4>
+          <h4 tw="text-4xl font-bold">Build your chain at ChainLink.st 🔗</h4>
         </div>
       </div>
     ),
     {
       height: 600,
       width: 1200,
+      headers: {
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Content-Type": "image/png",
+      },
     }
   )
 }
