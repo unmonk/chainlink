@@ -16,7 +16,7 @@ export const contentType = "image/png"
 
 export default async function Image({ params }: { params: { id: string } }) {
   const user = await getUserByUsername(params.id)
-  const streakData = await getStreak(params.id)
+  const streakData = await getStreak(user.id)
   if (!streakData) {
     throw Error("Streak not found")
   }

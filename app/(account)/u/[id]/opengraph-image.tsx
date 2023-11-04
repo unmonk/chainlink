@@ -16,7 +16,7 @@ export const contentType = "image/png"
 
 export default async function Image({ params }: { params: { id: string } }) {
   const user = await getUserByUsername(params.id)
-  const streakData = await getStreak(params.id)
+  const streakData = await getStreak(user.id)
   if (!streakData) {
     throw Error("Streak not found")
   }
@@ -33,7 +33,7 @@ export default async function Image({ params }: { params: { id: string } }) {
 
   return new ImageResponse(
     (
-      <div tw="flex flex-col w-full h-full bg-black text-white border-2">
+      <div tw="flex flex-col w-full h-full bg-black text-white border-2 p-4">
         <div tw="flex flex-row justify-between items-center text-center w-full h-3/4 p-4">
           <div tw="flex flex-col justify-center items-center">
             <h3>Chain</h3>
