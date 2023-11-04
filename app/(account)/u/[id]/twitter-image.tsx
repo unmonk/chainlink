@@ -5,6 +5,7 @@ import { getUserByUsername } from "@/lib/actions/users"
 
 export const runtime = "edge"
 export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export const alt = "ChainLink Profile"
 export const size = {
@@ -70,6 +71,10 @@ export default async function Image({ params }: { params: { id: string } }) {
     {
       height: 600,
       width: 1200,
+      headers: {
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        "Content-Type": "image/png",
+      },
     }
   )
 }
