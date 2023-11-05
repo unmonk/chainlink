@@ -1,10 +1,10 @@
-import { PickWithMatchup } from "@/drizzle/schema";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
-import { FC } from "react";
+import { PickWithMatchup } from "@/drizzle/schema"
+import { cn } from "@/lib/utils"
+import Image from "next/image"
+import { FC } from "react"
 
 interface PickDetailsProps {
-  pick: PickWithMatchup;
+  pick: PickWithMatchup
 }
 
 const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
@@ -34,7 +34,11 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
             height={40}
             alt={pick.matchup?.away_team || "AWAY"}
           />
-          <p>{pick.matchup?.away_value || "Unknown"}</p>
+          <p>
+            {pick.matchup?.away_value !== undefined
+              ? pick.matchup.away_value
+              : "Unknown"}
+          </p>
         </div>
         <div
           className={cn("flex flex-col items-center gap-2 rounded-md p-2", {
@@ -56,7 +60,11 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
             height={40}
             alt={pick.matchup?.home_team || "HOME"}
           />
-          <p>{pick.matchup?.home_value || "Unknown"}</p>
+          <p>
+            {pick.matchup?.home_value !== undefined
+              ? pick.matchup.home_value
+              : "Unknown"}
+          </p>
         </div>
       </div>
       <p className="text-sm">League: {pick.matchup?.league || "Unknown"}</p>
@@ -76,7 +84,7 @@ const PickDetails: FC<PickDetailsProps> = ({ pick }) => {
           : pick.pick_status}
       </p>
     </div>
-  );
-};
+  )
+}
 
-export default PickDetails;
+export default PickDetails

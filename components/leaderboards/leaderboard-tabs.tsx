@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Separator } from "@/components/ui/separator"
 import {
   Table,
   TableBody,
@@ -8,30 +8,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getActiveCampaign } from "@/lib/actions/campaign";
+} from "@/components/ui/table"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { getActiveCampaign } from "@/lib/actions/campaign"
 import {
   getAllTimeWinsLeaderboard,
   getCurrentLeaderboardByStreak,
   getCurrentLeaderboardByWins,
-} from "@/lib/actions/leaderboards";
-import { cn } from "@/lib/utils";
-import { auth } from "@clerk/nextjs";
+  getLastMonthsWinners,
+} from "@/lib/actions/leaderboards"
+import { cn } from "@/lib/utils"
+import { auth } from "@clerk/nextjs"
+import Link from "next/link"
+import Image from "next/image"
+import AchievementCircle from "../achievements/achievements"
 
 export async function LeaderboardTabs() {
-  const { userId } = auth();
-  const leaderboardByStreakPromise = getCurrentLeaderboardByStreak();
-  const leaderboardByWinsPromise = getCurrentLeaderboardByWins();
-  const allTimeWinsPromise = getAllTimeWinsLeaderboard();
-  const campaignPromise = getActiveCampaign();
-  const [streakLeaderboard, winsLeaderboard, allTimeLeaderboard, campaign] =
-    await Promise.all([
-      leaderboardByStreakPromise,
-      leaderboardByWinsPromise,
-      allTimeWinsPromise,
-      campaignPromise,
-    ]);
+  const { userId } = auth()
+  const leaderboardByStreakPromise = getCurrentLeaderboardByStreak()
+  const leaderboardByWinsPromise = getCurrentLeaderboardByWins()
+  const allTimeWinsPromise = getAllTimeWinsLeaderboard()
+  const campaignPromise = getActiveCampaign()
+  const lastMonthsWinnersPromise = getLastMonthsWinners()
+  const [
+    streakLeaderboard,
+    winsLeaderboard,
+    allTimeLeaderboard,
+    campaign,
+    lastMonthsWinners,
+  ] = await Promise.all([
+    leaderboardByStreakPromise,
+    leaderboardByWinsPromise,
+    allTimeWinsPromise,
+    campaignPromise,
+    lastMonthsWinnersPromise,
+  ])
   return (
     <Tabs defaultValue="streak" className="mt-2 w-full">
       <TabsList className="m-auto grid w-full grid-cols-3 md:w-5/6 xl:w-2/3">
@@ -61,14 +72,31 @@ export async function LeaderboardTabs() {
                 <TableCell className="font-bold lg:text-xl">
                   {idx + 1}
                 </TableCell>
-                <TableCell className="flex flex-row items-center gap-2">
-                  <Avatar>
-                    <AvatarImage src={leaderboard.user.image} />
-                    <AvatarFallback>{leaderboard.user.username}</AvatarFallback>
-                  </Avatar>
-                  <p className="font-semibold lg:text-lg">
-                    {leaderboard.user.username}
-                  </p>
+                <TableCell className="flex flex-row items-center gap-4">
+                  <Link
+                    href={`/u/${leaderboard.user.username}`}
+                    className="flex flex-row items-center gap-2"
+                  >
+                    <Avatar>
+                      <AvatarImage src={leaderboard.user.image} />
+                      <AvatarFallback>
+                        {leaderboard.user.username}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="font-semibold lg:text-lg">
+                      {leaderboard.user.username}
+                    </p>
+                  </Link>
+                  <>
+                    {lastMonthsWinners.map((winner) => (
+                      <AchievementCircle
+                        key={winner.achievement.id}
+                        achievement={winner.achievement}
+                        className="h-10 w-10"
+                        showName={false}
+                      />
+                    ))}
+                  </>
                 </TableCell>
                 <TableCell
                   className={cn("font-semibold lg:text-lg", {
@@ -170,5 +198,5 @@ export async function LeaderboardTabs() {
         </Table>
       </TabsContent>
     </Tabs>
-  );
+  )
 }

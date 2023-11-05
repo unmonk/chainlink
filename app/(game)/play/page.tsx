@@ -1,48 +1,48 @@
-import { ActivePickCard } from "@/components/picks/active-pick-card";
-import MatchupListCards from "@/components/picks/matchup-list-cards";
-import { StreakDisplay } from "@/components/streaks/streak-display";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { ActivePickCard } from "@/components/picks/active-pick-card"
+import MatchupListCards from "@/components/picks/matchup-list-cards"
+import { StreakDisplay } from "@/components/streaks/streak-display"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { getMatchups } from "@/lib/actions/matchups";
-import { getPick } from "@/lib/actions/picks";
-import { auth, redirectToSignIn } from "@clerk/nextjs";
-import { CalendarClockIcon, HistoryIcon, LockIcon } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+} from "@/components/ui/tooltip"
+import { getMatchups } from "@/lib/actions/matchups"
+import { getPick } from "@/lib/actions/picks"
+import { auth, redirectToSignIn } from "@clerk/nextjs"
+import { CalendarClockIcon, HistoryIcon, LockIcon } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
 type DashboardPageParams = {
   searchParams: {
-    f: string;
-  };
-};
+    f: string
+  }
+}
 
 export default async function Page({ searchParams }: DashboardPageParams) {
-  const { f } = searchParams;
-  const { userId } = auth();
+  const { f } = searchParams
+  const { userId } = auth()
   if (!userId) {
-    return redirectToSignIn();
+    return redirectToSignIn()
   }
-  const pick = await getPick();
-  const matchups = await getMatchups();
+  const pick = await getPick()
+  const matchups = await getMatchups()
 
   if (pick && matchups) {
-    const matchup = matchups.find((matchup) => matchup.id === pick.matchup_id);
+    const matchup = matchups.find((matchup) => matchup.id === pick.matchup_id)
     //REMOVE pick.matchup.id from matchupsArray
     matchups.splice(
       matchups.findIndex((matchup) => matchup.id === pick.matchup_id),
-      1,
-    );
+      1
+    )
 
     if (matchup) {
-      pick.matchup = matchup;
+      pick.matchup = matchup
     }
   }
 
@@ -107,7 +107,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
               {pick && pick.pick_status !== "PENDING" && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <LockIcon className="text-destructive ml-2 h-6 w-6" />
+                    <LockIcon className="ml-2 h-6 w-6 text-destructive" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Locked until pick completion</p>
@@ -121,7 +121,11 @@ export default async function Page({ searchParams }: DashboardPageParams) {
                   size={"icon"}
                   asChild
                 >
-                  <Link href={f ? "/play" : "/play?f=inprogress"}>
+                  <Link
+                    href={f ? "/play" : "/play?f=inprogress"}
+                    prefetch={false}
+                    replace={true}
+                  >
                     <CalendarClockIcon />
                     {f ? "Show All" : "Hide"}
                   </Link>
@@ -149,5 +153,5 @@ export default async function Page({ searchParams }: DashboardPageParams) {
         </TooltipProvider>
       </div>
     </section>
-  );
+  )
 }
