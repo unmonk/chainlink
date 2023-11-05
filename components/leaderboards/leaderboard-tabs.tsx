@@ -88,14 +88,18 @@ export async function LeaderboardTabs() {
                     </p>
                   </Link>
                   <>
-                    {lastMonthsWinners.map((winner) => (
-                      <AchievementCircle
-                        key={winner.achievement.id}
-                        achievement={winner.achievement}
-                        className="h-10 w-10"
-                        showName={false}
-                      />
-                    ))}
+                    {lastMonthsWinners.map((winner) => {
+                      if (winner.profile_id === leaderboard.user_id) {
+                        return (
+                          <AchievementCircle
+                            key={winner.achievement.id}
+                            achievement={winner.achievement}
+                            className="h-10 w-10"
+                            showName={false}
+                          />
+                        )
+                      }
+                    })}
                   </>
                 </TableCell>
                 <TableCell
@@ -137,14 +141,35 @@ export async function LeaderboardTabs() {
                 <TableCell className="font-bold lg:text-xl">
                   {idx + 1}
                 </TableCell>
-                <TableCell className="flex flex-row items-center gap-2">
-                  <Avatar>
-                    <AvatarImage src={leaderboard.user.image} />
-                    <AvatarFallback>{leaderboard.user.username}</AvatarFallback>
-                  </Avatar>
-                  <p className="font-semibold lg:text-lg">
-                    {leaderboard.user.username}
-                  </p>
+                <TableCell className="flex flex-row items-center gap-4">
+                  <Link
+                    href={`/u/${leaderboard.user.username}`}
+                    className="flex flex-row items-center gap-2"
+                  >
+                    <Avatar>
+                      <AvatarImage src={leaderboard.user.image} />
+                      <AvatarFallback>
+                        {leaderboard.user.username}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="font-semibold lg:text-lg">
+                      {leaderboard.user.username}
+                    </p>
+                  </Link>
+                  <>
+                    {lastMonthsWinners.map((winner) => {
+                      if (winner.profile_id === leaderboard.user_id) {
+                        return (
+                          <AchievementCircle
+                            key={winner.achievement.id}
+                            achievement={winner.achievement}
+                            className="h-10 w-10"
+                            showName={false}
+                          />
+                        )
+                      }
+                    })}
+                  </>
                 </TableCell>
                 <TableCell className="lg:text-lg">{leaderboard.wins}</TableCell>
                 <TableCell
@@ -182,14 +207,35 @@ export async function LeaderboardTabs() {
                 <TableCell className="font-bold lg:text-xl">
                   {idx + 1}
                 </TableCell>
-                <TableCell className="flex flex-row items-center gap-2">
-                  <Avatar>
-                    <AvatarImage src={leaderboard.user.image} />
-                    <AvatarFallback>{leaderboard.user.username}</AvatarFallback>
-                  </Avatar>
-                  <p className="font-semibold lg:text-lg">
-                    {leaderboard.user.username}
-                  </p>
+                <TableCell className="flex flex-row items-center gap-4">
+                  <Link
+                    href={`/u/${leaderboard.user.username}`}
+                    className="flex flex-row items-center gap-2"
+                  >
+                    <Avatar>
+                      <AvatarImage src={leaderboard.user.image} />
+                      <AvatarFallback>
+                        {leaderboard.user.username}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="font-semibold lg:text-lg">
+                      {leaderboard.user.username}
+                    </p>
+                  </Link>
+                  <>
+                    {lastMonthsWinners.map((winner) => {
+                      if (winner.profile_id === leaderboard.user_id) {
+                        return (
+                          <AchievementCircle
+                            key={winner.achievement.id}
+                            achievement={winner.achievement}
+                            className="h-10 w-10"
+                            showName={false}
+                          />
+                        )
+                      }
+                    })}
+                  </>
                 </TableCell>
                 <TableCell className="lg:text-lg">{leaderboard.wins}</TableCell>
               </TableRow>
