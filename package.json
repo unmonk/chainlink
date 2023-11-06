@@ -44,6 +44,7 @@
     "@react-email/components": "^0.0.9",
     "@react-email/html": "^0.0.6",
     "@tanstack/react-table": "^8.9.3",
+    "@tanstack/react-virtual": "^3.0.0-beta.68",
     "@types/node": "^20.8.9",
     "@types/react": "^18.2.33",
     "@types/react-dom": "^18.2.14",
@@ -75,6 +76,7 @@
     "timeago.js": "^4.0.2",
     "typescript": "^5",
     "uploadthing": "^5.3.3",
+    "usehooks-ts": "^2.9.1",
     "web-push": "^3.6.6",
     "zod": "^3.21.4",
     "zustand": "^4.4.1"
