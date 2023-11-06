@@ -8,14 +8,16 @@ import {
   achievements,
   profileAchievements,
 } from "@/drizzle/schema"
-import { and, eq } from "drizzle-orm"
+import { and, desc, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import format from "date-fns/format"
 
 export async function getAchievementList() {
-  const achievements = await db.query.achievements.findMany()
-  if (!achievements) return []
-  return achievements
+  const data = await db.query.achievements.findMany({
+    orderBy: [desc(achievements.name)],
+  })
+  if (!data) return []
+  return data
 }
 
 export async function addAchievement(achievement: NewAchievement) {

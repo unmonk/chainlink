@@ -107,7 +107,7 @@ export default async function Page({ searchParams }: DashboardPageParams) {
               {pick && pick.pick_status !== "PENDING" && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <LockIcon className="ml-2 h-6 w-6 text-destructive" />
+                    <LockIcon className="text-destructive ml-2 h-6 w-6" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Locked until pick completion</p>
