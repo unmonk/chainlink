@@ -15,7 +15,7 @@
     "studio": "drizzle-kit studio --host 127.0.0.1"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.26.1",
+    "@clerk/nextjs": "^4.29.5",
     "@clerk/themes": "^1.7.9",
     "@hookform/resolvers": "^3.2.0",
     "@planetscale/database": "^1.10.0",
@@ -58,7 +58,7 @@
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
-    "drizzle-orm": "^0.28.6",
+    "drizzle-orm": "^0.29.3",
     "drizzle-zod": "^0.5.1",
     "eslint-config-next": "^14.0.0",
     "lucide-react": "0.263.1",
@@ -85,7 +85,7 @@
     "@aacn.eu/eslint-plugin-tailwind-classname-order": "^0.4.3",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "autoprefixer": "^10.4.16",
-    "drizzle-kit": "^0.19.13",
+    "drizzle-kit": "^0.20.13",
     "eslint": "^8.50.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-tailwindcss": "^3.13.0",
