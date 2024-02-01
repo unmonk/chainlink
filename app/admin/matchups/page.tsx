@@ -1,6 +1,6 @@
-import { DatePicker } from "@/components/admin/matchups/datepicker";
-import { Button } from "@/components/ui/button";
-import ClientTime from "@/components/ui/client-time";
+import { DatePicker } from "@/components/admin/matchups/datepicker"
+import { Button } from "@/components/ui/button"
+import ClientTime from "@/components/ui/client-time"
 import {
   Table,
   TableBody,
@@ -8,22 +8,22 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { getMatchupsWithPicks } from "@/lib/actions/matchups";
-import { Edit2Icon } from "lucide-react";
-import Image from "next/image";
+} from "@/components/ui/table"
+import { getMatchupsWithPicks } from "@/lib/actions/matchups"
+import { Edit2Icon } from "lucide-react"
+import Image from "next/image"
 
 export default async function AdminMatchups({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined }
 }) {
-  const matchups = await getMatchupsWithPicks();
+  const matchups = await getMatchupsWithPicks(searchParams)
 
   return (
     <div className="mt-2 flex flex-col gap-2 rounded-md border">
       <div className="flex flex-row items-center justify-center gap-4">
-        <h1 className="text-primary p-4 text-xl">Matchups</h1>
+        <h1 className="p-4 text-xl text-primary">Matchups</h1>
 
         <DatePicker />
       </div>
@@ -84,5 +84,5 @@ export default async function AdminMatchups({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

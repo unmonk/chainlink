@@ -15,8 +15,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "utfs.io",
       },
+      {
+        protocol: "https",
+        hostname: "chainlink.st",
+      },
     ],
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
