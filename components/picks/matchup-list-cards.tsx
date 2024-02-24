@@ -52,13 +52,15 @@ function sortMatchups(matchupsArray: Matchup[]): Matchup[] {
     const bStartTime = new Date(b.start_time)
 
     if (
-      a.status === ("STATUS_FINAL" || "STATUS_FULL_TIME") &&
-      b.status !== ("STATUS_FINAL" || "STATUS_FULL_TIME")
+      (a.status === "STATUS_FINAL" || a.status === "STATUS_FULL_TIME") &&
+      b.status !== "STATUS_FINAL" &&
+      b.status !== "STATUS_FULL_TIME"
     ) {
       return 1
     } else if (
-      (b.status === "STATUS_FINAL" || "STATUS_FULL_TIME") &&
-      a.status !== ("STATUS_FINAL" || "STATUS_FULL_TIME")
+      (b.status === "STATUS_FINAL" || b.status === "STATUS_FULL_TIME") &&
+      a.status !== "STATUS_FINAL" &&
+      a.status !== "STATUS_FULL_TIME"
     ) {
       return -1
     } else if (

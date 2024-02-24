@@ -64,11 +64,11 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
           {status === "STATUS_SCHEDULED" && (
             <ClientTime time={matchup.start_time!} />
           )}
-          {status ===
-            ("STATUS_IN_PROGRESS" ||
-              "STATUS_FIRST_HALF" ||
-              "STATUS_SECOND_HALF") && "In Progress"}
-          {status === ("STATUS_FINAL" || "STATUS_FULL_TIME") && "Final"}
+          {status === "STATUS_IN_PROGRESS" && "In Progress"}
+          {status === "STATUS_FIRST_HALF" && "First Half"}
+          {status === "STATUS_SECOND_HALF" && "Second Half"}
+          {status === "STATUS_FULL_TIME" && "Full Time"}
+          {status === "STATUS_FINAL" && "Final"}
           {status === "STATUS_POSTPONED" && "Postponed"}
           {status === "STATUS_END_PERIOD" && "Period Ended"}
           {status === "STATUS_HALFTIME" && "Halftime"}
