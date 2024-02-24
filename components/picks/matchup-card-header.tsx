@@ -1,13 +1,13 @@
-import ClientTime from "../ui/client-time";
-import { Matchup, PickCardVariant } from "@/drizzle/schema";
-import { cn } from "@/lib/utils";
-import { cva } from "class-variance-authority";
-import { FC } from "react";
+import ClientTime from "../ui/client-time"
+import { Matchup, PickCardVariant } from "@/drizzle/schema"
+import { cn } from "@/lib/utils"
+import { cva } from "class-variance-authority"
+import { FC } from "react"
 
 interface PickCardHeaderProps {
-  matchup: Partial<Matchup>;
-  status: PickCardVariant;
-  active?: boolean;
+  matchup: Partial<Matchup>
+  status: PickCardVariant
+  active?: boolean
 }
 
 const MatchupCardHeader: FC<PickCardHeaderProps> = ({
@@ -20,33 +20,39 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
       status: {
         STATUS_SCHEDULED: "bg-secondary",
         STATUS_IN_PROGRESS:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800 to-bg-secondary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800",
+        STATUS_FIRST_HALF:
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800",
+        STATUS_SECOND_HALF:
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800",
         STATUS_FINAL:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400 to-bg-tertiary",
+          "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400",
+        STATUS_FULL_TIME:
+          "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400",
         STATUS_POSTPONED:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600  to-bg-secondary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600",
         STATUS_END_PERIOD:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800 to-bg-secondary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800",
         STATUS_HALFTIME:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800 to-bg-secondary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800",
         STATUS_CANCELED:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-rose-300 dark:from-rose-800 to-bg-secondary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-rose-300 dark:from-rose-800",
         STATUS_SUSPENDED:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600  to-bg-secondary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600",
         STATUS_DELAYED:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600 to-bg-secondary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600",
         STATUS_UNKNOWN:
-          "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600 to-bg-secondary",
-        LOSS: "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-rose-300 dark:from-rose-800 to-bg-secondary",
-        WIN: "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-green-200 dark:from-green-400 to-bg-tertiary",
+          "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600",
+        LOSS: "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-rose-300 dark:from-rose-800",
+        WIN: "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-green-200 dark:from-green-400",
         PENDING: "",
-        PUSH: "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600  to-bg-secondary",
+        PUSH: "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600",
       },
       defaultVariants: {
         status: "STATUS_SCHEDULED",
       },
     },
-  });
+  })
   return (
     <div className={cn(pickCardHeaderVariants({ status }))}>
       <div className="grid grid-cols-2 p-2">
@@ -58,8 +64,11 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
           {status === "STATUS_SCHEDULED" && (
             <ClientTime time={matchup.start_time!} />
           )}
-          {status === "STATUS_IN_PROGRESS" && "In Progress"}
-          {status === "STATUS_FINAL" && "Final"}
+          {status ===
+            ("STATUS_IN_PROGRESS" ||
+              "STATUS_FIRST_HALF" ||
+              "STATUS_SECOND_HALF") && "In Progress"}
+          {status === ("STATUS_FINAL" || "STATUS_FULL_TIME") && "Final"}
           {status === "STATUS_POSTPONED" && "Postponed"}
           {status === "STATUS_END_PERIOD" && "Period Ended"}
           {status === "STATUS_HALFTIME" && "Halftime"}
@@ -80,17 +89,17 @@ const MatchupCardHeader: FC<PickCardHeaderProps> = ({
           <div
             className={cn(
               pickCardHeaderVariants({ status }),
-              "-mt-0.5 rounded-b-md p-1",
+              "-mt-0.5 rounded-b-md p-1"
             )}
           >
-            <h3 className="text-primary animate-pulse text-center text-xs">
+            <h3 className="animate-pulse text-center text-xs text-primary">
               ACTIVE PICK
             </h3>
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MatchupCardHeader;
+export default MatchupCardHeader

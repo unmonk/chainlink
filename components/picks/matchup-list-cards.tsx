@@ -21,6 +21,8 @@ const MatchupListCards: FC<MatchupListCardsProps> = async ({
     sortedMatchups = sortedMatchups.filter(
       (matchup) =>
         matchup.status !== "STATUS_IN_PROGRESS" &&
+        matchup.status !== "STATUS_FIRST_HALF" &&
+        matchup.status !== "STATUS_SECOND_HALF" &&
         matchup.status !== "STATUS_HALFTIME" &&
         matchup.status !== "STATUS_END_PERIOD"
     )
@@ -49,9 +51,15 @@ function sortMatchups(matchupsArray: Matchup[]): Matchup[] {
     const aStartTime = new Date(a.start_time)
     const bStartTime = new Date(b.start_time)
 
-    if (a.status === "STATUS_FINAL" && b.status !== "STATUS_FINAL") {
+    if (
+      a.status === ("STATUS_FINAL" || "STATUS_FULL_TIME") &&
+      b.status !== ("STATUS_FINAL" || "STATUS_FULL_TIME")
+    ) {
       return 1
-    } else if (b.status === "STATUS_FINAL" && a.status !== "STATUS_FINAL") {
+    } else if (
+      (b.status === "STATUS_FINAL" || "STATUS_FULL_TIME") &&
+      a.status !== ("STATUS_FINAL" || "STATUS_FULL_TIME")
+    ) {
       return -1
     } else if (
       a.status === "STATUS_POSTPONED" &&
