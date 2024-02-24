@@ -22,7 +22,7 @@ export async function GET(
   if (key !== process.env.CRON_SECRET) {
     return NextResponse.json({ status: 401, message: "Unauthorized" })
   }
-  let localTesting = true
+  let localTesting = false
   const test = searchParams.get("test")
   if (test) {
     localTesting = true
