@@ -553,6 +553,9 @@ export type PickCardVariant =
   | "STATUS_UNKNOWN"
   | "STATUS_END_PERIOD"
   | "STATUS_HALFTIME"
+  | "STATUS_FIRST_HALF"
+  | "STATUS_SECOND_HALF"
+  | "STATUS_FULL_TIME"
 
 export type Operator =
   | "LESS_THAN"
