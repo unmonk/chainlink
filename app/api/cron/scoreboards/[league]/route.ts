@@ -158,19 +158,13 @@ export async function GET(
     const notificationPromises: Promise<void>[] = []
     for (let matchup of changedMatchups) {
       //HANDLE MATCHUPS THAT RE STATUS_IN_PROGRESS
-      if (
-        matchup.status === "STATUS_IN_PROGRESS" ||
-        matchup.status === "STATUS_FIRST_HALF"
-      ) {
+      if (matchup.status === ("STATUS_IN_PROGRESS" || "STATUS_FIRST_HALF")) {
         const pickUpdates = handleStatusInProgress(matchup)
         dbPromises.push(pickUpdates)
       }
 
       //HANDLE MATCHUPS THAT ARE STATUS_FINAL
-      if (
-        matchup.status === "STATUS_FINAL" ||
-        matchup.status === "STATUS_FULL_TIME"
-      ) {
+      if (matchup.status === ("STATUS_FINAL" || "STATUS_FULL_TIME")) {
         //GET UPDATED MATCHUP
         matchup = handleStatusFinal(matchup)
         //handle picks per matchup

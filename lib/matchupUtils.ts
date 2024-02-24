@@ -2,10 +2,7 @@ import { setPicksInProgress } from "./actions/picks"
 import { League, Matchup, MatchupStatus, NewMatchup } from "@/drizzle/schema"
 
 export async function handleStatusInProgress(matchup: Matchup) {
-  if (
-    matchup.status !== "STATUS_IN_PROGRESS" &&
-    matchup.status !== "STATUS_FIRST_HALF"
-  )
+  if (matchup.status !== "STATUS_IN_PROGRESS" || "STATUS_FIRST_HALF")
     return matchup
   await setPicksInProgress(matchup.id)
 }
