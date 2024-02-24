@@ -40,6 +40,7 @@ export const supportedLeagues = [
   "WBB",
   "WNBA",
   "NCAA",
+  "MLS",
 ]
 
 export const leagueLogos: {
@@ -55,4 +56,5 @@ export const leagueLogos: {
   WBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
   WNBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/wnba.png?w=100&h=100&transparent=true",
   NCAA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/ncaa.png?w=100&h=100&transparent=true",
+  MLS: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mls.png?w=100&h=100&transparent=true",
 }

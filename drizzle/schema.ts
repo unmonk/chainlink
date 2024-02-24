@@ -92,6 +92,7 @@ export const matchups = mysqlTable(
       "WNBA",
       "NCAA",
       "OTHER",
+      "MLS",
     ]).notNull(),
     operator: mysqlEnum("operator", [
       "LESS_THAN",
@@ -313,10 +314,7 @@ export const profileAchievements = mysqlTable(
   (table) => {
     return {
       profile_id_idx: index("profile_id_idx").on(table.profile_id),
-      profile_achievement_idx: primaryKey(
-        table.profile_id,
-        table.achievement_id
-      ),
+      pk: primaryKey({ columns: [table.achievement_id, table.profile_id] }),
     }
   }
 )
@@ -335,7 +333,7 @@ export const ownedSquads = mysqlTable(
     return {
       squad_id_idx: index("squad_id_idx").on(table.squad_id),
       profile_id_idx: index("profile_id_idx").on(table.profile_id),
-      unique_owned_squads_idx: primaryKey(table.squad_id, table.profile_id),
+      pk: primaryKey({ columns: [table.profile_id, table.squad_id] }),
     }
   }
 )
@@ -354,7 +352,7 @@ export const squadMembers = mysqlTable(
     return {
       squad_id_idx: index("squad_id_idx").on(table.squad_id),
       profile_id_idx: index("profile_id_idx").on(table.profile_id),
-      unique_squad_member_idx: primaryKey(table.squad_id, table.profile_id),
+      pk: primaryKey({ columns: [table.profile_id, table.squad_id] }),
     }
   }
 )
@@ -520,6 +518,7 @@ export type League =
   | "WBB"
   | "WNBA"
   | "NCAA"
+  | "MLS"
 
 export type MatchupStatus =
   | "STATUS_IN_PROGRESS"
