@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils"
 import { ImageResponse } from "next/og"
 import { getUserByUsername } from "@/lib/actions/users"
 
-export const runtime = "edge"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 

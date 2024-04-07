@@ -1,3 +1,5 @@
+"use server"
+
 import { getActiveCampaign } from "./campaign"
 import { sendDiscordStreakNotification } from "./discord-notifications"
 import { db } from "@/drizzle/db"

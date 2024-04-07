@@ -10,8 +10,6 @@ import { getPacifictime } from "@/lib/utils"
 import { and, gte, lte } from "drizzle-orm"
 import { NextResponse } from "next/server"
 
-export const runtime = "edge"
-
 export async function GET(
   request: Request,
   { params }: { params: { league: string } }
@@ -118,7 +116,7 @@ export async function GET(
 
   for (let matchup of newMatchups) {
     //write to database and get database id
-    const matchup_id = (await db.insert(matchups).values(matchup)).insertId
+    const matchup_id = (await db.insert(matchups).values(matchup))[0].insertId
     matchup.id = Number(matchup_id)
   }
 

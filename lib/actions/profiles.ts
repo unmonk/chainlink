@@ -1,3 +1,5 @@
+"use server"
+
 import { db } from "@/drizzle/db"
 import {
   ProfileAchievementWithAchievement,
@@ -150,19 +152,19 @@ export const getUserAchievements = async (userId: string) => {
   return filteredAchievements
 }
 
-export const getUserStats = async (userId: string) => {
-  interface LeagueStats {
-    leagues: string
-    win_count: number
-  }
+// export const getUserStats = async (userId: string) => {
+//   interface LeagueStats {
+//     leagues: string
+//     win_count: number
+//   }
 
-  const query = sql`SELECT m.leagues, COUNT(p.id) AS win_count
-FROM matchups as m
-INNER JOIN picks AS p on m.id = p.matchup_id
-WHERE p.user_id = ${userId} AND p.pick_status = 'WIN'
-GROUP BY m.leagues
-ORDER BY win_count DESC;`
+//   const query = sql`SELECT m.leagues, COUNT(p.id) AS win_count
+// FROM matchups as m
+// INNER JOIN picks AS p on m.id = p.matchup_id
+// WHERE p.user_id = ${userId} AND p.pick_status = 'WIN'
+// GROUP BY m.leagues
+// ORDER BY win_count DESC;`
 
-  const stats = await db.execute(query)
-  return stats.rows as LeagueStats[]
-}
+//   const stats = await db.execute(query)
+//   return stats.rows as LeagueStats[]
+// }

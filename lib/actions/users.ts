@@ -1,3 +1,4 @@
+"use server"
 import { getStreak } from "./streaks"
 import { clerkClient } from "@clerk/nextjs/server"
 

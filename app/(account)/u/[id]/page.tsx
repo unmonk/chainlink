@@ -8,8 +8,6 @@ type Props = {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export const runtime = "edge"
-
 export async function generateMetadata(
   { params, searchParams }: Props,
   parent: ResolvingMetadata

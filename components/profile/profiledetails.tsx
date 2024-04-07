@@ -1,5 +1,5 @@
 import ProfileAchievements from "@/components/profile/profileachievements"
-import ProfileStats from "@/components/profile/profilestats"
+//import ProfileStats from "@/components/profile/profilestats"
 import { ProfileStreakDisplay } from "@/components/streaks/profile-streak-display"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User } from "@clerk/nextjs/server"
@@ -35,7 +35,7 @@ const ProfileDetails: FC<ProfileDetailsProps> = async ({ user }) => {
       </div>
       <div className="flex w-full flex-col items-center">
         <div className="w-full rounded-md border p-4 md:w-5/6 lg:w-2/3">
-          <ProfileStats userId={user.id} />
+          {/* <ProfileStats userId={user.id} /> */}
         </div>
       </div>
     </div>

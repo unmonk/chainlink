@@ -1,3 +1,4 @@
+"use server"
 import { redis } from "../redis"
 import { db } from "@/drizzle/db"
 import {
