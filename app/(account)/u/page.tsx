@@ -3,8 +3,6 @@ import { auth, currentUser } from "@clerk/nextjs"
 import { Metadata, ResolvingMetadata } from "next"
 import { redirect } from "next/navigation"
 
-export const runtime = "edge"
-
 export async function generateMetadata(): Promise<Metadata> {
   const user = await currentUser()
   if (!user) {

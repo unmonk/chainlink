@@ -18,7 +18,6 @@ import { getPacifictime } from "@/lib/utils"
 import { eq } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
-export const runtime = "edge"
 //REDIS: setup redis client
 
 export async function GET(

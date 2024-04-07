@@ -1,3 +1,4 @@
+"use server"
 import { PickStatus } from "@/drizzle/schema"
 import { clerkClient } from "@clerk/nextjs"
 
