@@ -1,28 +1,28 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from "tailwindcss";
 const { fontFamily } = require("tailwindcss/defaultTheme");
 
-module.exports = {
+/** @type {import('tailwindcss').Config} */
+const config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./hooks/**/*.{ts,tsx}",
-    "./lib/**/*.{ts,tsx}",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
-    "./node_modules/@radix-ui/**/*.{ts,tsx}",
-    "./emails/**/*.{ts,tsx}",
-    "./app/admin/**/*.{ts,tsx}",
   ],
+  prefix: "",
   theme: {
     container: {
       center: true,
       padding: "2rem",
       screens: {
-        "2xl": "2000px",
+        "2xl": "1400px",
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", ...fontFamily.sans],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -59,12 +59,9 @@ module.exports = {
         },
       },
       borderRadius: {
-        lg: `var(--radius)`,
-        md: `calc(var(--radius) - 2px)`,
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-      },
-      fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {
@@ -83,4 +80,6 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-};
+} satisfies Config;
+
+export default config;

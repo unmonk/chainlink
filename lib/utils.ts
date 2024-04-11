@@ -5,24 +5,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getPacifictime(date?: Date | string | number) {
-  if (!date) {
-    date = new Date();
+export async function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    throw Error("Service workers are not supported by this browser");
   }
-  let america_datetime_str = new Date(date).toLocaleString("en-US", {
-    timeZone: "America/Los_Angeles",
-  });
-  let date_america = new Date(america_datetime_str);
-  let year = date_america.getFullYear();
-  let month = ("0" + (date_america.getMonth() + 1)).slice(-2);
-  let day = ("0" + date_america.getDate()).slice(-2);
-
-  return {
-    url: `${year}${month}${day}`,
-    redis: `${month}/${day}/${year}`,
-  };
+  await navigator.serviceWorker.register("/serviceWorker.js");
 }
 
-export function absoluteUrl(path: string) {
-  return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
+export async function getReadyServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    throw Error("Service workers are not supported by this browser");
+  }
+  return navigator.serviceWorker.ready;
 }

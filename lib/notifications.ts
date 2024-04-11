@@ -1,113 +1,68 @@
-export async function registerServiceWorker() {
-  if (!("serviceWorker" in navigator)) {
-    throw Error("Service worker not supported");
-  }
-  await navigator.serviceWorker.register("/serviceworker.js");
-}
+import { getReadyServiceWorker } from "@/lib/utils";
 
-export async function getReadyServiceWorker() {
-  if (!("serviceWorker" in navigator)) {
-    throw Error("Service worker not supported");
-  }
-  const registration = await navigator.serviceWorker.ready;
-  return registration;
-}
-
-export async function getSubscription(): Promise<PushSubscription | null> {
+export async function getCurrentPushSubscription(): Promise<PushSubscription | null> {
   const sw = await getReadyServiceWorker();
-  const subscription = await sw.pushManager.getSubscription();
-  return subscription;
+  return sw.pushManager.getSubscription();
 }
 
 export async function registerPushNotifications() {
   if (!("PushManager" in window)) {
-    throw Error("Push notifications not supported");
+    throw Error("Push notifications are not supported by this browser");
   }
 
-  const existingSubscription = await getSubscription();
+  const existingSubscription = await getCurrentPushSubscription();
+
   if (existingSubscription) {
-    throw Error("Push subscription already exists");
+    throw Error("Existing push subscription found");
   }
+
   const sw = await getReadyServiceWorker();
+
+  if (!process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY) {
+    throw Error("Web push public key not found");
+  }
   const subscription = await sw.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY,
   });
 
   await sendPushSubscriptionToServer(subscription);
-  return subscription;
 }
 
 export async function unregisterPushNotifications() {
-  const existingSubscription = await getSubscription();
+  const existingSubscription = await getCurrentPushSubscription();
+
   if (!existingSubscription) {
-    throw Error("Push subscription does not exist");
+    throw Error("No existing push subscription found");
   }
+
   await deletePushSubscriptionFromServer(existingSubscription);
+
   await existingSubscription.unsubscribe();
 }
 
 export async function sendPushSubscriptionToServer(
-  subscription: PushSubscription,
+  subscription: PushSubscription
 ) {
-  const response = await fetch("/api/notifications", {
+  const response = await fetch("/api/register-push", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(subscription),
   });
+
   if (!response.ok) {
-    throw Error("Could not send push subscription to server");
+    throw Error("Failed to send push subscription to server");
   }
 }
 
 export async function deletePushSubscriptionFromServer(
-  subscription: PushSubscription,
+  subscription: PushSubscription
 ) {
-  const response = await fetch("/api/notifications", {
+  const response = await fetch("/api/register-push", {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(subscription),
   });
+
   if (!response.ok) {
-    throw Error("Could not delete push subscription from server");
-  }
-
-  console.log("deletePushSubscriptionFromServer");
-}
-
-export async function sendPushNotificationToUser(
-  userId: string,
-  notification: {
-    title: string;
-    body: string;
-    icon?: string;
-    image?: string;
-    badge?: string;
-    vibrate?: number[];
-    tag?: string;
-    data?: any;
-  },
-) {
-  const baseurl = process.env.NEXT_PUBLIC_APP_URL!;
-  const url = `${baseurl}/api/notifications/push`;
-
-  console.log("sendPushNotificationToUser", url, userId, notification);
-
-  const response = await fetch(`${baseurl}/api/notifications/push`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userId,
-      notification,
-    }),
-  });
-  if (!response.ok) {
-    throw Error("Could not send push subscription to server");
+    throw Error("Failed to delete push subscription from server");
   }
 }

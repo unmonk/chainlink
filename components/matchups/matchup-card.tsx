@@ -1,0 +1,279 @@
+import { Doc, Id } from "@/convex/_generated/dataModel";
+import { Card, CardContent, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import Image from "next/image";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
+import { ConvexError } from "convex/values";
+
+const MatchupCard = ({ matchup }: { matchup: Doc<"matchups"> }) => {
+  return (
+    <Card className="rounded-t-none">
+      <MatchupCardHeader matchup={matchup} />
+      <CardTitle className="text-lg px-1 font-bold">{matchup.title}</CardTitle>
+      <MatchupCardButtons matchup={matchup} />
+    </Card>
+  );
+};
+
+export default MatchupCard;
+
+const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
+  return (
+    <div className="p-1">
+      <div className="grid grid-cols-3 items-center text-center">
+        <p className="text-balance text-sm font-semibold">
+          {matchup.awayTeam.name}
+        </p>
+        <p className="text-primary text-sm"></p>
+
+        <p className="text-balance text-sm font-semibold">
+          <span className="text-primary text-xs font-extralight">@</span>
+          {matchup.homeTeam.name}
+        </p>
+      </div>
+      <div className="grid grid-cols-6 items-center text-center py-1">
+        <div className="col-span-2">
+          <MatchupPickButton
+            name={matchup.awayTeam.name}
+            image={matchup.awayTeam.image}
+            id={matchup.awayTeam.id}
+            disabled={matchup.status !== "STATUS_SCHEDULED"}
+            winnerId={matchup.winnerId}
+            matchupId={matchup._id}
+          />
+        </div>
+        <p
+          className={
+            matchup.status === "STATUS_FINAL" &&
+            matchup.winnerId === matchup.awayTeam.id
+              ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+              : "text-center col-span-1 bg-accent rounded-sm mx-1"
+          }
+        >
+          {matchup.status !== "STATUS_SCHEDULED" ? matchup.awayTeam.score : ""}
+        </p>
+        <p
+          className={
+            matchup.status === "STATUS_FINAL" &&
+            matchup.winnerId === matchup.homeTeam.id
+              ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+              : "text-center col-span-1 bg-accent rounded-sm mx-1"
+          }
+        >
+          {matchup.status !== "STATUS_SCHEDULED" ? matchup.homeTeam.score : " "}
+        </p>
+        <div className="col-span-2">
+          <MatchupPickButton
+            name={matchup.homeTeam.name}
+            image={matchup.homeTeam.image}
+            id={matchup.homeTeam.id}
+            disabled={matchup.status !== "STATUS_SCHEDULED"}
+            winnerId={matchup.winnerId}
+            matchupId={matchup._id}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 items-center text-center p-2">
+        <div className="flex flex-col items-center justify-center">
+          {matchup.status === "STATUS_SCHEDULED" && (
+            <p className="text-light text-xs text-nowrap">
+              Wager: 🔗
+              <span className="text-yellow-500">{matchup.cost}</span>
+            </p>
+          )}
+          <p className="text-light text-xs text-nowrap">
+            Reward: 🔗
+            <span className="text-yellow-500">
+              {matchupRewardDisplay(matchup.cost, matchup.featured)}
+            </span>
+          </p>
+        </div>
+        <p className="text-primary text-sm">
+          {matchup.featured && "Chain Builder"}
+        </p>
+
+        <p
+          className={
+            matchup.status === "STATUS_SCHEDULED"
+              ? "font-extralight text-light text-sm"
+              : matchup.status === "STATUS_FINAL"
+                ? "font-bold font-sans"
+                : "text-red-500 animate-pulse"
+          }
+        >
+          {matchup.status === "STATUS_SCHEDULED"
+            ? "Pick Now"
+            : matchup.status === "STATUS_FINAL"
+              ? displayWinner(matchup)
+              : "Locked"}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const displayWinner = (matchup: Doc<"matchups">) => {
+  if (matchup.winnerId === matchup.awayTeam.id) {
+    return `🏆${matchup.awayTeam.name}`;
+  }
+  if (matchup.winnerId === matchup.homeTeam.id) {
+    return `🏆${matchup.homeTeam.name}`;
+  } else {
+    return "Push";
+  }
+};
+
+export const matchupRewardDisplay = (cost: number, featured: boolean) => {
+  if (featured) {
+    return cost * 3 > 0 ? cost * 3 : 30;
+  } else {
+    return cost * 2 > 0 ? cost * 2 : 10;
+  }
+};
+
+const MatchupPickButton = ({
+  name,
+  image,
+  id,
+  disabled,
+  matchupId,
+  winnerId,
+}: {
+  name: string;
+  image: string;
+  id: string;
+  disabled: boolean;
+  matchupId: Id<"matchups">;
+  winnerId?: string;
+}) => {
+  const makePick = useMutation(api.picks.makePick);
+
+  const handleClick = async () => {
+    if (disabled) return;
+    try {
+      await makePick({
+        matchupId,
+        pick: {
+          id,
+          name,
+          image,
+        },
+      });
+    } catch (e: any) {
+      const errorMessage =
+        // Check whether the error is an application error
+        e instanceof ConvexError
+          ? // Access data and cast it to the type we expect
+            (e.data as string)
+          : // Must be some developer error,
+            // and prod deployments will not
+            // reveal any more information about it
+            // to the client
+            "Unexpected error occurred";
+
+      if (errorMessage === "USER_NOT_FOUND") {
+        toast.error("Please sign in to make a pick");
+      }
+      if (errorMessage === "INSUFFICIENT_FUNDS") {
+        toast.error("You do not have enough Links to make this pick");
+      }
+      if (errorMessage === "EXISTING_PICK_FOUND") {
+        toast.error("You already have an active pick");
+      }
+      if (errorMessage === "MATCHUP_LOCKED") {
+        toast.error("This matchup is locked");
+      }
+    }
+  };
+
+  return (
+    <Button
+      variant={"outline"}
+      className={
+        winnerId === id
+          ? "border-primary border relative aspect-square h-5/6 w-5/6 overflow-hidden"
+          : "relative aspect-square h-5/6 w-5/6 overflow-hidden hover:animate-pulse"
+      }
+      disabled={disabled}
+      onClick={handleClick}
+    >
+      <Image src={image} alt={name} fill sizes={"100%"} />
+    </Button>
+  );
+};
+
+export const MatchupCardHeader = ({
+  matchup,
+}: {
+  matchup: Doc<"matchups">;
+}) => {
+  const headerColor = (status: string) => {
+    switch (status) {
+      case "STATUS_SCHEDULED":
+        return "bg-secondary";
+      case "STATUS_IN_PROGRESS":
+      case "STATUS_HALFTIME":
+      case "STATUS_FIRST_HALF":
+      case "STATUS_SECOND_HALF":
+      case "STATUS_END_PERIOD":
+        return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800";
+      case "STATUS_FINAL":
+        return "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400";
+      case "STATUS_POSTPONED":
+      case "STATUS_CANCELED":
+      case "STATUS_SUSPENDED":
+      case "STATUS_RAIN_DELAY":
+        return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600";
+      default:
+        return "bg-secondary";
+    }
+  };
+
+  const getNetwork = (metadata: any) => {
+    if (metadata?.network && metadata.network !== "N/A") {
+      return ` - ${metadata.network}`;
+    }
+    return "";
+  };
+  return (
+    <div className={headerColor(matchup.status)}>
+      <div className="grid grid-cols-2 p-1.5">
+        <div className="text-start flex flex-row items-center gap-1">
+          <div className="text-sm font-semibold">
+            {matchup.league === "COLLEGE-FOOTBALL" ? "CFB" : matchup.league}
+          </div>
+          <div className="text-xs font-extralight">
+            {getNetwork(matchup.metadata)}
+          </div>
+        </div>
+        <div className="text-right text-xs font-semibold text-gray-500 text-nowrap overflow-hidden">
+          {matchup.status === "STATUS_SCHEDULED" ? (
+            <div className="">
+              {new Date(matchup.startTime).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+              })}
+            </div>
+          ) : (
+            <div className="">
+              {matchup.metadata?.statusDetails ? (
+                <>
+                  <p className="text-xs text-gray-500 font-extralight">
+                    last update:
+                  </p>
+                  <span className="text-foreground">
+                    {matchup.metadata?.statusDetails}
+                  </span>
+                </>
+              ) : (
+                matchup.status
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
