@@ -33,12 +33,19 @@ export const getUserActiveChain = query({
         q.eq("active", true).eq("userId", user.subject)
       )
       .unique();
-
     return chain;
   },
 });
 
-export const createActiveChain = action({
+export const getChain = query({
+  args: { chainId: v.id("chains") },
+  handler: async (ctx, { chainId }) => {
+    const chain = await ctx.db.get(chainId);
+    return chain;
+  },
+});
+
+export const createActiveChain = mutation({
   args: {},
   handler: async (ctx) => {
     const user = await ctx.auth.getUserIdentity();
@@ -46,19 +53,28 @@ export const createActiveChain = action({
       throw new Error("User not found");
     }
 
-    const campaign = await ctx.runQuery(
-      api.campaigns.getActiveGlobalCampaign,
-      {}
-    );
+    const campaign = await ctx.db
+      .query("campaigns")
+      .filter((q) =>
+        q.and(q.eq(q.field("active"), true), q.eq(q.field("type"), "GLOBAL"))
+      )
+      .unique();
     if (!campaign) {
       throw new Error("No active campaign found");
     }
-    const campaignId = campaign._id;
 
-    const chain = await ctx.runMutation(internal.chains.createChain, {
-      campaignId,
+    const chain = await ctx.db.insert("chains", {
+      campaignId: campaign._id,
       userId: user.subject,
+      active: true,
+      wins: 0,
+      losses: 0,
+      best: 0,
+      chain: 0,
+      cost: 0,
+      pushes: 0,
     });
+    return chain;
   },
 });
 

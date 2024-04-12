@@ -7,6 +7,165 @@ import {
 } from "./_generated/server";
 import { pick_status } from "./schema";
 import { api } from "./_generated/api";
+import { matchupReward } from "./utils";
+
+//HANDLE PICK WIN
+export const handlePickWin = internalMutation({
+  args: { pickId: v.id("picks"), cost: v.number(), featured: v.boolean() },
+  handler: async (ctx, { pickId }) => {
+    //get pick
+    const pick = await ctx.db.get(pickId);
+    if (!pick) {
+      throw new ConvexError("PICK_NOT_FOUND");
+    }
+    //get user
+    const user = await ctx.db.get(pick.userId);
+    if (!user) {
+      throw new ConvexError("USER_NOT_FOUND");
+    }
+
+    //get user active chain
+    const chain = await ctx.db
+      .query("chains")
+      .withIndex("by_active_userId", (q) =>
+        q.eq("active", true).eq("userId", user.externalId)
+      )
+      .unique();
+    if (!chain) {
+      throw new ConvexError("CHAIN_NOT_FOUND");
+    }
+    //get matchup
+    const matchup = await ctx.db.get(pick.matchupId);
+    if (!matchup) {
+      throw new ConvexError("MATCHUP_NOT_FOUND");
+    }
+
+    //Record Win
+    chain.wins += 1;
+    user.stats.wins += 1;
+    user.stats.statsByLeague[matchup.league].wins += 1;
+    chain.chain > 0 ? (chain.chain += 1) : (chain.chain = 1);
+    chain.best = chain.chain > chain.best ? chain.chain : chain.best;
+
+    //Reward User
+    const reward = matchupReward(matchup.cost, matchup.featured);
+    user.coins += reward;
+    chain.cost += reward;
+
+    //Record Pick
+    pick.status = "WIN";
+    pick.coins = reward;
+    pick.active = false;
+
+    //Patch
+    await ctx.db.patch(chain._id, chain);
+    await ctx.db.patch(user._id, user);
+    await ctx.db.patch(pick._id, pick);
+  },
+});
+
+//HANDLE PICK LOSS
+export const handlePickLoss = internalMutation({
+  args: { pickId: v.id("picks"), cost: v.number() },
+  handler: async (ctx, { pickId }) => {
+    //get pick
+    const pick = await ctx.db.get(pickId);
+    if (!pick) {
+      throw new ConvexError("PICK_NOT_FOUND");
+    }
+    //get user
+    const user = await ctx.db.get(pick.userId);
+    if (!user) {
+      throw new ConvexError("USER_NOT_FOUND");
+    }
+
+    //get user active chain
+    const chain = await ctx.db
+      .query("chains")
+      .withIndex("by_active_userId", (q) =>
+        q.eq("active", true).eq("userId", user.externalId)
+      )
+      .unique();
+
+    if (!chain) {
+      throw new ConvexError("CHAIN_NOT_FOUND");
+    }
+    //get matchup
+    const matchup = await ctx.db.get(pick.matchupId);
+    if (!matchup) {
+      throw new ConvexError("MATCHUP_NOT_FOUND");
+    }
+
+    //Record loss
+    chain.losses += 1;
+    user.stats.losses += 1;
+    user.stats.statsByLeague[matchup.league].losses += 1;
+    chain.chain < 0 ? (chain.chain -= 1) : (chain.chain = -1);
+
+    //Deduct User
+    user.coins -= matchup.cost;
+    chain.cost -= matchup.cost;
+
+    //Record Pick
+    pick.status = "LOSS";
+    pick.coins = -matchup.cost;
+    pick.active = false;
+
+    //Patch
+    await ctx.db.patch(chain._id, chain);
+    await ctx.db.patch(user._id, user);
+    await ctx.db.patch(pick._id, pick);
+  },
+});
+
+//HANDLE PICK PUSH
+
+export const handlePickPush = internalMutation({
+  args: { pickId: v.id("picks") },
+  handler: async (ctx, { pickId }) => {
+    //get pick
+    const pick = await ctx.db.get(pickId);
+    if (!pick) {
+      throw new ConvexError("PICK_NOT_FOUND");
+    }
+    //get user
+    const user = await ctx.db.get(pick.userId);
+    if (!user) {
+      throw new ConvexError("USER_NOT_FOUND");
+    }
+
+    //get user active chain
+    const chain = await ctx.db
+      .query("chains")
+      .withIndex("by_active_userId", (q) =>
+        q.eq("active", true).eq("userId", user.externalId)
+      )
+      .unique();
+    if (!chain) {
+      throw new ConvexError("CHAIN_NOT_FOUND");
+    }
+    //get matchup
+    const matchup = await ctx.db.get(pick.matchupId);
+    if (!matchup) {
+      throw new ConvexError("MATCHUP_NOT_FOUND");
+    }
+
+    //Record push
+    chain.pushes += 1;
+    user.stats.pushes += 1;
+    user.stats.statsByLeague[matchup.league].pushes += 1;
+
+    //Record Pick
+    pick.status = "PUSH";
+    pick.coins = 0;
+    pick.active = false;
+
+    //Patch
+    await ctx.db.patch(chain._id, chain);
+    await ctx.db.patch(user._id, user);
+    await ctx.db.patch(pick._id, pick);
+  },
+});
 
 export const getPicksByMatchupId = internalQuery({
   args: { matchupId: v.id("matchups") },
@@ -28,12 +187,38 @@ export const getUserActivePick = query({
     }
     const pick = await ctx.db
       .query("picks")
-      .withIndex("by_active_userId", (q) =>
-        q.eq("active", true).eq("userId", user.subject)
+      .withIndex("by_active_externalId", (q) =>
+        q.eq("active", true).eq("externalId", user.subject)
       )
       .unique();
 
     return pick;
+  },
+});
+
+export const getUserActivePickWithMatchup = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) {
+      return null;
+    }
+    const pick = await ctx.db
+      .query("picks")
+      .withIndex("by_active_externalId", (q) =>
+        q.eq("active", true).eq("externalId", user.subject)
+      )
+      .unique();
+
+    if (!pick) {
+      return null;
+    }
+    const matchup = await ctx.db.get(pick.matchupId);
+    if (!matchup) {
+      return null;
+    }
+
+    return { pick, matchup };
   },
 });
 
@@ -80,8 +265,8 @@ export const makePick = mutation({
     //Check for existing active pick
     const existingPick = await ctx.db
       .query("picks")
-      .withIndex("by_active_userId", (q) =>
-        q.eq("active", true).eq("userId", user.subject)
+      .withIndex("by_active_externalId", (q) =>
+        q.eq("active", true).eq("externalId", user.subject)
       )
       .unique();
     if (existingPick) {
@@ -114,15 +299,16 @@ export const makePick = mutation({
       throw new ConvexError("MATCHUP_ALREADY_STARTED");
     }
 
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+    if (!userProfile) {
+      throw new ConvexError("USER_NOT_FOUND");
+    }
+
     //try to subtract coins from user
     if (matchup.cost > 0) {
-      const userProfile = await ctx.db
-        .query("users")
-        .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
-        .unique();
-      if (!userProfile) {
-        throw new ConvexError("USER_NOT_FOUND");
-      }
       if (userProfile.coins < matchup.cost) {
         throw new ConvexError("INSUFFICIENT_FUNDS");
       }
@@ -130,7 +316,8 @@ export const makePick = mutation({
     }
     //Create pick
     const pickCreated = await ctx.db.insert("picks", {
-      userId: user.subject,
+      userId: userProfile._id,
+      externalId: user.subject,
       matchupId,
       campaignId: campaign._id,
       pick,

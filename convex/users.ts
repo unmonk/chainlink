@@ -31,8 +31,10 @@ export const store = mutation({
       .unique();
     if (user !== null) {
       // If we've seen this identity before but the name has changed, patch the value.
-      if (user.name !== identity.name) {
-        await ctx.db.patch(user._id, { name: identity.name });
+      if (user.name !== identity.nickname ? identity.nickname : identity.name) {
+        await ctx.db.patch(user._id, {
+          name: identity.nickname ? identity.nickname : identity.name,
+        });
       }
       return user._id;
     }
@@ -47,7 +49,13 @@ export const store = mutation({
       tokenIdentifier: identity.tokenIdentifier,
       email: identity.email!,
       image: identity.pictureUrl!,
-      coins: 0,
+      coins: 50,
+      stats: {
+        wins: 0,
+        losses: 0,
+        pushes: 0,
+        statsByLeague: {},
+      },
       achievements: [],
       friends: [],
       squads: [],

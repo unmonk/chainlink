@@ -145,6 +145,8 @@ export const scoreboards = internalAction({
               ...matchup.metadata,
               statusDetails: statusDetails,
             },
+            cost: matchup.cost,
+            featured: matchup.featured,
           });
           leagueResponse.matchupsFinished++;
           console.log(`${league}: matchup finished for ${event.shortName}`);

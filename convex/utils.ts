@@ -17,6 +17,14 @@ export function deploymentName() {
   return regex.exec(url)?.[1];
 }
 
+export const matchupReward = (cost: number, featured: boolean) => {
+  if (featured) {
+    return cost * 3 > 0 ? cost * 3 : 30;
+  } else {
+    return cost * 2 > 0 ? cost * 2 : 10;
+  }
+};
+
 export const ACTIVE_LEAGUES: League[] = [
   "NFL",
   "NBA",
@@ -29,6 +37,23 @@ export const ACTIVE_LEAGUES: League[] = [
   "MLS",
   "UFL",
 ];
+
+export const leagueLogos: {
+  [key: string]: string;
+} = {
+  NFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nfl.png?w=100&h=100&transparent=true",
+  NBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png?w=100&h=100&transparent=true",
+  MLB: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mlb.png?w=100&h=100&transparent=true",
+  NHL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nhl.png?w=100&h=100&transparent=true",
+  "COLLEGE-FOOTBALL":
+    "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-football-college.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
+  MBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
+  WBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
+  WNBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/wnba.png?w=100&h=100&transparent=true",
+  UFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/ufl.png?w=100&h=100&transparent=true",
+  MLS: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mls.png?w=100&h=100&transparent=true",
+};
+
 export const STATS_BY_LEAGUE = {
   NBA: {
     rebounts: "Rebounds",

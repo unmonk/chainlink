@@ -1,6 +1,8 @@
 import { internalMutation, internalQuery, query } from "./_generated/server";
 import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
+import { matchupReward } from "./utils";
+import { internal } from "./_generated/api";
 
 export const getActiveMatchups = query({
   args: {},
@@ -90,7 +92,7 @@ export const getMatchupsByLeagueAndGameIds = internalQuery({
   },
 });
 
-export const getMatchupById = internalQuery({
+export const getMatchupById = query({
   args: { matchupId: v.id("matchups") },
   handler: async (ctx, { matchupId }) => {
     return await ctx.db.get(matchupId);
@@ -146,10 +148,22 @@ export const handleMatchupFinished = internalMutation({
     }),
     status: v.string(),
     metadata: v.optional(v.any()),
+    cost: v.number(),
+    featured: v.boolean(),
   },
   handler: async (
     ctx,
-    { matchupId, homeTeam, awayTeam, status, type, typeDetails, metadata }
+    {
+      matchupId,
+      homeTeam,
+      awayTeam,
+      status,
+      type,
+      typeDetails,
+      metadata,
+      cost,
+      featured,
+    }
   ) => {
     //#region //////////////////DETERMINE WINS ///////////////////////
     let winnerId = undefined;
@@ -178,11 +192,20 @@ export const handleMatchupFinished = internalMutation({
     //compare pick to winner and patch status
     for (const pick of picks) {
       if (winnerId === "PUSH") {
-        await ctx.db.patch(pick._id, { status: "PUSH" });
+        await ctx.scheduler.runAfter(0, internal.picks.handlePickPush, {
+          pickId: pick._id,
+        });
       } else if (pick.pick.id === winnerId) {
-        await ctx.db.patch(pick._id, { status: "WIN" });
+        await ctx.scheduler.runAfter(0, internal.picks.handlePickWin, {
+          pickId: pick._id,
+          cost,
+          featured,
+        });
       } else {
-        await ctx.db.patch(pick._id, { status: "LOSS" });
+        await ctx.scheduler.runAfter(0, internal.picks.handlePickLoss, {
+          pickId: pick._id,
+          cost,
+        });
       }
     }
 

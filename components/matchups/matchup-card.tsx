@@ -6,6 +6,9 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { ConvexError } from "convex/values";
+import { formatDistance } from "date-fns";
+import { Logo } from "../ui/logo";
+import { matchupReward } from "@/convex/utils";
 
 const MatchupCard = ({ matchup }: { matchup: Doc<"matchups"> }) => {
   return (
@@ -39,45 +42,79 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
             name={matchup.awayTeam.name}
             image={matchup.awayTeam.image}
             id={matchup.awayTeam.id}
-            disabled={matchup.status !== "STATUS_SCHEDULED"}
+            disabled={
+              matchup.status !== "STATUS_SCHEDULED" &&
+              matchup.status !== "STATUS_POSTPONED"
+            }
             winnerId={matchup.winnerId}
             matchupId={matchup._id}
           />
         </div>
-        <p
-          className={
-            matchup.status === "STATUS_FINAL" &&
-            matchup.winnerId === matchup.awayTeam.id
-              ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
-              : "text-center col-span-1 bg-accent rounded-sm mx-1"
-          }
-        >
-          {matchup.status !== "STATUS_SCHEDULED" ? matchup.awayTeam.score : ""}
-        </p>
-        <p
-          className={
-            matchup.status === "STATUS_FINAL" &&
-            matchup.winnerId === matchup.homeTeam.id
-              ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
-              : "text-center col-span-1 bg-accent rounded-sm mx-1"
-          }
-        >
-          {matchup.status !== "STATUS_SCHEDULED" ? matchup.homeTeam.score : " "}
-        </p>
+        {(matchup.status === "STATUS_SCHEDULED" ||
+          matchup.status === "STATUS_POSTPONED") && (
+          <p className="col-span-2"></p>
+          // <div className="col-span-2 bg-accent/40 flex flex-col items-center justify-center rounded-sm p-2 mx-auto ">
+          //   <span className="text-primary text-center text-xs font-bold">
+          //     Locks in:
+          //   </span>
+          //   <Logo size={50} />{" "}
+          //   <span className="text-primary text-center text-xs font-bold">
+          //     {formatDistance(new Date(matchup.startTime), new Date(), {
+          //       includeSeconds: true,
+          //     })}
+          //   </span>
+          // </div>
+        )}
+        {matchup.status !== "STATUS_SCHEDULED" &&
+          matchup.status !== "STATUS_POSTPONED" && (
+            <p
+              className={
+                matchup.status === "STATUS_FINAL" &&
+                matchup.winnerId === matchup.awayTeam.id
+                  ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+                  : "text-center col-span-1 bg-accent rounded-sm mx-1"
+              }
+            >
+              {matchup.status !== "STATUS_SCHEDULED" &&
+              matchup.status !== "STATUS_POSTPONED"
+                ? matchup.awayTeam.score
+                : ""}
+            </p>
+          )}
+        {matchup.status !== "STATUS_SCHEDULED" &&
+          matchup.status !== "STATUS_POSTPONED" && (
+            <p
+              className={
+                matchup.status === "STATUS_FINAL" &&
+                matchup.winnerId === matchup.homeTeam.id
+                  ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+                  : "text-center col-span-1 bg-accent rounded-sm mx-1"
+              }
+            >
+              {matchup.status !== "STATUS_SCHEDULED" &&
+              matchup.status !== "STATUS_POSTPONED"
+                ? matchup.homeTeam.score
+                : " "}
+            </p>
+          )}
         <div className="col-span-2">
           <MatchupPickButton
             name={matchup.homeTeam.name}
             image={matchup.homeTeam.image}
             id={matchup.homeTeam.id}
-            disabled={matchup.status !== "STATUS_SCHEDULED"}
+            disabled={
+              matchup.status !== "STATUS_SCHEDULED" &&
+              matchup.status !== "STATUS_POSTPONED"
+            }
             winnerId={matchup.winnerId}
             matchupId={matchup._id}
           />
         </div>
       </div>
-      <div className="grid grid-cols-3 items-center text-center p-2">
+      <div className="grid grid-cols-3 items-center text-center p-2 min-h-12">
         <div className="flex flex-col items-center justify-center">
-          {matchup.status === "STATUS_SCHEDULED" && (
+          {(matchup.status === "STATUS_SCHEDULED" ||
+            matchup.status === "STATUS_POSTPONED") && (
             <p className="text-light text-xs text-nowrap">
               Wager: 🔗
               <span className="text-yellow-500">{matchup.cost}</span>
@@ -86,7 +123,7 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
           <p className="text-light text-xs text-nowrap">
             Reward: 🔗
             <span className="text-yellow-500">
-              {matchupRewardDisplay(matchup.cost, matchup.featured)}
+              {matchupReward(matchup.cost, matchup.featured)}
             </span>
           </p>
         </div>
@@ -96,14 +133,16 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
 
         <p
           className={
-            matchup.status === "STATUS_SCHEDULED"
+            matchup.status === "STATUS_SCHEDULED" ||
+            matchup.status === "STATUS_POSTPONED"
               ? "font-extralight text-light text-sm"
               : matchup.status === "STATUS_FINAL"
                 ? "font-bold font-sans"
                 : "text-red-500 animate-pulse"
           }
         >
-          {matchup.status === "STATUS_SCHEDULED"
+          {matchup.status === "STATUS_SCHEDULED" ||
+          matchup.status === "STATUS_POSTPONED"
             ? "Pick Now"
             : matchup.status === "STATUS_FINAL"
               ? displayWinner(matchup)
@@ -114,7 +153,7 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
   );
 };
 
-const displayWinner = (matchup: Doc<"matchups">) => {
+export const displayWinner = (matchup: Doc<"matchups">) => {
   if (matchup.winnerId === matchup.awayTeam.id) {
     return `🏆${matchup.awayTeam.name}`;
   }
@@ -122,14 +161,6 @@ const displayWinner = (matchup: Doc<"matchups">) => {
     return `🏆${matchup.homeTeam.name}`;
   } else {
     return "Push";
-  }
-};
-
-export const matchupRewardDisplay = (cost: number, featured: boolean) => {
-  if (featured) {
-    return cost * 3 > 0 ? cost * 3 : 30;
-  } else {
-    return cost * 2 > 0 ? cost * 2 : 10;
   }
 };
 
@@ -194,12 +225,18 @@ const MatchupPickButton = ({
       className={
         winnerId === id
           ? "border-primary border relative aspect-square h-5/6 w-5/6 overflow-hidden"
-          : "relative aspect-square h-5/6 w-5/6 overflow-hidden hover:animate-pulse"
+          : "relative aspect-square h-5/6 w-5/6 overflow-hidden"
       }
       disabled={disabled}
       onClick={handleClick}
     >
-      <Image src={image} alt={name} fill sizes={"100%"} />
+      <Image
+        src={image}
+        alt={name}
+        fill
+        sizes={"100%"}
+        className="hover:scale-110 transition-transform duration-300 ease-in-out"
+      />
     </Button>
   );
 };
@@ -225,6 +262,7 @@ export const MatchupCardHeader = ({
       case "STATUS_CANCELED":
       case "STATUS_SUSPENDED":
       case "STATUS_RAIN_DELAY":
+      case "STATUS_DELAY":
         return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600";
       default:
         return "bg-secondary";
@@ -248,19 +286,21 @@ export const MatchupCardHeader = ({
             {getNetwork(matchup.metadata)}
           </div>
         </div>
-        <div className="text-right text-xs font-semibold text-gray-500 text-nowrap overflow-hidden">
-          {matchup.status === "STATUS_SCHEDULED" ? (
-            <div className="">
+        <div className="text-right text-xs font-semibold text-nowrap overflow-hidden">
+          {matchup.status === "STATUS_SCHEDULED" ||
+          matchup.status === "STATUS_POSTPONED" ? (
+            <p className="text-xs text-gray-800 dark:text-gray-300  font-light">
+              locks at:{" "}
               {new Date(matchup.startTime).toLocaleTimeString("en-US", {
                 hour: "numeric",
                 minute: "numeric",
               })}
-            </div>
+            </p>
           ) : (
             <div className="">
               {matchup.metadata?.statusDetails ? (
                 <>
-                  <p className="text-xs text-gray-500 font-extralight">
+                  <p className="text-xs text-gray-800 dark:text-gray-300  font-light">
                     last update:
                   </p>
                   <span className="text-foreground">

@@ -5,14 +5,14 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
-export default function useStoreUserEffect() {
+export default function useStoreChain() {
   const { isAuthenticated } = useConvexAuth();
   const { user } = useUser();
-  // When this state is set we know the server
-  // has stored the user.
-  const [userId, setUserId] = useState<Id<"users"> | null>(null);
-  const storeUser = useMutation(api.users.store);
+  const [activeChain, setActiveChain] = useState<Id<"chains"> | null>(null);
+  const storeChain = useMutation(api.chains.createActiveChain);
+  const chain = useQuery(api.chains.getUserActiveChain, {});
 
+  // Ensure the user has an active chain, if not create one
   // Call the `storeUser` mutation function to store
   // the current user in the `users` table and return the `Id` value.
   useEffect(() => {
@@ -20,20 +20,23 @@ export default function useStoreUserEffect() {
     if (!isAuthenticated) {
       return;
     }
-    // Store the user in the database.
-    // Recall that `storeUser` gets the user information via the `auth`
-    // object on the server. You don't need to pass anything manually here.
-    async function createUser() {
-      const id = await storeUser();
-      setUserId(id);
+
+    if (chain) {
+      return;
     }
 
-    createUser();
+    // Create an active chain for the user if they don't have one
+    async function createChain() {
+      const id = await storeChain();
+      setActiveChain(id);
+    }
+
+    createChain();
 
     // Cleanup the effect
-    return () => setUserId(null);
+    return () => setActiveChain(null);
     // Make sure the effect reruns if the user logs in with
     // a different identity
-  }, [isAuthenticated, storeUser, user?.id]);
-  return userId;
+  }, [isAuthenticated, chain, user?.id]);
+  return chain;
 }

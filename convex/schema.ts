@@ -122,7 +122,8 @@ export default defineSchema({
   }),
 
   picks: defineTable({
-    userId: v.string(),
+    userId: v.id("users"),
+    externalId: v.string(),
     matchupId: v.id("matchups"),
     campaignId: v.id("campaigns"),
     pick: v.object({
@@ -136,7 +137,7 @@ export default defineSchema({
   })
     .index("by_matchupId", ["matchupId"])
     .index("by_userId", ["userId"])
-    .index("by_active_userId", ["active", "userId"]),
+    .index("by_active_externalId", ["active", "externalId"]),
 
   squads: defineTable({
     name: v.string(),
@@ -205,14 +206,12 @@ export default defineSchema({
         earnedAt: v.string(),
       })
     ),
-    chain: v.optional(
-      v.object({
-        chainId: v.id("chains"),
-        wins: v.number(),
-        losses: v.number(),
-        pushes: v.number(),
-      })
-    ),
+    stats: v.object({
+      wins: v.number(),
+      losses: v.number(),
+      pushes: v.number(),
+      statsByLeague: v.any(),
+    }),
     friends: v.array(v.id("users")),
     squads: v.array(v.id("squads")),
     externalId: v.string(),

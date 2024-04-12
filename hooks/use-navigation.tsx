@@ -12,16 +12,16 @@ type BreadcrumbStore = {
 const useNavigation = () => {
   const pathname = usePathname();
   const [isDashboardActive, setIsDashboardActive] = useState(false);
-  const [isExploreActive, setIsExploreActive] = useState(false);
-  const [isNotificationsActive, setIsNotificationsActive] = useState(false);
+  const [isPlayActive, setIsPlayActive] = useState(false);
+  const [isSettingsActive, setIsSettingsActive] = useState(false);
   const [isMessagesActive, setIsMessagesActive] = useState(false);
 
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbStore[]>([]);
 
   useEffect(() => {
     setIsDashboardActive(false);
-    setIsExploreActive(false);
-    setIsNotificationsActive(false);
+    setIsSettingsActive(false);
+    setIsPlayActive(false);
     setIsMessagesActive(false);
 
     switch (pathname) {
@@ -30,14 +30,13 @@ const useNavigation = () => {
         setBreadcrumb([{ label: "Dashboard", href: "/dashboard" }]);
         break;
       case "/play":
-        setIsExploreActive(true);
+        setIsPlayActive(true);
         setBreadcrumb([
           { label: "Dashboard", href: "/dashboard" },
           { label: "Play", href: "/play" },
         ]);
         break;
       case "/picks":
-        setIsNotificationsActive(true);
         setBreadcrumb([
           { label: "Dashboard", href: "/dashboard" },
           { label: "Picks", href: "/picks" },
@@ -50,6 +49,14 @@ const useNavigation = () => {
           { label: "Leaderboards", href: "/leaderboards" },
         ]);
         break;
+      case "/settings":
+      case "/settings/notifications":
+        setIsSettingsActive(true);
+        setBreadcrumb([
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Settings", href: "/settings" },
+        ]);
+        break;
       default:
         // Handle any other cases here
         break;
@@ -58,8 +65,8 @@ const useNavigation = () => {
 
   return {
     isDashboardActive,
-    isExploreActive,
-    isNotificationsActive,
+    isSettingsActive,
+    isPlayActive,
     isMessagesActive,
     breadcrumb,
   };
