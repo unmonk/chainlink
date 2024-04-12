@@ -83,7 +83,7 @@ export default function AddToHomeScreen() {
       }
     } else {
     }
-  }, [userAgent, isMobile, isStandalone, isIOS]);
+  }, [userAgent, isMobile, isStandalone, isIOS, cookies]);
 
   const Prompt = () => (
     <>

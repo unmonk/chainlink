@@ -20,7 +20,7 @@ export default function Page() {
   );
 }
 
-export const NotificationsPage = () => {
+const NotificationsPage = () => {
   return (
     <div className="grid gap-6">
       <h1 className="text-white text-2xl ">Notifications</h1>
