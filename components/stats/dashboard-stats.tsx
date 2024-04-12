@@ -49,27 +49,16 @@ const DashboardStats = () => {
                 width={40}
                 height={40}
               />
-              <div className="flex flex-row gap-0.5 text-sm">
-                <p>
-                  W:
-                  <span className="font-semibold">
-                    {user.stats.statsByLeague[league].wins}
-                  </span>
-                </p>
-                |
-                <p>
-                  L:
-                  <span className="font-semibold">
-                    {user.stats.statsByLeague[league].losses}
-                  </span>
-                </p>
-                |
-                <p>
-                  P:
-                  <span className="font-semibold">
-                    {user.stats.statsByLeague[league].pushes}
-                  </span>
-                </p>
+              <div className="flex justify-center px-2 py-2 flex-wrap gap-1">
+                <Badge className="bg-green-500 text-white text-nowrap">
+                  {user.stats.statsByLeague[league].wins} Wins
+                </Badge>
+                <Badge className="bg-red-500 text-white text-nowrap">
+                  {user.stats.statsByLeague[league].losses} Losses
+                </Badge>
+                <Badge className="bg-gray-500 text-white text-nowrap">
+                  {user.stats.statsByLeague[league].pushes} Pushes
+                </Badge>
               </div>
             </div>
           ))}
