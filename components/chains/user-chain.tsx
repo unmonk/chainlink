@@ -1,26 +1,36 @@
 import { api } from "@/convex/_generated/api";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useConvexAuth, useQuery } from "convex/react";
 import { Skeleton } from "../ui/skeleton";
 import useStoreChain from "@/hooks/use-active-chain";
 
 export const UserChain = () => {
-  const chain = useStoreChain();
+  const store = useStoreChain();
+  const chain = useQuery(api.chains.getUserActiveChain, {});
 
   return (
     <>
       <div className="flex flex-row items-center justify-center">
-        {!chain && <Skeleton className="h-4 w-26" />}
-        {chain && (
-          <div className="flex flex-row gap-4 items-center justify-center text-nowrap overflow-auto">
+        <div className="flex flex-row gap-4 items-center justify-center text-nowrap overflow-auto">
+          {!chain && <Skeleton className="h-8 w-16 m-1" />}
+          {chain && (
             <p className={streakColor(chain.chain)}>
               {streakLetter(chain.chain)}
               {Math.abs(chain.chain)}
             </p>
+          )}
+          {!chain && (
+            <>
+              <Skeleton className="h-4 w-4 m-1" /> -{" "}
+              <Skeleton className="h-4 w-4 m-1" />
+              - <Skeleton className="h-4 w-4 m-1" />
+            </>
+          )}
+          {chain && (
             <p className="font-mono">
               {chain.wins} - {chain.losses} - {chain.pushes}
             </p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

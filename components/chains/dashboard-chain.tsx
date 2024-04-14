@@ -10,10 +10,14 @@ import {
 import useStoreChain from "@/hooks/use-active-chain";
 import { streakColor, streakLetter } from "./user-chain";
 import { Badge } from "../ui/badge";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Skeleton } from "../ui/skeleton";
 
 export const DashboardChain = () => {
-  const chain = useStoreChain();
-  if (!chain) return null;
+  const { isAuthenticated } = useConvexAuth();
+  const chain = useQuery(api.chains.getUserActiveChain, {});
+
   return (
     <Card className="">
       <CardHeader className="pb-2">
@@ -23,44 +27,68 @@ export const DashboardChain = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center py-4 flex-grow">
-        <Badge
-          className={cn(
-            "mb-2 px-3 py-1 text-white font-bold rounded-full",
-            streakColorBackground(chain.chain)
-          )}
-          variant="secondary"
-        >
-          {streakLetter(chain.chain)}
-          {Math.abs(chain.chain)}
-        </Badge>
+        {isAuthenticated && chain && (
+          <Badge
+            className={cn(
+              "mb-2 px-3 py-1 text-white font-bold rounded-full",
+              streakColorBackground(chain.chain)
+            )}
+            variant="secondary"
+          >
+            {streakLetter(chain.chain)}
+            {Math.abs(chain.chain)}
+          </Badge>
+        )}
+        {!isAuthenticated && (
+          <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
+        )}
         <CardDescription className="text-xs text-muted-foreground">
           Current Chain
         </CardDescription>
-
-        <Badge
-          className={cn(
-            "mb-2 px-3 py-1 text-white font-bold rounded-full mt-2",
-            streakColorBackground(chain.best)
-          )}
-          variant="secondary"
-        >
-          {streakLetter(chain.best)}
-          {Math.abs(chain.best)}
-        </Badge>
+        {isAuthenticated && chain && (
+          <Badge
+            className={cn(
+              "mb-2 px-3 py-1 text-white font-bold rounded-full mt-2",
+              streakColorBackground(chain.best)
+            )}
+            variant="secondary"
+          >
+            {streakLetter(chain.best)}
+            {Math.abs(chain.best)}
+          </Badge>
+        )}
+        {!isAuthenticated && (
+          <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
+        )}
         <CardDescription className="text-xs text-muted-foreground">
           Best Chain
         </CardDescription>
       </CardContent>
       <CardFooter className="flex justify-center px-2 py-2 bg-accent rounded-b-lg flex-wrap gap-1 ">
-        <Badge className="bg-green-500 text-white text-nowrap">
-          {chain.wins} Wins
-        </Badge>
-        <Badge className="bg-red-500 text-white text-nowrap">
-          {chain.losses} Losses
-        </Badge>
-        <Badge className="bg-gray-500 text-white text-nowrap">
-          {chain.pushes} Pushes
-        </Badge>
+        {isAuthenticated && chain && (
+          <Badge className="bg-green-500 text-white text-nowrap">
+            {chain.wins} Wins
+          </Badge>
+        )}
+        {!isAuthenticated && (
+          <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
+        )}
+        {isAuthenticated && chain && (
+          <Badge className="bg-red-500 text-white text-nowrap">
+            {chain.losses} Losses
+          </Badge>
+        )}
+        {!isAuthenticated && (
+          <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
+        )}
+        {isAuthenticated && chain && (
+          <Badge className="bg-gray-500 text-white text-nowrap">
+            {chain.pushes} Pushes
+          </Badge>
+        )}
+        {!isAuthenticated && (
+          <Skeleton className="h-8 w-16 inline-flex bg-background  items-center rounded-full border px-2.5 py-0.5" />
+        )}
       </CardFooter>
     </Card>
   );

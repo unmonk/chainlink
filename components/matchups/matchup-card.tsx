@@ -112,6 +112,9 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
         </div>
       </div>
       <div className="grid grid-cols-3 items-center text-center p-2 min-h-12">
+        <p className="text-primary text-sm">
+          {matchup.featured && "Chain Builder🖇️"}
+        </p>
         <div className="flex flex-col items-center justify-center">
           {(matchup.status === "STATUS_SCHEDULED" ||
             matchup.status === "STATUS_POSTPONED") && (
@@ -127,10 +130,6 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
             </span>
           </p>
         </div>
-        <p className="text-primary text-sm">
-          {matchup.featured && "Chain Builder"}
-        </p>
-
         <p
           className={
             matchup.status === "STATUS_SCHEDULED" ||
@@ -143,7 +142,7 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
         >
           {matchup.status === "STATUS_SCHEDULED" ||
           matchup.status === "STATUS_POSTPONED"
-            ? "Pick Now"
+            ? ""
             : matchup.status === "STATUS_FINAL"
               ? displayWinner(matchup)
               : "Locked"}

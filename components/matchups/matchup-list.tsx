@@ -7,6 +7,7 @@ import { BackgroundGradient } from "../ui/background-gradient";
 import { Doc } from "@/convex/_generated/dataModel";
 import ActivePickCard, { UserPickWithMatchup } from "./active-pick";
 import { Separator } from "../ui/separator";
+import { Skeleton } from "../ui/skeleton";
 
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
@@ -38,6 +39,10 @@ const MatchupList = ({}) => {
         </div>
       )}
       <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3 flex-grow">
+        {!matchups &&
+          Array.from({ length: 12 }).map((_, i) => (
+            <Skeleton key={i} className="h-72 w-96 self-center rounded-lg" />
+          ))}
         {matchups &&
           matchups.length > 0 &&
           matchups

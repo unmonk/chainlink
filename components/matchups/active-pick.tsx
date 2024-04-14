@@ -186,23 +186,6 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
           <p className="text-primary text-sm">
             {pick.matchup.featured && "Chain Builder"}
           </p>
-          <p
-            className={
-              pick.matchup.status === "STATUS_SCHEDULED" ||
-              pick.matchup.status === "STATUS_POSTPONED"
-                ? "font-extralight text-light text-sm"
-                : pick.matchup.status === "STATUS_FINAL"
-                  ? "font-bold font-sans"
-                  : "text-red-500 animate-pulse"
-            }
-          >
-            {pick.matchup.status === "STATUS_SCHEDULED" ||
-            pick.matchup.status === "STATUS_POSTPONED"
-              ? "Pick Now"
-              : pick.matchup.status === "STATUS_FINAL"
-                ? displayWinner(pick.matchup)
-                : "Locked"}
-          </p>
         </div>
       </div>
     </Card>

@@ -47,10 +47,14 @@ export const handlePickWin = internalMutation({
     chain.chain > 0 ? (chain.chain += 1) : (chain.chain = 1);
     chain.best = chain.chain > chain.best ? chain.chain : chain.best;
 
+    console.log(`user: ${user.name} won pick: ${pick.pick.name}`);
+
     //Reward User
     const reward = matchupReward(matchup.cost, matchup.featured);
     user.coins += reward;
     chain.cost += reward;
+
+    console.log(`user: ${user.name} won ${reward} coins`);
 
     //Record Pick
     pick.status = "WIN";
@@ -102,9 +106,13 @@ export const handlePickLoss = internalMutation({
     user.stats.statsByLeague[matchup.league].losses += 1;
     chain.chain < 0 ? (chain.chain -= 1) : (chain.chain = -1);
 
+    console.log(`user: ${user.name} lost pick: ${pick.pick.name}`);
+
     //Deduct User
     user.coins -= matchup.cost;
     chain.cost -= matchup.cost;
+
+    console.log(`user: ${user.name} lost ${matchup.cost} coins`);
 
     //Record Pick
     pick.status = "LOSS";
@@ -154,6 +162,8 @@ export const handlePickPush = internalMutation({
     chain.pushes += 1;
     user.stats.pushes += 1;
     user.stats.statsByLeague[matchup.league].pushes += 1;
+
+    console.log(`user: ${user.name} pushed pick: ${pick.pick.name}`);
 
     //Record Pick
     pick.status = "PUSH";

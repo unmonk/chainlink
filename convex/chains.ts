@@ -33,6 +33,7 @@ export const getUserActiveChain = query({
         q.eq("active", true).eq("userId", user.subject)
       )
       .unique();
+
     return chain;
   },
 });
@@ -48,10 +49,24 @@ export const getChain = query({
 export const createActiveChain = mutation({
   args: {},
   handler: async (ctx) => {
-    const user = await ctx.auth.getUserIdentity();
-    if (!user) {
-      throw new Error("User not found");
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("USER_NOT_FOUND");
     }
+
+    //check if user has an active chain
+    const activeChain = await ctx.db
+      .query("chains")
+      .withIndex("by_active_userId", (q) =>
+        q.eq("active", true).eq("userId", identity.subject)
+      )
+      .unique();
+
+    if (activeChain !== null) {
+      return activeChain._id;
+    }
+
+    //else create a new chain
 
     const campaign = await ctx.db
       .query("campaigns")
@@ -65,7 +80,7 @@ export const createActiveChain = mutation({
 
     const chain = await ctx.db.insert("chains", {
       campaignId: campaign._id,
-      userId: user.subject,
+      userId: identity.subject,
       active: true,
       wins: 0,
       losses: 0,
