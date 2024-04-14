@@ -3,6 +3,34 @@ import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
 import { matchupReward } from "./utils";
 import { internal } from "./_generated/api";
+import { Doc } from "./_generated/dataModel";
+
+export const getAdminMatchups = query({
+  args: {},
+  handler: async (ctx) => {
+    type MatchupWithPicks = Doc<"matchups"> & { picks: Doc<"picks">[] };
+
+    const currentTime = new Date().getTime();
+    const minus6Hours = currentTime - 12 * 60 * 60 * 1000;
+    const plus18Hours = currentTime + 36 * 60 * 60 * 1000;
+    const matchups = (await ctx.db
+      .query("matchups")
+      .withIndex("by_startTime", (q) =>
+        q.gte("startTime", minus6Hours).lte("startTime", plus18Hours)
+      )
+      .collect()) as MatchupWithPicks[];
+
+    //get picks for each matchup
+    for (const matchup of matchups) {
+      const picks = await ctx.db
+        .query("picks")
+        .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
+        .collect();
+      matchup.picks = picks;
+    }
+    return matchups;
+  },
+});
 
 export const getActiveMatchups = query({
   args: {},

@@ -46,17 +46,16 @@ import { UserChain } from "../chains/user-chain";
 import { Separator } from "../ui/separator";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { MdAdminPanelSettings } from "react-icons/md";
+import useAdminNavigation from "@/hooks/use-admin-navigation";
 
-const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
+const AdminDashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   const {
     isDashboardActive,
     isSettingsActive,
-    isPlayActive,
+    isMatchupsActive,
     isMessagesActive,
-  } = useNavigation();
-
-  const userStore = useStoreUserEffect();
-  const { user } = useUser();
+    breadcrumb,
+  } = useAdminNavigation();
 
   return (
     <>
@@ -73,7 +72,7 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="/dashboard"
+                  href="/admin"
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
                     isDashboardActive
@@ -81,30 +80,30 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                       : "text-muted-foreground"
                   )}
                 >
-                  <Home className="h-5 w-5" />
-                  <span className="sr-only">Dashboard</span>
+                  <MdAdminPanelSettings className="h-5 w-5" />
+                  <span className="sr-only">Admin Dashboard</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Dashboard</TooltipContent>
+              <TooltipContent side="right">Admin Dashboard</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="/play"
+                  href="/admin/matchups"
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
-                    isPlayActive
+                    isMatchupsActive
                       ? "text-accent-foreground bg-accent"
                       : "text-muted-foreground"
                   )}
                 >
                   <Dices className="h-5 w-5" />
-                  <span className="sr-only">Play</span>
+                  <span className="sr-only">Matchups</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Play</TooltipContent>
+              <TooltipContent side="right">Matchups</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <TooltipProvider>
@@ -149,22 +148,6 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
               <TooltipContent side="right">Analytics</TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {user?.publicMetadata.isAdmin === true && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href="/admin"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                  >
-                    <MdAdminPanelSettings className="h-5 w-5" />
-                    <span className="sr-only">Admin</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right">Admin</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
         </nav>
         <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
           <TooltipProvider>
@@ -206,10 +189,10 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                     className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                   >
                     <Logo className="h-10 w-10 transition-all group-hover:scale-110" />
-                    <span className="sr-only">ChainLink</span>
+                    <span className="sr-only">ChainLink Admin</span>
                   </Link>
                   <Link
-                    href="/dashboard"
+                    href="/admin"
                     className={cn(
                       "flex items-center gap-4 px-2.5 hover:text-foreground",
                       isDashboardActive
@@ -217,18 +200,20 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                         : "text-muted-foreground"
                     )}
                   >
-                    <Home className="h-5 w-5" />
-                    Dashboard
+                    <MdAdminPanelSettings className="h-5 w-5" />
+                    Admin Dashboard
                   </Link>
                   <Link
                     href="/play"
                     className={cn(
                       "flex items-center gap-4 px-2.5 hover:text-foreground",
-                      isPlayActive ? "text-foreground" : "text-muted-foreground"
+                      isMatchupsActive
+                        ? "text-foreground"
+                        : "text-muted-foreground"
                     )}
                   >
                     <Dices className="h-5 w-5" />
-                    Play
+                    Matchups
                   </Link>
                   <Link
                     href="#"
@@ -244,15 +229,7 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                     <Trophy className="h-5 w-5" />
                     Leaderboards
                   </Link>
-                  {user?.publicMetadata.isAdmin === true && (
-                    <Link
-                      href="/admin"
-                      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    >
-                      <MdAdminPanelSettings className="h-5 w-5" />
-                      Admin
-                    </Link>
-                  )}
+
                   <Link
                     href="settings"
                     className={cn(
@@ -268,9 +245,7 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
 
                   <div className="justify-center items-center mt-auto">
                     <div className="flex flex-row gap-2 items-center justify-center">
-                      <Coins />
-                      <span> | </span>
-                      <UserChain />
+                      <p className="text-red-500 animate-pulse">ADMIN</p>
                     </div>
                     <Separator orientation="horizontal" className="my-1" />
                     <div className="flex justify-center">
@@ -285,15 +260,15 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link href="/admin">Admin Dashboard</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
-              {isPlayActive && (
+              {isMatchupsActive && (
                 <>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                      <Link href="/play">Play</Link>
+                      <Link href="/admin/matchups">Matchups</Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                 </>
@@ -312,10 +287,7 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
           </Breadcrumb>
           <div className="relative ml-auto flex-initial md:grow-0">
             <div className="flex flex-row gap-4 items-center">
-              <Coins />
-              <Separator orientation="vertical" />
-              <UserChain />
-              <Separator orientation="vertical" />
+              <p className="text-red-500 animate-pulse">ADMIN</p>
             </div>
           </div>
           <SignedIn>
@@ -339,4 +311,4 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
     </>
   );
 };
-export default DashboardWrapper;
+export default AdminDashboardWrapper;

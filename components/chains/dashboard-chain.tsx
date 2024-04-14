@@ -24,6 +24,9 @@ export const DashboardChain = () => {
         <CardTitle>My Chain</CardTitle>
         <CardDescription className="text-xs text-muted-foreground">
           Global Campaign
+          {isAuthenticated && chain && (
+            <> {chain.wins + chain.losses + chain.pushes} picks </>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center py-4 flex-grow">

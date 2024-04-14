@@ -105,7 +105,8 @@ export default defineSchema({
     metadata: v.optional(v.any()),
   })
     .index("by_active_league", ["league", "active"])
-    .index("by_active_dates", ["active", "startTime"]),
+    .index("by_active_dates", ["active", "startTime"])
+    .index("by_startTime", ["startTime"]),
 
   campaigns: defineTable({
     name: v.string(),

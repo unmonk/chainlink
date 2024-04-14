@@ -31,9 +31,15 @@ export const store = mutation({
       .unique();
     if (user !== null) {
       // If we've seen this identity before but the name has changed, patch the value.
-      if (user.name !== identity.nickname ? identity.nickname : identity.name) {
+      if (
+        user.name !== identity.preferredUsername
+          ? identity.preferredUsername
+          : identity.name
+      ) {
         await ctx.db.patch(user._id, {
-          name: identity.nickname ? identity.nickname : identity.name,
+          name: identity.preferredUsername
+            ? identity.preferredUsername
+            : identity.name,
         });
       }
       return user._id;
@@ -41,8 +47,8 @@ export const store = mutation({
 
     // If it's a new identity, create a new `User`.
     return await ctx.db.insert("users", {
-      name: identity.nickname
-        ? identity.nickname
+      name: identity.preferredUsername
+        ? identity.preferredUsername
         : identity.name
           ? identity.name
           : "",

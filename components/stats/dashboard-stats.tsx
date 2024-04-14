@@ -49,10 +49,10 @@ const DashboardStats = () => {
       </CardContent>
       <CardContent>
         <h3 className="text-lg mt-2">Stats By League</h3>
-        <div className="grid gap-2 grid-cols-2 mt-1 items-center">
+        <div className="grid gap-2 grid-cols-4 mt-1 items-center">
           {!user &&
             Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-20 w-40 rounded-lg " />
+              <Skeleton key={i} className="h-32 w-32 rounded-lg " />
             ))}
           {user &&
             Object.keys(user.stats.statsByLeague).map((league) => (

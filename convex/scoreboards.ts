@@ -121,7 +121,8 @@ export const scoreboards = internalAction({
         ///////////////////MATCHUP ENDED////////////////////////
         if (
           (matchup.status === "STATUS_IN_PROGRESS" ||
-            matchup.status === "STATUS_END_PERIOD") &&
+            matchup.status === "STATUS_END_PERIOD" ||
+            matchup.status === "STATUS_SECOND_HALF") &&
           (eventStatus === "STATUS_FINAL" || eventStatus === "STATUS_FULL_TIME")
         ) {
           await ctx.runMutation(internal.matchups.handleMatchupFinished, {

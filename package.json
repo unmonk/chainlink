@@ -29,6 +29,7 @@
     "@serwist/next": "^9.0.0-preview.21",
     "@serwist/precaching": "^9.0.0-preview.21",
     "@serwist/sw": "^9.0.0-preview.21",
+    "@tanstack/react-table": "^8.16.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "convex": "^1.11.0",

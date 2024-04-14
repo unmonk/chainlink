@@ -30,7 +30,7 @@ const DashboardCoins = () => {
       )}
       {chain && coins && (
         <CardContent className="mb-2">
-          <CardTitle className="text-3xl text-yellow-500">
+          <CardTitle className="md:text-3xl text-xl text-yellow-500 text-nowrap">
             🔗 {coins?.toLocaleString("en-US")}
           </CardTitle>
           <div className="text-xs text-muted-foreground">
