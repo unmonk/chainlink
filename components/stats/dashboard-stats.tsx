@@ -58,26 +58,32 @@ const DashboardStats = () => {
             Object.keys(user.stats.statsByLeague).map((league) => (
               <div
                 key={league}
-                className="flex flex-col gap-1 items-center rounded-lg bg-accent text-center p-1"
+                className="flex flex-col items-center rounded-lg bg-accent text-center p-1"
               >
                 <span className="sr-only">{league}</span>
                 <Image
                   src={leagueLogos[league] ? leagueLogos[league] : "/logo.svg "}
                   alt={league}
-                  width={40}
-                  height={40}
+                  width={50}
+                  height={50}
                 />
                 <div className="flex justify-center px-2 py-2 flex-wrap gap-1">
-                  <Badge className="bg-green-500 text-white text-nowrap">
+                  {/* <Badge className="bg-green-500 text-white text-nowrap">
                     {user.stats.statsByLeague[league].wins} Wins
                   </Badge>
                   <Badge className="bg-red-500 text-white text-nowrap">
-                    {user.stats.statsByLeague[league].losses} Losses
+                  {user.stats.statsByLeague[league].losses} Losses
                   </Badge>
                   <Badge className="bg-gray-500 text-white text-nowrap">
-                    {user.stats.statsByLeague[league].pushes} Pushes
-                  </Badge>
+                  {user.stats.statsByLeague[league].pushes} Pushes
+                </Badge> */}
+                  {user.stats.statsByLeague[league].wins} -{" "}
+                  {user.stats.statsByLeague[league].losses} -{" "}
+                  {user.stats.statsByLeague[league].pushes}
                 </div>
+                <p className="text-xs font-light text-muted-foreground">
+                  {league}
+                </p>
               </div>
             ))}
         </div>
