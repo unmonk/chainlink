@@ -191,6 +191,8 @@ const MatchupPickButton = ({
           image,
         },
       });
+      //top of page
+      window.scrollTo(0, 0);
     } catch (e: any) {
       const errorMessage =
         // Check whether the error is an application error

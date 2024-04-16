@@ -20,7 +20,7 @@ export const handlePickWin = internalMutation({
     }
     //get user
     const user = await ctx.db.get(pick.userId);
-    if (!user) {
+    if (!user || !user.stats) {
       throw new ConvexError("USER_NOT_FOUND");
     }
 
@@ -43,7 +43,13 @@ export const handlePickWin = internalMutation({
     //Record Win
     chain.wins += 1;
     user.stats.wins += 1;
-    user.stats.statsByLeague[matchup.league].wins += 1;
+    user.stats.statsByLeague[matchup.league]
+      ? (user.stats.statsByLeague[matchup.league].wins += 1)
+      : (user.stats.statsByLeague[matchup.league] = {
+          wins: 1,
+          losses: 0,
+          pushes: 0,
+        });
     chain.chain > 0 ? (chain.chain += 1) : (chain.chain = 1);
     chain.best = chain.chain > chain.best ? chain.chain : chain.best;
 
@@ -103,7 +109,14 @@ export const handlePickLoss = internalMutation({
     //Record loss
     chain.losses += 1;
     user.stats.losses += 1;
-    user.stats.statsByLeague[matchup.league].losses += 1;
+    user.stats.statsByLeague[matchup.league]
+      ? (user.stats.statsByLeague[matchup.league].losses += 1)
+      : (user.stats.statsByLeague[matchup.league] = {
+          wins: 0,
+          losses: 1,
+          pushes: 0,
+        });
+
     chain.chain < 0 ? (chain.chain -= 1) : (chain.chain = -1);
 
     console.log(`user: ${user.name} lost pick: ${pick.pick.name}`);
@@ -161,7 +174,13 @@ export const handlePickPush = internalMutation({
     //Record push
     chain.pushes += 1;
     user.stats.pushes += 1;
-    user.stats.statsByLeague[matchup.league].pushes += 1;
+    user.stats.statsByLeague[matchup.league]
+      ? (user.stats.statsByLeague[matchup.league].pushes += 1)
+      : (user.stats.statsByLeague[matchup.league] = {
+          wins: 0,
+          losses: 0,
+          pushes: 1,
+        });
 
     console.log(`user: ${user.name} pushed pick: ${pick.pick.name}`);
 

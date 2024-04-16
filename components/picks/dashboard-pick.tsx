@@ -11,12 +11,21 @@ import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { formatDistance } from "date-fns";
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
 const DashboardActivePick = () => {
   const pick = useQuery(api.picks.getUserActivePickWithMatchup, {});
+  const router = useRouter();
+  const goToPlay = () => router.push("/play");
 
   //Todo loading skeleton
-  if (!pick) return null;
+  if (!pick)
+    return (
+      <Button variant="outline" className="col-span-2" onClick={goToPlay}>
+        Make Pick
+      </Button>
+    );
 
   return (
     <Card className="col-span-2">
@@ -76,6 +85,7 @@ const DashboardActivePick = () => {
                   {pick.matchup.awayTeam.score}
                 </span>
               </div>
+              <p className="mx-2">-</p>
               <div className="flex flex-col items-center space-y-1">
                 <span className="text-2xl font-semibold">
                   {pick.matchup.homeTeam.score}
@@ -103,7 +113,7 @@ const DashboardActivePick = () => {
                 <p className="text-xs text-gray-800 dark:text-gray-300  font-light">
                   last update:
                 </p>
-                <span className="text-foreground">
+                <span className="text-foreground ml-1">
                   {pick.matchup.metadata?.statusDetails}
                 </span>
               </>

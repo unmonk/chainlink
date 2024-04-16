@@ -67,26 +67,28 @@ export const DashboardChain = () => {
           Best Chain
         </CardDescription>
       </CardContent>
-      <CardFooter className="flex justify-center px-2 py-2 bg-accent rounded-b-lg flex-wrap gap-1 ">
+      <CardFooter className="flex justify-center px-2 py-2 bg-accent rounded-b-lg flex-nowrap gap-1 ">
         {isAuthenticated && chain && (
-          <Badge className="bg-green-500 text-white text-nowrap">
-            {chain.wins} Wins
+          <Badge className="border border-input bg-background  text-foreground text-nowrap">
+            {chain.wins}
           </Badge>
         )}
         {!isAuthenticated && (
           <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
         )}
+        -
         {isAuthenticated && chain && (
-          <Badge className="bg-red-500 text-white text-nowrap">
-            {chain.losses} Losses
+          <Badge className="border border-input bg-background  text-foreground text-nowrap">
+            {chain.losses}
           </Badge>
         )}
         {!isAuthenticated && (
           <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
         )}
+        -
         {isAuthenticated && chain && (
-          <Badge className="bg-gray-500 text-white text-nowrap">
-            {chain.pushes} Pushes
+          <Badge className="border border-input bg-background text-foreground text-nowrap">
+            {chain.pushes}
           </Badge>
         )}
         {!isAuthenticated && (

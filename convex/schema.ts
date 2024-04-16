@@ -146,6 +146,8 @@ export default defineSchema({
     image: v.string(),
     active: v.boolean(),
     featured: v.boolean(),
+    slug: v.string(),
+    open: v.boolean(),
     ownerId: v.string(),
     members: v.array(
       v.object({
@@ -155,7 +157,12 @@ export default defineSchema({
       })
     ),
     score: v.number(),
-  }),
+  })
+    .index("by_ownerId", ["ownerId"])
+    .searchIndex("by_name", {
+      searchField: "name",
+      filterFields: ["active", "open"],
+    }),
 
   referrals: defineTable({
     userId: v.string(),
@@ -214,6 +221,7 @@ export default defineSchema({
       statsByLeague: v.any(),
     }),
     friends: v.array(v.id("users")),
+    squadId: v.optional(v.id("squads")),
     squads: v.array(v.id("squads")),
     externalId: v.string(),
     role: user_role,

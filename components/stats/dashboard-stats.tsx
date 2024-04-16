@@ -52,7 +52,7 @@ const DashboardStats = () => {
         <div className="grid gap-2 grid-cols-4 mt-1 items-center">
           {!user &&
             Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 w-32 rounded-lg " />
+              <Skeleton key={i} className="h-32 w-full rounded-lg " />
             ))}
           {user &&
             Object.keys(user.stats.statsByLeague).map((league) => (
@@ -67,7 +67,7 @@ const DashboardStats = () => {
                   width={50}
                   height={50}
                 />
-                <div className="flex justify-center px-2 py-2 flex-wrap gap-1">
+                <div className="flex justify-center px-1 py-2 flex-nowrap text-sm md:text-md">
                   {/* <Badge className="bg-green-500 text-white text-nowrap">
                     {user.stats.statsByLeague[league].wins} Wins
                   </Badge>

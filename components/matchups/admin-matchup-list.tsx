@@ -6,8 +6,6 @@ import { AdminColumns } from "./admin-columns";
 
 const AdminMatchupList = () => {
   const matchups = useQuery(api.matchups.getAdminMatchups, {});
-  console.log(matchups);
-
   return (
     <div>
       <h1>Admin Matchup List</h1>

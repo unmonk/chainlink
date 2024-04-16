@@ -54,6 +54,21 @@ export const leagueLogos: {
   MLS: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mls.png?w=100&h=100&transparent=true",
 };
 
+export const leagueNames: {
+  [key: string]: string;
+} = {
+  NFL: "NFL",
+  NBA: "NBA",
+  MLB: "MLB",
+  NHL: "NHL",
+  "COLLEGE-FOOTBALL": "College Football",
+  MBB: "Men's College Basketball",
+  WBB: "Women's College Basketball",
+  WNBA: "WNBA",
+  MLS: "MLS",
+  UFL: "UFL",
+};
+
 export const STATS_BY_LEAGUE = {
   NBA: {
     rebounts: "Rebounds",

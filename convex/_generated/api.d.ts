@@ -21,6 +21,7 @@ import type * as matchups from "../matchups.js";
 import type * as picks from "../picks.js";
 import type * as schedules from "../schedules.js";
 import type * as scoreboards from "../scoreboards.js";
+import type * as squads from "../squads.js";
 import type * as users from "../users.js";
 import type * as utils from "../utils.js";
 
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   picks: typeof picks;
   schedules: typeof schedules;
   scoreboards: typeof scoreboards;
+  squads: typeof squads;
   users: typeof users;
   utils: typeof utils;
 }>;

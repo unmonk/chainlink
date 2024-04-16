@@ -5,6 +5,18 @@ import { matchupReward } from "./utils";
 import { internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 
+export const getHomepageMatchups = query({
+  args: {},
+  handler: async (ctx) => {
+    const currentTime = new Date().getTime();
+    const matchups = await ctx.db
+      .query("matchups")
+      .withIndex("by_startTime", (q) => q.gte("startTime", currentTime))
+      .take(3);
+    return matchups;
+  },
+});
+
 export const getAdminMatchups = query({
   args: {},
   handler: async (ctx) => {

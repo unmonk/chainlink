@@ -18,6 +18,7 @@ import {
   Settings2,
   Ticket,
   Trophy,
+  ListTodo,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -99,7 +100,7 @@ const AdminDashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                       : "text-muted-foreground"
                   )}
                 >
-                  <Dices className="h-5 w-5" />
+                  <ListTodo className="h-5 w-5" />
                   <span className="sr-only">Matchups</span>
                 </Link>
               </TooltipTrigger>
@@ -212,7 +213,7 @@ const AdminDashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                         : "text-muted-foreground"
                     )}
                   >
-                    <Dices className="h-5 w-5" />
+                    <ListTodo className="h-5 w-5" />
                     Matchups
                   </Link>
                   <Link
