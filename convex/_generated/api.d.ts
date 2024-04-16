@@ -14,6 +14,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as achievements from "../achievements.js";
 import type * as campaigns from "../campaigns.js";
 import type * as chains from "../chains.js";
 import type * as crons from "../crons.js";
@@ -34,6 +35,7 @@ import type * as utils from "../utils.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  achievements: typeof achievements;
   campaigns: typeof campaigns;
   chains: typeof chains;
   crons: typeof crons;

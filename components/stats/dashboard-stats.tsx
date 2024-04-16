@@ -52,13 +52,13 @@ const DashboardStats = () => {
         <div className="grid gap-2 grid-cols-4 mt-1 items-center">
           {!user &&
             Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-lg " />
+              <Skeleton key={i} className="h-28 w-full rounded-lg " />
             ))}
           {user &&
             Object.keys(user.stats.statsByLeague).map((league) => (
               <div
                 key={league}
-                className="flex flex-col items-center rounded-lg bg-accent text-center p-1"
+                className="flex flex-col items-center rounded-lg bg-accent text-center p-1 w-full h-full"
               >
                 <span className="sr-only">{league}</span>
                 <Image
@@ -67,7 +67,7 @@ const DashboardStats = () => {
                   width={50}
                   height={50}
                 />
-                <div className="flex justify-center px-1 py-2 flex-nowrap text-sm md:text-md">
+                <div className="flex justify-center px-1 py-2 flex-nowrap text-xs sm:text-sm md:text-base">
                   {/* <Badge className="bg-green-500 text-white text-nowrap">
                     {user.stats.statsByLeague[league].wins} Wins
                   </Badge>

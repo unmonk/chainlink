@@ -1,6 +1,11 @@
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
 
+export const featured_type = v.union(
+  v.literal("CHAINBUILDER"),
+  v.literal("SPONSORED")
+);
+
 export const matchup_type = v.union(
   v.literal("SCORE"),
   v.literal("STATS"),
@@ -70,18 +75,12 @@ export const user_role = v.union(v.literal("USER"), v.literal("ADMIN"));
 export type UserRole = Infer<typeof user_role>;
 
 export default defineSchema({
-  notes: defineTable({
-    userId: v.string(),
-    title: v.string(),
-    content: v.string(),
-    summary: v.optional(v.string()),
-  }),
-
   matchups: defineTable({
     updatedAt: v.optional(v.number()),
     startTime: v.number(),
     active: v.boolean(),
     featured: v.boolean(),
+    featuredType: v.optional(featured_type),
     title: v.string(),
     league: v.string(),
     type: matchup_type,
@@ -148,17 +147,30 @@ export default defineSchema({
     featured: v.boolean(),
     slug: v.string(),
     open: v.boolean(),
-    ownerId: v.string(),
+    ownerId: v.id("users"),
+    stats: v.object({
+      wins: v.number(),
+      losses: v.number(),
+      pushes: v.number(),
+      coins: v.number(),
+    }),
+    score: v.number(),
     members: v.array(
       v.object({
-        userId: v.string(),
+        userId: v.id("users"),
         role: squad_role,
         joinedAt: v.string(),
+        stats: v.object({
+          wins: v.number(),
+          losses: v.number(),
+          pushes: v.number(),
+          coins: v.number(),
+        }),
       })
     ),
-    score: v.number(),
   })
     .index("by_ownerId", ["ownerId"])
+    .index("by_score", ["score"])
     .searchIndex("by_name", {
       searchField: "name",
       filterFields: ["active", "open"],
@@ -174,6 +186,7 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     image: v.string(),
+    imageStorageId: v.id("_storage"),
     coins: v.number(),
     value: v.number(),
     type: achievement_type,
@@ -211,7 +224,7 @@ export default defineSchema({
     achievements: v.array(
       v.object({
         achievementId: v.id("achievements"),
-        earnedAt: v.string(),
+        awardedAt: v.number(),
       })
     ),
     stats: v.object({

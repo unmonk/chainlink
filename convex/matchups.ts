@@ -1,4 +1,9 @@
-import { internalMutation, internalQuery, query } from "./_generated/server";
+import {
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+} from "./_generated/server";
 import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
 import { matchupReward } from "./utils";
@@ -266,5 +271,19 @@ export const handleMatchupFinished = internalMutation({
     });
 
     //#endregion
+  },
+});
+
+export const patchFeatured = mutation({
+  args: { matchupId: v.id("matchups"), featured: v.boolean() },
+  handler: async (ctx, { matchupId, featured }) => {
+    await ctx.db.patch(matchupId, { featured });
+  },
+});
+
+export const patchActive = mutation({
+  args: { matchupId: v.id("matchups"), active: v.boolean() },
+  handler: async (ctx, { matchupId, active }) => {
+    await ctx.db.patch(matchupId, { active });
   },
 });

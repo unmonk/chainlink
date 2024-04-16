@@ -30,10 +30,10 @@ const DashboardCoins = () => {
       )}
       {chain && coins && (
         <CardContent className="mb-2">
-          <CardTitle className="md:text-3xl text-xl text-yellow-500 text-nowrap">
+          <CardTitle className="md:text-2xl text-xl text-cyan-600 text-nowrap">
             🔗 {coins?.toLocaleString("en-US")}
           </CardTitle>
-          <div className="text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground ">
             {chain.cost < 0 ? "-" : "+"}
             {Math.abs(chain.cost)} this month (
             {((chain.cost / coins) * 100).toFixed(2)}%)

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { formatDistance } from "date-fns";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import { CalendarRange, CircleArrowOutUpRightIcon } from "lucide-react";
 
 const DashboardActivePick = () => {
   const pick = useQuery(api.picks.getUserActivePickWithMatchup, {});
@@ -22,9 +23,18 @@ const DashboardActivePick = () => {
   //Todo loading skeleton
   if (!pick)
     return (
-      <Button variant="outline" className="col-span-2" onClick={goToPlay}>
-        Make Pick
-      </Button>
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>My Pick</CardTitle>
+          <CardDescription>No Active Pick</CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 flex flex-col items-center">
+          <Button variant={"outline"} onClick={goToPlay} size="lg">
+            <CircleArrowOutUpRightIcon size={16} className="mr-1" />
+            Make Pick
+          </Button>
+        </CardContent>
+      </Card>
     );
 
   return (

@@ -15,6 +15,7 @@ import {
 } from "../ui/dropdown-menu";
 import { MoreHorizontal, MoreVertical } from "lucide-react";
 import { Button } from "../ui/button";
+import { Select } from "../ui/select";
 
 type MatchupWithPicks = Doc<"matchups"> & { picks: Doc<"picks">[] };
 
@@ -32,12 +33,39 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => console.log("Copy payment ID")}>
-              Copy payment ID
-            </DropdownMenuItem>
+            {row.original.status !== "STATUS_SCHEDULED" &&
+              row.original.status !== "STATUS_FINAL" &&
+              row.original.status !== "STATUS_FULLTIME" &&
+              row.original.status !== "STATUS_POSTPONED" && (
+                <DropdownMenuItem
+                  onClick={() => console.log("Copy payment ID")}
+                >
+                  Complete Matchup
+                </DropdownMenuItem>
+              )}
+            {row.original.status === "STATUS_SCHEDULED" && (
+              <DropdownMenuItem className="text-primary">
+                {row.original.featured
+                  ? "Disable ChainBuilder"
+                  : "Enable ChainBuilder"}
+              </DropdownMenuItem>
+            )}
+            {row.original.status === "STATUS_SCHEDULED" && (
+              <DropdownMenuItem>
+                {row.original.active ? "Set Inactive" : "Set Active"}
+              </DropdownMenuItem>
+            )}
+            {row.original.status === "STATUS_SCHEDULED" && (
+              <DropdownMenuItem>Edit Matchup</DropdownMenuItem>
+            )}
+
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive"
+              onClick={() => console.log("Copy payment ID")}
+            >
+              Delete Matchup and Picks
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -150,12 +178,20 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
   },
   {
     accessorKey: "featured",
-    header: "Featured",
+    header: "ChainBuilder",
     cell: ({ row }) => {
-      return row.original.featured ? (
-        <Badge className="bg-orange-600">🔗CB</Badge>
-      ) : (
-        <Badge variant="outline">No</Badge>
+      return (
+        <Select
+          value={
+            row.original.featured &&
+            row.original.featuredType === "CHAINBUILDER"
+              ? "Enabled"
+              : "Disabled"
+          }
+        >
+          <option value="Enabled">Enabled</option>
+          <option value="Disabled">Disabled</option>
+        </Select>
       );
     },
   },

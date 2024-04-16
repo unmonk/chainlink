@@ -1,5 +1,12 @@
 "use client";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -9,11 +16,13 @@ import DashboardActivePick from "@/components/picks/dashboard-pick";
 import DashboardStats from "@/components/stats/dashboard-stats";
 import DashboardSquads from "@/components/squads/dashboard-squads";
 import DashboardAchievements from "@/components/achievements/dashboard-achievements";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Dashboard() {
   return (
     <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-      <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
+      <main className="grid flex-1 items-start gap-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
         <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
             <DashboardCoins />
@@ -39,9 +48,50 @@ export default function Dashboard() {
           </Tabs>
         </div>
         <div className="gap-2 flex-col flex">
-          <Card className="min-h-96">Ads</Card>
           <DashboardAchievements />
           <DashboardSquads />
+          <Card className="">
+            <CardHeader>
+              <CardTitle className="text-xs text-muted-foreground">
+                Ads & Sponsors
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 grid-rows-2 gap-1">
+                <div className="overflow-hidden rounded-md justify-self-center">
+                  <Link href="https://www.theroseleague.com/" target="_blank">
+                    <Image
+                      src="/images/ad1.png"
+                      className="h-auto w-auto object-cover transition-all hover:scale-105 aspect-square"
+                      alt="The Rose League"
+                      width={250}
+                      height={250}
+                    />
+                  </Link>
+                </div>
+                <div className="overflow-hidden rounded-md justify-self-center">
+                  <Image
+                    src="/images/ad3.png"
+                    className="h-auto w-auto object-cover transition-all hover:scale-105 aspect-square"
+                    alt="602 Pick'em"
+                    width={250}
+                    height={250}
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <CardDescription className="text-xs text-muted-foreground">
+                Interested in advertising? Contact us{" "}
+                <a
+                  href="mailto:admin@chainlink.st?subject=Advertising Inquiry"
+                  className="text-accent-foreground hover:underline"
+                >
+                  here{" "}
+                </a>
+              </CardDescription>
+            </CardFooter>
+          </Card>
         </div>
       </main>
     </div>

@@ -22,3 +22,7 @@ open [http://localhost:3000](http://localhost:3000)
 - [Shadcn/ui](https://shadcn/ui)
 - [Serwist](https://github.com/serwist/serwist)
 
+
+## Preview
+
+![Preview](preview.png)
