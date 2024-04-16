@@ -74,6 +74,12 @@ export const schedules = internalAction({
           if (!competition) continue;
           if (!competition.competitors) continue;
           if (competition.competitors.length < 2) continue;
+          if (
+            competition.competitors[0].team.name === "TBD" ||
+            competition.competitors[1].team.name === "TBD"
+          )
+            continue;
+
           const competitionStatus =
             competition.status?.type?.name ?? "STATUS_SCHEDULED";
           if (
