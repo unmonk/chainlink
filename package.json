@@ -1,6 +1,6 @@
 {
-  "name": "chainlinknew",
-  "version": "0.1.0",
+  "name": "chainlink",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "npm-run-all dev:init --parallel dev:server dev:client",
