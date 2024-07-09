@@ -5,6 +5,7 @@ import { v } from "convex/values";
 
 export const createMonthlyCampaign = internalAction({
   args: {},
+  returns: v.string(),
   handler: async (ctx) => {
     //get the current active global campaign
     const activeGlobalCampaign = await ctx.runQuery(
@@ -20,6 +21,10 @@ export const createMonthlyCampaign = internalAction({
     const chains = await ctx.runQuery(internal.chains.getChainsByCampaignId, {
       campaignId: activeGlobalCampaign._id,
     });
+
+    if (!chains || chains.length === 0) {
+      throw new Error("No chains found for active global campaign");
+    }
 
     //get chain with highest chain number
     const highestChain = chains.reduce((prev, current) =>
@@ -51,6 +56,11 @@ export const createMonthlyCampaign = internalAction({
       campaignId: activeGlobalCampaign._id,
     });
 
+    //deactivate all chains
+    await ctx.runMutation(internal.chains.deactivateAllChains, {
+      campaignId: activeGlobalCampaign._id,
+    });
+
     //todo notifications
     //todo achievements
 
@@ -79,19 +89,18 @@ export const createMonthlyCampaign = internalAction({
       30
     );
 
-    const newCampaign = await ctx.runMutation(
-      internal.campaigns.createGlobalCampaign,
-      {
-        name: campaignName,
-        description: campaignDescription,
-        active: true,
-        featured: true,
-        type: "GLOBAL",
-        startDate: startDate.getTime(),
-        endDate: endDate.getTime(),
-        ownedBy: "SYSTEM",
-      }
-    );
+    await ctx.runMutation(internal.campaigns.createGlobalCampaign, {
+      name: campaignName,
+      description: campaignDescription,
+      active: true,
+      featured: true,
+      type: "GLOBAL",
+      startDate: startDate.getTime(),
+      endDate: endDate.getTime(),
+      ownedBy: "SYSTEM",
+    });
+
+    return `Created ${campaignName}`;
   },
 });
 

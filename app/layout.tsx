@@ -51,24 +51,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ErrorBoundary>
-      <CookiesProvider>
-        <ConvexClientProvider>
-          <html lang="en">
-            <body className={cn("antialiased font-sans", inter.variable)}>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="dark"
-                enableSystem
-                disableTransitionOnChange
-              >
-                <main>{children}</main>
-                <Toaster />
-              </ThemeProvider>
-            </body>
-          </html>
-        </ConvexClientProvider>
-      </CookiesProvider>
-    </ErrorBoundary>
+    <CookiesProvider>
+      <ConvexClientProvider>
+        <html lang="en">
+          <body className={cn("antialiased font-sans", inter.variable)}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <main>{children}</main>
+              <Toaster />
+            </ThemeProvider>
+          </body>
+        </html>
+      </ConvexClientProvider>
+    </CookiesProvider>
   );
 }

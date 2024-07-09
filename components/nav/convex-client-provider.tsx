@@ -19,7 +19,7 @@ export default function ConvexClientProvider({
       appearance={{
         baseTheme: dark,
         variables: {
-          colorPrimary: "#12a150",
+          colorPrimary: "hsl(142.1 76.2% 36.3%)",
           //colorNeutral: "white",
         },
       }}

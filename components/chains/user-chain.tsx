@@ -38,7 +38,7 @@ export const UserChain = () => {
 
 export const streakLetter = (chain: number) => {
   if (chain === 0) {
-    return "";
+    return "W";
   }
   if (chain > 0) {
     return "W";

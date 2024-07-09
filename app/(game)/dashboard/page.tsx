@@ -30,7 +30,7 @@ export default function Dashboard() {
             <DashboardActivePick />
           </div>
           <DashboardStats />
-          <Tabs defaultValue="today">
+          {/* <Tabs defaultValue="today">
             <div className="flex items-center">
               <TabsList>
                 <TabsTrigger value="today">Today</TabsTrigger>
@@ -45,11 +45,11 @@ export default function Dashboard() {
                 </CardHeader>
               </Card>
             </TabsContent>
-          </Tabs>
+          </Tabs> */}
         </div>
         <div className="gap-2 flex-col flex">
-          <DashboardAchievements />
-          <DashboardSquads />
+          {/* <DashboardAchievements /> */}
+          {/* <DashboardSquads /> */}
           <Card className="">
             <CardHeader>
               <CardTitle className="text-xs text-muted-foreground">
@@ -70,13 +70,13 @@ export default function Dashboard() {
                   </Link>
                 </div>
                 <div className="overflow-hidden rounded-md justify-self-center">
-                  <Image
+                  {/* <Image
                     src="/images/ad3.png"
                     className="h-auto w-auto object-cover transition-all hover:scale-105 aspect-square"
                     alt="602 Pick'em"
                     width={250}
                     height={250}
-                  />
+                  /> */}
                 </div>
               </div>
             </CardContent>

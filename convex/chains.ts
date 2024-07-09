@@ -9,6 +9,28 @@ import {
 } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 
+export const updateChain = internalMutation({
+  args: { chainId: v.id("chains"), chain: v.number() },
+  handler: async (ctx, { chainId, chain }) => {
+    await ctx.db.patch(chainId, { chain });
+  },
+});
+
+export const deactivateAllChains = internalMutation({
+  args: {
+    campaignId: v.id("campaigns"),
+  },
+  handler: async (ctx, { campaignId }) => {
+    const chains = await ctx.db
+      .query("chains")
+      .filter((q) => q.eq(q.field("campaignId"), campaignId))
+      .collect();
+    for (const chain of chains) {
+      await ctx.db.patch(chain._id, { active: false });
+    }
+  },
+});
+
 export const getChainsByCampaignId = internalQuery({
   args: { campaignId: v.id("campaigns") },
   handler: async (ctx, { campaignId }) => {
