@@ -54,6 +54,7 @@ const AdminDashboardWrapper = ({ children }: { children: React.ReactNode }) => {
     isDashboardActive,
     isSettingsActive,
     isMatchupsActive,
+    isUsersActive,
     isMessagesActive,
     breadcrumb,
   } = useAdminNavigation();
@@ -125,21 +126,26 @@ const AdminDashboardWrapper = ({ children }: { children: React.ReactNode }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  href="/admin/users"
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
+                    isUsersActive
+                      ? "text-accent-foreground bg-accent"
+                      : "text-muted-foreground"
+                  )}
                 >
-                  <Trophy className="h-5 w-5" />
-                  <span className="sr-only">Leaderboards</span>
+                  <Users2 className="h-5 w-5" />
+                  <span className="sr-only">Users</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Leaderboards</TooltipContent>
+              <TooltipContent side="right">Users</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
+                  href="/admin/users"
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <LineChart className="h-5 w-5" />
@@ -205,7 +211,7 @@ const AdminDashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                     Admin Dashboard
                   </Link>
                   <Link
-                    href="/play"
+                    href="/admin/matchups"
                     className={cn(
                       "flex items-center gap-4 px-2.5 hover:text-foreground",
                       isMatchupsActive
@@ -224,11 +230,11 @@ const AdminDashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                     Picks
                   </Link>
                   <Link
-                    href="#"
+                    href="/admin/users"
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                   >
-                    <Trophy className="h-5 w-5" />
-                    Leaderboards
+                    <Users2 className="h-5 w-5" />
+                    Users
                   </Link>
 
                   <Link

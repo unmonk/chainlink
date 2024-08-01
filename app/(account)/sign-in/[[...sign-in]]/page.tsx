@@ -7,6 +7,8 @@ export default function Page() {
         <SignIn
           path="/sign-in"
           signUpUrl="/sign-up"
+          afterSignOutUrl={"/"}
+          fallbackRedirectUrl={"/dashboard"}
           appearance={{
             variables: {
               colorPrimary: "#12a150",

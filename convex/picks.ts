@@ -57,10 +57,13 @@ export const handlePickWin = internalMutation({
 
     //Reward User
     const reward = matchupReward(matchup.cost, matchup.featured);
-    user.coins += reward;
-    chain.cost += reward;
+    await ctx.scheduler.runAfter(0, api.users.addCoins, {
+      userId: user._id,
+      transactionType: "PICK",
+      amount: reward,
+    });
 
-    console.log(`user: ${user.name} won ${reward} coins`);
+    chain.cost += reward;
 
     //Record Pick
     pick.status = "WIN";
@@ -71,6 +74,13 @@ export const handlePickWin = internalMutation({
     await ctx.db.patch(chain._id, chain);
     await ctx.db.patch(user._id, user);
     await ctx.db.patch(pick._id, pick);
+
+    //schedule achievements
+    // await ctx.scheduler.runAfter(0, api.achievements.checkAchievements, {
+    //   user: user,
+    //   pick: pick,
+    //   chain: chain,
+    // });
   },
 });
 
@@ -122,10 +132,13 @@ export const handlePickLoss = internalMutation({
     console.log(`user: ${user.name} lost pick: ${pick.pick.name}`);
 
     //Deduct User
-    user.coins -= matchup.cost;
-    chain.cost -= matchup.cost;
+    await ctx.scheduler.runAfter(0, api.users.subtractCoins, {
+      userId: user._id,
+      transactionType: "PICK",
+      amount: matchup.cost,
+    });
 
-    console.log(`user: ${user.name} lost ${matchup.cost} coins`);
+    chain.cost -= matchup.cost;
 
     //Record Pick
     pick.status = "LOSS";
@@ -248,6 +261,23 @@ export const getUserActivePickWithMatchup = query({
     }
 
     return { pick, matchup };
+  },
+});
+
+export const getUserPicks = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) {
+      return null;
+    }
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_externalId", (q) => q.eq("externalId", user.subject))
+      .order("desc")
+      .take(50);
+
+    return picks;
   },
 });
 

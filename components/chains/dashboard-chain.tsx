@@ -19,7 +19,7 @@ export const DashboardChain = () => {
   const chain = useQuery(api.chains.getUserActiveChain, {});
 
   return (
-    <Card className="">
+    <Card className="flex flex-col">
       <CardHeader className="pb-2">
         <CardTitle>My Chain</CardTitle>
         <CardDescription className="text-xs text-muted-foreground whitespace-nowrap">
@@ -30,71 +30,76 @@ export const DashboardChain = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center py-4 flex-grow">
-        {isAuthenticated && chain && (
-          <Badge
-            className={cn(
-              "mb-2 px-3 py-1 text-white font-bold rounded-full",
-              streakColorBackground(chain.chain)
-            )}
-            variant="secondary"
-          >
-            {streakLetter(chain.chain)}
-            {Math.abs(chain.chain)}
-          </Badge>
-        )}
-        {!isAuthenticated && (
-          <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
-        )}
-        <CardDescription className="text-xs text-muted-foreground">
-          Current Chain
-        </CardDescription>
-        {isAuthenticated && chain && (
-          <Badge
-            className={cn(
-              "mb-2 px-3 py-1 text-white font-bold rounded-full mt-2",
-              streakColorBackground(chain.best)
-            )}
-            variant="secondary"
-          >
-            {streakLetter(chain.best)}
-            {Math.abs(chain.best)}
-          </Badge>
-        )}
-        {!isAuthenticated && (
-          <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
-        )}
-        <CardDescription className="text-xs text-muted-foreground">
-          Best Chain
-        </CardDescription>
+        <div className="mt-auto flex flex-col items-center">
+          {isAuthenticated && chain && (
+            <Badge
+              className={cn(
+                "mb-2 px-3 py-1 text-white font-bold rounded-full",
+                streakColorBackground(chain.chain)
+              )}
+              variant="secondary"
+            >
+              {streakLetter(chain.chain)}
+              {Math.abs(chain.chain)}
+            </Badge>
+          )}
+          {!isAuthenticated && (
+            <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
+          )}
+          <CardDescription className="text-xs text-muted-foreground">
+            Current Chain
+          </CardDescription>
+        </div>
+        <div className="mt-auto flex flex-col items-center">
+          {isAuthenticated && chain && (
+            <Badge
+              className={cn(
+                "mb-2 px-3 py-1 text-white font-bold rounded-full",
+                streakColorBackground(chain.best)
+              )}
+              variant="secondary"
+            >
+              {streakLetter(chain.best)}
+              {Math.abs(chain.best)}
+            </Badge>
+          )}
+          {!isAuthenticated && (
+            <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
+          )}
+          <CardDescription className="text-xs text-muted-foreground mt-auto">
+            Best Chain
+          </CardDescription>
+        </div>
+        <div className="mt-auto flex flex-row flex-nowrap">
+          {isAuthenticated && chain && (
+            <Badge className="border border-input bg-background  text-foreground text-nowrap">
+              W: {chain.wins}
+            </Badge>
+          )}
+          {!isAuthenticated && (
+            <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
+          )}
+          -
+          {isAuthenticated && chain && (
+            <Badge className="border border-input bg-background  text-foreground text-nowrap">
+              L: {chain.losses}
+            </Badge>
+          )}
+          {!isAuthenticated && (
+            <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
+          )}
+          -
+          {isAuthenticated && chain && (
+            <Badge className="border border-input bg-background text-foreground text-nowrap">
+              P: {chain.pushes}
+            </Badge>
+          )}
+          {!isAuthenticated && (
+            <Skeleton className="h-8 w-16 inline-flex bg-background  items-center rounded-full border px-2.5 py-0.5" />
+          )}
+        </div>
       </CardContent>
-      <CardFooter className="flex justify-center px-2 py-2 bg-accent rounded-b-lg flex-nowrap gap-1 ">
-        {isAuthenticated && chain && (
-          <Badge className="border border-input bg-background  text-foreground text-nowrap">
-            {chain.wins}
-          </Badge>
-        )}
-        {!isAuthenticated && (
-          <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
-        )}
-        -
-        {isAuthenticated && chain && (
-          <Badge className="border border-input bg-background  text-foreground text-nowrap">
-            {chain.losses}
-          </Badge>
-        )}
-        {!isAuthenticated && (
-          <Skeleton className="h-8 w-16 inline-flex bg-background items-center rounded-full border px-2.5 py-0.5" />
-        )}
-        -
-        {isAuthenticated && chain && (
-          <Badge className="border border-input bg-background text-foreground text-nowrap">
-            {chain.pushes}
-          </Badge>
-        )}
-        {!isAuthenticated && (
-          <Skeleton className="h-8 w-16 inline-flex bg-background  items-center rounded-full border px-2.5 py-0.5" />
-        )}
-      </CardFooter>
+      {/* <CardFooter className="flex justify-center px-2 py-2 bg-accent rounded-b-lg flex-nowrap gap-1 "></CardFooter> */}
     </Card>
   );
 };

@@ -6,7 +6,7 @@ import { BellRingIcon } from "lucide-react";
 
 export default function Page() {
   return (
-    <main>
+    <main className="flex flex-col items-center">
       <UserProfile path="/settings" routing="path">
         <UserProfile.Page
           label="Notifications"

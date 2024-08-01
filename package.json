@@ -50,6 +50,8 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.51.3",
     "react-icons": "^5.0.1",
+    "react-twitter-widgets": "^1.11.0",
+    "recharts": "^2.12.7",
     "slugify": "^1.6.6",
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.2.2",

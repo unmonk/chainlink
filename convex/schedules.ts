@@ -370,7 +370,7 @@ export const updateScheduledMatchup = internalMutation({
 function getScheduleEndpoint(league: League) {
   switch (league) {
     case "NFL":
-      return `http://cdn.espn.com/core/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
+      return `http://cdn.espn.com/core/nfl/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
     case "NBA":
       return `http://cdn.espn.com/core/nba/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
     case "NHL":

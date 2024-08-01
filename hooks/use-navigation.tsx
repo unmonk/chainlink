@@ -15,6 +15,8 @@ const useNavigation = () => {
   const [isPlayActive, setIsPlayActive] = useState(false);
   const [isSettingsActive, setIsSettingsActive] = useState(false);
   const [isMessagesActive, setIsMessagesActive] = useState(false);
+  const [isPicksActive, setIsPicksActive] = useState(false);
+  const [isLeaderboardsActive, setIsLeaderboardsActive] = useState(false);
 
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbStore[]>([]);
 
@@ -23,6 +25,8 @@ const useNavigation = () => {
     setIsSettingsActive(false);
     setIsPlayActive(false);
     setIsMessagesActive(false);
+    setIsPicksActive(false);
+    setIsLeaderboardsActive(false);
 
     switch (pathname) {
       case "/dashboard":
@@ -37,13 +41,14 @@ const useNavigation = () => {
         ]);
         break;
       case "/picks":
+        setIsPicksActive(true);
         setBreadcrumb([
           { label: "Dashboard", href: "/dashboard" },
           { label: "Picks", href: "/picks" },
         ]);
         break;
       case "/leaderboards":
-        setIsMessagesActive(true);
+        setIsLeaderboardsActive(true);
         setBreadcrumb([
           { label: "Dashboard", href: "/dashboard" },
           { label: "Leaderboards", href: "/leaderboards" },
@@ -67,7 +72,9 @@ const useNavigation = () => {
     isDashboardActive,
     isSettingsActive,
     isPlayActive,
+    isPicksActive,
     isMessagesActive,
+    isLeaderboardsActive,
     breadcrumb,
   };
 };

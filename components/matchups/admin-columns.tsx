@@ -1,7 +1,7 @@
 "use client";
 
 import { Doc } from "@/convex/_generated/dataModel";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { Badge } from "../ui/badge";
 import { leagueLogos } from "@/convex/utils";
 import Image from "next/image";
@@ -15,60 +15,26 @@ import {
 } from "../ui/dropdown-menu";
 import { MoreHorizontal, MoreVertical } from "lucide-react";
 import { Button } from "../ui/button";
-import { Select } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { patchFeatured } from "@/convex/matchups";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import { EditMatchupForm } from "./edit-matchup";
 
 type MatchupWithPicks = Doc<"matchups"> & { picks: Doc<"picks">[] };
 
 export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
   {
-    id: "actions",
+    id: "edit",
     cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-4 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            {row.original.status !== "STATUS_SCHEDULED" &&
-              row.original.status !== "STATUS_FINAL" &&
-              row.original.status !== "STATUS_FULLTIME" &&
-              row.original.status !== "STATUS_POSTPONED" && (
-                <DropdownMenuItem
-                  onClick={() => console.log("Copy payment ID")}
-                >
-                  Complete Matchup
-                </DropdownMenuItem>
-              )}
-            {row.original.status === "STATUS_SCHEDULED" && (
-              <DropdownMenuItem className="text-primary">
-                {row.original.featured
-                  ? "Disable ChainBuilder"
-                  : "Enable ChainBuilder"}
-              </DropdownMenuItem>
-            )}
-            {row.original.status === "STATUS_SCHEDULED" && (
-              <DropdownMenuItem>
-                {row.original.active ? "Set Inactive" : "Set Active"}
-              </DropdownMenuItem>
-            )}
-            {row.original.status === "STATUS_SCHEDULED" && (
-              <DropdownMenuItem>Edit Matchup</DropdownMenuItem>
-            )}
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={() => console.log("Copy payment ID")}
-            >
-              Delete Matchup and Picks
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <EditMatchupForm row={row.original} />;
     },
   },
   {
@@ -97,11 +63,7 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
     accessorKey: "active",
     header: "Active",
     cell: ({ row }) => {
-      return (
-        <Badge className={row.original.active ? "bg-green-500" : "bg-red-500"}>
-          {row.original.active ? "Active" : "Inactive"}
-        </Badge>
-      );
+      return <ActiveSelect row={row} />;
     },
   },
   {
@@ -122,14 +84,12 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
           case "STATUS_SUSPENDED":
           case "STATUS_RAIN_DELAY":
           case "STATUS_DELAY":
-            return (
-              <Badge className="bg-yellow-600 hover:bg-inherit">{status}</Badge>
-            );
+            return <Badge className="bg-yellow-600">{status}</Badge>;
           case "STATUS_FINAL":
           case "STATUS_FULL_TIME":
-            return <Badge className="bg-red-500  hover:">{status}</Badge>;
+            return <Badge className="bg-red-500 ">FINAL</Badge>;
           case "STATUS_SCHEDULED":
-            return <Badge className="bg-teal-400">{status}</Badge>;
+            return <Badge className="bg-teal-400">SCHEDULED</Badge>;
           default:
             return <Badge variant="outline">{status}</Badge>;
         }
@@ -180,19 +140,7 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
     accessorKey: "featured",
     header: "ChainBuilder",
     cell: ({ row }) => {
-      return (
-        <Select
-          value={
-            row.original.featured &&
-            row.original.featuredType === "CHAINBUILDER"
-              ? "Enabled"
-              : "Disabled"
-          }
-        >
-          <option value="Enabled">Enabled</option>
-          <option value="Disabled">Disabled</option>
-        </Select>
-      );
+      return <ChainBuilderSelect row={row} />;
     },
   },
   {
@@ -243,3 +191,144 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
     },
   },
 ];
+
+const ChainBuilderSelect: React.FC<{ row: Row<MatchupWithPicks> }> = ({
+  row,
+}) => {
+  const mutateChainBuilder = useMutation(api.matchups.patchFeatured);
+
+  const onChainBuilderValueChange = async (
+    value: string,
+    row: Row<MatchupWithPicks>
+  ) => {
+    if (value === "enabled") {
+      await mutateChainBuilder({
+        featured: true,
+        matchupId: row.original._id,
+        featuredType: "CHAINBUILDER",
+      });
+    }
+    if (value === "disabled") {
+      await mutateChainBuilder({
+        featured: false,
+        matchupId: row.original._id,
+        featuredType: "CHAINBUILDER",
+      });
+    }
+  };
+
+  return (
+    <Select
+      onValueChange={(value) => {
+        onChainBuilderValueChange(value, row);
+      }}
+    >
+      <SelectTrigger
+        className={
+          row.original.featured && row.original.featuredType === "CHAINBUILDER"
+            ? "border-green-500 border-2"
+            : ""
+        }
+      >
+        <SelectValue
+          placeholder={
+            row.original.featured &&
+            row.original.featuredType === "CHAINBUILDER"
+              ? "Enabled"
+              : "Disabled"
+          }
+        />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="enabled">Enabled</SelectItem>
+        <SelectItem value="disabled">Disabled</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+};
+
+const ActiveSelect: React.FC<{ row: Row<MatchupWithPicks> }> = ({ row }) => {
+  const mutateActive = useMutation(api.matchups.patchActive);
+
+  const onActiveSelectChange = async (
+    value: string,
+    row: Row<MatchupWithPicks>
+  ) => {
+    if (value === "active") {
+      await mutateActive({
+        active: true,
+        matchupId: row.original._id,
+      });
+    }
+    if (value === "inactive") {
+      await mutateActive({
+        active: false,
+        matchupId: row.original._id,
+      });
+    }
+  };
+
+  return (
+    <Select
+      onValueChange={(value) => {
+        onActiveSelectChange(value, row);
+      }}
+    >
+      <SelectTrigger
+        className={row.original.active ? "" : "border-red-500 border-2"}
+      >
+        <SelectValue
+          placeholder={row.original.active ? "Active" : "Inactive"}
+        />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="active">Active</SelectItem>
+        <SelectItem value="inactive">Inactive</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+};
+
+const MatchupActions: React.FC<{ row: Row<MatchupWithPicks> }> = ({ row }) => {
+  const mutateActive = useMutation(api.matchups.patchActive);
+  const toggleActive = async () => {
+    await mutateActive({
+      active: !row.original.active,
+      matchupId: row.original._id,
+    });
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-4 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        {row.original.status !== "STATUS_SCHEDULED" &&
+          row.original.status !== "STATUS_FINAL" &&
+          row.original.status !== "STATUS_FULLTIME" &&
+          row.original.status !== "STATUS_POSTPONED" && (
+            <DropdownMenuItem onClick={() => console.log("Copy payment ID")}>
+              Complete Matchup
+            </DropdownMenuItem>
+          )}
+        {row.original.status === "STATUS_SCHEDULED" && (
+          <DropdownMenuItem onClick={toggleActive}>
+            {row.original.active ? "Set Inactive" : "Set Active"}
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-destructive"
+          onClick={() => console.log("Copy payment ID")}
+        >
+          Delete Matchup and Picks
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};

@@ -12,6 +12,7 @@ import { Progress } from "../ui/progress";
 import useStoreChain from "@/hooks/use-active-chain";
 import { api } from "@/convex/_generated/api";
 import { Skeleton } from "../ui/skeleton";
+import { CoinHistoryChart } from "./coin-history-chart";
 
 const DashboardCoins = () => {
   const coins = useQuery(api.users.getCoins, {});
@@ -22,6 +23,7 @@ const DashboardCoins = () => {
       <CardHeader className="pb-2 flex-grow">
         <CardTitle>Link Balance</CardTitle>
       </CardHeader>
+      <CoinHistoryChart />
       {!chain && !coins && (
         <CardContent className="mb-2">
           <Skeleton className="h-8 w-16 m-0.5" />
@@ -29,7 +31,7 @@ const DashboardCoins = () => {
         </CardContent>
       )}
       {chain && coins && (
-        <CardContent className="mb-2">
+        <CardContent className="mb-2 py-2">
           <CardTitle className="md:text-2xl text-xl text-cyan-600 text-nowrap">
             🔗 {coins?.toLocaleString("en-US")}
           </CardTitle>

@@ -1,5 +1,5 @@
 import { internalAction, internalMutation, query } from "./_generated/server";
-import { Doc } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 import { api, internal } from "./_generated/api";
 import { v } from "convex/values";
 
@@ -62,7 +62,29 @@ export const createMonthlyCampaign = internalAction({
     });
 
     //todo notifications
-    //todo achievements
+
+    //award highest chain winner
+    const MONTHLYCHAINWINACHIEVEMENTID =
+      process.env.MONTHLYCHAINWINACHIEVEMENTID;
+
+    if (!MONTHLYCHAINWINACHIEVEMENTID) {
+      throw new Error("No Monthly Chain Win Achievement ID found");
+    }
+    await ctx.scheduler.runAfter(0, api.achievements.awardAchievement, {
+      userId: highestChain.userId,
+      achievementId: MONTHLYCHAINWINACHIEVEMENTID as Id<"achievements">,
+    });
+
+    //award highest win winner
+    const MONTHLYWINACHIEVEMENTID = process.env.MONTHLYWINACHIEVEMENTID;
+    if (!MONTHLYWINACHIEVEMENTID) {
+      throw new Error("No Monthly Win Achievement ID found");
+    }
+
+    await ctx.scheduler.runAfter(0, api.achievements.awardAchievement, {
+      userId: highestWin.userId,
+      achievementId: MONTHLYWINACHIEVEMENTID as Id<"achievements">,
+    });
 
     //create a new global campaign
     const date = new Date();

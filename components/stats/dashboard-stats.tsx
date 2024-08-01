@@ -11,9 +11,38 @@ import { leagueLogos } from "@/convex/utils";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
+import { LeagueRadarChart } from "./league-radar-chart";
+import { MonthlyStatsChart } from "./monthly-stats-chart";
 
 const DashboardStats = () => {
   const user = useQuery(api.users.currentUser, {});
+
+  //create an array of the leagues in this format [{league: "NFL", wins: 186, losses: 80}]
+  const leagueChartData: { league: string; wins: number; losses: number }[] =
+    [];
+  if (user?.stats.statsByLeague) {
+    Object.keys(user?.stats.statsByLeague).map((league) => {
+      if (!user?.stats.statsByLeague[league]) return;
+      leagueChartData.push({
+        league: league,
+        wins: user?.stats.statsByLeague[league].wins,
+        losses: user?.stats.statsByLeague[league].losses,
+      });
+    });
+  }
+
+  const monthlyChartData: { month: string; wins: number; losses: number }[] =
+    [];
+  if (user?.monthlyStats) {
+    Object.keys(user?.monthlyStats).map((month) => {
+      if (!user?.monthlyStats[month]) return;
+      monthlyChartData.push({
+        month: month,
+        wins: user?.monthlyStats[month].wins,
+        losses: user?.monthlyStats[month].losses,
+      });
+    });
+  }
 
   return (
     <Card>
@@ -46,6 +75,10 @@ const DashboardStats = () => {
             {user.stats.pushes} Pushes
           </Badge>
         )}
+      </CardContent>
+      <CardContent className="grid gap-2 grid-cols-1 md:grid-cols-2">
+        <LeagueRadarChart leagueData={leagueChartData} />
+        <MonthlyStatsChart monthlyData={monthlyChartData} />
       </CardContent>
       <CardContent>
         <h3 className="text-lg mt-2">Stats By League</h3>

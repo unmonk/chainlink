@@ -59,6 +59,7 @@ export const transaction_type = v.union(
   v.literal("REFERRAL"),
   v.literal("BONUS"),
   v.literal("GIFT"),
+  v.literal("ACHIEVEMENT"),
   v.literal("PAYOUT")
 );
 export const trasaction_status = v.union(
@@ -137,7 +138,8 @@ export default defineSchema({
   })
     .index("by_matchupId", ["matchupId"])
     .index("by_userId", ["userId"])
-    .index("by_active_externalId", ["active", "externalId"]),
+    .index("by_active_externalId", ["active", "externalId"])
+    .index("by_externalId", ["externalId"]),
 
   squads: defineTable({
     name: v.string(),
@@ -213,7 +215,8 @@ export default defineSchema({
     cost: v.number(),
   })
     .index("by_userId", ["userId"])
-    .index("by_active_userId", ["active", "userId"]),
+    .index("by_active_userId", ["active", "userId"])
+    .index("by_active", ["active"]),
 
   users: defineTable({
     email: v.string(),
@@ -233,6 +236,8 @@ export default defineSchema({
       pushes: v.number(),
       statsByLeague: v.any(),
     }),
+    monthlyStats: v.optional(v.any()),
+    coinStats: v.optional(v.any()),
     friends: v.array(v.id("users")),
     squadId: v.optional(v.id("squads")),
     squads: v.array(v.id("squads")),
@@ -240,6 +245,7 @@ export default defineSchema({
     role: user_role,
     status: v.union(v.literal("ACTIVE"), v.literal("INACTIVE")),
     metadata: v.optional(v.object({})),
+    settings: v.optional(v.object({})),
   })
     .index("by_token", ["tokenIdentifier"])
     .index("by_clerk_id", ["externalId"]),

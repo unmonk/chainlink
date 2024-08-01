@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 import { QueryCtx, mutation, query } from "./_generated/server";
+import { transaction_type } from "./schema";
 
 /**
  * Insert or update the user in a Convex table then return the document's ID.
@@ -62,6 +63,7 @@ export const store = mutation({
         pushes: 0,
         statsByLeague: {},
       },
+      monthlyStats: {},
       achievements: [],
       friends: [],
       squads: [],
@@ -102,20 +104,34 @@ export const getCoins = query({
 });
 
 export const addCoins = mutation({
-  args: { amount: v.number() },
-  handler: async (ctx, { amount }) => {
-    const user = await getCurrentUser(ctx);
+  args: {
+    amount: v.number(),
+    transactionType: transaction_type,
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { amount, transactionType, userId }) => {
+    const user = await ctx.db.get(userId);
     if (user === null) {
       throw new Error("USER_NOT_FOUND");
     }
     await ctx.db.patch(user._id, { coins: user.coins + amount });
+    await ctx.db.insert("coinTransactions", {
+      userId: user._id,
+      amount,
+      type: transactionType,
+      status: "COMPLETE",
+    });
   },
 });
 
 export const subtractCoins = mutation({
-  args: { amount: v.number() },
-  handler: async (ctx, { amount }) => {
-    const user = await getCurrentUser(ctx);
+  args: {
+    amount: v.number(),
+    transactionType: transaction_type,
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { amount, transactionType, userId }) => {
+    const user = await ctx.db.get(userId);
     if (user === null) {
       throw new Error("USER_NOT_FOUND");
     }
@@ -123,5 +139,11 @@ export const subtractCoins = mutation({
       throw new Error("INSUFFICIENT_FUNDS");
     }
     await ctx.db.patch(user._id, { coins: user.coins - amount });
+    await ctx.db.insert("coinTransactions", {
+      userId: user._id,
+      amount,
+      type: transactionType,
+      status: "COMPLETE",
+    });
   },
 });

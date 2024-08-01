@@ -9,6 +9,7 @@ import { v } from "convex/values";
 import { matchupReward } from "./utils";
 import { internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
+import { featured_type } from "./schema";
 
 export const getHomepageMatchups = query({
   args: {},
@@ -275,9 +276,16 @@ export const handleMatchupFinished = internalMutation({
 });
 
 export const patchFeatured = mutation({
-  args: { matchupId: v.id("matchups"), featured: v.boolean() },
+  args: {
+    matchupId: v.id("matchups"),
+    featured: v.boolean(),
+    featuredType: featured_type,
+  },
   handler: async (ctx, { matchupId, featured }) => {
-    await ctx.db.patch(matchupId, { featured });
+    const res = await ctx.db.patch(matchupId, {
+      featured,
+      featuredType: "CHAINBUILDER",
+    });
   },
 });
 

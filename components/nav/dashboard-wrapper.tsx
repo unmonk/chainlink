@@ -52,7 +52,9 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
     isDashboardActive,
     isSettingsActive,
     isPlayActive,
+    isPicksActive,
     isMessagesActive,
+    isLeaderboardsActive,
   } = useNavigation();
 
   const userStore = useStoreUserEffect();
@@ -111,8 +113,13 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  href="/picks"
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
+                    isPicksActive
+                      ? "text-accent-foreground bg-accent"
+                      : "text-muted-foreground"
+                  )}
                 >
                   <Ticket className="h-5 w-5" />
                   <span className="sr-only">Picks</span>
@@ -125,8 +132,13 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                  href="/leaderboards"
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8",
+                    isLeaderboardsActive
+                      ? "text-accent-foreground bg-accent"
+                      : "text-muted-foreground"
+                  )}
                 >
                   <Trophy className="h-5 w-5" />
                   <span className="sr-only">Leaderboards</span>
@@ -231,14 +243,19 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                     Play
                   </Link>
                   <Link
-                    href="#"
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    href="/picks"
+                    className={cn(
+                      "flex items-center gap-4 px-2.5 hover:text-foreground",
+                      isPicksActive
+                        ? "text-foreground"
+                        : "text-muted-foreground"
+                    )}
                   >
                     <Ticket className="h-5 w-5" />
                     Picks
                   </Link>
                   <Link
-                    href="#"
+                    href="/leaderboards"
                     className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                   >
                     <Trophy className="h-5 w-5" />
@@ -294,6 +311,26 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
                   <BreadcrumbItem>
                     <BreadcrumbLink asChild>
                       <Link href="/play">Play</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                </>
+              )}
+              {isPicksActive && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link href="/picks">Picks</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                </>
+              )}
+              {isLeaderboardsActive && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link href="/leaderboards">Leaderboards</Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                 </>

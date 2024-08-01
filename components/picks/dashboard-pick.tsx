@@ -14,6 +14,7 @@ import { formatDistance } from "date-fns";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { CalendarRange, CircleArrowOutUpRightIcon } from "lucide-react";
+import { matchupReward } from "@/convex/utils";
 
 const DashboardActivePick = () => {
   const pick = useQuery(api.picks.getUserActivePickWithMatchup, {});
@@ -130,6 +131,13 @@ const DashboardActivePick = () => {
             ) : (
               pick.matchup.status
             )}
+          </Badge>
+          <Badge className="text-xs" variant="outline">
+            <span className="text-red-500">- {pick.matchup.cost} </span>
+            <span className="mx-1">🔗</span>
+            <span className="text-blue-500">
+              + {matchupReward(pick.matchup.cost, pick.matchup.featured)}
+            </span>
           </Badge>
         </div>
       </CardContent>

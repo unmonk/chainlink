@@ -15,6 +15,7 @@ const useAdminNavigation = () => {
   const [isMatchupsActive, setIsMatchupsActive] = useState(false);
   const [isSettingsActive, setIsSettingsActive] = useState(false);
   const [isMessagesActive, setIsMessagesActive] = useState(false);
+  const [isUsersActive, setIsUsersActive] = useState(false);
 
   const [breadcrumb, setBreadcrumb] = useState<BreadcrumbStore[]>([]);
 
@@ -23,6 +24,7 @@ const useAdminNavigation = () => {
     setIsSettingsActive(false);
     setIsMatchupsActive(false);
     setIsMessagesActive(false);
+    setIsUsersActive(false);
 
     switch (pathname) {
       case "/admin":
@@ -36,10 +38,17 @@ const useAdminNavigation = () => {
           { label: "Matchups", href: "/admin/matchups" },
         ]);
         break;
+      case "/admin/users":
+        setIsUsersActive(true);
+        setBreadcrumb([
+          { label: "Admin", href: "/admin" },
+          { label: "Users", href: "/admin/users" },
+        ]);
+        break;
       case "/picks":
         setBreadcrumb([
           { label: "Admin", href: "/admin" },
-          { label: "Picks", href: "/picks" },
+          { label: "Picks", href: "/admin/picks" },
         ]);
         break;
       case "/leaderboards":
@@ -68,6 +77,7 @@ const useAdminNavigation = () => {
     isSettingsActive,
     isMatchupsActive,
     isMessagesActive,
+    isUsersActive,
     breadcrumb,
   };
 };

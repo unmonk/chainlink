@@ -22,11 +22,11 @@ export const Hero = () => {
   };
 
   return (
-    <section className="container grid lg:grid-cols-2 place-items-center py-16 md:py-24">
+    <section className="container grid lg:grid-cols-2 place-items-center pt-16 md:pt-24">
       <div className="text-center lg:text-start space-y-6">
         <main className="text-5xl md:text-6xl font-bold">
           <h1 className="inline">
-            <span className="inline bg-gradient-to-r from-[#228B22]  to-[#0FFF50] text-transparent bg-clip-text">
+            <span className="inline bg-gradient-to-r from-black  to-green-400 dark:from-white dark:to-green-700 text-transparent bg-clip-text">
               ChainLink
             </span>
           </h1>
@@ -68,7 +68,7 @@ export const Hero = () => {
       </div>
 
       {/* Hero cards sections */}
-      <div className="z-10 mr-16">
+      <div className="z-10 mr-20">
         <HeroCards />
       </div>
 
