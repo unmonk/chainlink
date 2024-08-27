@@ -218,6 +218,29 @@ export default defineSchema({
     .index("by_active_userId", ["active", "userId"])
     .index("by_active", ["active"]),
 
+  pickemGames: defineTable({
+    title: v.string(),
+    description: v.string(),
+    image: v.string(),
+    active: v.boolean(),
+    startDate: v.number(),
+    endDate: v.number(),
+    cost: v.number(),
+    reward: v.number(),
+    league: v.string(),
+
+    type: v.optional(v.string()),
+    pickSchedule: v.any(),
+  }),
+
+  pickemPicks: defineTable({
+    userId: v.id("users"),
+    gameId: v.id("pickemGames"),
+    picks: v.any(),
+  }),
+
+
+
   users: defineTable({
     email: v.string(),
     name: v.string(),
@@ -250,3 +273,4 @@ export default defineSchema({
     .index("by_token", ["tokenIdentifier"])
     .index("by_clerk_id", ["externalId"]),
 });
+

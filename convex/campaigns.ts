@@ -16,6 +16,17 @@ export const createMonthlyCampaign = internalAction({
     if (!activeGlobalCampaign) {
       throw new Error("No active global campaign found");
     }
+    const MONTHLYCHAINWINACHIEVEMENTID =
+      process.env.MONTHLYCHAINWINACHIEVEMENTID;
+
+    if (!MONTHLYCHAINWINACHIEVEMENTID) {
+      throw new Error("No Monthly Chain Win Achievement ID found");
+    }
+
+    const MONTHLYWINACHIEVEMENTID = process.env.MONTHLYWINACHIEVEMENTID;
+    if (!MONTHLYWINACHIEVEMENTID) {
+      throw new Error("No Monthly Win Achievement ID found");
+    }
 
     //get chains for the active global campaign
     const chains = await ctx.runQuery(internal.chains.getChainsByCampaignId, {
@@ -64,22 +75,13 @@ export const createMonthlyCampaign = internalAction({
     //todo notifications
 
     //award highest chain winner
-    const MONTHLYCHAINWINACHIEVEMENTID =
-      process.env.MONTHLYCHAINWINACHIEVEMENTID;
 
-    if (!MONTHLYCHAINWINACHIEVEMENTID) {
-      throw new Error("No Monthly Chain Win Achievement ID found");
-    }
     await ctx.scheduler.runAfter(0, api.achievements.awardAchievement, {
       userId: highestChain.userId,
       achievementId: MONTHLYCHAINWINACHIEVEMENTID as Id<"achievements">,
     });
 
     //award highest win winner
-    const MONTHLYWINACHIEVEMENTID = process.env.MONTHLYWINACHIEVEMENTID;
-    if (!MONTHLYWINACHIEVEMENTID) {
-      throw new Error("No Monthly Win Achievement ID found");
-    }
 
     await ctx.scheduler.runAfter(0, api.achievements.awardAchievement, {
       userId: highestWin.userId,
