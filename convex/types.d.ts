@@ -10,4 +10,13 @@ export type League =
   | "WBB"
   | "WNBA"
   | "MLS"
+  | "PLL"
+  | "NWSL"
+  | "EPL"
+  | "RPL"
+  | "ARG"
+  | "TUR"
+  | "CSL"
+  | "NBAG"
+  | "FRIENDLY"
   | "UFL";

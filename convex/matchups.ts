@@ -55,7 +55,7 @@ export const getActiveMatchups = query({
   handler: async (ctx) => {
     const currentTime = new Date().getTime();
     const minus6Hours = currentTime - 6 * 60 * 60 * 1000;
-    const plus18Hours = currentTime + 18 * 60 * 60 * 1000;
+    const plus18Hours = currentTime + 48 * 60 * 60 * 1000;
     const matchups = await ctx.db
       .query("matchups")
       .withIndex("by_active_dates", (q) =>

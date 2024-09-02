@@ -153,6 +153,16 @@ export const scoreboards = internalAction({
           console.log(`${league}: matchup finished for ${event.shortName}`);
         }
 
+        /////////////MATCHUP POSTPONED///////////////////////////
+        //release picks / push
+
+        /////////////MATCHUP DELAYED////////////////////////////
+        //hold
+        /////////////MATCHUP CANCELLED//////////////////////////
+        //release
+
+        //overtime
+
         /////////////MATCHUP UPDATE ONLY////////////////////////
         if (
           eventStatus &&

@@ -10,27 +10,27 @@ interface FeatureProps {
 const features: FeatureProps[] = [
   {
     icon: <Medal />,
-    title: "Make Pick",
+    title: "Make Picks",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Pick winners from all your favorite sports leagues throughout the month",
   },
   {
     icon: <Medal />,
-    title: "Await Results",
+    title: "Watch the Game",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Check in during the game for live scoring, no need to download additional score tracking apps",
   },
   {
     icon: <Medal />,
-    title: "Build Chain",
+    title: "Build Your Chain",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Chain together winning picks to beat your friends and the rest of the world",
   },
   {
     icon: <Gift />,
-    title: "Win",
+    title: "Dominate",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum quas provident cum",
+      "Show off your wins and accomplishments every month and earn the title of ChainMaster",
   },
 ];
 

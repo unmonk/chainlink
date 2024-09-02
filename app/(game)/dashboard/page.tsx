@@ -53,7 +53,7 @@ export default function Dashboard() {
           <Card className="">
             <CardHeader>
               <CardTitle className="text-xs text-muted-foreground">
-                Ads & Sponsors
+                Sponsors & Partners
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -82,7 +82,8 @@ export default function Dashboard() {
             </CardContent>
             <CardFooter>
               <CardDescription className="text-xs text-muted-foreground">
-                Interested in advertising? Contact us{" "}
+                Interested in promoting your product or app with ChainLink?
+                Contact us{" "}
                 <a
                   href="mailto:admin@chainlink.st?subject=Advertising Inquiry"
                   className="text-accent-foreground hover:underline"

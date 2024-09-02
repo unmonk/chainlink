@@ -16,19 +16,19 @@ const FAQList: FAQProps[] = [
   {
     question: "What matchups can I pick?",
     answer:
-      "Matchups are curated by our team of experts, you can pick any matchup that is available on the platform. The Play screen will show you all matchups for the next 18 hours. ",
+      "Matchups are curated by our team of experts, and you can pick any matchup that is available on the platform. The Play screen will show you all matchups for the next 48 hours across several football, soccer, baseball, and other leagues. ",
     value: "item-1",
   },
   {
-    question: "When do matchups get updated?",
+    question: "When are matchups updated?",
     answer:
-      "Matchups are checked every minute, if there has not been an update since the last time we checked, you would not see any reflected changes.",
+      "Matchups are checked every minute as long as the league is pushing scores.",
     value: "item-2",
   },
   {
     question: "What are 🔗Links?",
     answer:
-      "🔗Links are the currency or coins in the ChainLink game. You earn 🔗Links through login rewards, matchup wins, and other means.",
+      "🔗Links are our currency in the ChainLink game. You earn 🔗Links through winning matchups. Additonal ways to earn and use 🔗Links will be announced soon.",
     value: "item-3",
   },
 ];

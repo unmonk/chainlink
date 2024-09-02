@@ -69,6 +69,7 @@ export const Hero = () => {
 
       {/* Hero cards sections */}
       <div className="z-10 mr-20">
+        {" "}
         <HeroCards />
       </div>
 

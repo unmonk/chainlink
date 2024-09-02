@@ -34,19 +34,6 @@ export const LandingLeagues = () => {
       </div> */}
       <div className="flex flex-col md:flex-row">
         <LeagueBeam />
-        <div className="w-1/2 items-center justify-center p-14 rounded-lg">
-          <Timeline
-            dataSource={{
-              sourceType: "profile",
-              screenName: "ChainLink_st",
-            }}
-            options={{
-              height: "400",
-              width: "400",
-              theme: "dark",
-            }}
-          />
-        </div>
       </div>
     </section>
   );

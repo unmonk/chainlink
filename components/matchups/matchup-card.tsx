@@ -295,6 +295,8 @@ export const MatchupCardHeader = ({
               {new Date(matchup.startTime).toLocaleTimeString("en-US", {
                 hour: "numeric",
                 minute: "numeric",
+                day: "numeric",
+                month: "short",
               })}
             </p>
           ) : (

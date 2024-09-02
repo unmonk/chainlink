@@ -30,12 +30,21 @@ export const ACTIVE_LEAGUES: League[] = [
   "NBA",
   "MLB",
   "NHL",
-  //   "COLLEGE-FOOTBALL",
+  "COLLEGE-FOOTBALL",
   "MBB",
   "WBB",
   "WNBA",
   "MLS",
+  "NWSL",
+  "PLL",
+  "EPL",
   "UFL",
+  "ARG",
+  "NBAG",
+  "TUR",
+  "FRIENDLY",
+  "CSL",
+  "RPL",
 ];
 
 export const leagueLogos: {
@@ -43,14 +52,26 @@ export const leagueLogos: {
 } = {
   NFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nfl.png?w=100&h=100&transparent=true",
   NBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png?w=100&h=100&transparent=true",
+  NBAG: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png?w=100&h=100&transparent=true",
+
   MLB: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mlb.png?w=100&h=100&transparent=true",
   NHL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nhl.png?w=100&h=100&transparent=true",
-  // "COLLEGE-FOOTBALL":
-  //   "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-football-college.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
+  "COLLEGE-FOOTBALL":
+    "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-football-college.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
   MBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
   WBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
   WNBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/wnba.png?w=100&h=100&transparent=true",
   MLS: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mls.png?w=100&h=100&transparent=true",
+  NWSL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+  ARG: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+  CSL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+  FRIENDLY:
+    "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+  TUR: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+
+  RPL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+  PLL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pll.png&w=100&h=100&transparent=true",
+  EPL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
   UFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/ufl.png?w=100&h=100&transparent=true",
 };
 
@@ -66,7 +87,16 @@ export const leagueNames: {
   WBB: "Women's College Basketball",
   WNBA: "WNBA",
   MLS: "MLS",
+  NWSL: "National Womans Soccer League",
+  PLL: "Premier Lacross League",
+  EPL: "Premier League",
   UFL: "UFL",
+  RPL: "Russian Premier League",
+  ARG: "Argentine Liga Profesional",
+  CSL: "Chinese Super League",
+  NBAG: "G League",
+  FRIENDLY: "Intertional Friendly",
+  TUR: "Turkish Super Lig",
 };
 
 export const STATS_BY_LEAGUE = {
@@ -91,7 +121,16 @@ export const STATS_BY_LEAGUE = {
   WBB: false,
   WNBA: false,
   MLS: false,
+  NWSL: false,
+  EPL: false,
+  PLL: false,
   UFL: false,
+  ARG: false,
+  NBAG: false,
+  FRIENDLY: false,
+  TUR: false,
+  CSL: false,
+  RPL: false,
 };
 
 export function getHawaiiTime() {
