@@ -122,7 +122,8 @@ export const scoreboards = internalAction({
         if (
           (matchup.status === "STATUS_IN_PROGRESS" ||
             matchup.status === "STATUS_END_PERIOD" ||
-            matchup.status === "STATUS_SECOND_HALF") &&
+            matchup.status === "STATUS_SECOND_HALF" ||
+            matchup.status === "STATUS_SCHEDULED") &&
           (eventStatus === "STATUS_FINAL" || eventStatus === "STATUS_FULL_TIME")
         ) {
           await ctx.runMutation(internal.matchups.handleMatchupFinished, {
@@ -257,6 +258,20 @@ function getScoreboardUrl(league: League) {
       return `http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?dates=${date}&limit=${limit}`;
     case "UFL":
       return `http://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard?dates=${date}&limit=${limit}`;
+    case "ARG":
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${date}&limit=${limit}`;
+    case "CSL":
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/chn.1/scoreboard?dates=${date}&limit=${limit}`;
+    case "EPL":
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=${date}&limit=${limit}`;
+    case "NWSL":
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.nwsl/scoreboard?dates=${date}&limit=${limit}`;
+    case "FRIENDLY":
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/fifa.friendly/scoreboard?dates=${date}&limit=${limit}`;
+    case "TUR":
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/scoreboard?dates=${date}&limit=${limit}`;
+    case "RPL":
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/rus.1/scoreboard?dates=${date}&limit=${limit}`;
     default:
       throw new Error("Invalid league");
   }
