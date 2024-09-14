@@ -1,10 +1,10 @@
+"use client";
+
 import { api } from "@/convex/_generated/api";
-import { useAction, useConvexAuth, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { Skeleton } from "../ui/skeleton";
-import useStoreChain from "@/hooks/use-active-chain";
 
 export const UserChain = () => {
-  const store = useStoreChain();
   const chain = useQuery(api.chains.getUserActiveChain, {});
 
   return (

@@ -1,0 +1,47 @@
+import { SheetMenu } from "@/components/nav/sheet-menu";
+import { ThemeToggle } from "../ui/theme-toggle";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import Coins from "../coins/coins";
+import { Separator } from "../ui/separator";
+import { UserChain } from "../chains/user-chain";
+
+interface NavbarProps {
+  title: string;
+}
+
+export function Navbar({ title }: NavbarProps) {
+  return (
+    <header className="sticky top-0 z-10 w-full bg-background/95">
+      <div className="mx-4 sm:mx-8 flex h-14 items-center">
+        <div className="flex items-center space-x-4 lg:space-x-0">
+          <SheetMenu />
+          <h1 className="font-bold">{title}</h1>
+        </div>
+        <div className="flex flex-1 items-center justify-end">
+          <div className="relative ml-auto flex-initial md:grow-0">
+            <div className="flex flex-row gap-2 mr-2 items-center">
+              <Coins />
+              |
+              <UserChain />
+            </div>
+          </div>
+          <SignedIn>
+            <UserButton
+              userProfileMode="navigation"
+              userProfileUrl="/settings"
+              afterSignOutUrl="/"
+              appearance={{
+                variables: {
+                  colorPrimary: "#12a150",
+                },
+              }}
+            />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+        </div>
+      </div>
+    </header>
+  );
+}

@@ -14,9 +14,9 @@ const Coins = () => {
         </>
       )}
       {coins && (
-        <p className="text-cyan-600 text-nowrap">
+        <span className="text-cyan-600 text-nowrap">
           🔗 {coins.toLocaleString("en-US")}
-        </p>
+        </span>
       )}
     </>
   );

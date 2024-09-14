@@ -1,4 +1,5 @@
 "use client";
+import { ContentLayout } from "@/components/nav/content-layout";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { UserProfile } from "@clerk/nextjs";
@@ -6,7 +7,7 @@ import { BellRingIcon } from "lucide-react";
 
 export default function Page() {
   return (
-    <main className="flex flex-col items-center">
+    <ContentLayout title="Settings">
       <UserProfile path="/settings" routing="path">
         <UserProfile.Page
           label="Notifications"
@@ -16,7 +17,7 @@ export default function Page() {
           <NotificationsPage />
         </UserProfile.Page>
       </UserProfile>
-    </main>
+    </ContentLayout>
   );
 }
 

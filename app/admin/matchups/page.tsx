@@ -1,9 +1,10 @@
 import AdminMatchupList from "@/components/matchups/admin-matchup-list";
+import { ContentLayout } from "@/components/nav/content-layout";
 
 export default function Page() {
   return (
-    <main>
+    <ContentLayout title="Admin Matchups">
       <AdminMatchupList />
-    </main>
+    </ContentLayout>
   );
 }
