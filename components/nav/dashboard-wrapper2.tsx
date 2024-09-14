@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useStore } from "@/hooks/use-store";
 import { Sidebar } from "@/components/nav/sidebar";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
+import useStoreUserEffect from "@/hooks/use-store-user";
 
 export default function DashboardWrapper2({
   children,
@@ -11,6 +12,7 @@ export default function DashboardWrapper2({
   children: React.ReactNode;
 }) {
   const sidebar = useStore(useSidebarToggle, (state) => state);
+  const userStore = useStoreUserEffect();
 
   if (!sidebar) return null;
 
@@ -31,9 +33,7 @@ export default function DashboardWrapper2({
           sidebar?.isOpen === false ? "lg:ml-[90px]" : "lg:ml-72"
         )}
       >
-        <p className="text-sm text-muted-foreground text-center">
-          Chainlink 2024
-        </p>
+        <p className="text-xs text-muted text-center">Chainlink 2024</p>
       </footer>
     </>
   );

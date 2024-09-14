@@ -81,6 +81,18 @@ export const store = mutation({
   },
 });
 
+export const queryByClerkId = query({
+  args: {
+    clerkUserId: v.string(),
+  },
+  handler: async (ctx, { clerkUserId }) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", clerkUserId))
+      .unique();
+  },
+});
+
 export async function userQuery(ctx: QueryCtx, clerkUserId: string) {
   return await ctx.db
     .query("users")

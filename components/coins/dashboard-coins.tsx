@@ -8,8 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Progress } from "../ui/progress";
-import useStoreChain from "@/hooks/use-active-chain";
 import { api } from "@/convex/_generated/api";
 import { Skeleton } from "../ui/skeleton";
 import { CoinHistoryChart } from "./coin-history-chart";
@@ -41,9 +39,13 @@ const DashboardCoins = () => {
             🔗 {user.coins?.toLocaleString("en-US")}
           </CardTitle>
           <div className="text-xs text-muted-foreground ">
-            {coinDifference < 0 ? "-" : "+"}
-            {Math.abs(coinDifference)} this month (
-            {((coinDifference / user.coins) * 100).toFixed(2)}%)
+            {!Number.isNaN(coinDifference) && (
+              <>
+                {coinDifference < 0 ? "-" : "+"}
+                {Math.abs(coinDifference)} this month (
+                {((coinDifference / user.coins) * 100).toFixed(2)}%)
+              </>
+            )}
           </div>
         </CardContent>
       )}

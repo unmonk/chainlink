@@ -12,6 +12,7 @@ import {
   UserCheckIcon,
   ShieldAlertIcon,
   ListIcon,
+  UserRound,
 } from "lucide-react";
 
 type Submenu = {
@@ -99,6 +100,13 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: "Other",
       menus: [
+        {
+          href: "/u",
+          label: "My Profile",
+          active: pathname.includes("/u"),
+          icon: UserRound,
+          submenus: [],
+        },
         {
           href: "/settings",
           label: "Settings",

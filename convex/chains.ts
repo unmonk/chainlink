@@ -56,6 +56,9 @@ export const getUserActiveChain = query({
       )
       .unique();
 
+    if (!chain) {
+      return null;
+    }
     return chain;
   },
 });

@@ -1,11 +1,12 @@
 "use client";
 import { api } from "@/convex/_generated/api";
-import useStoreUserEffect from "@/hooks/use-store-user";
 import { useQuery } from "convex/react";
 import { Skeleton } from "../ui/skeleton";
 
 const Coins = () => {
-  const coins = useQuery(api.users.getCoins, {});
+  const user = useQuery(api.users.currentUser);
+  const coins = user?.coins;
+
   return (
     <>
       {!coins && (

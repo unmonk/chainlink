@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import useStoreChain from "@/hooks/use-active-chain";
 import { streakColor, streakLetter } from "./user-chain";
 import { Badge } from "../ui/badge";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
@@ -17,6 +16,14 @@ import { Skeleton } from "../ui/skeleton";
 export const DashboardChain = () => {
   const { isAuthenticated } = useConvexAuth();
   const chain = useQuery(api.chains.getUserActiveChain, {});
+  const createChain = useMutation(api.chains.createActiveChain);
+  if (chain === null) {
+    createChain();
+  }
+
+  if (chain === null) {
+    return <Skeleton className="h-8 w-16 m-0.5" />;
+  }
 
   return (
     <Card className="flex flex-col">
