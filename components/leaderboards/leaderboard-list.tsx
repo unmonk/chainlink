@@ -168,7 +168,7 @@ export const LeaderboardList = () => {
                     key={leaderboardData[0].user?._id}
                     className="flex flex-col items-center gap-2 p-4"
                   >
-                    <Avatar>
+                    <Avatar className="w-20 h-20">
                       <AvatarImage
                         src={leaderboardData[0].user?.image}
                         alt={leaderboardData[0].user?.name}
@@ -196,7 +196,7 @@ export const LeaderboardList = () => {
                   key={leaderboardData[1].user?._id}
                   className="flex flex-col items-center gap-1 p-2"
                 >
-                  <Avatar>
+                  <Avatar className="w-20 h-20">
                     <AvatarImage
                       src={leaderboardData[1].user?.image}
                       alt={leaderboardData[1].user?.name}
@@ -221,7 +221,7 @@ export const LeaderboardList = () => {
                   key={leaderboardData[2].user?._id}
                   className="flex flex-col items-center gap-1 p-2"
                 >
-                  <Avatar>
+                  <Avatar className="w-20 h-20">
                     <AvatarImage
                       src={leaderboardData[2].user?.image}
                       alt={leaderboardData[2].user?.name}

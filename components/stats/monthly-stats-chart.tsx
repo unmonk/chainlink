@@ -18,15 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "January", wins: 186, losses: 80 },
-  { month: "February", wins: 305, losses: 200 },
-  { month: "March", wins: 237, losses: 120 },
-  { month: "April", wins: 73, losses: 190 },
-  { month: "May", wins: 209, losses: 130 },
-  { month: "June", wins: 214, losses: 140 },
-];
-
 const chartConfig = {
   wins: {
     label: "wins",
@@ -45,7 +36,28 @@ interface MonthlyStatsChartProps {
 export const MonthlyStatsChart: React.FC<MonthlyStatsChartProps> = ({
   monthlyData,
 }) => {
-  return monthlyData.length !== 0 ? null : (
+  //change yyyyMM to month name
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const lastSixMonths = monthlyData.slice(-6).map((month) => {
+    const monthName = monthNames[parseInt(month.month.slice(4, 6)) - 1];
+    return { ...month, month: `${monthName} ${month.month.slice(0, 4)}` };
+  });
+  if (!lastSixMonths || lastSixMonths.length === 0) return null;
+
+  return (
     <Card>
       <CardHeader className="items-center pb-4">
         <CardTitle>Monthly Stats</CardTitle>
@@ -55,7 +67,7 @@ export const MonthlyStatsChart: React.FC<MonthlyStatsChartProps> = ({
         <ChartContainer config={chartConfig}>
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={lastSixMonths}
             margin={{
               left: 12,
               right: 12,
