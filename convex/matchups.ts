@@ -9,7 +9,7 @@ import { v } from "convex/values";
 import { matchupReward } from "./utils";
 import { internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
-import { featured_type } from "./schema";
+import { featured_type, matchup_type } from "./schema";
 
 export const getHomepageMatchups = query({
   args: {},
@@ -293,5 +293,47 @@ export const patchActive = mutation({
   args: { matchupId: v.id("matchups"), active: v.boolean() },
   handler: async (ctx, { matchupId, active }) => {
     await ctx.db.patch(matchupId, { active });
+  },
+});
+
+export const updateMatchup = mutation({
+  args: {
+    matchupId: v.id("matchups"),
+    title: v.string(),
+    league: v.string(),
+    type: matchup_type,
+    typeDetails: v.optional(v.string()),
+    cost: v.number(),
+    startTime: v.number(),
+    active: v.boolean(),
+    featured: v.boolean(),
+    featuredType: v.optional(featured_type),
+  },
+  handler: async (
+    ctx,
+    {
+      matchupId,
+      title,
+      league,
+      type,
+      typeDetails,
+      cost,
+      startTime,
+      active,
+      featured,
+      featuredType,
+    }
+  ) => {
+    await ctx.db.patch(matchupId, {
+      title,
+      league,
+      type,
+      typeDetails,
+      cost,
+      startTime,
+      active,
+      featured,
+      featuredType,
+    });
   },
 });

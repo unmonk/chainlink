@@ -239,8 +239,6 @@ export default defineSchema({
     picks: v.any(),
   }),
 
-
-
   users: defineTable({
     email: v.string(),
     name: v.string(),
@@ -271,6 +269,7 @@ export default defineSchema({
     settings: v.optional(v.object({})),
   })
     .index("by_token", ["tokenIdentifier"])
-    .index("by_clerk_id", ["externalId"]),
+    .index("by_clerk_id", ["externalId"])
+    .index("by_coins", ["coins"])
+    .index("by_wins", ["stats.wins"]),
 });
-

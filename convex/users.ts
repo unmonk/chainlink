@@ -1,8 +1,15 @@
 import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
-import { QueryCtx, mutation, query } from "./_generated/server";
+import {
+  QueryCtx,
+  internalAction,
+  internalMutation,
+  mutation,
+  query,
+} from "./_generated/server";
 import { transaction_type } from "./schema";
-
+import { api, internal } from "./_generated/api";
+import { formatDate } from "date-fns";
 /**
  * Insert or update the user in a Convex table then return the document's ID.
  *
@@ -145,5 +152,69 @@ export const subtractCoins = mutation({
       type: transactionType,
       status: "COMPLETE",
     });
+  },
+});
+
+export const updateUserMonthlyStats = internalMutation({
+  args: {
+    userId: v.id("users"),
+    month: v.string(),
+    monthlyStats: v.any(),
+  },
+  handler: async (ctx, { userId, month, monthlyStats }) => {
+    await ctx.db.patch(userId, { monthlyStats: { [month]: monthlyStats } });
+  },
+});
+
+export const monthlyStatsRecord = internalAction({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.runQuery(api.users.getAllUsers);
+    for (const user of users) {
+      if (!user.monthlyStats) {
+        user.monthlyStats = {};
+      }
+      const currentMonth = formatDate(new Date(), "yyyyMM");
+      const currentStats = user.monthlyStats[currentMonth] || {};
+      currentStats.wins = user.stats.wins;
+      currentStats.losses = user.stats.losses;
+      currentStats.pushes = user.stats.pushes;
+      currentStats.totalGames =
+        user.stats.wins + user.stats.losses + user.stats.pushes;
+      if (currentStats.totalGames > 0) {
+        currentStats.winRate = user.stats.wins / currentStats.totalGames;
+      }
+      if (currentStats.totalGames === 0) {
+        currentStats.winRate = 0;
+      }
+      currentStats.coins = user.coins;
+      currentStats.statsByLeague = user.stats.statsByLeague;
+
+      await ctx.runMutation(internal.users.updateUserMonthlyStats, {
+        userId: user._id,
+        month: currentMonth,
+        monthlyStats: currentStats,
+      });
+    }
+  },
+});
+
+export const getUserByCoins = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("users").withIndex("by_coins").collect();
+  },
+});
+
+export const getUserByWins = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("users").withIndex("by_wins").collect();
+  },
+});
+
+export const getAllUsers = query({
+  handler: async (ctx) => {
+    return await ctx.db.query("users").collect();
   },
 });

@@ -1,7 +1,6 @@
-"use client";
-
 import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { parse } from "date-fns";
 
 import {
   Card,
@@ -17,14 +16,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-const chartData = [
-  { month: "January", coins: 186, mobile: 80 },
-  { month: "February", coins: 305, mobile: 200 },
-  { month: "March", coins: 237, mobile: 120 },
-  { month: "April", coins: 73, mobile: 190 },
-  { month: "May", coins: 209, mobile: 130 },
-  { month: "June", coins: 214, mobile: 140 },
-];
 
 const chartConfig = {
   coins: {
@@ -33,13 +24,30 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function CoinHistoryChart() {
+export function CoinHistoryChart({
+  chartData,
+}: {
+  chartData: {
+    [month: string]: {
+      coins: number;
+    };
+  };
+}) {
+  const chartDataArray = Object.entries(chartData).map(
+    ([month, { coins }]) => ({
+      month: parse(month, "yyyyMM", new Date()).toLocaleDateString("en-US", {
+        month: "short",
+      }),
+      coins,
+    })
+  );
+
   return (
     <>
       <ChartContainer config={chartConfig}>
         <AreaChart
           accessibilityLayer
-          data={chartData}
+          data={chartDataArray}
           margin={{
             left: 12,
             right: 12,
@@ -51,7 +59,7 @@ export function CoinHistoryChart() {
             tickLine={false}
             axisLine={false}
             tickMargin={8}
-            tickFormatter={(value) => value.slice(0, 3)}
+            tickFormatter={(value) => value}
           />
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
           <defs>

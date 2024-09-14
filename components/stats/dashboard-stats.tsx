@@ -13,35 +13,67 @@ import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { LeagueRadarChart } from "./league-radar-chart";
 import { MonthlyStatsChart } from "./monthly-stats-chart";
+import { formatDate } from "date-fns";
 
 const DashboardStats = () => {
   const user = useQuery(api.users.currentUser, {});
+  const leagueChartData: {
+    league: string;
+    wins: number;
+    losses: number;
+    pushes: number;
+  }[] = [];
+  const monthlyChartData: {
+    month: string;
+    wins: number;
+    losses: number;
+    pushes: number;
+  }[] = [];
 
-  //create an array of the leagues in this format [{league: "NFL", wins: 186, losses: 80}]
-  const leagueChartData: { league: string; wins: number; losses: number }[] =
-    [];
-  if (user?.stats.statsByLeague) {
-    Object.keys(user?.stats.statsByLeague).map((league) => {
-      if (!user?.stats.statsByLeague[league]) return;
-      leagueChartData.push({
-        league: league,
-        wins: user?.stats.statsByLeague[league].wins,
-        losses: user?.stats.statsByLeague[league].losses,
-      });
-    });
-  }
-
-  const monthlyChartData: { month: string; wins: number; losses: number }[] =
-    [];
   if (user?.monthlyStats) {
-    Object.keys(user?.monthlyStats).map((month) => {
-      if (!user?.monthlyStats[month]) return;
+    // Create an object to store aggregated league stats
+    const leagueStats: Record<
+      string,
+      { wins: number; losses: number; pushes: number }
+    > = {};
+
+    Object.keys(user.monthlyStats).forEach((month) => {
+      console.log(user.monthlyStats[month], month);
+      if (!user.monthlyStats[month]) return;
+
       monthlyChartData.push({
         month: month,
-        wins: user?.monthlyStats[month].wins,
-        losses: user?.monthlyStats[month].losses,
+        wins: user.monthlyStats[month].wins,
+        losses: user.monthlyStats[month].losses,
+        pushes: user.monthlyStats[month].pushes,
       });
+
+      if (!user.monthlyStats[month].statsByLeague) return;
+
+      Object.entries(user.monthlyStats[month].statsByLeague).forEach(
+        ([league, stats]) => {
+          if (!leagueStats[league]) {
+            leagueStats[league] = { wins: 0, losses: 0, pushes: 0 };
+          }
+          if (typeof stats === "object" && stats !== null) {
+            leagueStats[league].wins +=
+              "wins" in stats ? (stats.wins as number) : 0;
+            leagueStats[league].losses +=
+              "losses" in stats ? (stats.losses as number) : 0;
+            leagueStats[league].pushes +=
+              "pushes" in stats ? (stats.pushes as number) : 0;
+          }
+        }
+      );
     });
+
+    // Convert aggregated league stats to chart data format
+    leagueChartData.push(
+      ...Object.entries(leagueStats).map(([league, stats]) => ({
+        league,
+        ...stats,
+      }))
+    );
   }
 
   return (
@@ -76,7 +108,7 @@ const DashboardStats = () => {
           </Badge>
         )}
       </CardContent>
-      <CardContent className="grid gap-2 grid-cols-1 md:grid-cols-2">
+      <CardContent className="grid gap-2 grid-cols-1">
         <LeagueRadarChart leagueData={leagueChartData} />
         <MonthlyStatsChart monthlyData={monthlyChartData} />
       </CardContent>

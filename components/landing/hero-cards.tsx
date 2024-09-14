@@ -21,11 +21,92 @@ import { Skeleton } from "../ui/skeleton";
 import { BackgroundGradient } from "../ui/background-gradient";
 
 export const HeroCards = () => {
-  const matchups = useQuery(api.matchups.getHomepageMatchups, {});
+  //const matchups = useQuery(api.matchups.getHomepageMatchups, {});
+  const matchups = [
+    {
+      active: false,
+      awayTeam: {
+        id: "7",
+        image: "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/den.png",
+        name: "Broncos",
+        score: 20,
+      },
+      cost: 0,
+      featured: false,
+      gameId: "401671664",
+      homeTeam: {
+        id: "26",
+        image: "https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/sea.png",
+        name: "Seahawks",
+        score: 26,
+      },
+      league: "NFL",
+      metadata: { network: "CBS", statusDetails: "Final" },
+      startTime: 1725825900000,
+      status: "STATUS_FINAL",
+      title: "Who will win? Broncos @ Seahawks",
+      type: "SCORE",
+      typeDetails: "GREATER_THAN",
+      updatedAt: 1725837867747,
+      winnerId: "26",
+    },
+    {
+      active: true,
+      awayTeam: {
+        id: "183",
+        image: "https://a.espncdn.com/i/teamlogos/soccer/500/183.png",
+        name: "Columbus Crew",
+        score: 0,
+      },
+      cost: 0,
+      featured: false,
+      gameId: "693007",
+      homeTeam: {
+        id: "18267",
+        image: "https://a.espncdn.com/i/teamlogos/soccer/500/18267.png",
+        name: "FC Cincinnati",
+        score: 0,
+      },
+      league: "MLS",
+      metadata: { network: "MLS Season Pass" },
+      startTime: 1726356600000,
+      status: "STATUS_SCHEDULED",
+      title: "Who will win? Columbus Crew @ FC Cincinnati",
+      type: "SCORE",
+      typeDetails: "GREATER_THAN",
+    },
+    {
+      active: false,
+      awayTeam: {
+        id: "7",
+        image: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/kc.png",
+        name: "Royals",
+        score: 5,
+      },
+      cost: 0,
+      featured: false,
+      gameId: "401570638",
+      homeTeam: {
+        id: "10",
+        image: "https://a.espncdn.com/i/teamlogos/mlb/500/scoreboard/nyy.png",
+        name: "Yankees",
+        score: 0,
+      },
+      league: "MLB",
+      metadata: { network: "MLB.TV", statusDetails: "Final" },
+      startTime: 1726009500000,
+      status: "STATUS_FINAL",
+      title: "Who will win? Royals @ Yankees",
+      type: "SCORE",
+      typeDetails: "GREATER_THAN",
+      updatedAt: 1726018827969,
+      winnerId: "7",
+    },
+  ];
 
   return (
     <div className="hidden lg:flex flex-row flex-nowrap gap-2">
-      <div className="flex flex-col w-1/2 h-full items-center justify-center gap-4">
+      <div className="hidden xl:flex flex-col w-1/2 h-full items-center justify-center gap-4">
         <Card className=" drop-shadow-xl shadow-black/10 dark:shadow-white/10 w-full">
           {!matchups && <Skeleton className="w-full h-12" />}
           <CardHeader className="flex flex-row items-center gap-4 pb-2 font-bold text-lg text-nowrap">

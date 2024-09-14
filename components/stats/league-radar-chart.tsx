@@ -58,7 +58,7 @@ export const LeagueRadarChart: React.FC<LeagueRadarChartProps> = ({
       <CardContent className="pb-0 w-full">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
+          className="mx-auto aspect-square max-h-[250px] w-full"
         >
           <RadarChart data={leagueData}>
             <ChartTooltip
