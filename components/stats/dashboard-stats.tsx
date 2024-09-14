@@ -86,8 +86,6 @@ const DashboardStats = () => {
     );
   }
 
-  console.log(monthlyChartData);
-
   return (
     <Card>
       <CardHeader>
@@ -127,44 +125,56 @@ const DashboardStats = () => {
         <MonthlyStatsChart monthlyData={monthlyChartData} />
       </CardContent>
       <CardContent>
-        <h3 className="text-lg mt-2">Stats By League</h3>
-        <div className="grid gap-2 grid-cols-4 mt-1 items-center">
-          {!user &&
-            Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-28 w-full rounded-lg " />
-            ))}
-          {user &&
-            Object.keys(user.stats.statsByLeague).map((league) => (
-              <div
-                key={league}
-                className="flex flex-col items-center rounded-lg bg-accent text-center p-1 w-full h-full"
-              >
-                <span className="sr-only">{league}</span>
-                <Image
-                  src={leagueLogos[league] ? leagueLogos[league] : "/logo.svg "}
-                  alt={league}
-                  width={50}
-                  height={50}
-                />
-                <div className="flex justify-center px-1 py-2 flex-nowrap text-xs sm:text-sm md:text-base">
-                  {/* <Badge className="bg-green-500 text-white text-nowrap">
-                    {user.stats.statsByLeague[league].wins} Wins
-                  </Badge>
-                  <Badge className="bg-red-500 text-white text-nowrap">
-                  {user.stats.statsByLeague[league].losses} Losses
-                  </Badge>
-                  <Badge className="bg-gray-500 text-white text-nowrap">
-                  {user.stats.statsByLeague[league].pushes} Pushes
-                </Badge> */}
-                  {user.stats.statsByLeague[league].wins} -{" "}
-                  {user.stats.statsByLeague[league].losses} -{" "}
-                  {user.stats.statsByLeague[league].pushes}
-                </div>
-                <p className="text-xs font-light text-muted-foreground">
-                  {league}
-                </p>
-              </div>
-            ))}
+        <div className="flex flex-col gap-2 border rounded-lg p-2">
+          <h3 className="text-2xl mt-2 text-center font-bold">
+            Stats By League
+          </h3>
+          <p className="text-sm text-muted-foreground text-center">
+            Total results by league
+          </p>
+          <div className="grid gap-2 grid-cols-4 mt-1 items-center">
+            {!user &&
+              Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-28 w-full rounded-lg " />
+              ))}
+            {user &&
+              Object.keys(user.stats.statsByLeague)
+                .sort((a, b) => {
+                  const totalA =
+                    user.stats.statsByLeague[a].wins +
+                    user.stats.statsByLeague[a].losses +
+                    user.stats.statsByLeague[a].pushes;
+                  const totalB =
+                    user.stats.statsByLeague[b].wins +
+                    user.stats.statsByLeague[b].losses +
+                    user.stats.statsByLeague[b].pushes;
+                  return totalB - totalA; // Sort in descending order
+                })
+                .map((league) => (
+                  <div
+                    key={league}
+                    className="flex flex-col items-center rounded-lg bg-accent text-center p-1 w-full h-full"
+                  >
+                    <span className="sr-only">{league}</span>
+                    <Image
+                      src={
+                        leagueLogos[league] ? leagueLogos[league] : "/logo.svg "
+                      }
+                      alt={league}
+                      width={50}
+                      height={50}
+                    />
+                    <div className="flex justify-center px-1 py-2 flex-nowrap text-xs sm:text-sm md:text-base">
+                      {user.stats.statsByLeague[league].wins} -{" "}
+                      {user.stats.statsByLeague[league].losses} -{" "}
+                      {user.stats.statsByLeague[league].pushes}
+                    </div>
+                    <p className="text-xs font-light text-muted-foreground">
+                      {league}
+                    </p>
+                  </div>
+                ))}
+          </div>
         </div>
       </CardContent>
       <CardContent>

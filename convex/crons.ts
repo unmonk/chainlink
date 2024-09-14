@@ -21,4 +21,10 @@ crons.monthly(
   internal.campaigns.createMonthlyCampaign
 );
 
+crons.monthly(
+  "Record monthly statistics for all players",
+  { day: 1, hourUTC: 9, minuteUTC: 45 }, // last day of the month at 11:45 PM HST
+  internal.users.monthlyStatsRecord
+);
+
 export default crons;

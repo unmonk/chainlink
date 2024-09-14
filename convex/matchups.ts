@@ -11,6 +11,73 @@ import { internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 import { featured_type, matchup_type } from "./schema";
 
+export const manuallyFinalizeMatchup = mutation({
+  args: { matchupId: v.id("matchups"), type: v.string() },
+  handler: async (ctx, { matchupId, type }) => {
+    const matchup = await ctx.db.get(matchupId);
+    if (!matchup) {
+      throw new Error(`Matchup not found: ${matchupId}`);
+    }
+    if (
+      matchup.status === "STATUS_FINAL" ||
+      matchup.status === "STATUS_FULL_TIME"
+    ) {
+      throw new Error(`Matchup is already finalized: ${matchupId}`);
+    }
+
+    if (type === "STANDARD_FINAL") {
+      console.log(
+        `ADMIN:: finalizing matchup with standard scoring: ${matchupId}`
+      );
+      await ctx.scheduler.runAfter(0, internal.matchups.handleMatchupFinished, {
+        matchupId,
+        ...matchup,
+      });
+    }
+
+    if (type === "ALL_WINNERS") {
+      console.log(`ADMIN:: finalizing matchup with all winners: ${matchupId}`);
+      await ctx.scheduler.runAfter(
+        0,
+        internal.matchups.handleMatchupAllWinners,
+        {
+          matchupId,
+          ...matchup,
+        }
+      );
+    }
+
+    if (type === "ALL_LOSERS") {
+      console.log(`ADMIN:: finalizing matchup with all losers: ${matchupId}`);
+      await ctx.scheduler.runAfter(
+        0,
+        internal.matchups.handleMatchupAllLosers,
+        {
+          matchupId,
+          ...matchup,
+        }
+      );
+    }
+
+    if (type === "ALL_PUSHS") {
+      console.log(`ADMIN:: finalizing matchup with all pushes: ${matchupId}`);
+      await ctx.scheduler.runAfter(
+        0,
+        internal.matchups.handleMatchupAllPushes,
+        {
+          matchupId,
+          ...matchup,
+        }
+      );
+    }
+
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+  },
+});
+
 export const getHomepageMatchups = query({
   args: {},
   handler: async (ctx) => {
@@ -244,13 +311,10 @@ export const handleMatchupFinished = internalMutation({
       } else if (pick.pick.id === winnerId) {
         await ctx.scheduler.runAfter(0, internal.picks.handlePickWin, {
           pickId: pick._id,
-          cost,
-          featured,
         });
       } else {
         await ctx.scheduler.runAfter(0, internal.picks.handlePickLoss, {
           pickId: pick._id,
-          cost,
         });
       }
     }
@@ -272,6 +336,82 @@ export const handleMatchupFinished = internalMutation({
     });
 
     //#endregion
+  },
+});
+
+//handle matchup finished, everyone wins
+export const handleMatchupAllWinners = internalMutation({
+  args: {
+    matchupId: v.id("matchups"),
+    cost: v.number(),
+    featured: v.boolean(),
+  },
+  handler: async (ctx, { matchupId, cost, featured }) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+
+    for (const pick of picks) {
+      await ctx.scheduler.runAfter(0, internal.picks.handlePickWin, {
+        pickId: pick._id,
+      });
+    }
+
+    await ctx.db.patch(matchupId, {
+      status: "STATUS_FINAL",
+      active: false,
+    });
+  },
+});
+
+//handle matchup finished, everyone loses
+export const handleMatchupAllLosers = internalMutation({
+  args: {
+    matchupId: v.id("matchups"),
+    cost: v.number(),
+  },
+  handler: async (ctx, { matchupId, cost }) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+
+    for (const pick of picks) {
+      await ctx.scheduler.runAfter(0, internal.picks.handlePickLoss, {
+        pickId: pick._id,
+      });
+    }
+
+    await ctx.db.patch(matchupId, {
+      status: "STATUS_FINAL",
+      active: false,
+    });
+  },
+});
+
+//handle matchup finished, everyone pushes
+export const handleMatchupAllPushes = internalMutation({
+  args: {
+    matchupId: v.id("matchups"),
+    cost: v.number(),
+  },
+  handler: async (ctx, { matchupId, cost }) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+
+    for (const pick of picks) {
+      await ctx.scheduler.runAfter(0, internal.picks.handlePickPush, {
+        pickId: pick._id,
+      });
+    }
+
+    await ctx.db.patch(matchupId, {
+      status: "STATUS_FINAL",
+      active: false,
+    });
   },
 });
 

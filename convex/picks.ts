@@ -6,12 +6,68 @@ import {
   query,
 } from "./_generated/server";
 import { pick_status } from "./schema";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { matchupReward } from "./utils";
+
+export const getPickById = query({
+  args: { pickId: v.id("picks") },
+  handler: async (ctx, { pickId }) => {
+    const pick = await ctx.db.get(pickId);
+    return pick;
+  },
+});
+
+//Release picks for a matchup, all win or all loss
+export const releasePicksAllWinners = mutation({
+  args: { matchupId: v.id("matchups") },
+  handler: async (ctx, { matchupId }) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+    for (const pick of picks) {
+      await ctx.scheduler.runAfter(0, internal.picks.handlePickWin, {
+        pickId: pick._id,
+      });
+    }
+  },
+});
+
+//Release picks for a matchup, all losers
+export const releasePicksAllLosers = mutation({
+  args: { matchupId: v.id("matchups") },
+  handler: async (ctx, { matchupId }) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+    for (const pick of picks) {
+      await ctx.scheduler.runAfter(0, internal.picks.handlePickLoss, {
+        pickId: pick._id,
+      });
+    }
+  },
+});
+
+//Release picks for a matchup, all pushes
+export const releasePicksAllPushes = mutation({
+  args: { matchupId: v.id("matchups") },
+  handler: async (ctx, { matchupId }) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+    for (const pick of picks) {
+      await ctx.scheduler.runAfter(0, internal.picks.handlePickPush, {
+        pickId: pick._id,
+      });
+    }
+  },
+});
 
 //HANDLE PICK WIN
 export const handlePickWin = internalMutation({
-  args: { pickId: v.id("picks"), cost: v.number(), featured: v.boolean() },
+  args: { pickId: v.id("picks") },
   handler: async (ctx, { pickId }) => {
     //get pick
     const pick = await ctx.db.get(pickId);
@@ -81,12 +137,22 @@ export const handlePickWin = internalMutation({
     //   pick: pick,
     //   chain: chain,
     // });
+
+    //send notification
+    await ctx.scheduler.runAfter(
+      0,
+      api.notifications.handlePickWinNotification,
+      {
+        clerkId: user.externalId,
+        matchupId: matchup._id,
+      }
+    );
   },
 });
 
 //HANDLE PICK LOSS
 export const handlePickLoss = internalMutation({
-  args: { pickId: v.id("picks"), cost: v.number() },
+  args: { pickId: v.id("picks") },
   handler: async (ctx, { pickId }) => {
     //get pick
     const pick = await ctx.db.get(pickId);
@@ -149,6 +215,16 @@ export const handlePickLoss = internalMutation({
     await ctx.db.patch(chain._id, chain);
     await ctx.db.patch(user._id, user);
     await ctx.db.patch(pick._id, pick);
+
+    //send notification
+    await ctx.scheduler.runAfter(
+      0,
+      api.notifications.handlePickLossNotification,
+      {
+        clerkId: user.externalId,
+        matchupId: matchup._id,
+      }
+    );
   },
 });
 
@@ -206,6 +282,16 @@ export const handlePickPush = internalMutation({
     await ctx.db.patch(chain._id, chain);
     await ctx.db.patch(user._id, user);
     await ctx.db.patch(pick._id, pick);
+
+    //send notification
+    await ctx.scheduler.runAfter(
+      0,
+      api.notifications.handlePickPushNotification,
+      {
+        clerkId: user.externalId,
+        matchupId: matchup._id,
+      }
+    );
   },
 });
 
@@ -302,6 +388,19 @@ export const cancelPick = mutation({
 
     //delete pick
     await ctx.db.delete(pickId);
+  },
+});
+
+export const forceCancelPicks = mutation({
+  args: { matchupId: v.id("matchups") },
+  handler: async (ctx, { matchupId }) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+    for (const pick of picks) {
+      await ctx.db.delete(pick._id);
+    }
   },
 });
 

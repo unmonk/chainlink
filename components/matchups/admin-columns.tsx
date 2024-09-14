@@ -34,7 +34,12 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
   {
     id: "edit",
     cell: ({ row }) => {
-      return <EditMatchupForm row={row.original} />;
+      return (
+        <EditMatchupForm
+          row={row.original}
+          totalPicks={row.original.picks.length}
+        />
+      );
     },
   },
   {
@@ -222,6 +227,10 @@ const ChainBuilderSelect: React.FC<{ row: Row<MatchupWithPicks> }> = ({
       onValueChange={(value) => {
         onChainBuilderValueChange(value, row);
       }}
+      disabled={
+        row.original.status === "STATUS_FINAL" ||
+        row.original.status === "STATUS_FULL_TIME"
+      }
     >
       <SelectTrigger
         className={
@@ -273,6 +282,10 @@ const ActiveSelect: React.FC<{ row: Row<MatchupWithPicks> }> = ({ row }) => {
       onValueChange={(value) => {
         onActiveSelectChange(value, row);
       }}
+      disabled={
+        row.original.status === "STATUS_FINAL" ||
+        row.original.status === "STATUS_FULL_TIME"
+      }
     >
       <SelectTrigger
         className={row.original.active ? "" : "border-red-500 border-2"}

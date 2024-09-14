@@ -3,6 +3,7 @@ import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -43,6 +44,9 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../ui/drawer";
+import { manuallyFinalizeMatchup } from "@/convex/matchups";
+import { toast } from "sonner";
+import { forceCancelPicks, releasePicksAllWinners } from "@/convex/picks";
 
 const EditMatchupFormSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
@@ -74,10 +78,16 @@ const EditMatchupFormSchema = z.object({
 
 export interface EditMatchupFormProps {
   row: z.infer<typeof EditMatchupFormSchema> & { _id: string };
+  totalPicks: number;
 }
 
-export function EditMatchupForm({ row }: EditMatchupFormProps) {
+export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
   const updateMatchup = useMutation(api.matchups.updateMatchup);
+  const releasePicksAllWinners = useMutation(api.picks.releasePicksAllWinners);
+  const releasePicksAllLosers = useMutation(api.picks.releasePicksAllLosers);
+  const releasePicksAllPushes = useMutation(api.picks.releasePicksAllPushes);
+  const forceCancelPicks = useMutation(api.picks.forceCancelPicks);
+
   const methods = useForm<z.infer<typeof EditMatchupFormSchema>>({
     resolver: zodResolver(EditMatchupFormSchema),
     defaultValues: {
@@ -109,6 +119,37 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
     },
   });
 
+  async function handleReleasePicks(releaseType: string) {
+    try {
+      if (releaseType === "DELETE") {
+        await forceCancelPicks({
+          matchupId: row._id as Id<"matchups">,
+        });
+        toast.success("Picks deleted");
+      }
+      if (releaseType === "ALL_WINNERS") {
+        await releasePicksAllWinners({
+          matchupId: row._id as Id<"matchups">,
+        });
+        toast.success("Picks released, all winners");
+      }
+      if (releaseType === "ALL_LOSERS") {
+        await releasePicksAllLosers({
+          matchupId: row._id as Id<"matchups">,
+        });
+        toast.success("Picks released, all losers");
+      }
+      if (releaseType === "ALL_PUSHES") {
+        await releasePicksAllPushes({
+          matchupId: row._id as Id<"matchups">,
+        });
+        toast.success("Picks released, all pushes");
+      }
+    } catch (error) {
+      console.error("Failed to release picks:", error);
+    }
+  }
+
   async function onSubmit(values: z.infer<typeof EditMatchupFormSchema>) {
     try {
       await updateMatchup({
@@ -129,6 +170,9 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
         <Button
           variant="outline"
           size="sm"
+          disabled={
+            row.status === "STATUS_FINAL" || row.status === "STATUS_FULL_TIME"
+          }
           className={
             row.status !== "STATUS_SCHEDULED"
               ? "border-red-500 border animate-pulse"
@@ -461,8 +505,108 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
             <hr className="my-4" />
             <div className="flex flex-col space-y-2">
               <h4 className="text-lg font-medium">In Progress Actions</h4>
-              <Button variant={"destructive"}>Finalize Matchup</Button>
-              <Button variant={"secondary"}>Release Picks</Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="destructive">Finalize Matchup</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Finalize Matchup</DialogTitle>
+                    <DialogDescription>
+                      Finalizing the matchup will close the match and score all
+                      picks the same, or with standard win/loss scoring
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col space-y-2">
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleFinalize("STANDARD_FINAL")}
+                        variant={"secondary"}
+                      >
+                        Score Regularly
+                      </Button>
+                    </DialogTrigger>
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleFinalize("ALL_WINNERS")}
+                        variant={"outline"}
+                      >
+                        All Picks Win
+                      </Button>
+                    </DialogTrigger>
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleFinalize("ALL_LOSERS")}
+                        variant={"outline"}
+                      >
+                        All Picks Lose
+                      </Button>
+                    </DialogTrigger>
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={() => handleFinalize("ALL_PUSHES")}
+                        variant={"outline"}
+                      >
+                        All Picks Push
+                      </Button>
+                    </DialogTrigger>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="secondary">Release Picks</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Release Picks</DialogTitle>
+                    <DialogDescription>
+                      Release the picks without finalizing the matchup.
+                      <br />
+                      <span className="text-lg text-red-500">
+                        <span className="font-bold text-xl">{totalPicks}</span>{" "}
+                        picks will be released
+                      </span>
+                      <br />
+                      <b>Warning: This action cannot be undone.</b>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="flex flex-col space-y-2">
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() => handleReleasePicks("DELETE")}
+                        variant={"destructive"}
+                      >
+                        Delete All Picks
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() => handleReleasePicks("ALL_WINNERS")}
+                        variant={"outline"}
+                      >
+                        All Picks Win
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() => handleReleasePicks("ALL_LOSERS")}
+                        variant={"outline"}
+                      >
+                        All Picks Lose
+                      </Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        onClick={() => handleReleasePicks("ALL_PUSHES")}
+                        variant={"outline"}
+                      >
+                        All Picks Push
+                      </Button>
+                    </DialogClose>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             <hr className="my-4" />
             <div className="flex justify-end space-x-2">

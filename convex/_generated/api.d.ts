@@ -21,6 +21,7 @@ import type * as chains from "../chains.js";
 import type * as crons from "../crons.js";
 import type * as leaderboards from "../leaderboards.js";
 import type * as matchups from "../matchups.js";
+import type * as notifications from "../notifications.js";
 import type * as picks from "../picks.js";
 import type * as schedules from "../schedules.js";
 import type * as scoreboards from "../scoreboards.js";
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   leaderboards: typeof leaderboards;
   matchups: typeof matchups;
+  notifications: typeof notifications;
   picks: typeof picks;
   schedules: typeof schedules;
   scoreboards: typeof scoreboards;
