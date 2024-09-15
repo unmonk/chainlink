@@ -126,7 +126,7 @@ const DashboardStats = () => {
       </CardContent>
       <CardContent>
         <div className="flex flex-col gap-2 border rounded-lg p-2">
-          <h3 className="text-2xl mt-2 text-center font-bold">
+          <h3 className="text-2xl mt-2 text-center font-semibold">
             Stats By League
           </h3>
           <p className="text-sm text-muted-foreground text-center">

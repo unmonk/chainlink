@@ -50,7 +50,7 @@ export const leagueLogos: {
 } = {
   NFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nfl.png?w=100&h=100&transparent=true",
   NBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png?w=100&h=100&transparent=true",
-  NBAG: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png?w=100&h=100&transparent=true",
+  NBAG: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba_gleague.png&w=100&h=100",
 
   MLB: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mlb.png?w=100&h=100&transparent=true",
   NHL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nhl.png?w=100&h=100&transparent=true",
@@ -60,16 +60,16 @@ export const leagueLogos: {
   WBB: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-basketball.png&h=80&w=80&scale=crop&cquality=40&transparent=true",
   WNBA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/wnba.png?w=100&h=100&transparent=true",
   MLS: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/mls.png?w=100&h=100&transparent=true",
-  NWSL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
-  ARG: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
-  CSL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+  NWSL: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/2323.png&transparent=true&w=100&h=100",
+  ARG: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/1.png&transparent=true&w=100&h=100",
+  CSL: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/2350.png&transparent=true&w=100&h=100",
   FRIENDLY:
-    "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
-  TUR: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+    "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/53.png&transparent=true&w=100&h=100",
+  TUR: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/18.png&transparent=true&w=100&h=100",
 
-  RPL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
-  PLL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pll.png&w=100&h=100&transparent=true",
-  EPL: "https://a.espncdn.com/combiner/i?img=/redesign/assets/img/icons/ESPN-icon-soccer.png&w=100&h=100&transparent=true",
+  RPL: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/106.png&transparent=true&w=100&h=100",
+  PLL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pll.png?w=100&h=100&transparent=true",
+  EPL: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/23.png&transparent=true&w=100&h=100",
   UFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/ufl.png?w=100&h=100&transparent=true",
 };
 
