@@ -12,6 +12,7 @@ import { api } from "@/convex/_generated/api";
 import { Skeleton } from "../ui/skeleton";
 import { CoinHistoryChart } from "./coin-history-chart";
 import { formatDate, subMonths } from "date-fns";
+import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 
 const DashboardCoins = () => {
   const user = useQuery(api.users.currentUser);
@@ -45,6 +46,12 @@ const DashboardCoins = () => {
                 {Math.abs(coinDifference)} this month (
                 {((coinDifference / user.coins) * 100).toFixed(2)}%)
               </>
+            )}
+            {!Number.isNaN(coinDifference) && coinDifference < 0 && (
+              <TrendingDownIcon className="w-4 h-4 inline-block" />
+            )}
+            {!Number.isNaN(coinDifference) && coinDifference > 0 && (
+              <TrendingUpIcon className="w-4 h-4 inline-block" />
             )}
           </div>
         </CardContent>

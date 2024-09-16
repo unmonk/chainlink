@@ -3,14 +3,6 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { parse } from "date-fns";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,

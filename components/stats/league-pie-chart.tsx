@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import React from "react";
+import { getSportFromLeague } from "@/lib/utils";
 
 export function LeaguePieChart({
   leagueChartData,
@@ -32,19 +33,19 @@ export function LeaguePieChart({
       case "NFL":
         return "hsla(0, 78%, 34%, 1)"; // Red
       case "COLLEGE-FOOTBALL":
-        return "hsla(0, 78%, 88%, 1)"; // Red
+        return "hsla(0, 78%, 50%, 1)"; // Red
       case "NBA":
         return "hsla(15, 78%, 50%, 1)"; // Orange
       case "MBB":
-        return "hsla(15, 78%, 62%, 1)"; //Light Orange
+        return "hsla(15, 78%, 70%, 1)"; //Light Orange
       case "WNBA":
-        return "hsla(320, 78%, 44%, 1)"; //Pink
+        return "hsla(15, 78%, 60%, 1)"; // Orange
       case "WBB":
         return "hsla(320, 78%, 63%, 1)"; //Light Pink
       case "MLB":
         return "hsla(229, 78%, 38%, 1)"; // Blue
       case "NHL":
-        return "hsla(55, 100%, 51%, 1)"; // Yellow
+        return "hsla(0, 0%, 40%, 1)"; // grey
       case "MLS":
         return "hsla(115, 78%, 44%, 1)"; //Green
       case "NWSL":
@@ -64,12 +65,26 @@ export function LeaguePieChart({
     }
   };
 
-  const chartData = leagueChartData.map((data) => ({
-    ...data,
-    picks: data.wins + data.losses + data.pushes,
-    label: data.league,
-    fill: getLeagueColor(data.league),
-  }));
+  const chartData = leagueChartData
+    .map((data) => ({
+      ...data,
+      picks: data.wins + data.losses + data.pushes,
+      label: data.league,
+      fill: getLeagueColor(data.league),
+      sport: getSportFromLeague(data.league),
+    }))
+    .sort((a, b) => {
+      const sportOrder = [
+        "football",
+        "baseball",
+        "hockey",
+        "soccer",
+        "basketball",
+        "lacrosse",
+        "other",
+      ];
+      return sportOrder.indexOf(a.sport) - sportOrder.indexOf(b.sport);
+    });
 
   const pieChartConfig: ChartConfig = Object.fromEntries(
     leagueChartData.map((data) => [

@@ -234,13 +234,16 @@ const MatchupPickButton = ({
       <Image
         src={image}
         alt={name}
-        fill
         className="hover:scale-110 transition-transform duration-300 ease-in-out"
         sizes={"100%"}
+        width={100}
+        height={100}
         style={{
           maxWidth: "100%",
-          height: "auto"
-        }} />
+          height: "auto",
+          width: "100%",
+        }}
+      />
     </Button>
   );
 };

@@ -1,5 +1,13 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import {
+  FaBasketballBall,
+  FaFootballBall,
+  FaBaseballBall,
+  FaHockeyPuck,
+} from "react-icons/fa";
+import { MdSportsSoccer } from "react-icons/md";
+import { GiBugNet } from "react-icons/gi";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,3 +26,18 @@ export async function getReadyServiceWorker() {
   }
   return navigator.serviceWorker.ready;
 }
+export const getSportFromLeague = (league: string): string => {
+  if (["NBA", "WNBA", "MBB", "WBB"].includes(league)) return "basketball";
+  if (["NFL", "COLLEGE-FOOTBALL", "UFL"].includes(league)) return "football";
+  if (["MLB"].includes(league)) return "baseball";
+  if (["NHL"].includes(league)) return "hockey";
+  if (
+    ["MLS", "NWSL", "EPL", "RPL", "CSL", "ARG", "TUR", "FRIENDLY"].includes(
+      league
+    )
+  )
+    return "soccer";
+  if (["PLL"].includes(league)) return "lacrosse";
+
+  return "other";
+};

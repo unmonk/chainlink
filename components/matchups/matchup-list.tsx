@@ -19,7 +19,7 @@ import {
 } from "react-icons/fa";
 import { GiBugNet } from "react-icons/gi";
 import { MdSportsSoccer } from "react-icons/md";
-
+import { getSportFromLeague } from "@/lib/utils";
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
   const userPick = useQuery(api.picks.getUserActivePick, {});
@@ -177,22 +177,6 @@ const MatchupList = ({}) => {
 };
 
 export default MatchupList;
-
-const getSportFromLeague = (league: string): string => {
-  if (["NBA", "WNBA", "MBB", "WBB"].includes(league)) return "basketball";
-  if (["NFL", "COLLEGE-FOOTBALL", "UFL"].includes(league)) return "football";
-  if (["MLB"].includes(league)) return "baseball";
-  if (["NHL"].includes(league)) return "hockey";
-  if (
-    ["MLS", "NWSL", "EPL", "RPL", "CSL", "ARG", "TUR", "FRIENDLY"].includes(
-      league
-    )
-  )
-    return "soccer";
-  if (["PLL"].includes(league)) return "lacrosse";
-
-  return "other";
-};
 
 const getSportIcon = (sport: string) => {
   switch (sport) {

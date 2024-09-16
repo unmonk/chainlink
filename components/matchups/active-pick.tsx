@@ -88,12 +88,15 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
               <Image
                 src={pick.matchup.awayTeam.image}
                 alt={pick.matchup.awayTeam.name}
-                fill
                 sizes={"100%"}
+                width={100}
+                height={100}
                 style={{
                   maxWidth: "100%",
-                  height: "auto"
-                }} />
+                  height: "auto",
+                  width: "100%",
+                }}
+              />
               {pick.pick.id === pick.matchup.awayTeam.id && (
                 <Badge className="absolute right-1 top-1">
                   <CheckIcon size={12} />
@@ -155,12 +158,15 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
               <Image
                 src={pick.matchup.homeTeam.image}
                 alt={pick.matchup.homeTeam.name}
-                fill
                 sizes={"100%"}
+                width={100}
+                height={100}
                 style={{
                   maxWidth: "100%",
-                  height: "auto"
-                }} />
+                  height: "auto",
+                  width: "100%",
+                }}
+              />
               {pick.pick.id === pick.matchup.homeTeam.id && (
                 <Badge className="absolute right-1 top-1">
                   <CheckIcon size={12} />
