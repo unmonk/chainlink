@@ -16,7 +16,7 @@ import DashboardActivePick from "@/components/picks/dashboard-pick";
 import DashboardStats from "@/components/stats/dashboard-stats";
 import DashboardSquads from "@/components/squads/dashboard-squads";
 import DashboardAchievements from "@/components/achievements/dashboard-achievements";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import Link from "next/link";
 import { ContentLayout } from "@/components/nav/content-layout";
 
@@ -68,7 +68,10 @@ export default function Dashboard() {
                         alt="The Rose League"
                         width={250}
                         height={250}
-                      />
+                        style={{
+                          maxWidth: "100%",
+                          height: "auto"
+                        }} />
                     </Link>
                   </div>
                   <div className="overflow-hidden rounded-md justify-self-center">

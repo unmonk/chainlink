@@ -1,7 +1,7 @@
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
@@ -235,9 +235,12 @@ const MatchupPickButton = ({
         src={image}
         alt={name}
         fill
-        sizes={"100%"}
         className="hover:scale-110 transition-transform duration-300 ease-in-out"
-      />
+        sizes={"100%"}
+        style={{
+          maxWidth: "100%",
+          height: "auto"
+        }} />
     </Button>
   );
 };

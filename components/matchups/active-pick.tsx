@@ -1,6 +1,6 @@
 import { Doc } from "@/convex/_generated/dataModel";
 import { Card, CardTitle } from "../ui/card";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { CheckIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
@@ -90,7 +90,10 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
                 alt={pick.matchup.awayTeam.name}
                 fill
                 sizes={"100%"}
-              />
+                style={{
+                  maxWidth: "100%",
+                  height: "auto"
+                }} />
               {pick.pick.id === pick.matchup.awayTeam.id && (
                 <Badge className="absolute right-1 top-1">
                   <CheckIcon size={12} />
@@ -154,7 +157,10 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
                 alt={pick.matchup.homeTeam.name}
                 fill
                 sizes={"100%"}
-              />
+                style={{
+                  maxWidth: "100%",
+                  height: "auto"
+                }} />
               {pick.pick.id === pick.matchup.homeTeam.id && (
                 <Badge className="absolute right-1 top-1">
                   <CheckIcon size={12} />

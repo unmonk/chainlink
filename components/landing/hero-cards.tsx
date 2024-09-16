@@ -16,7 +16,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Logo } from "../ui/logo";
 import { matchupReward } from "@/convex/utils";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
 import { BackgroundGradient } from "../ui/background-gradient";
 
@@ -208,7 +208,10 @@ export const HeroCards = () => {
                     alt={matchups[2].awayTeam.name}
                     width={50}
                     height={50}
-                  />
+                    style={{
+                      maxWidth: "100%",
+                      height: "auto"
+                    }} />
                 )}
                 {!matchups && <Skeleton className="w-9 h-9 rounded-full" />}
                 {matchups && (
@@ -217,7 +220,10 @@ export const HeroCards = () => {
                     alt={matchups[2].homeTeam.name}
                     width={50}
                     height={50}
-                  />
+                    style={{
+                      maxWidth: "100%",
+                      height: "auto"
+                    }} />
                 )}
               </div>
 

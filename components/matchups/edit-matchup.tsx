@@ -33,7 +33,7 @@ import { Input } from "../ui/input";
 import { Id } from "@/convex/_generated/dataModel";
 import { useState } from "react";
 import { ACTIVE_LEAGUES } from "@/convex/utils";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { leagueLogos } from "@/convex/utils";
 import {
   Drawer,
@@ -229,7 +229,10 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                               alt={league}
                               height={40}
                               width={40}
-                            />
+                              style={{
+                                maxWidth: "100%",
+                                height: "auto"
+                              }} />
                             <span>{league}</span>
                           </div>
                         </SelectItem>
@@ -267,7 +270,10 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                             alt={"Away Team Image"}
                             width={40}
                             height={40}
-                          />
+                            style={{
+                              maxWidth: "100%",
+                              height: "auto"
+                            }} />
                         </div>
                       )}
                       <FormItem>
@@ -320,7 +326,10 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                             alt={"Home Team Image"}
                             width={40}
                             height={40}
-                          />
+                            style={{
+                              maxWidth: "100%",
+                              height: "auto"
+                            }} />
                         </div>
                       )}
                       <FormItem>

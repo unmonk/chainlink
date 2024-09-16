@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { api } from "@/convex/_generated/api";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { formatDistance } from "date-fns";
@@ -61,10 +61,13 @@ const DashboardActivePick = () => {
               src={pick.matchup.awayTeam.image}
               alt={pick.matchup.awayTeam.name}
               className="rounded-lg aspect-square"
-              objectFit="cover"
               width={80}
               height={80}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                objectFit: "cover"
+              }} />
             <div className="flex flex-col text-sm leading-none">
               <span className="font-medium">{pick.matchup.awayTeam.name}</span>
             </div>
@@ -82,10 +85,13 @@ const DashboardActivePick = () => {
               src={pick.matchup.homeTeam.image}
               alt={pick.matchup.homeTeam.name}
               className="rounded-lg aspect-square"
-              objectFit="cover"
               width={80}
               height={80}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                objectFit: "cover"
+              }} />
           </div>
         </div>
         {pick.matchup.status !== "STATUS_SCHEDULED" &&

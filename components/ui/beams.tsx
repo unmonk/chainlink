@@ -5,7 +5,7 @@ import React, { forwardRef, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { ACTIVE_LEAGUES, leagueLogos, leagueNames } from "@/convex/utils";
-import Image from "next/legacy/image";
+import Image from "next/image";
 
 const Circle = forwardRef<
   HTMLDivElement,
@@ -51,7 +51,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[0]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
           <Circle ref={div5Ref}>
             <Image
@@ -59,7 +62,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[1]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
         </div>
         <div className="flex flex-row items-center justify-between">
@@ -69,7 +75,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[2]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
           <Circle ref={div4Ref}>
             <Icons.chainlink />
@@ -80,7 +89,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[3]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
         </div>
         <div className="flex flex-row items-center justify-between">
@@ -90,7 +102,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[8]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
           <Circle ref={div7Ref}>
             <Image
@@ -98,7 +113,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[4]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
         </div>
         <div className="flex flex-row items-center justify-between">
@@ -108,7 +126,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[6]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
           <Circle ref={div9Ref}>
             <Image
@@ -116,7 +137,10 @@ export function LeagueBeam() {
               width={100}
               height={100}
               alt={ACTIVE_LEAGUES[7]}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </Circle>
         </div>
       </div>

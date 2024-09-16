@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/legacy/image";
+import Image from "next/image";
 
 import { FaTimes } from "react-icons/fa";
 import { HiDotsVertical } from "react-icons/hi";
@@ -37,7 +37,10 @@ export default function AddToMobileFirefox(props: Props) {
                 alt="Firefox install icon"
                 width={32}
                 height={32}
-              />
+                style={{
+                  maxWidth: "100%",
+                  height: "auto"
+                }} />
               <p>Install</p>
             </div>
           </div>

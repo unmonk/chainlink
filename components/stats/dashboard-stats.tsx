@@ -8,7 +8,7 @@ import {
 } from "../ui/card";
 import { api } from "@/convex/_generated/api";
 import { leagueLogos } from "@/convex/utils";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { LeagueRadarChart } from "./league-radar-chart";
@@ -163,7 +163,10 @@ const DashboardStats = () => {
                       alt={league}
                       width={50}
                       height={50}
-                    />
+                      style={{
+                        maxWidth: "100%",
+                        height: "auto"
+                      }} />
                     <div className="flex justify-center px-1 py-2 flex-nowrap text-xs sm:text-sm md:text-base">
                       {user.stats.statsByLeague[league].wins} -{" "}
                       {user.stats.statsByLeague[league].losses} -{" "}

@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { formatDistance } from "date-fns";
 import { Badge } from "../ui/badge";
 
@@ -38,7 +38,10 @@ export const UserPickList = () => {
               alt={pick.pick.name}
               width={100}
               height={100}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </CardContent>
           <CardFooter className="flex flex-col gap-1 flex-nowrap">
             <CardDescription className="text-nowrap">
