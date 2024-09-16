@@ -33,7 +33,7 @@ import { Input } from "../ui/input";
 import { Id } from "@/convex/_generated/dataModel";
 import { useState } from "react";
 import { ACTIVE_LEAGUES } from "@/convex/utils";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { leagueLogos } from "@/convex/utils";
 import {
   Drawer,

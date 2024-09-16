@@ -4,7 +4,7 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { Badge } from "../ui/badge";
 import { leagueLogos } from "@/convex/utils";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import {
   DropdownMenu,
   DropdownMenuContent,

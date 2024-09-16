@@ -1,7 +1,7 @@
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";

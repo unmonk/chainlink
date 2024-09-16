@@ -1,6 +1,6 @@
 import { Doc } from "@/convex/_generated/dataModel";
 import { Card, CardTitle } from "../ui/card";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { cn } from "@/lib/utils";
 import { CheckIcon } from "lucide-react";
 import { Badge } from "../ui/badge";

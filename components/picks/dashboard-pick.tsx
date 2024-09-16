@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { api } from "@/convex/_generated/api";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { formatDistance } from "date-fns";

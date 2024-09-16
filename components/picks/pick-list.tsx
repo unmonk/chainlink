@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { formatDistance } from "date-fns";
 import { Badge } from "../ui/badge";
 

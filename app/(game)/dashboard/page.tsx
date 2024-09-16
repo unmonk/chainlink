@@ -16,7 +16,7 @@ import DashboardActivePick from "@/components/picks/dashboard-pick";
 import DashboardStats from "@/components/stats/dashboard-stats";
 import DashboardSquads from "@/components/squads/dashboard-squads";
 import DashboardAchievements from "@/components/achievements/dashboard-achievements";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import { ContentLayout } from "@/components/nav/content-layout";
 

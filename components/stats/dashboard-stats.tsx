@@ -8,7 +8,7 @@ import {
 } from "../ui/card";
 import { api } from "@/convex/_generated/api";
 import { leagueLogos } from "@/convex/utils";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { LeagueRadarChart } from "./league-radar-chart";

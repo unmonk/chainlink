@@ -16,7 +16,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Logo } from "../ui/logo";
 import { matchupReward } from "@/convex/utils";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { Skeleton } from "../ui/skeleton";
 import { BackgroundGradient } from "../ui/background-gradient";
 
