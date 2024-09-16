@@ -520,7 +520,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                   <div className="flex flex-col space-y-2">
                     <DialogTrigger asChild>
                       <Button
-                        onClick={() => handleFinalize("STANDARD_FINAL")}
+                        //onClick={() => handleFinalize("STANDARD_FINAL")}
                         variant={"secondary"}
                       >
                         Score Regularly
@@ -528,7 +528,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                     <DialogTrigger asChild>
                       <Button
-                        onClick={() => handleFinalize("ALL_WINNERS")}
+                        // onClick={() => handleFinalize("ALL_WINNERS")}
                         variant={"outline"}
                       >
                         All Picks Win
@@ -536,7 +536,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                     <DialogTrigger asChild>
                       <Button
-                        onClick={() => handleFinalize("ALL_LOSERS")}
+                        //onClick={() => handleFinalize("ALL_LOSERS")}
                         variant={"outline"}
                       >
                         All Picks Lose
@@ -544,7 +544,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                     <DialogTrigger asChild>
                       <Button
-                        onClick={() => handleFinalize("ALL_PUSHES")}
+                        //onClick={() => handleFinalize("ALL_PUSHES")}
                         variant={"outline"}
                       >
                         All Picks Push

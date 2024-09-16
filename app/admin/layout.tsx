@@ -1,6 +1,5 @@
 "use client";
 import AddToHomeScreen from "@/components/addtohome/add-to-home";
-import AdminDashboardWrapper from "@/components/nav/admin-dashboard-wrapper";
 import DashboardWrapper2 from "@/components/nav/dashboard-wrapper2";
 import { RedirectToSignIn, useUser } from "@clerk/nextjs";
 

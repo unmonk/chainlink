@@ -4,7 +4,6 @@ import SendNotification from "@/components/profile/notifications";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { UserProfile, useUser } from "@clerk/nextjs";
-import { clerkClient } from "@clerk/nextjs/server";
 import { BellRingIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 

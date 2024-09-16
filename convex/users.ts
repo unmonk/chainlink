@@ -38,46 +38,57 @@ export const store = mutation({
       )
       .unique();
     if (user !== null) {
+      console.log(identity, "identity");
+      console.log(user, "user");
       // If we've seen this identity before but the name has changed, patch the value.
-      if (
-        user.name !== identity.preferredUsername
-          ? identity.preferredUsername
-          : identity.name
-      ) {
+
+      if (user.name !== identity.preferredUsername) {
         await ctx.db.patch(user._id, {
-          name: identity.preferredUsername
-            ? identity.preferredUsername
-            : identity.name,
+          ...user,
+          name: identity.preferredUsername,
         });
       }
-      return user._id;
-    }
 
-    // If it's a new identity, create a new `User`.
-    return await ctx.db.insert("users", {
-      name: identity.preferredUsername
-        ? identity.preferredUsername
-        : identity.name
-          ? identity.name
-          : "",
-      tokenIdentifier: identity.tokenIdentifier,
-      email: identity.email!,
-      image: identity.pictureUrl!,
-      coins: 50,
-      stats: {
-        wins: 0,
-        losses: 0,
-        pushes: 0,
-        statsByLeague: {},
-      },
-      monthlyStats: {},
-      achievements: [],
-      friends: [],
-      squads: [],
-      role: "USER",
-      status: "ACTIVE",
-      externalId: identity.subject,
-    });
+      if (user.image !== identity.pictureUrl) {
+        await ctx.db.patch(user._id, {
+          ...user,
+          image: identity.pictureUrl,
+        });
+      }
+
+      if (user.email !== identity.email) {
+        await ctx.db.patch(user._id, {
+          ...user,
+          email: identity.email,
+        });
+      }
+
+      return user._id;
+    } else {
+      console.log("NEW USER");
+      return await ctx.db.insert("users", {
+        name:
+          identity.preferredUsername ??
+          identity.tokenIdentifier.substring(0, 10),
+        tokenIdentifier: identity.tokenIdentifier,
+        email: identity.email!,
+        image: identity.pictureUrl!,
+        coins: 50,
+        stats: {
+          wins: 0,
+          losses: 0,
+          pushes: 0,
+          statsByLeague: {},
+        },
+        monthlyStats: {},
+        achievements: [],
+        friends: [],
+        squads: [],
+        role: "USER",
+        status: "ACTIVE",
+        externalId: identity.subject,
+      });
+    }
   },
 });
 
@@ -214,14 +225,22 @@ export const monthlyStatsRecord = internalAction({
 export const getUserByCoins = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("users").withIndex("by_coins").collect();
+    return await ctx.db
+      .query("users")
+      .withIndex("by_coins")
+      .order("desc")
+      .collect();
   },
 });
 
 export const getUserByWins = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("users").withIndex("by_wins").collect();
+    return await ctx.db
+      .query("users")
+      .withIndex("by_wins")
+      .order("desc")
+      .collect();
   },
 });
 

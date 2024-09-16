@@ -6,7 +6,7 @@ export async function getAuthToken() {
 }
 
 export async function getUserByUsername(username: string) {
-  const user = await clerkClient.users.getUserList({
+  const user = await clerkClient().users.getUserList({
     username: [username],
     limit: 1,
   });

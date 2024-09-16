@@ -1,5 +1,4 @@
 import AddToHomeScreen from "@/components/addtohome/add-to-home";
-import DashboardWrapper from "@/components/nav/dashboard-wrapper";
 import DashboardWrapper2 from "@/components/nav/dashboard-wrapper2";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

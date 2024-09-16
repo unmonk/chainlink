@@ -6,7 +6,7 @@
     "dev": "npm-run-all dev:init --parallel dev:server dev:client",
     "build": "tsc && next build 2>&1",
     "dev:server": "convex dev",
-    "dev:client": "next dev --experimental-https",
+    "dev:client": "next dev",
     "dev:init": "convex dev --until-success",
     "start": "next start",
     "lint": "next lint"
