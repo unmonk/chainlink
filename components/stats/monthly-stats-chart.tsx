@@ -27,10 +27,20 @@ const chartConfig = {
     label: "losses",
     color: "hsl(var(--chart-2))",
   },
+  pushes: {
+    label: "pushes",
+    color: "hsl(var(--chart-3) / 0.3)",
+  },
 } satisfies ChartConfig;
 
 interface MonthlyStatsChartProps {
-  monthlyData: { month: string; wins: number; losses: number }[];
+  monthlyData: {
+    month: string;
+    wins: number;
+    losses: number;
+    winRate: number;
+    pushes: number;
+  }[];
 }
 
 export const MonthlyStatsChart: React.FC<MonthlyStatsChartProps> = ({
@@ -51,23 +61,23 @@ export const MonthlyStatsChart: React.FC<MonthlyStatsChartProps> = ({
     "Nov",
     "Dec",
   ];
-  const lastSixMonths = monthlyData.slice(-6).map((month) => {
+  const lastTwelveMonths = monthlyData.slice(-12).map((month) => {
     const monthName = monthNames[parseInt(month.month.slice(4, 6)) - 1];
     return { ...month, month: `${monthName} ${month.month.slice(0, 4)}` };
   });
-  if (!lastSixMonths || lastSixMonths.length === 0) return null;
+  if (!lastTwelveMonths || lastTwelveMonths.length === 0) return null;
 
   return (
-    <Card>
+    <Card className="bg-background/20">
       <CardHeader className="items-center pb-4">
         <CardTitle>Monthly Stats</CardTitle>
-        <CardDescription>Wins and Losses last 6 months.</CardDescription>
+        <CardDescription>Wins and Losses last 12 months.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <LineChart
             accessibilityLayer
-            data={lastSixMonths}
+            data={lastTwelveMonths}
             margin={{
               left: 12,
               right: 12,
@@ -94,6 +104,14 @@ export const MonthlyStatsChart: React.FC<MonthlyStatsChartProps> = ({
               type="monotone"
               stroke="var(--color-losses)"
               strokeWidth={2}
+              dot={false}
+            />
+
+            <Line
+              dataKey="pushes"
+              type="monotone"
+              stroke="var(--color-pushes)"
+              strokeWidth={1}
               dot={false}
             />
           </LineChart>

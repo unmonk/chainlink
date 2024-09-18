@@ -19,7 +19,6 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@/components/ui/tooltip";
-import { UrlObject } from "url";
 
 const MatchupView = ({ data, league }: { data: any; league: string }) => {
   const homeTeam = data.boxscore.teams[1].team;

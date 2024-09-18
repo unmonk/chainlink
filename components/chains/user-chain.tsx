@@ -10,8 +10,8 @@ export const UserChain = () => {
   return (
     <>
       <div className="flex flex-row items-center justify-center">
-        <div className="flex flex-row gap-4 items-center justify-center text-nowrap overflow-auto">
-          {!chain && <Skeleton className="h-8 w-16 m-1" />}
+        <div className="flex flex-row gap-2 md:gap-4 items-center justify-center text-nowrap overflow-auto">
+          {!chain && <Skeleton className="h-4 w-4 m-0 md:m-1" />}
           {chain && (
             <p className={streakColor(chain.chain)}>
               {streakLetter(chain.chain)}
@@ -20,13 +20,13 @@ export const UserChain = () => {
           )}
           {!chain && (
             <>
-              <Skeleton className="h-4 w-4 m-1" /> -{" "}
-              <Skeleton className="h-4 w-4 m-1" />
-              - <Skeleton className="h-4 w-4 m-1" />
+              <Skeleton className="h-4 w-4 m-0 md:m-1" /> -{" "}
+              <Skeleton className="h-4 w-4 m-0 md:m-1" />
+              - <Skeleton className="h-4 w-4 m-0 md:m-1" />
             </>
           )}
           {chain && (
-            <p className="font-mono">
+            <p className="font-mono text-sm md:text-base">
               {chain.wins} - {chain.losses} - {chain.pushes}
             </p>
           )}

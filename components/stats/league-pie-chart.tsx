@@ -101,9 +101,9 @@ export function LeaguePieChart({
   }, [chartData]);
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col bg-background/20">
       <CardHeader className="items-center pb-0">
-        <CardTitle>League Distribution</CardTitle>
+        <CardTitle>Picks Distribution</CardTitle>
         <CardDescription>Picks by League</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">

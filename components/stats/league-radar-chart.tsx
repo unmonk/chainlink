@@ -41,9 +41,9 @@ export const LeagueRadarChart: React.FC<LeagueRadarChartProps> = ({
   }
 
   return (
-    <Card>
+    <Card className="bg-background/20">
       <CardHeader className="items-center pb-4">
-        <CardTitle>League Stats</CardTitle>
+        <CardTitle>League Radar</CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
       <CardContent className="pb-0 w-full">

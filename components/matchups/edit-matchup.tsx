@@ -231,8 +231,9 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                               width={40}
                               style={{
                                 maxWidth: "100%",
-                                height: "auto"
-                              }} />
+                                height: "auto",
+                              }}
+                            />
                             <span>{league}</span>
                           </div>
                         </SelectItem>
@@ -272,8 +273,9 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                             height={40}
                             style={{
                               maxWidth: "100%",
-                              height: "auto"
-                            }} />
+                              height: "auto",
+                            }}
+                          />
                         </div>
                       )}
                       <FormItem>
@@ -328,8 +330,9 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                             height={40}
                             style={{
                               maxWidth: "100%",
-                              height: "auto"
-                            }} />
+                              height: "auto",
+                            }}
+                          />
                         </div>
                       )}
                       <FormItem>
@@ -514,7 +517,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
             <hr className="my-4" />
             <div className="flex flex-col space-y-2">
               <h4 className="text-lg font-medium">In Progress Actions</h4>
-              <Dialog>
+              {/* <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="destructive">Finalize Matchup</Button>
                 </DialogTrigger>
@@ -561,7 +564,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                   </div>
                 </DialogContent>
-              </Dialog>
+              </Dialog> */}
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="secondary">Release Picks</Button>

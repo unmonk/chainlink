@@ -1,6 +1,7 @@
 "use client";
 import MatchupView from "@/components/matchups/matchup-view";
 import { ContentLayout } from "@/components/nav/content-layout";
+import Loading from "@/components/ui/loading";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
@@ -40,7 +41,11 @@ export default function Page({ params }: { params: { id: string } }) {
   }, [summaryUrl]);
 
   if (!summary) {
-    return <div>Loading...</div>;
+    return (
+      <ContentLayout title="Loading...">
+        <Loading />
+      </ContentLayout>
+    );
   }
 
   return (

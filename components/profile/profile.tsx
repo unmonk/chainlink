@@ -24,41 +24,17 @@ function Profile({ user }: { user: User }) {
         Joined: <span>{format(user.createdAt)}</span>
       </p>
 
-      <h2>All-Time Stats</h2>
-      <h2>Current Stats</h2>
-
-      <div className="flex flex-row gap-4 mx-2">
-        <div className="friends-section">
+      <div className="grid grid-cols-2 gap-4 mx-2">
+        <div className="friends-section flex flex-col gap-2 items-center">
           <h2>Friends</h2>
-          <AvatarCircles
-            avatarUrls={[
-              "https://i.pravatar.cc/150?img=1",
-              "https://i.pravatar.cc/150?img=2",
-              "https://i.pravatar.cc/150?img=3",
-              "https://i.pravatar.cc/150?img=4",
-              "https://i.pravatar.cc/150?img=5",
-            ]}
-            numPeople={99}
-          />
-        </div>
-        <div className="squads-section">
-          <h2>Squads</h2>
-          <AvatarCircles
-            avatarUrls={[
-              "https://i.pravatar.cc/150?img=1",
-              "https://i.pravatar.cc/150?img=2",
-              "https://i.pravatar.cc/150?img=3",
-              "https://i.pravatar.cc/150?img=4",
-              "https://i.pravatar.cc/150?img=5",
-            ]}
-            numPeople={99}
-          />
-        </div>
-      </div>
 
-      <div className="statistics-panel">
-        <h2>Statistics</h2>
-        {/* Add statistics content here */}
+          <AvatarCircles avatarUrls={[]} numPeople={0} />
+        </div>
+        <div className="achievements-section flex flex-col gap-2 items-center">
+          <h2>Achievements</h2>
+
+          <AvatarCircles avatarUrls={[]} numPeople={0} />
+        </div>
       </div>
     </div>
   );

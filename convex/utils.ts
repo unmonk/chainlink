@@ -10,6 +10,24 @@ export function missingEnvVariableUrl(envVarName: string, whereToGet: string) {
   );
 }
 
+export interface UserMonthlyStats {
+  [key: string]: {
+    wins: number;
+    losses: number;
+    pushes: number;
+    winRate: number;
+    totalGames: number;
+    coins: number;
+    statsByLeague: {
+      [key: string]: {
+        wins: number;
+        losses: number;
+        pushes: number;
+      };
+    };
+  };
+}
+
 export function deploymentName() {
   const url = process.env.CONVEX_CLOUD_URL;
   if (!url) return undefined;

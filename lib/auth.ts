@@ -12,7 +12,7 @@ export async function getUserByUsername(username: string) {
   });
 
   if (user.data.length === 0) {
-    throw Error("No user found");
+    return null;
   }
   return user.data[0];
 }

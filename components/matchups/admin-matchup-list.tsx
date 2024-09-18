@@ -7,7 +7,7 @@ import { AdminColumns } from "./admin-columns";
 const AdminMatchupList = () => {
   const matchups = useQuery(api.matchups.getAdminMatchups, {});
   return (
-    <div>
+    <div className="p-2">
       <h1>Admin Matchup List</h1>
       {matchups && <DataTable columns={AdminColumns} data={matchups} />}
     </div>

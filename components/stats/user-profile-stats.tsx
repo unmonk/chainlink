@@ -1,4 +1,3 @@
-import { useQuery } from "convex/react";
 import {
   Card,
   CardContent,
@@ -6,17 +5,20 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { api } from "@/convex/_generated/api";
 import { leagueLogos } from "@/convex/utils";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
-import { Skeleton } from "../ui/skeleton";
 import { LeagueRadarChart } from "./league-radar-chart";
 import { MonthlyStatsChart } from "./monthly-stats-chart";
 import { LeaguePieChart } from "./league-pie-chart";
+import { Skeleton } from "../ui/skeleton";
+import { Doc } from "@/convex/_generated/dataModel";
 
-const DashboardStats = () => {
-  const user = useQuery(api.users.currentUser, {});
+interface UserStatsProps {
+  user: Doc<"users">;
+}
+
+const UserStats = ({ user }: UserStatsProps) => {
   const leagueChartData: {
     league: string;
     wins: number;
@@ -108,10 +110,12 @@ const DashboardStats = () => {
   }
 
   return (
-    <Card>
+    <Card className="bg-background/20">
       <CardHeader>
-        <CardTitle>Stats</CardTitle>
-        <CardDescription>All-Time Statistics</CardDescription>
+        <CardTitle className="text-center">
+          {user?.name}&apos;s statistics
+        </CardTitle>
+        <CardDescription className="text-center">All-Time</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center px-2 py-2 flex-wrap gap-1">
         {!user && (
@@ -142,8 +146,85 @@ const DashboardStats = () => {
       <CardContent className="grid gap-2 grid-cols-1">
         <LeagueRadarChart leagueData={leagueChartData} />
       </CardContent>
+      <CardContent>
+        <div className="flex flex-col gap-2 border rounded-lg p-2">
+          <h3 className="text-2xl mt-2 text-center font-semibold">
+            League Stats
+          </h3>
+          <p className="text-sm text-muted-foreground text-center">
+            Breakdown of performance across different leagues
+          </p>
+          <div className="grid gap-2 grid-cols-4 mt-1 items-center">
+            {!user &&
+              Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-28 w-full rounded-lg " />
+              ))}
+            {user &&
+              Object.entries(
+                Object.values(user.monthlyStats).reduce<
+                  Record<
+                    string,
+                    { wins: number; losses: number; pushes: number }
+                  >
+                >((acc, monthStats) => {
+                  Object.entries(
+                    //@ts-ignore
+                    monthStats.statsByLeague as Record<
+                      string,
+                      { wins: number; losses: number; pushes: number }
+                    >
+                  ).forEach(([league, stats]) => {
+                    if (!acc[league]) {
+                      acc[league] = { wins: 0, losses: 0, pushes: 0 };
+                    }
+                    acc[league].wins += stats.wins;
+                    acc[league].losses += stats.losses;
+                    acc[league].pushes += stats.pushes;
+                  });
+                  return acc;
+                }, {})
+              )
+                .sort(([, statsA], [, statsB]) => {
+                  const totalA = statsA.wins + statsA.losses + statsA.pushes;
+                  const totalB = statsB.wins + statsB.losses + statsB.pushes;
+                  return totalB - totalA; // Sort in descending order
+                })
+                .map(([league, stats]) => (
+                  <div
+                    key={league}
+                    className="flex flex-col items-center rounded-lg bg-accent/40 text-center p-1 w-full h-full"
+                  >
+                    <span className="sr-only">{league}</span>
+                    <Image
+                      src={leagueLogos[league] ?? "/logo.svg"}
+                      alt={league}
+                      width={50}
+                      height={50}
+                      style={{
+                        maxWidth: "100%",
+                        height: "auto",
+                      }}
+                    />
+                    <div className="flex justify-center px-1 py-2 flex-nowrap text-xs sm:text-sm md:text-base">
+                      {stats.wins} - {stats.losses} - {stats.pushes}
+                    </div>
+                    <p className="text-xs font-light text-muted-foreground">
+                      {league}
+                    </p>
+                  </div>
+                ))}
+          </div>
+        </div>
+      </CardContent>
+      <CardContent>
+        <MonthlyStatsChart monthlyData={monthlyChartData} />
+      </CardContent>
+
+      <CardContent>
+        <LeaguePieChart leagueChartData={leagueChartData} />
+      </CardContent>
     </Card>
   );
 };
 
-export default DashboardStats;
+export default UserStats;

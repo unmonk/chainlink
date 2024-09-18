@@ -1,7 +1,12 @@
 import { ContentLayout } from "@/components/nav/content-layout";
 import Profile from "@/components/profile/profile";
+import DashboardStats from "@/components/stats/dashboard-stats";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
 import { getUserByUsername } from "@/lib/auth";
 import { Metadata, ResolvingMetadata } from "next";
+import UserStats from "@/components/stats/user-profile-stats";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: { id: string };
@@ -14,6 +19,9 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const id = params.id;
   const user = await getUserByUsername(id);
+  if (!user) {
+    redirect("/dashboard");
+  }
   return {
     title: `${user.username} | ChainLink`,
     description: `View ${user.username}'s ChainLink profile.`,
@@ -37,15 +45,24 @@ export async function generateMetadata(
 }
 
 export default async function IdUserProfilePage({ params: { id } }: Props) {
-  const user = await getUserByUsername(id);
-
-  if (!user) {
+  const clerkUser = await getUserByUsername(id);
+  if (!clerkUser) {
     return <ContentLayout title="Profile">User not found</ContentLayout>;
   }
 
+  const user = await fetchQuery(api.users.queryByClerkId, {
+    clerkUserId: clerkUser.id,
+  });
+  if (!user) {
+    return (
+      <ContentLayout title="Profile">User not found in database</ContentLayout>
+    );
+  }
+
   return (
-    <ContentLayout title="Profile">
-      <Profile user={user} />
+    <ContentLayout title={`${user.name}`}>
+      <Profile user={clerkUser} />
+      <UserStats user={user} />
     </ContentLayout>
   );
 }
