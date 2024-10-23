@@ -8,6 +8,7 @@ import {
 import { pick_status } from "./schema";
 import { api, internal } from "./_generated/api";
 import { matchupReward } from "./utils";
+import { paginationOptsValidator } from "convex/server";
 
 export const getPickById = query({
   args: { pickId: v.id("picks") },
@@ -351,17 +352,17 @@ export const getUserActivePickWithMatchup = query({
 });
 
 export const getUserPicks = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
     const user = await ctx.auth.getUserIdentity();
     if (!user) {
-      return null;
+      throw new ConvexError("USER_NOT_FOUND");
     }
     const picks = await ctx.db
       .query("picks")
       .withIndex("by_externalId", (q) => q.eq("externalId", user.subject))
       .order("desc")
-      .take(50);
+      .paginate(args.paginationOpts);
 
     return picks;
   },

@@ -41,3 +41,23 @@ export const getSportFromLeague = (league: string): string => {
 
   return "other";
 };
+
+export const achievementTypes = [
+  "CHAINWIN",
+  "CHAINLOSS",
+  "CHAINPUSH",
+  "CAMPAIGNCHAIN",
+  "CAMPAIGNWINS",
+  "MONTHLYWIN",
+  "MONTHLYLOSS",
+  "WEEKLYWIN",
+  "WEEKLYLOSS",
+  "DAILYWIN",
+  "DAILYLOSS",
+  "SQUADWIN",
+  "SQUADLOSS",
+  "REFERRAL",
+  "COINS",
+  "FRIENDS",
+  "OTHER",
+] as const;

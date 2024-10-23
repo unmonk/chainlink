@@ -20,6 +20,8 @@ import {
 import { GiBugNet } from "react-icons/gi";
 import { MdSportsSoccer } from "react-icons/md";
 import { getSportFromLeague } from "@/lib/utils";
+import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
+
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
   const userPick = useQuery(api.picks.getUserActivePick, {});
@@ -78,7 +80,7 @@ const MatchupList = ({}) => {
         </div>
       )}
 
-      {/* Status Filters */}
+      {/* Status Filters - Always visible */}
       <div className="flex flex-col md:flex-row justify-center items-center gap-2 mb-4">
         <Tabs
           value={filter}
@@ -100,8 +102,7 @@ const MatchupList = ({}) => {
           </TabsList>
         </Tabs>
 
-        {/* League Filters */}
-
+        {/* League Filters - Always visible */}
         <Tabs defaultValue="all" className="flex justify-center">
           <TabsList className="">
             <TabsTrigger
@@ -127,39 +128,58 @@ const MatchupList = ({}) => {
       </div>
 
       <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3 flex-grow">
-        {!matchups &&
-          Array.from({ length: 12 }).map((_, i) => (
-            <Skeleton key={i} className="h-72 w-96 self-center rounded-lg" />
-          ))}
-        {filteredMatchups.length > 0 &&
-          filteredMatchups
-            .filter((m) => m._id !== userPickWithMatchup?.matchupId)
-            .sort((a, b) => {
-              if (a.status === "STATUS_POSTPONED") return 1;
-              if (b.status === "STATUS_POSTPONED") return -1;
-              return a.startTime - b.startTime;
-            })
-            .map((matchup) => {
-              if (matchup.featured) {
-                return (
-                  <BackgroundGradient
-                    key={matchup._id}
-                    animate={true}
-                    className="rounded-lg overflow-hidden shadow-lg"
-                  >
-                    <MatchupCard matchup={matchup} />
-                  </BackgroundGradient>
-                );
-              } else {
-                return <MatchupCard key={matchup._id} matchup={matchup} />;
-              }
-            })}
+        {!matchups
+          ? Array.from({ length: 12 }).map((_, i) => (
+              <Card key={i} className="w-full">
+                <CardHeader className="space-y-2">
+                  <Skeleton className="h-4 w-1/3" />
+                  <Skeleton className="h-4 w-1/2" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <Skeleton className="h-6 w-16" />
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                  </div>
+                  <Skeleton className="h-4 w-full" />
+                </CardContent>
+                <CardFooter>
+                  <Skeleton className="h-8 w-full" />
+                </CardFooter>
+              </Card>
+            ))
+          : filteredMatchups.length > 0 &&
+            filteredMatchups
+              .filter((m) => m._id !== userPickWithMatchup?.matchupId)
+              .sort((a, b) => {
+                if (a.status === "STATUS_POSTPONED") return 1;
+                if (b.status === "STATUS_POSTPONED") return -1;
+                return a.startTime - b.startTime;
+              })
+              .map((matchup) => {
+                if (matchup.featured) {
+                  return (
+                    <BackgroundGradient
+                      key={matchup._id}
+                      animate={true}
+                      className="rounded-lg overflow-hidden shadow-lg"
+                    >
+                      <MatchupCard matchup={matchup} />
+                    </BackgroundGradient>
+                  );
+                } else {
+                  return <MatchupCard key={matchup._id} matchup={matchup} />;
+                }
+              })}
       </div>
+
+      {/* Footer text */}
       <p className="text-center text-xs text-muted">
-        {matchups && matchups.length === 0 && "No matchups available"}
-        {!matchups && "Loading matchups"}
-        {matchups &&
-          matchups.length > 0 &&
+        {!matchups ? (
+          <Skeleton className="h-4 w-64 mx-auto" />
+        ) : matchups.length === 0 ? (
+          "No matchups available"
+        ) : (
           `${matchups.length} matchups | Window: ${new Date(
             minus6Hours
           ).toLocaleTimeString("en-US", {
@@ -170,7 +190,8 @@ const MatchupList = ({}) => {
             hour: "numeric",
             minute: "numeric",
             weekday: "short",
-          })}`}
+          })}`
+        )}
       </p>
     </div>
   );

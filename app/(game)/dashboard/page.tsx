@@ -19,6 +19,7 @@ import DashboardAchievements from "@/components/achievements/dashboard-achieveme
 import Image from "next/image";
 import Link from "next/link";
 import { ContentLayout } from "@/components/nav/content-layout";
+import ProfileAchievements from "@/components/profile/profile-achievements";
 
 export default function Dashboard() {
   return (
@@ -50,7 +51,14 @@ export default function Dashboard() {
           </Tabs> */}
           </div>
           <div className="gap-2 flex-col flex">
-            {/* <DashboardAchievements /> */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Achievements</CardTitle>
+              </CardHeader>
+              <div className="flex justify-center m-2">
+                <DashboardAchievements />
+              </div>
+            </Card>
             {/* <DashboardSquads /> */}
             <Card className="">
               <CardHeader>
@@ -70,8 +78,9 @@ export default function Dashboard() {
                         height={250}
                         style={{
                           maxWidth: "100%",
-                          height: "auto"
-                        }} />
+                          height: "auto",
+                        }}
+                      />
                     </Link>
                   </div>
                   <div className="overflow-hidden rounded-md justify-self-center">

@@ -9,8 +9,20 @@ export const POST = async (req: NextRequest) => {
   ) {
     throw new Error("Environment variables supplied not sufficient.");
   }
-  const { subscription } = (await req.json()) as {
+  const { subscription, payload } = (await req.json()) as {
     subscription: webPush.PushSubscription;
+    payload: {
+      notification: {
+        title: string;
+        message: string;
+        icon: string;
+        actions: {
+          action: string;
+          title: string;
+        }[];
+        data: Record<string, any>;
+      };
+    };
   };
   try {
     webPush.setVapidDetails(
@@ -21,8 +33,11 @@ export const POST = async (req: NextRequest) => {
     const response = await webPush.sendNotification(
       subscription,
       JSON.stringify({
-        title: "Hello Web Push",
-        message: "Your web push notification is here!",
+        title: payload.notification.title,
+        message: payload.notification.message,
+        icon: payload.notification.icon,
+        actions: payload.notification.actions,
+        data: payload.notification.data,
       })
     );
     return new NextResponse(response.body, {

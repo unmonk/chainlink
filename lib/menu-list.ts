@@ -50,6 +50,16 @@ export function getAdminMenuList(pathname: string): Group[] {
               label: "Matchups",
               active: pathname.includes("/admin/matchups"),
             },
+            {
+              href: "/admin/achievements",
+              label: "Achievements",
+              active: pathname.includes("/admin/achievements"),
+            },
+            {
+              href: "/admin/users",
+              label: "Users",
+              active: pathname.includes("/admin/users"),
+            },
           ],
         },
       ],

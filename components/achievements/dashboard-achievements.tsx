@@ -1,16 +1,9 @@
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+"use client";
+import { useUser } from "@clerk/nextjs";
+import AchievementCircles from "../magicui/achievement-circles";
 
-const DashboardAchievements = () => {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle>My Achievements</CardTitle>
-        <CardDescription className="text-xs text-muted-foreground">
-          0/10 Achievements
-        </CardDescription>
-      </CardHeader>
-    </Card>
-  );
-};
+export default function DashboardAchievements() {
+  const { user } = useUser();
 
-export default DashboardAchievements;
+  return <div>{user && <AchievementCircles userId={user?.id} />}</div>;
+}

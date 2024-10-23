@@ -38,6 +38,9 @@ export type PickStatus = Infer<typeof pick_status>;
 export const achievement_type = v.union(
   v.literal("CHAINWIN"),
   v.literal("CHAINLOSS"),
+  v.literal("CHAINPUSH"),
+  v.literal("CAMPAIGNCHAIN"),
+  v.literal("CAMPAIGNWINS"),
   v.literal("MONTHLYWIN"),
   v.literal("MONTHLYLOSS"),
   v.literal("WEEKLYWIN"),
@@ -48,7 +51,8 @@ export const achievement_type = v.union(
   v.literal("SQUADLOSS"),
   v.literal("REFERRAL"),
   v.literal("COINS"),
-  v.literal("FRIENDS")
+  v.literal("FRIENDS"),
+  v.literal("OTHER")
 );
 export type AchievementType = Infer<typeof achievement_type>;
 
@@ -60,7 +64,8 @@ export const transaction_type = v.union(
   v.literal("BONUS"),
   v.literal("GIFT"),
   v.literal("ACHIEVEMENT"),
-  v.literal("PAYOUT")
+  v.literal("PAYOUT"),
+  v.literal("OTHER")
 );
 export const trasaction_status = v.union(
   v.literal("PENDING"),
@@ -106,7 +111,8 @@ export default defineSchema({
   })
     .index("by_active_league", ["league", "active"])
     .index("by_active_dates", ["active", "startTime"])
-    .index("by_startTime", ["startTime"]),
+    .index("by_startTime", ["startTime"])
+    .index("by_gameId", ["gameId"]),
 
   campaigns: defineTable({
     name: v.string(),
@@ -190,7 +196,8 @@ export default defineSchema({
     image: v.string(),
     imageStorageId: v.id("_storage"),
     coins: v.number(),
-    value: v.number(),
+    weight: v.number(),
+    threshold: v.number(),
     type: achievement_type,
   }),
 

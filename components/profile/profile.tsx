@@ -4,6 +4,7 @@ import { User } from "@clerk/nextjs/server";
 import SparklesText from "../magicui/sparkles-text";
 import { format } from "timeago.js";
 import AvatarCircles from "../magicui/avatar-circles";
+import ProfileAchievements from "./profile-achievements";
 
 function Profile({ user }: { user: User }) {
   return (
@@ -33,7 +34,7 @@ function Profile({ user }: { user: User }) {
         <div className="achievements-section flex flex-col gap-2 items-center">
           <h2>Achievements</h2>
 
-          <AvatarCircles avatarUrls={[]} numPeople={0} />
+          <ProfileAchievements userId={user.id} />
         </div>
       </div>
     </div>

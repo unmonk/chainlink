@@ -33,6 +33,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "via.placeholder.com",
       },
+      {
+        protocol: "https",
+        hostname: "successful-guineapig-805.convex.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "img.clerk.com",
+      },
     ],
   },
   async headers() {

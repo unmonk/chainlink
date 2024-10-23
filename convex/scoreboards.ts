@@ -16,6 +16,111 @@ export const scoreboards = internalAction({
         message: string;
       }
     > = {};
+
+    // Fetch scoreboard data for all leagues
+    const leagueData: Record<League, ScoreboardResponse> = {
+      NFL: {
+        events: [],
+        leagues: undefined,
+      },
+      NBA: {
+        events: [],
+        leagues: undefined,
+      },
+      MLB: {
+        events: [],
+        leagues: undefined,
+      },
+      NHL: {
+        events: [],
+        leagues: undefined,
+      },
+      "COLLEGE-FOOTBALL": {
+        events: [],
+        leagues: undefined,
+      },
+      MBB: {
+        events: [],
+        leagues: undefined,
+      },
+      WBB: {
+        events: [],
+        leagues: undefined,
+      },
+      WNBA: {
+        events: [],
+        leagues: undefined,
+      },
+      MLS: {
+        events: [],
+        leagues: undefined,
+      },
+      PLL: {
+        events: [],
+        leagues: undefined,
+      },
+      NWSL: {
+        events: [],
+        leagues: undefined,
+      },
+      EPL: {
+        events: [],
+        leagues: undefined,
+      },
+      RPL: {
+        events: [],
+        leagues: undefined,
+      },
+      ARG: {
+        events: [],
+        leagues: undefined,
+      },
+      TUR: {
+        events: [],
+        leagues: undefined,
+      },
+      CSL: {
+        events: [],
+        leagues: undefined,
+      },
+      NBAG: {
+        events: [],
+        leagues: undefined,
+      },
+      FRIENDLY: {
+        events: [],
+        leagues: undefined,
+      },
+      UFL: {
+        events: [],
+        leagues: undefined,
+      },
+    };
+    const allGameIds: string[] = [];
+
+    for (const league of ACTIVE_LEAGUES) {
+      const url = getScoreboardUrl(league);
+      const response = await fetch(url);
+      const data = (await response.json()) as ScoreboardResponse;
+      leagueData[league] = data;
+
+      if (data.events && data.events.length > 0) {
+        allGameIds.push(...data.events.map((event) => event.id));
+      }
+    }
+    // Query all matchups at once
+    const allMatchups = await ctx.runQuery(
+      internal.matchups.getMatchupsByGameIds,
+      {
+        gameIds: allGameIds,
+      }
+    );
+
+    console.log(
+      `Total matchups (from db): ${allMatchups.length}.Total events (from espn): ${allGameIds.length}`
+    );
+
+    // Process each league
     for (const league of ACTIVE_LEAGUES) {
       let leagueResponse = {
         matchupsStarted: 0,
@@ -23,49 +128,29 @@ export const scoreboards = internalAction({
         matchupsUpdated: 0,
         message: "",
       };
-      //Get scoreboard data
-      const url = getScoreboardUrl(league);
-      const response = await fetch(url);
-      const data = (await response.json()) as ScoreboardResponse;
 
-      //skip if no events for league
+      const data = leagueData[league];
+
       if (!data.events || data.events.length === 0) {
         console.log(`${league}: no events fetched`);
-        leagueResponse = {
-          ...leagueResponse,
-          message: "NO EVENTS FOUND",
-        };
+        leagueResponse.message = "NO EVENTS FOUND";
         actionResponse[league] = leagueResponse;
         continue;
       }
 
-      //get list of gameIds
-      const gameIds = data.events.map((event) => event.id);
-
-      //get matchups from db
-      const matchups = await ctx.runQuery(
-        internal.matchups.getMatchupsByLeagueAndGameIds,
-        {
-          league,
-          gameIds,
-        }
-      );
+      const leagueMatchups = allMatchups.filter((m) => m.league === league);
 
       console.log(
-        `${league}: total fetched matchups (from db): ${matchups.length} :: total fetched events (from espn): ${data.events.length}`
+        `${league}: total fetched matchups (from db): ${leagueMatchups.length} :: total fetched events (from espn): ${data.events.length}`
       );
 
-      //#region compare each matchup with matching event for changes to score and status
+      // Process events for the current league
       for (const event of data.events) {
-        const matchup = matchups.find((matchup) => matchup.gameId === event.id);
-        //skip if no matchup found
+        const matchup = leagueMatchups.find((m) => m.gameId === event.id);
         if (!matchup) {
+          console.log(`${league}: no matchup found for ${event.shortName}`);
           continue;
         }
-
-        console.log(
-          `${league}: processing matchup ${event.shortName} :: ${event.competitions[0].status?.type?.name} :: ${matchup.status}`
-        );
 
         const eventStatus = event.competitions[0].status?.type?.name;
         const statusDetails = event.competitions[0].status?.type?.detail;
@@ -84,8 +169,6 @@ export const scoreboards = internalAction({
         const homeScore = parseInt(homeTeam.score);
         const awayScore = parseInt(awayTeam.score);
 
-        //#endregion
-
         //#region HANDLE MATCHUP STATUS AND SCORE CHANGES
 
         ///////////////////MATCHUP STARTED////////////////////////
@@ -94,6 +177,9 @@ export const scoreboards = internalAction({
           (eventStatus === "STATUS_IN_PROGRESS" ||
             eventStatus === "STATUS_FIRST_HALF")
         ) {
+          console.log(
+            `${league}: processing matchup started ${event.shortName} :: ${event.competitions[0].status?.type?.name} :: ${matchup.status}`
+          );
           await ctx.runMutation(internal.matchups.handleMatchupStarted, {
             matchupId: matchup._id,
             status: eventStatus,
@@ -126,6 +212,9 @@ export const scoreboards = internalAction({
             matchup.status === "STATUS_SCHEDULED") &&
           (eventStatus === "STATUS_FINAL" || eventStatus === "STATUS_FULL_TIME")
         ) {
+          console.log(
+            `${league}: processing matchup ended ${event.shortName} :: ${event.competitions[0].status?.type?.name} :: ${matchup.status}`
+          );
           await ctx.runMutation(internal.matchups.handleMatchupFinished, {
             matchupId: matchup._id,
             homeTeam: {
@@ -188,8 +277,13 @@ export const scoreboards = internalAction({
           }
           //#endregion
           if (!hasChanged) {
+            console.log(
+              `${league}: no changes for ${event.shortName}, skipping update`
+            );
             continue;
           } else {
+            console.log(hasChangedDetails);
+
             await ctx.runMutation(internal.matchups.handleMatchupUpdated, {
               matchupId: matchup._id,
               status: eventStatus,
@@ -211,16 +305,18 @@ export const scoreboards = internalAction({
               },
             });
             leagueResponse.matchupsUpdated++;
-            console.log(`${league}: matchup updated for ${event.shortName}`);
-            console.log(hasChangedDetails);
+            console.log(
+              `${league}: matchup updated for ${event.shortName} with ${hasChangedDetails}`
+            );
           }
         }
         // #endregion
       }
 
-      leagueResponse.message = `SUCCESS`;
+      leagueResponse.message = "SUCCESS";
       actionResponse[league] = leagueResponse;
     }
+
     return actionResponse;
   },
 });

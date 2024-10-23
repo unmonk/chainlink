@@ -191,6 +191,7 @@ export const handleMatchupStarted = internalMutation({
   },
 });
 
+//SCOREBOARDS
 export const getMatchupsByLeagueAndGameIds = internalQuery({
   args: { gameIds: v.array(v.string()), league: v.string() },
   handler: async (ctx, { gameIds, league }) => {
@@ -201,6 +202,15 @@ export const getMatchupsByLeagueAndGameIds = internalQuery({
           q.eq("league", league).eq("active", true)
         ),
       (m) => gameIds.includes(m.gameId)
+    ).collect();
+  },
+});
+
+export const getMatchupsByGameIds = internalQuery({
+  args: { gameIds: v.array(v.string()) },
+  handler: async (ctx, { gameIds }) => {
+    return await filter(ctx.db.query("matchups"), (m) =>
+      gameIds.includes(m.gameId)
     ).collect();
   },
 });

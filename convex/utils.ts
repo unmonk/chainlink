@@ -10,6 +10,12 @@ export function missingEnvVariableUrl(envVarName: string, whereToGet: string) {
   );
 }
 
+export function getImageUrl(storageId: string) {
+  const getImageUrl = new URL(`${process.env.NEXT_PUBLIC_CONVEX_URL}/getImage`);
+  getImageUrl.searchParams.set("storageId", storageId);
+  return getImageUrl.href;
+}
+
 export interface UserMonthlyStats {
   [key: string]: {
     wins: number;

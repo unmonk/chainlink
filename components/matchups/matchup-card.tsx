@@ -237,6 +237,7 @@ const MatchupPickButton = ({
         className="hover:scale-110 transition-transform duration-300 ease-in-out"
         sizes={"100%"}
         width={100}
+        priority={true}
         height={100}
         style={{
           maxWidth: "100%",
