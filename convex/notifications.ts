@@ -14,6 +14,7 @@ export const createMassNotification = action({
         icon: v.string(),
         badge: v.optional(v.string()),
         storageId: v.optional(v.id("_storage")),
+        image: v.optional(v.string()),
         actions: v.array(
           v.object({
             action: v.string(),
@@ -107,8 +108,11 @@ export const sendNotification = action({
     payload: v.object({
       notification: v.object({
         title: v.string(),
-        body: v.string(),
+        message: v.string(),
         icon: v.string(),
+        badge: v.optional(v.string()),
+        storageId: v.optional(v.id("_storage")),
+        image: v.optional(v.string()),
         actions: v.array(
           v.object({
             action: v.string(),
@@ -116,6 +120,8 @@ export const sendNotification = action({
           })
         ),
         data: v.any(),
+        clickActionUrl: v.optional(v.string()),
+        tag: v.optional(v.string()),
       }),
     }),
   },
@@ -123,6 +129,12 @@ export const sendNotification = action({
     const user = await clerkClient().users.getUser(clerkId);
     if (!user) {
       throw new ConvexError("USER_NOT_FOUND");
+    }
+    if (payload.notification.storageId) {
+      const imageUrl = await ctx.storage.getUrl(payload.notification.storageId);
+      if (imageUrl) {
+        payload.notification.image = imageUrl;
+      }
     }
 
     if (
@@ -144,7 +156,10 @@ export const sendNotification = action({
           process.env.NEXT_PUBLIC_WEB_PUSH_KEY!,
           process.env.WEB_PUSH_PRIVATE_KEY!
         );
-        await webPush.sendNotification(subscription, JSON.stringify(payload));
+        await webPush.sendNotification(
+          subscription,
+          JSON.stringify(payload.notification)
+        );
       } catch (err) {
         if (err instanceof webPush.WebPushError) {
           if (err.statusCode === 410 || err.statusCode === 404) {
@@ -181,7 +196,7 @@ export const handlePickWinNotification = action({
     const payload = {
       notification: {
         title: `Your Pick Won!`,
-        body: `${matchup.title} has concluded! Make your next pick now.`,
+        message: `${matchup.title} has concluded! Make your next pick now.`,
         icon: "/images/icon-512x512.png",
         actions: [{ action: "pick", title: "Pick Now" }],
         data: {
@@ -222,7 +237,7 @@ export const handlePickLossNotification = action({
     const payload = {
       notification: {
         title: `Your Pick Lost!`,
-        body: `${matchup.title} has concluded! Make your next pick now.`,
+        message: `${matchup.title} has concluded! Make your next pick now.`,
         icon: "/images/icon-512x512.png",
         actions: [{ action: "pick", title: "Pick Now" }],
         data: {
@@ -263,7 +278,7 @@ export const handlePickPushNotification = action({
     const payload = {
       notification: {
         title: `Your Pick Pushed!`,
-        body: `${matchup.title} has concluded! Make your next pick now.`,
+        message: `${matchup.title} has concluded! Make your next pick now.`,
         icon: "/images/icon-512x512.png",
         actions: [{ action: "pick", title: "Pick Now" }],
         data: {

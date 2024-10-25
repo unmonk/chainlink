@@ -80,7 +80,38 @@ export type SquadRole = Infer<typeof squad_role>;
 export const user_role = v.union(v.literal("USER"), v.literal("ADMIN"));
 export type UserRole = Infer<typeof user_role>;
 
+export const slot_symbol_type = v.union(
+  v.literal("COIN"),
+  v.literal("DIAMOND"),
+  v.literal("STAR"),
+  v.literal("SEVEN"),
+  v.literal("BAR"),
+  v.literal("CHERRY")
+);
+export type SlotSymbolType = Infer<typeof slot_symbol_type>;
+
 export default defineSchema({
+  slotMachineSpins: defineTable({
+    userId: v.id("users"),
+    spunAt: v.number(),
+    result: v.array(slot_symbol_type),
+    payout: v.number(),
+    freeSpin: v.boolean(),
+  }).index("by_userId", ["userId"]),
+
+  slotMachineConfig: defineTable({
+    active: v.boolean(),
+    symbolWeights: v.record(v.string(), v.number()),
+    payouts: v.array(
+      v.object({
+        line: v.number(),
+        payout: v.number(),
+      })
+    ),
+    spinCost: v.number(),
+    freeSpinInterval: v.number(),
+  }),
+
   matchups: defineTable({
     updatedAt: v.optional(v.number()),
     startTime: v.number(),
@@ -274,6 +305,15 @@ export default defineSchema({
     status: v.union(v.literal("ACTIVE"), v.literal("INACTIVE")),
     metadata: v.optional(v.object({})),
     settings: v.optional(v.object({})),
+    referralCode: v.optional(v.string()),
+    referredBy: v.optional(v.id("users")),
+    coinGames: v.optional(
+      v.object({
+        lastSlotSpin: v.optional(v.number()),
+        freeSpinCount: v.optional(v.number()),
+        lastFreeSpin: v.optional(v.number()),
+      })
+    ),
   })
     .index("by_token", ["tokenIdentifier"])
     .index("by_clerk_id", ["externalId"])

@@ -16,6 +16,7 @@ import type {
 import type * as achievements from "../achievements.js";
 import type * as campaigns from "../campaigns.js";
 import type * as chains from "../chains.js";
+import type * as coingames from "../coingames.js";
 import type * as crons from "../crons.js";
 import type * as leaderboards from "../leaderboards.js";
 import type * as matchups from "../matchups.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   achievements: typeof achievements;
   campaigns: typeof campaigns;
   chains: typeof chains;
+  coingames: typeof coingames;
   crons: typeof crons;
   leaderboards: typeof leaderboards;
   matchups: typeof matchups;

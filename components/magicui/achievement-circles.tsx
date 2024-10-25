@@ -12,7 +12,13 @@ import {
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-const AchievementCircles = ({ userId }: { userId: string }) => {
+const AchievementCircles = ({
+  userId,
+  username,
+}: {
+  userId: string;
+  username: string | null;
+}) => {
   const achievementsQuery = useQuery(
     api.achievements.getAchievementsByClerkUserId,
     {
@@ -51,7 +57,7 @@ const AchievementCircles = ({ userId }: { userId: string }) => {
                 src={a.image ?? ""}
                 width={75}
                 height={75}
-                alt={`a.name`}
+                alt={a.name}
               />
             </TooltipTrigger>
             <TooltipContent>{a.name}</TooltipContent>
@@ -60,7 +66,7 @@ const AchievementCircles = ({ userId }: { userId: string }) => {
       ))}
       <a
         className="hover:scale-125 transition-all duration-300 flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-black/20 text-center text-xs font-medium text-white hover:bg-gray-400 dark:border-gray-800 dark:bg-gray-700/40 dark:text-black"
-        href=""
+        href={`/u/${username}/achievements`}
       >
         +{numPeople}
       </a>

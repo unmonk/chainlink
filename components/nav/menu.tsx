@@ -19,6 +19,7 @@ import Coins from "../coins/coins";
 import { UserChain } from "../chains/user-chain";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { useUser } from "@clerk/nextjs";
+import { useState } from "react";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -29,6 +30,8 @@ export function Menu({ isOpen }: MenuProps) {
   const menuList = getMenuList(pathname);
   const adminMenuList = getAdminMenuList(pathname);
   const { user } = useUser();
+
+  const [spinFree, setSpinFree] = useState(false);
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block scrollbar-hide">
@@ -68,7 +71,12 @@ export function Menu({ isOpen }: MenuProps) {
                               className="w-full justify-start h-10 mb-1"
                               asChild
                             >
-                              <Link href={href}>
+                              <Link
+                                href={
+                                  href === "/u" ? `/u/${user?.username}` : href
+                                }
+                                className="relative flex items-center w-full"
+                              >
                                 <span
                                   className={cn(isOpen === false ? "" : "mr-4")}
                                 >
@@ -84,6 +92,9 @@ export function Menu({ isOpen }: MenuProps) {
                                 >
                                   {label}
                                 </p>
+                                {label === "Spin" && spinFree && (
+                                  <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
+                                )}
                               </Link>
                             </Button>
                           </TooltipTrigger>

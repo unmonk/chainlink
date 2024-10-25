@@ -1,11 +1,15 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Skeleton } from "../ui/skeleton";
 
 export const UserChain = () => {
   const chain = useQuery(api.chains.getUserActiveChain, {});
+  const createChain = useMutation(api.chains.createActiveChain);
+  if (chain === null) {
+    createChain();
+  }
 
   return (
     <>

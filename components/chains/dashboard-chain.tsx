@@ -16,10 +16,6 @@ import { Skeleton } from "../ui/skeleton";
 export const DashboardChain = () => {
   const { isAuthenticated } = useConvexAuth();
   const chain = useQuery(api.chains.getUserActiveChain, {});
-  const createChain = useMutation(api.chains.createActiveChain);
-  if (chain === null) {
-    createChain();
-  }
 
   if (chain === null) {
     return <Skeleton className="h-8 w-16 m-0.5" />;

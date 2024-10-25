@@ -10,6 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     background_color: "#161616",
     theme_color: "#1f821f",
+    categories: ["game", "social"],
     icons: [
       {
         src: "/icons/icon-192x192.png",

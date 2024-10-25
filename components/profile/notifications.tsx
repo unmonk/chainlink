@@ -202,6 +202,12 @@ export default function SendNotification() {
         },
         body: JSON.stringify({
           subscription,
+          payload: {
+            notification: {
+              title: "Test Notification",
+              message: "This is a test notification from ChainLink",
+            },
+          },
         }),
         signal: AbortSignal.timeout(10000),
       });

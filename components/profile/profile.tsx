@@ -25,7 +25,7 @@ function Profile({ user }: { user: User }) {
         Joined: <span>{format(user.createdAt)}</span>
       </p>
 
-      <div className="grid grid-cols-2 gap-4 mx-2">
+      {/* <div className="grid grid-cols-2 gap-4 mx-2">
         <div className="friends-section flex flex-col gap-2 items-center">
           <h2>Friends</h2>
 
@@ -36,6 +36,10 @@ function Profile({ user }: { user: User }) {
 
           <ProfileAchievements userId={user.id} />
         </div>
+      </div> */}
+      <div className="flex flex-col gap-2 items-center">
+        <h2>Achievements</h2>
+        <ProfileAchievements userId={user.id} username={user.username} />
       </div>
     </div>
   );

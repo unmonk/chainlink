@@ -13,6 +13,8 @@ import {
   ShieldAlertIcon,
   ListIcon,
   UserRound,
+  CoinsIcon,
+  ShirtIcon,
 } from "lucide-react";
 
 type Submenu = {
@@ -45,6 +47,11 @@ export function getAdminMenuList(pathname: string): Group[] {
           active: pathname.includes("/admin"),
           icon: ShieldAlertIcon,
           submenus: [
+            {
+              href: "/shop",
+              label: "Shop",
+              active: pathname.includes("/shop"),
+            },
             {
               href: "/admin/matchups",
               label: "Matchups",
@@ -105,6 +112,13 @@ export function getMenuList(pathname: string): Group[] {
           icon: TrophyIcon,
           submenus: [],
         },
+        {
+          href: "/spin",
+          label: "Spin",
+          active: pathname.includes("/spin"),
+          icon: CoinsIcon,
+          submenus: [],
+        },
       ],
     },
     {
@@ -117,6 +131,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: UserRound,
           submenus: [],
         },
+
         {
           href: "/settings",
           label: "Settings",

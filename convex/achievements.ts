@@ -129,13 +129,23 @@ export const getAchievementsByIds = query({
   },
   handler: async (ctx, { ids }) => {
     const achievements: Doc<"achievements">[] = [];
-    ids.forEach(async (id) => {
-      const achievement = await ctx.db.get(id);
-      if (achievement) {
-        achievements.push(achievement);
-      }
-    });
-    return achievements;
+
+    await Promise.all(
+      ids.map(async (id) => {
+        const achievement = await ctx.db.get(id);
+        if (achievement) {
+          achievements.push(achievement);
+        }
+      })
+    );
+
+    const achievementsWithImage = await Promise.all(
+      achievements.map(async (a) => ({
+        ...a,
+        image: await ctx.storage.getUrl(a.imageStorageId),
+      }))
+    );
+    return achievementsWithImage;
   },
 });
 
