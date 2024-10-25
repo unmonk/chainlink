@@ -127,7 +127,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/u",
           label: "My Profile",
-          active: pathname.includes("/u"),
+          active: pathname.includes("/u/"),
           icon: UserRound,
           submenus: [],
         },

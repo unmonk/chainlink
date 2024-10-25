@@ -40,7 +40,7 @@ interface SlotMachineProps {
 export function SlotMachine({ userId }: SlotMachineProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentSymbols, setCurrentSymbols] = useState<string[]>(
-    Array(5).fill(SYMBOLS.CHERRY)
+    Array(5).fill(SYMBOLS.DIAMOND)
   );
   const [lastWin, setLastWin] = useState<{
     payout: number;
@@ -160,11 +160,17 @@ export function SlotMachine({ userId }: SlotMachineProps) {
               variant={spinStatus.canFreeSpin ? "default" : "outline"}
               disabled={isSpinning || !spinStatus.canFreeSpin}
               onClick={() => handleSpin(true)}
+              className="relative overflow-hidden"
             >
               {isSpinning ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                "Free Spin"
+                <>
+                  {spinStatus.canFreeSpin && (
+                    <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-75 animate-pulse blur-sm" />
+                  )}
+                  <span className="relative z-10">Free Spin</span>
+                </>
               )}
             </Button>
             {!spinStatus.canFreeSpin && (

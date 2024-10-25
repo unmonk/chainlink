@@ -37,6 +37,17 @@ import Image from "next/image";
 import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -55,6 +66,7 @@ const formSchema = z.object({
 export default function NotificationForm() {
   const [image, setImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const generateUploadUrl = useMutation(api.achievements.generateUploadUrl);
@@ -133,24 +145,32 @@ export default function NotificationForm() {
     }
   };
 
+  // Add this new function to handle the confirmed submission
+  const onConfirmedSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    form.handleSubmit(handleSubmit, (errors) => {
+      console.log("Errors", errors);
+    })();
+    setIsLoading(false);
+    setIsAlertOpen(false);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
         <Card className="md:col-span-2 lg:col-span-1 row-span-2">
           <CardHeader>
-            <CardTitle>Create Push Notification</CardTitle>
-            <CardDescription>
+            <CardTitle>Create Mass Notification</CardTitle>
+            <CardDescription className="flex gap-2 flex-col">
               Enter the details for your push notification.
+              <span className="text-destructive animate-pulse">
+                This will send to all users.
+              </span>
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleSubmit, (errors) => {
-                  console.log("Errors", errors);
-                })}
-                className="space-y-4"
-              >
+              <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="title"
@@ -183,7 +203,7 @@ export default function NotificationForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="showImage"
                   render={({ field }) => (
@@ -263,10 +283,83 @@ export default function NotificationForm() {
                       </FormItem>
                     )}
                   />
-                )}
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send Notification"}
-                </Button>
+                )} */}
+                <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button type="submit" disabled={isLoading}>
+                      {isLoading ? "Sending..." : "Send Notification"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action will send a push notification to all users
+                        of the application. This action cannot be undone.
+                        <div className="bg-slate-100 p-4 rounded-lg shadow-inner mt-4">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <Image
+                              src="/icons/icon-192x192.png"
+                              width={192}
+                              height={192}
+                              className="h-5 w-5 text-black"
+                              alt="Notification icon"
+                            />
+                            <span className="font-semibold text-sm text-slate-600">
+                              ChainLink
+                            </span>
+                          </div>
+                          <div className="flex">
+                            {showImage && (
+                              <div className="mr-3">
+                                <Image
+                                  src={
+                                    image
+                                      ? URL.createObjectURL(image)
+                                      : "/icons/favicon-16x16.png"
+                                  }
+                                  alt="Notification image"
+                                  width={64}
+                                  height={64}
+                                  className="w-16 h-16 object-cover rounded"
+                                />
+                              </div>
+                            )}
+                            <div>
+                              <h3 className="font-bold mb-1 text-black">
+                                {form.watch("title") || "Notification Title"}
+                              </h3>
+                              <p className="text-sm text-slate-600">
+                                {form.watch("message") ||
+                                  "Notification body will appear here."}
+                              </p>
+                              {showCta && (
+                                <Button
+                                  variant="link"
+                                  className="p-0 h-auto mt-2 text-blue-500"
+                                >
+                                  {form.watch("cta") || "Click here"}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogContent></AlertDialogContent>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={onConfirmedSubmit}
+                        className="bg-red-500 hover:bg-red-600 text-white"
+                      >
+                        Yes, send notification
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </form>
             </Form>
           </CardContent>
