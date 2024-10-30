@@ -35,13 +35,18 @@ export const UserPickList = () => {
     <>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
         {results.map((pick) => (
-          <Link href={`/matchups/${pick.matchupId}`} key={pick._id} passHref>
+          <Link
+            href={`/matchups/${pick.matchupId}`}
+            key={pick._id}
+            passHref
+            prefetch={false}
+          >
             <Card
               key={pick._id}
               className={`h-full flex items-center flex-col text-center ${pick.status === "PENDING" || pick.status === "STATUS_IN_PROGRESS" ? "bg-blue-500/10" : pick.status === "WIN" ? "bg-green-500/10" : pick.status === "LOSS" ? "bg-red-500/10" : ""}`}
             >
               <CardHeader>
-                <CardTitle className="text-balance font-normal text-md">
+                <CardTitle className="text-balance font-normal text-md min-h-12">
                   {pick.pick.name}
                 </CardTitle>
                 <CardDescription>

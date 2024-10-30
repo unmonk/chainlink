@@ -1,9 +1,256 @@
 import { ConvexError, GenericId, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { achievement_type, pick_status } from "./schema";
+import { achievement_type, AchievementType, pick_status } from "./schema";
 import { api } from "./_generated/api";
 import { Doc, Id } from "./_generated/dataModel";
 import { userQuery } from "./users";
+
+export const getMonthlyChainWinAchievement = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("achievements")
+      .withIndex("by_type_threshold", (q) => q.eq("type", "CAMPAIGNCHAIN"))
+      .unique();
+  },
+});
+
+export const getMonthlyWinAchievement = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("achievements")
+      .withIndex("by_type_threshold", (q) => q.eq("type", "CAMPAIGNWINS"))
+      .unique();
+  },
+});
+
+export const checkPickAchievements = mutation({
+  args: {
+    chain: v.object({
+      wins: v.number(),
+      losses: v.number(),
+      pushes: v.number(),
+      best: v.number(),
+      chain: v.number(),
+      cost: v.number(),
+    }),
+    user: v.object({
+      _id: v.id("users"),
+      achievements: v.array(
+        v.object({
+          achievementId: v.id("achievements"),
+          awardedAt: v.number(),
+        })
+      ),
+      externalId: v.string(),
+      stats: v.object({
+        wins: v.number(),
+        losses: v.number(),
+        pushes: v.number(),
+        statsByLeague: v.any(),
+      }),
+    }),
+  },
+  handler: async (ctx, { chain, user }) => {
+    //check if chain is negative
+    let isNegative = chain.chain < 0;
+    let absoluteChain = Math.abs(chain.chain);
+    //check if chain is dividable by 5 or 10
+    if (
+      absoluteChain !== 0 &&
+      (absoluteChain % 5 === 0 || absoluteChain % 10 === 0)
+    ) {
+      //HANDLE CHAIN ACHIEVEMENTS
+      const achievementType: AchievementType = isNegative
+        ? "CHAINLOSS"
+        : "CHAINWIN";
+      const achievement = await ctx.db
+        .query("achievements")
+        .withIndex("by_type_threshold", (q) =>
+          q.eq("type", achievementType).eq("threshold", absoluteChain)
+        )
+        .unique();
+      if (achievement) {
+        //check if user already has this achievement
+        user.achievements.forEach((a) => {
+          if (a.achievementId === achievement._id) {
+            console.log(
+              `Achievement ${achievement._id} already awarded to user ${user._id}`
+            );
+            return;
+          }
+        });
+        await awardAchievementToUser(ctx, {
+          userId: user._id,
+          achievementId: achievement._id,
+        });
+        //send notification
+        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+          notificationType: "achievement",
+          clerkId: user.externalId,
+          payload: {
+            notification: {
+              title: `${achievement.name} Achievement Unlocked!`,
+              message: achievement.description,
+              icon: "/images/icon-512x512.png",
+              actions: [{ action: "achievement", title: "View Achievement" }],
+              data: {
+                onActionClick: {
+                  default: {
+                    operation: "openWindow",
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+
+    if (chain.wins !== 0 && (chain.wins % 5 === 0 || chain.wins % 10 === 0)) {
+      //handle wins achievement
+      const achievementType: AchievementType = "WINS";
+      const achievement = await ctx.db
+        .query("achievements")
+        .withIndex("by_type_threshold", (q) =>
+          q.eq("type", achievementType).eq("threshold", chain.wins)
+        )
+        .unique();
+      if (achievement) {
+        //check if user already has this achievement
+        user.achievements.forEach((a) => {
+          if (a.achievementId === achievement._id) {
+            console.log(
+              `Achievement ${achievement._id} already awarded to user ${user._id}`
+            );
+            return;
+          }
+        });
+        await awardAchievementToUser(ctx, {
+          userId: user._id,
+          achievementId: achievement._id,
+        });
+        //send notification
+        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+          notificationType: "achievement",
+          clerkId: user.externalId,
+          payload: {
+            notification: {
+              title: `${achievement.name} Achievement Unlocked!`,
+              message: achievement.description,
+              icon: "/images/icon-512x512.png",
+              actions: [{ action: "achievement", title: "View Achievement" }],
+              data: {
+                onActionClick: {
+                  default: {
+                    operation: "openWindow",
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+    if (
+      user.stats.losses !== 0 &&
+      (user.stats.losses % 5 === 0 || user.stats.losses % 10 === 0)
+    ) {
+      //handle losses achievement
+      const achievementType: AchievementType = "LOSS";
+      const achievement = await ctx.db
+        .query("achievements")
+        .withIndex("by_type_threshold", (q) =>
+          q.eq("type", achievementType).eq("threshold", user.stats.losses)
+        )
+        .unique();
+      if (achievement) {
+        //check if user already has this achievement
+        user.achievements.forEach((a) => {
+          if (a.achievementId === achievement._id) {
+            console.log(
+              `Achievement ${achievement._id} already awarded to user ${user._id}`
+            );
+            return;
+          }
+        });
+        await awardAchievementToUser(ctx, {
+          userId: user._id,
+          achievementId: achievement._id,
+        });
+        //send notification
+        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+          notificationType: "achievement",
+          clerkId: user.externalId,
+          payload: {
+            notification: {
+              title: `${achievement.name} Achievement Unlocked!`,
+              message: achievement.description,
+              icon: "/images/icon-512x512.png",
+              actions: [{ action: "achievement", title: "View Achievement" }],
+              data: {
+                onActionClick: {
+                  default: {
+                    operation: "openWindow",
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+    if (
+      user.stats.pushes !== 0 &&
+      (user.stats.pushes % 5 === 0 || user.stats.pushes % 10 === 0)
+    ) {
+      //handle pushes achievement
+      const achievementType: AchievementType = "PUSH";
+      const achievement = await ctx.db
+        .query("achievements")
+        .withIndex("by_type_threshold", (q) =>
+          q.eq("type", achievementType).eq("threshold", user.stats.pushes)
+        )
+        .unique();
+      if (achievement) {
+        //check if user already has this achievement
+        user.achievements.forEach((a) => {
+          if (a.achievementId === achievement._id) {
+            console.log(
+              `Achievement ${achievement._id} already awarded to user ${user._id}`
+            );
+            return;
+          }
+        });
+        await awardAchievementToUser(ctx, {
+          userId: user._id,
+          achievementId: achievement._id,
+        });
+        //send notification
+        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+          notificationType: "achievement",
+          clerkId: user.externalId,
+          payload: {
+            notification: {
+              title: `${achievement.name} Achievement Unlocked!`,
+              message: achievement.description,
+              icon: "/images/icon-512x512.png",
+              actions: [{ action: "achievement", title: "View Achievement" }],
+              data: {
+                onActionClick: {
+                  default: {
+                    operation: "openWindow",
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+  },
+});
 
 export const listAchievements = query({
   args: {},

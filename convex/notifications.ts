@@ -136,7 +136,6 @@ export const sendNotification = action({
         payload.notification.image = imageUrl;
       }
     }
-
     if (
       notificationType === "pickCompletion" &&
       !user.publicMetadata.pickCompletionNotifications

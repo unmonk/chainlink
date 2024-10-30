@@ -15,7 +15,10 @@ import {
   UserRound,
   CoinsIcon,
   ShirtIcon,
+  ScrollTextIcon,
 } from "lucide-react";
+
+import { RiTeamLine } from "react-icons/ri";
 
 type Submenu = {
   href: string;
@@ -63,9 +66,19 @@ export function getAdminMenuList(pathname: string): Group[] {
               active: pathname.includes("/admin/achievements"),
             },
             {
+              href: "/admin/quiz",
+              label: "Challenge",
+              active: pathname.includes("/admin/quiz"),
+            },
+            {
               href: "/admin/users",
               label: "Users",
               active: pathname.includes("/admin/users"),
+            },
+            {
+              href: "/admin/notifications",
+              label: "Notifications",
+              active: pathname.includes("/admin/notifications"),
             },
           ],
         },
@@ -106,10 +119,24 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
+          href: "/squads",
+          label: "My Squad",
+          active: pathname.includes("/squads"),
+          icon: RiTeamLine as LucideIcon,
+          submenus: [],
+        },
+        {
           href: "/leaderboards",
           label: "Leaderboards",
           active: pathname.includes("/leaderboards"),
           icon: TrophyIcon,
+          submenus: [],
+        },
+        {
+          href: "/challenge",
+          label: "Challenge",
+          active: pathname.includes("/challenge"),
+          icon: ScrollTextIcon,
           submenus: [],
         },
         {
@@ -131,7 +158,13 @@ export function getMenuList(pathname: string): Group[] {
           icon: UserRound,
           submenus: [],
         },
-
+        {
+          href: "/friends",
+          label: "Friends",
+          active: pathname.includes("/friends"),
+          icon: Users,
+          submenus: [],
+        },
         {
           href: "/settings",
           label: "Settings",

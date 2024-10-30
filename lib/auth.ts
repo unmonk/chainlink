@@ -16,3 +16,15 @@ export async function getUserByUsername(username: string) {
   }
   return user.data[0];
 }
+
+export async function getUsersByClerkIds(userIds: string[]) {
+  const users = await clerkClient().users.getUserList({
+    userId: userIds,
+    limit: userIds.length,
+  });
+  return users.data;
+}
+
+export async function getClerkUser(userId: string) {
+  return await clerkClient().users.getUser(userId);
+}

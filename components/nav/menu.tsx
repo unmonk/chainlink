@@ -20,6 +20,8 @@ import { UserChain } from "../chains/user-chain";
 import { ThemeToggle } from "../ui/theme-toggle";
 import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
+import { Card } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -201,18 +203,21 @@ export function Menu({ isOpen }: MenuProps) {
                 )}
               </li>
             ))}
-          <li className="w-full grow flex items-end ">
+          <li className="w-full grow items-end flex justify-center">
             <div
               className={cn(
-                "whitespace-nowrap flex flex-col gap-2",
+                "w-full",
                 isOpen === false ? "opacity-0 hidden" : "opacity-100"
               )}
             >
-              <UserChain />
-              <div className="flex flex-row gap-2">
-                <Coins />
-                <ThemeToggle />
-              </div>
+              <Card className="w-full p-2 flex flex-col gap-1 items-center bg-background/30">
+                <UserChain />
+                <Separator className="my-2" />
+                <div className="flex flex-row gap-2 justify-center items-center">
+                  <ThemeToggle />
+                  <Coins />
+                </div>
+              </Card>
             </div>
           </li>
         </ul>

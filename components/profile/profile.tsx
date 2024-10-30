@@ -3,16 +3,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User } from "@clerk/nextjs/server";
 import SparklesText from "../magicui/sparkles-text";
 import { format } from "timeago.js";
-import AvatarCircles from "../magicui/avatar-circles";
 import ProfileAchievements from "./profile-achievements";
+import AddFriendButton from "./add-friend-button";
 
 function Profile({ user }: { user: User }) {
   return (
-    <div className="flex flex-col items-center py-4 md:py-6">
+    <div className="relative flex flex-col items-center py-4 md:py-6">
+      <div className="absolute top-0 right-0">
+        <AddFriendButton userId={user.id} />
+      </div>
+
       <Avatar className="w-28 h-28">
         <AvatarFallback>{user.username?.charAt(0)}</AvatarFallback>
         <AvatarImage src={user.imageUrl} alt={user.username ?? "User Avatar"} />
       </Avatar>
+
       <SparklesText
         text={user.username ?? ""}
         colors={{
@@ -25,20 +30,8 @@ function Profile({ user }: { user: User }) {
         Joined: <span>{format(user.createdAt)}</span>
       </p>
 
-      {/* <div className="grid grid-cols-2 gap-4 mx-2">
-        <div className="friends-section flex flex-col gap-2 items-center">
-          <h2>Friends</h2>
-
-          <AvatarCircles avatarUrls={[]} numPeople={0} />
-        </div>
-        <div className="achievements-section flex flex-col gap-2 items-center">
-          <h2>Achievements</h2>
-
-          <ProfileAchievements userId={user.id} />
-        </div>
-      </div> */}
-      <div className="flex flex-col gap-2 items-center">
-        <h2>Achievements</h2>
+      <div className="flex flex-col gap-2 items-center mt-4">
+        <h2 className="text-lg font-bold">Achievements</h2>
         <ProfileAchievements userId={user.id} username={user.username} />
       </div>
     </div>

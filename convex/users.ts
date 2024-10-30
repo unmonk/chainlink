@@ -91,6 +91,18 @@ export const store = mutation({
   },
 });
 
+export const queryByUserIds = query({
+  args: {
+    userIds: v.array(v.id("users")),
+  },
+  handler: async (ctx, { userIds }) => {
+    //promise.all all the users
+    return await Promise.all(
+      userIds.map(async (userId) => await ctx.db.get(userId))
+    );
+  },
+});
+
 export const queryByClerkId = query({
   args: {
     clerkUserId: v.string(),
@@ -100,6 +112,22 @@ export const queryByClerkId = query({
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("externalId", clerkUserId))
       .unique();
+  },
+});
+
+export const queryByClerkIds = query({
+  args: {
+    clerkUserIds: v.array(v.string()),
+  },
+  handler: async (ctx, { clerkUserIds }) => {
+    return await Promise.all(
+      clerkUserIds.map(async (clerkUserId) => {
+        return await ctx.db
+          .query("users")
+          .withIndex("by_clerk_id", (q) => q.eq("externalId", clerkUserId))
+          .unique();
+      })
+    );
   },
 });
 

@@ -133,11 +133,22 @@ export const handlePickWin = internalMutation({
     await ctx.db.patch(pick._id, pick);
 
     //schedule achievements
-    // await ctx.scheduler.runAfter(0, api.achievements.checkAchievements, {
-    //   user: user,
-    //   pick: pick,
-    //   chain: chain,
-    // });
+    await ctx.scheduler.runAfter(0, api.achievements.checkPickAchievements, {
+      user: {
+        _id: user._id,
+        achievements: user.achievements,
+        stats: user.stats,
+        externalId: user.externalId,
+      },
+      chain: {
+        cost: chain.cost,
+        wins: chain.wins,
+        losses: chain.losses,
+        pushes: chain.pushes,
+        chain: chain.chain,
+        best: chain.best,
+      },
+    });
 
     //send notification
     await ctx.scheduler.runAfter(
@@ -217,6 +228,23 @@ export const handlePickLoss = internalMutation({
     await ctx.db.patch(user._id, user);
     await ctx.db.patch(pick._id, pick);
 
+    //schedule achievements
+    await ctx.scheduler.runAfter(0, api.achievements.checkPickAchievements, {
+      user: {
+        _id: user._id,
+        achievements: user.achievements,
+        stats: user.stats,
+        externalId: user.externalId,
+      },
+      chain: {
+        cost: chain.cost,
+        wins: chain.wins,
+        losses: chain.losses,
+        pushes: chain.pushes,
+        chain: chain.chain,
+        best: chain.best,
+      },
+    });
     //send notification
     await ctx.scheduler.runAfter(
       0,
@@ -283,6 +311,24 @@ export const handlePickPush = internalMutation({
     await ctx.db.patch(chain._id, chain);
     await ctx.db.patch(user._id, user);
     await ctx.db.patch(pick._id, pick);
+
+    //schedule achievements
+    await ctx.scheduler.runAfter(0, api.achievements.checkPickAchievements, {
+      user: {
+        _id: user._id,
+        achievements: user.achievements,
+        stats: user.stats,
+        externalId: user.externalId,
+      },
+      chain: {
+        cost: chain.cost,
+        wins: chain.wins,
+        losses: chain.losses,
+        pushes: chain.pushes,
+        chain: chain.chain,
+        best: chain.best,
+      },
+    });
 
     //send notification
     await ctx.scheduler.runAfter(

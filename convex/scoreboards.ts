@@ -210,7 +210,9 @@ export const scoreboards = internalAction({
             matchup.status === "STATUS_END_PERIOD" ||
             matchup.status === "STATUS_SECOND_HALF" ||
             matchup.status === "STATUS_SCHEDULED") &&
-          (eventStatus === "STATUS_FINAL" || eventStatus === "STATUS_FULL_TIME")
+          (eventStatus === "STATUS_FINAL" ||
+            eventStatus === "STATUS_FULL_TIME" ||
+            eventStatus === "STATUS_FINAL_PEN")
         ) {
           console.log(
             `${league}: processing matchup ended ${event.shortName} :: ${event.competitions[0].status?.type?.name} :: ${matchup.status}`
@@ -236,8 +238,6 @@ export const scoreboards = internalAction({
               ...matchup.metadata,
               statusDetails: statusDetails,
             },
-            cost: matchup.cost,
-            featured: matchup.featured,
           });
           leagueResponse.matchupsFinished++;
           console.log(`${league}: matchup finished for ${event.shortName}`);
@@ -258,6 +258,7 @@ export const scoreboards = internalAction({
           eventStatus &&
           eventStatus !== "STATUS_FINAL" &&
           eventStatus !== "STATUS_FULL_TIME" &&
+          eventStatus !== "STATUS_FINAL_PEN" &&
           eventStatus !== "STATUS_SCHEDULED"
         ) {
           //#region CHECK FOR CHANGES IN MATCHUP and LOGGING

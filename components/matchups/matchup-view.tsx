@@ -227,66 +227,70 @@ const PlayerStats = ({
                         <TableHeader>
                           <TableRow>
                             <TableHead>Player</TableHead>
-                            {statGroup.labels.map((label, index) => (
-                              <TableHead key={index}>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span>{label}</span>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      {statGroup.descriptions[index]}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </TableHead>
-                            ))}
+                            {statGroup.labels &&
+                              statGroup.labels.map((label, index) => (
+                                <TableHead key={index}>
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span>{label}</span>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        {statGroup.descriptions[index]}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                </TableHead>
+                              ))}
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {statGroup.athletes.map((athlete) => {
-                            if (athlete.active === false) {
-                              return null;
-                            }
-                            return (
-                              <TableRow key={athlete.athlete.id}>
-                                <TableCell>
-                                  <div className="flex items-center">
-                                    <Avatar className="h-10 w-10 mr-2">
-                                      <AvatarImage
-                                        src={
-                                          athlete.athlete.headshot?.href || ""
-                                        }
-                                        alt={athlete.athlete.displayName}
-                                      />
-                                      <AvatarFallback>
-                                        {athlete.athlete.shortName}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <p>{athlete.athlete.shortName}</p>
-                                    <span className="text-xs ml-2 text-muted-foreground">
-                                      #{athlete.athlete.jersey}
-                                    </span>
-                                  </div>
-                                </TableCell>
-                                {athlete.stats.map((stat, index) => (
-                                  <TableCell key={index}>
-                                    {" "}
-                                    <p className="text-nowrap">{stat}</p>
+                          {statGroup.athletes &&
+                            statGroup.athletes.map((athlete) => {
+                              if (athlete.active === false) {
+                                return null;
+                              }
+                              return (
+                                <TableRow key={athlete.athlete.id}>
+                                  <TableCell>
+                                    <div className="flex items-center">
+                                      <Avatar className="h-10 w-10 mr-2">
+                                        <AvatarImage
+                                          src={
+                                            athlete.athlete.headshot?.href || ""
+                                          }
+                                          alt={athlete.athlete.displayName}
+                                        />
+                                        <AvatarFallback>
+                                          {athlete.athlete.shortName}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <p>{athlete.athlete.shortName}</p>
+                                      <span className="text-xs ml-2 text-muted-foreground">
+                                        #{athlete.athlete.jersey}
+                                      </span>
+                                    </div>
                                   </TableCell>
-                                ))}
-                              </TableRow>
-                            );
-                          })}
+                                  {athlete.stats.map((stat, index) => (
+                                    <TableCell key={index}>
+                                      {" "}
+                                      <p className="text-nowrap">{stat}</p>
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              );
+                            })}
                           <TableRow>
                             <TableCell>Totals</TableCell>
-                            {statGroup.totals.map((total, index) => (
-                              <TableCell key={index}>
-                                <p className="font-semibold text-nowrap">
-                                  {total}
-                                </p>
-                              </TableCell>
-                            ))}
+                            {statGroup.totals &&
+                              statGroup.totals.length > 0 &&
+                              statGroup.totals.map((total, index) => (
+                                <TableCell key={index}>
+                                  <p className="font-semibold text-nowrap">
+                                    {total}
+                                  </p>
+                                </TableCell>
+                              ))}
                           </TableRow>
                         </TableBody>
                       </Table>
@@ -348,66 +352,70 @@ const PlayerStats = ({
                         <TableHeader>
                           <TableRow>
                             <TableHead>Player</TableHead>
-                            {statGroup.labels.map((label, index) => (
-                              <TableHead key={index}>
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span>{label}</span>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      {statGroup.descriptions[index]}
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </TableHead>
-                            ))}
+                            {statGroup.labels &&
+                              statGroup.labels.map((label, index) => (
+                                <TableHead key={index}>
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <span>{label}</span>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        {statGroup.descriptions[index]}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                </TableHead>
+                              ))}
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {statGroup.athletes.map((athlete) => {
-                            if (athlete.active === false) {
-                              return null;
-                            }
-                            return (
-                              <TableRow key={athlete.athlete.id}>
-                                <TableCell>
-                                  <div className="flex items-center">
-                                    <Avatar className="h-10 w-10 mr-2">
-                                      <AvatarImage
-                                        src={
-                                          athlete.athlete.headshot?.href || ""
-                                        }
-                                        alt={athlete.athlete.displayName}
-                                      />
-                                      <AvatarFallback>
-                                        {athlete.athlete.shortName}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <p>{athlete.athlete.shortName}</p>
-                                    <span className="text-xs ml-2 text-muted-foreground">
-                                      #{athlete.athlete.jersey}
-                                    </span>
-                                  </div>
-                                </TableCell>
-                                {athlete.stats.map((stat, index) => (
-                                  <TableCell key={index}>
-                                    {" "}
-                                    <p className="text-nowrap">{stat}</p>
+                          {statGroup.athletes &&
+                            statGroup.athletes.map((athlete) => {
+                              if (athlete.active === false) {
+                                return null;
+                              }
+                              return (
+                                <TableRow key={athlete.athlete.id}>
+                                  <TableCell>
+                                    <div className="flex items-center">
+                                      <Avatar className="h-10 w-10 mr-2">
+                                        <AvatarImage
+                                          src={
+                                            athlete.athlete.headshot?.href || ""
+                                          }
+                                          alt={athlete.athlete.displayName}
+                                        />
+                                        <AvatarFallback>
+                                          {athlete.athlete.shortName}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <p>{athlete.athlete.shortName}</p>
+                                      <span className="text-xs ml-2 text-muted-foreground">
+                                        #{athlete.athlete.jersey}
+                                      </span>
+                                    </div>
                                   </TableCell>
-                                ))}
-                              </TableRow>
-                            );
-                          })}
+                                  {athlete.stats.map((stat, index) => (
+                                    <TableCell key={index}>
+                                      {" "}
+                                      <p className="text-nowrap">{stat}</p>
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              );
+                            })}
                           <TableRow>
                             <TableCell>Totals</TableCell>
-                            {statGroup.totals.map((total, index) => (
-                              <TableCell key={index}>
-                                <p className="font-semibold text-nowrap">
-                                  {total}
-                                </p>
-                              </TableCell>
-                            ))}
+                            {statGroup.totals &&
+                              statGroup.totals.length > 0 &&
+                              statGroup.totals.map((total, index) => (
+                                <TableCell key={index}>
+                                  <p className="font-semibold text-nowrap">
+                                    {total}
+                                  </p>
+                                </TableCell>
+                              ))}
                           </TableRow>
                         </TableBody>
                       </Table>

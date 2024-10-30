@@ -53,7 +53,7 @@ const AchievementCircles = ({
           <Tooltip>
             <TooltipTrigger>
               <Image
-                className="h-12 w-12 rounded-full border border-white dark:border-gray-600/20 hover:scale-125 transition-all duration-300"
+                className="h-16 w-16 rounded-full border border-white dark:border-gray-600/20 hover:scale-125 transition-all duration-300"
                 src={a.image ?? ""}
                 width={75}
                 height={75}
@@ -65,7 +65,7 @@ const AchievementCircles = ({
         </TooltipProvider>
       ))}
       <a
-        className="hover:scale-125 transition-all duration-300 flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-black/20 text-center text-xs font-medium text-white hover:bg-gray-400 dark:border-gray-800 dark:bg-gray-700/40 dark:text-black"
+        className="hover:scale-125 transition-all duration-300 flex h-16 w-16 items-center justify-center rounded-full border-2 border-white bg-black/20 text-center text-xs font-medium text-white hover:bg-gray-400 dark:border-gray-800 dark:bg-gray-700/40 dark:text-black"
         href={`/u/${username}/achievements`}
       >
         +{numPeople}

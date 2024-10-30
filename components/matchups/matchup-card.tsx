@@ -14,7 +14,9 @@ const MatchupCard = ({ matchup }: { matchup: Doc<"matchups"> }) => {
   return (
     <Card className="rounded-t-none">
       <MatchupCardHeader matchup={matchup} />
-      <CardTitle className="text-lg px-1 font-bold">{matchup.title}</CardTitle>
+      <CardTitle className="text-lg px-1 font-bold min-h-12">
+        {matchup.title}
+      </CardTitle>
       <MatchupCardButtons matchup={matchup} />
     </Card>
   );
@@ -111,7 +113,7 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-3 items-center text-center p-2 min-h-12">
+      <div className="grid grid-cols-3 items-center text-center p-2 min-h-12 sticky bottom-0 bg-background/20 border-t border-border">
         <p className="text-primary text-sm">
           {matchup.featured && "Chain Builder🖇️"}
         </p>

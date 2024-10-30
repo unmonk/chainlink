@@ -20,6 +20,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ContentLayout } from "@/components/nav/content-layout";
 import ProfileAchievements from "@/components/profile/profile-achievements";
+import DashboardQuiz from "@/components/quiz/dashboard-quiz";
 
 export default function Dashboard() {
   return (
@@ -60,9 +61,10 @@ export default function Dashboard() {
               </div>
             </Card>
             {/* <DashboardSquads /> */}
+            <DashboardQuiz />
             <Card className="">
               <CardHeader>
-                <CardTitle className="text-xs text-muted-foreground">
+                <CardTitle className="text-sm text-muted-foreground">
                   Sponsors & Partners
                 </CardTitle>
               </CardHeader>

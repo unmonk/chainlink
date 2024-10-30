@@ -14,13 +14,20 @@ export function BackButton() {
     return null;
   }
 
+  if (pathSegments[0] === "u" && pathSegments.length === 2) {
+    return null;
+  }
+  if (pathSegments[0] === "squads" && pathSegments.length === 2) {
+    return null;
+  }
+
   const handleBack = () => {
     router.back();
   };
 
   return (
     <Button
-      className="h-8 hidden lg:flex"
+      className="h-8"
       variant="outline"
       size="icon"
       onClick={handleBack}

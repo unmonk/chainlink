@@ -1,7 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
 import {
   Card,
@@ -98,14 +98,28 @@ export const MonthlyStatsChart: React.FC<MonthlyStatsChartProps> = ({
               stroke="var(--color-wins)"
               strokeWidth={2}
               dot={false}
-            />
+            >
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground/50"
+                fontSize={8}
+              />
+            </Line>
             <Line
               dataKey="losses"
               type="monotone"
               stroke="var(--color-losses)"
               strokeWidth={2}
               dot={false}
-            />
+            >
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground/50"
+                fontSize={8}
+              />
+            </Line>
 
             <Line
               dataKey="pushes"

@@ -87,6 +87,10 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
   const releasePicksAllLosers = useMutation(api.picks.releasePicksAllLosers);
   const releasePicksAllPushes = useMutation(api.picks.releasePicksAllPushes);
   const forceCancelPicks = useMutation(api.picks.forceCancelPicks);
+  const manuallyFinalizeMatchup = useMutation(
+    api.matchups.manuallyFinalizeMatchup
+  );
+  const [open, setOpen] = useState(false);
 
   const methods = useForm<z.infer<typeof EditMatchupFormSchema>>({
     resolver: zodResolver(EditMatchupFormSchema),
@@ -119,6 +123,43 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
     },
   });
 
+  async function handleFinalize(finalizeType: string) {
+    try {
+      if (finalizeType === "ALL_WINNERS") {
+        await manuallyFinalizeMatchup({
+          matchupId: row._id as Id<"matchups">,
+          type: "ALL_WINNERS",
+        });
+        toast.success("Matchup finalized, all winners");
+      }
+      if (finalizeType === "ALL_LOSERS") {
+        await manuallyFinalizeMatchup({
+          matchupId: row._id as Id<"matchups">,
+          type: "ALL_LOSERS",
+        });
+        toast.success("Matchup finalized, all losers");
+      }
+      if (finalizeType === "ALL_PUSHES") {
+        await manuallyFinalizeMatchup({
+          matchupId: row._id as Id<"matchups">,
+          type: "ALL_PUSHES",
+        });
+        toast.success("Matchup finalized, all pushes");
+      }
+      if (finalizeType === "STANDARD_FINAL") {
+        await manuallyFinalizeMatchup({
+          matchupId: row._id as Id<"matchups">,
+          type: "STANDARD_FINAL",
+        });
+        toast.success("Matchup finalized, standard scoring");
+      }
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to finalize matchup:", error);
+      toast.error("Failed to finalize matchup");
+    }
+  }
+
   async function handleReleasePicks(releaseType: string) {
     try {
       if (releaseType === "DELETE") {
@@ -145,8 +186,10 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
         });
         toast.success("Picks released, all pushes");
       }
+      setOpen(false);
     } catch (error) {
       console.error("Failed to release picks:", error);
+      toast.error("Failed to release picks");
     }
   }
 
@@ -157,21 +200,23 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
         ...values,
         startTime: values.startTime,
       });
-      // Close the dialog or show a success message
+      setOpen(false);
     } catch (error) {
       console.error("Failed to update matchup:", error);
-      // Show an error message to the user
+      toast.error("Failed to update matchup");
     }
   }
 
   return (
-    <Drawer>
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button
           variant="outline"
           size="sm"
           disabled={
-            row.status === "STATUS_FINAL" || row.status === "STATUS_FULL_TIME"
+            row.status === "STATUS_FINAL" ||
+            row.status === "STATUS_FULL_TIME" ||
+            row.status === "STATUS_FULL_PEN"
           }
           className={
             row.status !== "STATUS_SCHEDULED"
@@ -517,7 +562,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
             <hr className="my-4" />
             <div className="flex flex-col space-y-2">
               <h4 className="text-lg font-medium">In Progress Actions</h4>
-              {/* <Dialog>
+              <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="destructive">Finalize Matchup</Button>
                 </DialogTrigger>
@@ -532,7 +577,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                   <div className="flex flex-col space-y-2">
                     <DialogTrigger asChild>
                       <Button
-                        //onClick={() => handleFinalize("STANDARD_FINAL")}
+                        onClick={() => handleFinalize("STANDARD_FINAL")}
                         variant={"secondary"}
                       >
                         Score Regularly
@@ -540,7 +585,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                     <DialogTrigger asChild>
                       <Button
-                        // onClick={() => handleFinalize("ALL_WINNERS")}
+                        onClick={() => handleFinalize("ALL_WINNERS")}
                         variant={"outline"}
                       >
                         All Picks Win
@@ -548,7 +593,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                     <DialogTrigger asChild>
                       <Button
-                        //onClick={() => handleFinalize("ALL_LOSERS")}
+                        onClick={() => handleFinalize("ALL_LOSERS")}
                         variant={"outline"}
                       >
                         All Picks Lose
@@ -556,7 +601,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                     <DialogTrigger asChild>
                       <Button
-                        //onClick={() => handleFinalize("ALL_PUSHES")}
+                        onClick={() => handleFinalize("ALL_PUSHES")}
                         variant={"outline"}
                       >
                         All Picks Push
@@ -564,7 +609,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                     </DialogTrigger>
                   </div>
                 </DialogContent>
-              </Dialog> */}
+              </Dialog>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="secondary">Release Picks</Button>

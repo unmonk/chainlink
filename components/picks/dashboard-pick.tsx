@@ -15,6 +15,7 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { CalendarRange, CircleArrowOutUpRightIcon } from "lucide-react";
 import { matchupReward } from "@/convex/utils";
+import AnimatedShinyText from "../ui/animated-shiny-text";
 
 const DashboardActivePick = () => {
   const pick = useQuery(api.picks.getUserActivePickWithMatchup, {});
@@ -30,10 +31,26 @@ const DashboardActivePick = () => {
           <CardDescription>No Active Pick</CardDescription>
         </CardHeader>
         <CardContent className="p-4 flex flex-col items-center">
-          <Button variant={"outline"} onClick={goToPlay} size="lg">
-            <CircleArrowOutUpRightIcon size={16} className="mr-1" />
-            Make Pick
-          </Button>
+          <div
+            className={cn(
+              "group rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            )}
+          >
+            <Button
+              variant={"ghost"}
+              onClick={goToPlay}
+              size="lg"
+              className="rounded-full"
+            >
+              <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
+                <CircleArrowOutUpRightIcon
+                  size={16}
+                  className="mr-1 size-3 transition-transform duration-300 ease-in-out group-hover:-translate-x-0.5"
+                />
+                <span>Make Pick</span>{" "}
+              </AnimatedShinyText>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
@@ -66,8 +83,9 @@ const DashboardActivePick = () => {
               style={{
                 maxWidth: "100%",
                 height: "auto",
-                objectFit: "cover"
-              }} />
+                objectFit: "cover",
+              }}
+            />
             <div className="flex flex-col text-sm leading-none">
               <span className="font-medium">{pick.matchup.awayTeam.name}</span>
             </div>
@@ -90,8 +108,9 @@ const DashboardActivePick = () => {
               style={{
                 maxWidth: "100%",
                 height: "auto",
-                objectFit: "cover"
-              }} />
+                objectFit: "cover",
+              }}
+            />
           </div>
         </div>
         {pick.matchup.status !== "STATUS_SCHEDULED" &&

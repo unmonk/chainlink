@@ -16,16 +16,19 @@ export const createMonthlyCampaign = internalAction({
     if (!activeGlobalCampaign) {
       throw new Error("No active global campaign found");
     }
-    const MONTHLYCHAINWINACHIEVEMENTID =
-      process.env.MONTHLYCHAINWINACHIEVEMENTID;
 
-    if (!MONTHLYCHAINWINACHIEVEMENTID) {
-      throw new Error("No Monthly Chain Win Achievement ID found");
+    //get achievements
+    const monthlyChainWinAchievement = await ctx.runQuery(
+      api.achievements.getMonthlyChainWinAchievement
+    );
+    if (!monthlyChainWinAchievement) {
+      throw new Error("No monthly chain win achievement found");
     }
-
-    const MONTHLYWINACHIEVEMENTID = process.env.MONTHLYWINACHIEVEMENTID;
-    if (!MONTHLYWINACHIEVEMENTID) {
-      throw new Error("No Monthly Win Achievement ID found");
+    const monthlyWinAchievement = await ctx.runQuery(
+      api.achievements.getMonthlyWinAchievement
+    );
+    if (!monthlyWinAchievement) {
+      throw new Error("No monthly win achievement found");
     }
 
     //get chains for the active global campaign
@@ -38,14 +41,29 @@ export const createMonthlyCampaign = internalAction({
     }
 
     //get chain with highest chain number
-    const highestChain = chains.reduce((prev, current) =>
-      prev.chain > current.chain ? prev : current
-    );
+    const highestChain = chains.reduce((prev, current) => {
+      if (prev.chain > current.chain) return prev;
+      if (prev.chain < current.chain) return current;
+      // If chains are equal, check wins
+      if (prev.wins > current.wins) return prev;
+      if (prev.wins < current.wins) return current;
+      // If wins are equal, check pushes
+      if (prev.pushes > current.pushes) return prev;
+      if (prev.pushes < current.pushes) return current;
+      // If everything is equal, keep the first one
+      return prev;
+    });
 
     //get chain with highest win number
-    const highestWin = chains.reduce((prev, current) =>
-      prev.wins > current.wins ? prev : current
-    );
+    const highestWin = chains.reduce((prev, current) => {
+      if (prev.wins > current.wins) return prev;
+      if (prev.wins < current.wins) return current;
+      // If wins are equal, check pushes
+      if (prev.pushes > current.pushes) return prev;
+      if (prev.pushes < current.pushes) return current;
+      // If everything is equal, keep the first one
+      return prev;
+    });
 
     if (!highestChain) {
       throw new Error("No Chain Winner");
@@ -78,14 +96,14 @@ export const createMonthlyCampaign = internalAction({
 
     await ctx.scheduler.runAfter(0, api.achievements.awardAchievement, {
       userId: highestChain.userId,
-      achievementId: MONTHLYCHAINWINACHIEVEMENTID as Id<"achievements">,
+      achievementId: monthlyChainWinAchievement._id,
     });
 
     //award highest win winner
 
     await ctx.scheduler.runAfter(0, api.achievements.awardAchievement, {
       userId: highestWin.userId,
-      achievementId: MONTHLYWINACHIEVEMENTID as Id<"achievements">,
+      achievementId: monthlyWinAchievement._id,
     });
 
     //create a new global campaign

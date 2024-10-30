@@ -1,200 +1,250 @@
 "use client";
-import * as React from "react";
 
-import { cn } from "@/lib/utils";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { ImageUpload } from "@/components/ui/image-upload";
+import { Switch } from "@/components/ui/switch";
+import { Id } from "@/convex/_generated/dataModel";
+import { Card, CardContent, CardTitle, CardHeader } from "../ui/card";
+import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PlusCircle } from "lucide-react";
-import {
-  UploadButton,
-  UploadDropzone,
-  UploadFileResponse,
-  useUploadFiles,
-} from "@xixixao/uploadstuff/react";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { Doc } from "@/convex/_generated/dataModel";
-import { Logo } from "../ui/logo";
-import { Avatar, AvatarImage } from "../ui/avatar";
-import { AvatarFallback } from "@radix-ui/react-avatar";
-import Slugify from "slugify";
-import { Switch } from "../ui/switch";
+
+const formSchema = z.object({
+  name: z.string().min(5).max(50),
+  description: z.string().min(10).max(500),
+  storageId: z.string(),
+  open: z.boolean(),
+  slug: z.string().min(5).max(50),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export function NewSquadForm() {
-  const [open, setOpen] = React.useState(false);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const router = useRouter();
+  const createSquad = useMutation(api.squads.createSquad);
+  const [isLoading, setIsLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant={"outline"}>
-            <PlusCircle size={16} className="mr-0.5" />
-            Create Squad
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Create Squad</DialogTitle>
-            <DialogDescription>
-              Make changes to your profile here. Click save when youre done.
-            </DialogDescription>
-          </DialogHeader>
-          <ProfileForm />
-        </DialogContent>
-      </Dialog>
-    );
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      storageId: "",
+      open: true,
+      slug: "",
+    },
+  });
+
+  function slugify(text: string) {
+    return text
+      .toLowerCase()
+      .replace(/[^\w ]+/g, "")
+      .replace(/ +/g, "-");
+  }
+
+  async function onNameChange(name: string) {
+    const slug = slugify(name);
+    form.setValue("slug", slug);
+    form.setValue("name", name);
+    form.trigger("slug");
+    form.trigger("name");
+  }
+
+  async function onSubmit(values: FormValues) {
+    try {
+      setIsLoading(true);
+
+      await createSquad({
+        name: values.name,
+        description: values.description,
+        storageId: values.storageId as Id<"_storage">,
+        image: "",
+        slug: values.slug,
+        open: true,
+      });
+
+      toast.success("Squad created successfully!");
+      setDialogOpen(false);
+      router.push(`/squads/${values.slug}`);
+    } catch (error) {
+      toast.error("Something went wrong!");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant={"outline"}>
-          <PlusCircle size={16} className="mr-0.5" />
-          Create Squad
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Create Squad</DrawerTitle>
-          <DrawerDescription>
-            Create a squad by providing a name, description, and a picture.
-          </DrawerDescription>
-        </DrawerHeader>
-        <ProfileForm className="px-4" />
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  );
-}
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-full sm:w-auto">Create New Squad</Button>
+      </DialogTrigger>
+      <DialogContent className="w-[95%] max-w-[600px] p-0 h-[95vh] sm:h-auto">
+        <DialogHeader className="p-4 sm:p-6 border-b">
+          <DialogTitle className="text-xl sm:text-2xl">
+            Create Squad
+          </DialogTitle>
+        </DialogHeader>
+        <div className="overflow-y-auto max-h-[calc(95vh-130px)] sm:max-h-none">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6 sm:space-y-8 p-4 sm:p-6"
+            >
+              <FormField
+                control={form.control}
+                name="storageId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Squad Image</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-function ProfileForm({ className }: React.ComponentProps<"form">) {
-  const generateUploadUrl = useMutation(api.squads.generateUploadUrl);
-  const { startUpload } = useUploadFiles(generateUploadUrl);
-  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
-  const [slug, setSlug] = React.useState<string>("");
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Squad Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter squad name"
+                        {...field}
+                        disabled={isLoading}
+                        onChange={(e) => onNameChange(e.target.value)}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      This will be your squad&apos;s display name
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Squad Slug</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="my-awesome-squad"
+                        {...field}
+                        disabled
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      This will be your squad&apos;s unique identifier
+                      <br />
+                      <span className="text-xs text-gray-500">
+                        chainlink.st/squads/{field.value}
+                      </span>
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Tell us about your squad"
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Describe what makes your squad unique
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-  const [formState, setFormState] = React.useState({
-    name: "",
-    description: "",
-    open: true,
-    slug: "my-awesome-squad",
-    imageId: "",
-  });
-
-  const onFileUpload = async (event: any) => {
-    const files = Array.from(event.target.files) as File[];
-    if (files.length === 0) {
-      return;
-    }
-    setImagePreview(URL.createObjectURL(files[0]));
-    const uploaded: UploadFileResponse[] = await startUpload(files);
-    const storageId = uploaded[0].response as string;
-
-    setFormState({
-      ...formState,
-      imageId: storageId,
-    });
-
-    console.log(uploaded);
-  };
-
-  const onFormInputChange = (event: any) => {
-    if (!event) {
-      return;
-    }
-    const { name, value } = event.target;
-    if (name === "name") {
-      const slug = Slugify(value);
-      console.log(slug);
-      setFormState({
-        ...formState,
-        slug: slug,
-        name: value,
-      });
-    }
-    if (name === "open") {
-      setFormState({
-        ...formState,
-        open: !formState.open,
-      });
-    } else {
-      setFormState({
-        ...formState,
-        [name]: value,
-      });
-    }
-  };
-
-  return (
-    <form className={cn("grid items-start gap-4", className)}>
-      {imagePreview && (
-        <div className="flex items-center justify-center">
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={imagePreview} />
-            <AvatarFallback>Squad Picture</AvatarFallback>
-          </Avatar>
+              <FormField
+                control={form.control}
+                name="open"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col sm:flex-row sm:items-center sm:justify-between rounded-lg border p-3 sm:p-4">
+                    <div className="space-y-1 mb-2 sm:mb-0">
+                      <FormLabel>Open Squad</FormLabel>
+                      <FormDescription className="text-sm">
+                        If your squad is open, anyone can join. If it&apos;s
+                        closed, you can invite people.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        {...field}
+                        checked={field.value}
+                        value={field.value.toString()}
+                        onCheckedChange={field.onChange}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
         </div>
-      )}
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Label htmlFor="picture">Picture</Label>
-        <Input id="picture" type="file" onChange={onFileUpload} />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          placeholder="My Awesome Squad"
-          onChange={onFormInputChange}
-        />
-        <span className="text-xs leading-snug text-muted-foreground">
-          chainlink.st/squads/{formState.slug}
-        </span>
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="name">Description</Label>
-        <Input
-          id="description"
-          placeholder="For people from my city..."
-          onChange={onFormInputChange}
-        />
-      </div>
-      <div className="flex items-center justify-between space-x-2">
-        <Label htmlFor="open" className="flex flex-col space-y-1">
-          <span>Open Membership</span>
-          <span className="font-normal leading-snug text-muted-foreground">
-            The squad will be open for anyone to join. Disable if you want to
-            invite members only.
-          </span>
-        </Label>
-        <Switch id="open" defaultChecked />
-      </div>
-
-      <Button type="submit">Create</Button>
-    </form>
+        <div className="border-t p-4 sm:p-6 mt-auto">
+          <div className="flex flex-col-reverse sm:flex-row items-center gap-2">
+            <DialogClose asChild>
+              <Button variant="outline" className="w-full sm:w-auto">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full sm:w-auto mb-2 sm:mb-0"
+              onClick={form.handleSubmit(onSubmit)}
+            >
+              {isLoading ? "Creating..." : "Create Squad"}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -23,6 +23,7 @@ import {
 } from "../ui/collapsible";
 import { Separator } from "../ui/separator";
 import { formatDistanceToNow } from "date-fns";
+import { RainbowButton } from "../ui/rainbow-button";
 
 const SYMBOLS = {
   CHERRY: "🍒",
@@ -106,7 +107,7 @@ export function SlotMachine({ userId }: SlotMachineProps) {
     <Card className="p-6 w-full max-w-2xl mx-auto">
       <div className="space-y-6">
         {/* Slot Display */}
-        <div className="flex justify-center gap-2 p-4 bg-black rounded-lg">
+        <div className="flex justify-center gap-2 p-4 bg-gray-50 dark:bg-background/50 rounded-lg">
           {currentSymbols.map((symbol, index) => (
             <div
               key={index}
@@ -130,7 +131,7 @@ export function SlotMachine({ userId }: SlotMachineProps) {
         </div>
 
         {/* Result Box */}
-        <div className="text-center p-4 rounded-lg bg-slate-100 dark:bg-slate-800 min-h-[80px] flex items-center justify-center">
+        <div className="text-center p-4 rounded-lg bg-gray-100 dark:bg-background/50 min-h-[80px] flex items-center justify-center">
           {isSpinning ? (
             <div className="text-lg font-semibold animate-pulse">
               Spinning...
@@ -153,7 +154,7 @@ export function SlotMachine({ userId }: SlotMachineProps) {
         </div>
 
         {/* Controls */}
-        <div className="flex justify-center gap-4">
+        <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col gap-2">
             <Button
               size="lg"
@@ -180,9 +181,7 @@ export function SlotMachine({ userId }: SlotMachineProps) {
             )}
           </div>
 
-          <Button
-            size="lg"
-            variant="secondary"
+          <RainbowButton
             disabled={isSpinning || !spinStatus.canPaidSpin}
             onClick={() => handleSpin(false)}
           >
@@ -191,7 +190,7 @@ export function SlotMachine({ userId }: SlotMachineProps) {
             ) : (
               `Spin (🔗${spinStatus.spinCost})`
             )}
-          </Button>
+          </RainbowButton>
         </div>
 
         {/* Paytable */}

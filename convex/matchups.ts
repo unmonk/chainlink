@@ -18,9 +18,11 @@ export const manuallyFinalizeMatchup = mutation({
     if (!matchup) {
       throw new Error(`Matchup not found: ${matchupId}`);
     }
+
     if (
       matchup.status === "STATUS_FINAL" ||
-      matchup.status === "STATUS_FULL_TIME"
+      matchup.status === "STATUS_FULL_TIME" ||
+      matchup.status === "STATUS_FULL_PEN"
     ) {
       throw new Error(`Matchup is already finalized: ${matchupId}`);
     }
@@ -31,7 +33,12 @@ export const manuallyFinalizeMatchup = mutation({
       );
       await ctx.scheduler.runAfter(0, internal.matchups.handleMatchupFinished, {
         matchupId,
-        ...matchup,
+        status: "STATUS_FINAL",
+        type: matchup.type,
+        typeDetails: matchup.typeDetails,
+        homeTeam: matchup.homeTeam,
+        awayTeam: matchup.awayTeam,
+        metadata: matchup.metadata,
       });
     }
 
@@ -42,7 +49,6 @@ export const manuallyFinalizeMatchup = mutation({
         internal.matchups.handleMatchupAllWinners,
         {
           matchupId,
-          ...matchup,
         }
       );
     }
@@ -54,7 +60,6 @@ export const manuallyFinalizeMatchup = mutation({
         internal.matchups.handleMatchupAllLosers,
         {
           matchupId,
-          ...matchup,
         }
       );
     }
@@ -66,15 +71,11 @@ export const manuallyFinalizeMatchup = mutation({
         internal.matchups.handleMatchupAllPushes,
         {
           matchupId,
-          ...matchup,
         }
       );
     }
 
-    const picks = await ctx.db
-      .query("picks")
-      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
-      .collect();
+    return { success: true };
   },
 });
 
@@ -271,22 +272,10 @@ export const handleMatchupFinished = internalMutation({
     }),
     status: v.string(),
     metadata: v.optional(v.any()),
-    cost: v.number(),
-    featured: v.boolean(),
   },
   handler: async (
     ctx,
-    {
-      matchupId,
-      homeTeam,
-      awayTeam,
-      status,
-      type,
-      typeDetails,
-      metadata,
-      cost,
-      featured,
-    }
+    { matchupId, homeTeam, awayTeam, status, type, typeDetails, metadata }
   ) => {
     //#region //////////////////DETERMINE WINS ///////////////////////
     let winnerId = undefined;
@@ -353,13 +342,11 @@ export const handleMatchupFinished = internalMutation({
 export const handleMatchupAllWinners = internalMutation({
   args: {
     matchupId: v.id("matchups"),
-    cost: v.number(),
-    featured: v.boolean(),
   },
-  handler: async (ctx, { matchupId, cost, featured }) => {
+  handler: async (ctx, args) => {
     const picks = await ctx.db
       .query("picks")
-      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", args.matchupId))
       .collect();
 
     for (const pick of picks) {
@@ -368,7 +355,7 @@ export const handleMatchupAllWinners = internalMutation({
       });
     }
 
-    await ctx.db.patch(matchupId, {
+    await ctx.db.patch(args.matchupId, {
       status: "STATUS_FINAL",
       active: false,
     });
@@ -379,9 +366,8 @@ export const handleMatchupAllWinners = internalMutation({
 export const handleMatchupAllLosers = internalMutation({
   args: {
     matchupId: v.id("matchups"),
-    cost: v.number(),
   },
-  handler: async (ctx, { matchupId, cost }) => {
+  handler: async (ctx, { matchupId }) => {
     const picks = await ctx.db
       .query("picks")
       .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
@@ -404,9 +390,8 @@ export const handleMatchupAllLosers = internalMutation({
 export const handleMatchupAllPushes = internalMutation({
   args: {
     matchupId: v.id("matchups"),
-    cost: v.number(),
   },
-  handler: async (ctx, { matchupId, cost }) => {
+  handler: async (ctx, { matchupId }) => {
     const picks = await ctx.db
       .query("picks")
       .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))

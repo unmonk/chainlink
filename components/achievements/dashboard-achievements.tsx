@@ -8,7 +8,11 @@ export default function DashboardAchievements() {
   return (
     <div>
       {user && (
-        <AchievementCircles userId={user?.id} username={user?.username} />
+        <div className="flex flex-col items-center justify-center">
+          <div className="w-full max-w-2xl">
+            <AchievementCircles userId={user?.id} username={user?.username} />
+          </div>
+        </div>
       )}
     </div>
   );

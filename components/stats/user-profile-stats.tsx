@@ -13,6 +13,7 @@ import { MonthlyStatsChart } from "./monthly-stats-chart";
 import { LeaguePieChart } from "./league-pie-chart";
 import { Skeleton } from "../ui/skeleton";
 import { Doc } from "@/convex/_generated/dataModel";
+import NumberTicker from "../ui/number-ticker";
 
 interface UserStatsProps {
   user: Doc<"users">;
@@ -109,13 +110,17 @@ const UserStats = ({ user }: UserStatsProps) => {
     });
   }
 
+  const ratio = totalWins / (totalWins + totalLosses);
+  const winRate = ratio * 100;
+
   return (
     <Card className="bg-background/20">
       <CardHeader>
-        <CardTitle className="text-center">
-          {user?.name}&apos;s statistics
-        </CardTitle>
-        <CardDescription className="text-center">All-Time</CardDescription>
+        <CardTitle className="text-center">{user?.name}&apos;s Stats</CardTitle>
+        <CardDescription className="text-center text-xl font-bold">
+          <NumberTicker value={winRate} decimalPlaces={2} direction="up" />% Win
+          Rate
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center px-2 py-2 flex-wrap gap-1">
         {!user && (
@@ -123,7 +128,7 @@ const UserStats = ({ user }: UserStatsProps) => {
         )}
         {user && (
           <Badge className="bg-green-500 text-white text-nowrap">
-            {totalWins} Wins
+            <NumberTicker value={totalWins} direction="up" /> Wins
           </Badge>
         )}
         {!user && (
@@ -131,7 +136,7 @@ const UserStats = ({ user }: UserStatsProps) => {
         )}
         {user && (
           <Badge className="bg-red-500 text-white text-nowrap">
-            {totalLosses} Losses
+            <NumberTicker value={totalLosses} direction="up" /> Losses
           </Badge>
         )}
         {!user && (
@@ -139,7 +144,7 @@ const UserStats = ({ user }: UserStatsProps) => {
         )}
         {user && (
           <Badge className="bg-gray-500 text-white text-nowrap">
-            {totalPushes} Pushes
+            <NumberTicker value={totalPushes} direction="up" /> Pushes
           </Badge>
         )}
       </CardContent>
