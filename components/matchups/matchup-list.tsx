@@ -21,6 +21,7 @@ import { GiBugNet } from "react-icons/gi";
 import { MdSportsSoccer } from "react-icons/md";
 import { getSportFromLeague } from "@/lib/utils";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
+import BlurFade from "../ui/blur-fade";
 
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
@@ -156,19 +157,33 @@ const MatchupList = ({}) => {
                 if (b.status === "STATUS_POSTPONED") return -1;
                 return a.startTime - b.startTime;
               })
-              .map((matchup) => {
+              .map((matchup, idx) => {
                 if (matchup.featured) {
                   return (
-                    <BackgroundGradient
+                    <BlurFade
                       key={matchup._id}
-                      animate={true}
-                      className="rounded-lg overflow-hidden shadow-lg"
+                      delay={0.25 * idx * 0.01}
+                      inView
                     >
-                      <MatchupCard matchup={matchup} />
-                    </BackgroundGradient>
+                      <BackgroundGradient
+                        key={matchup._id}
+                        animate={true}
+                        className="rounded-lg overflow-hidden shadow-lg"
+                      >
+                        <MatchupCard matchup={matchup} />
+                      </BackgroundGradient>
+                    </BlurFade>
                   );
                 } else {
-                  return <MatchupCard key={matchup._id} matchup={matchup} />;
+                  return (
+                    <BlurFade
+                      key={matchup._id}
+                      delay={0.25 * idx * 0.01}
+                      inView
+                    >
+                      <MatchupCard matchup={matchup} />
+                    </BlurFade>
+                  );
                 }
               })}
       </div>

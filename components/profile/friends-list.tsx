@@ -32,6 +32,7 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
+import { motion } from "framer-motion";
 
 export function FriendsList() {
   const user = useUser();
@@ -94,6 +95,15 @@ export function FriendsList() {
 
   if (!mergedRequests || !mergedFriends) return null;
 
+  const FADE_UP_ANIMATION_VARIANTS = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0, transition: { type: "spring" } },
+  };
+  const FADE_DOWN_ANIMATION_VARIANTS = {
+    hidden: { opacity: 0, y: -10 },
+    show: { opacity: 1, y: 0, transition: { type: "spring" } },
+  };
+
   return (
     <SignedIn>
       <Card className="w-full">
@@ -103,15 +113,28 @@ export function FriendsList() {
         </CardHeader>
         <CardContent>
           {mergedRequests && mergedRequests.length > 0 && (
-            <>
+            <motion.div
+              initial="hidden"
+              animate="show"
+              viewport={{ once: true }}
+              variants={{
+                hidden: {},
+                show: {
+                  transition: {
+                    staggerChildren: 0.15,
+                  },
+                },
+              }}
+            >
               <div className="mb-4">
                 <h3 className="text-sm font-medium mb-2">Pending Requests</h3>
                 <ScrollArea className="h-[150px]">
                   {mergedRequests.map((request) => {
                     return (
-                      <div
+                      <motion.div
                         key={request._id}
                         className="flex items-center justify-between p-2"
+                        variants={FADE_DOWN_ANIMATION_VARIANTS}
                       >
                         <Link href={`/u/${request.user?.name}`} passHref>
                           <div className="flex items-center gap-2">
@@ -150,93 +173,113 @@ export function FriendsList() {
                             Decline
                           </Button>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </ScrollArea>
               </div>
               <Separator className="my-4" />
-            </>
+            </motion.div>
           )}
 
           <div>
             <h3 className="text-sm font-medium mb-2">Friends</h3>
             <ScrollArea className="h-[200px]">
-              {mergedFriends &&
-                mergedFriends.map((friend) => {
-                  return (
-                    <div
-                      key={friend.userId}
-                      className="flex items-center justify-between p-2 hover:bg-muted rounded-md cursor-pointer transition-all duration-300 ease-in-out border-y border-border"
-                    >
-                      <Link href={`/u/${friend.user?.name}`} className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <Avatar>
-                            <AvatarImage src={friend.user?.image} />
-                            <AvatarFallback>
-                              {friend.user?.name?.slice(0, 2).toUpperCase() ??
-                                "??"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium">
-                                {friend.user?.name ?? "Loading..."}
+              <motion.div
+                initial="hidden"
+                animate="show"
+                viewport={{ once: true }}
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: {
+                      staggerChildren: 0.3,
+                    },
+                  },
+                }}
+              >
+                {mergedFriends &&
+                  mergedFriends.map((friend) => {
+                    return (
+                      <motion.div
+                        key={friend.userId}
+                        className="flex items-center justify-between p-2 hover:bg-muted rounded-md cursor-pointer transition-all duration-300 ease-in-out border-y border-border"
+                        variants={FADE_UP_ANIMATION_VARIANTS}
+                      >
+                        <Link
+                          href={`/u/${friend.user?.name}`}
+                          className="flex-1"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Avatar>
+                              <AvatarImage src={friend.user?.image} />
+                              <AvatarFallback>
+                                {friend.user?.name?.slice(0, 2).toUpperCase() ??
+                                  "??"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium">
+                                  {friend.user?.name ?? "Loading..."}
+                                </p>
+                                <span
+                                  className={`h-2 w-2 rounded-full ${
+                                    friend.status === "ONLINE"
+                                      ? "bg-green-500"
+                                      : "bg-gray-300"
+                                  }`}
+                                />
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {friend.status.toLowerCase()}
                               </p>
-                              <span
-                                className={`h-2 w-2 rounded-full ${
-                                  friend.status === "ONLINE"
-                                    ? "bg-green-500"
-                                    : "bg-gray-300"
-                                }`}
-                              />
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                              {friend.status.toLowerCase()}
-                            </p>
                           </div>
-                        </div>
-                      </Link>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="ml-2 hover:bg-red-500 hover:text-white rounded-md shrink-0"
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Remove Friend</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to remove this friend? This
-                              action cannot be undone. You have been friends
-                              with{" "}
-                              <Badge variant="outline">
-                                {friend.user?.name}
-                              </Badge>{" "}
-                              for{" "}
-                              <span className="font-medium">
-                                {formatDistanceToNow(friend.addedAt)}
-                              </span>
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleRemoveFriend(friend.userId)}
-                              className="bg-red-500 hover:bg-red-600"
+                        </Link>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="ml-2 hover:bg-red-500 hover:text-white rounded-md shrink-0"
                             >
-                              Remove
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  );
-                })}
+                              <Trash className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Remove Friend</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to remove this friend?
+                                This action cannot be undone. You have been
+                                friends with{" "}
+                                <Badge variant="outline">
+                                  {friend.user?.name}
+                                </Badge>{" "}
+                                for{" "}
+                                <span className="font-medium">
+                                  {formatDistanceToNow(friend.addedAt)}
+                                </span>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() =>
+                                  handleRemoveFriend(friend.userId)
+                                }
+                                className="bg-red-500 hover:bg-red-600"
+                              >
+                                Remove
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </motion.div>
+                    );
+                  })}
+              </motion.div>
             </ScrollArea>
           </div>
         </CardContent>
