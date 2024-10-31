@@ -106,10 +106,10 @@ export const HeroCards = () => {
 
   return (
     <div className="hidden lg:flex flex-row flex-nowrap gap-2">
-      <div className="hidden xl:flex flex-col w-1/2 h-full items-center justify-center gap-4">
+      <div className="hidden  flex-col w-1/2 h-full items-center justify-center gap-4">
         <Card className=" drop-shadow-xl shadow-black/10 dark:shadow-white/10 w-full">
           {!matchups && <Skeleton className="w-full h-12" />}
-          <CardHeader className="flex flex-row items-center gap-4 pb-2 font-bold text-lg text-nowrap">
+          <CardHeader className="flex flex-row items-center gap-4 pb-2 font-bold text-lg">
             {matchups && matchups[0].title}
           </CardHeader>
 
@@ -210,8 +210,9 @@ export const HeroCards = () => {
                     height={50}
                     style={{
                       maxWidth: "100%",
-                      height: "auto"
-                    }} />
+                      height: "auto",
+                    }}
+                  />
                 )}
                 {!matchups && <Skeleton className="w-9 h-9 rounded-full" />}
                 {matchups && (
@@ -222,8 +223,9 @@ export const HeroCards = () => {
                     height={50}
                     style={{
                       maxWidth: "100%",
-                      height: "auto"
-                    }} />
+                      height: "auto",
+                    }}
+                  />
                 )}
               </div>
 

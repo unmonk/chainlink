@@ -44,17 +44,18 @@ export default function SquadMembers({
                   <AvatarImage src={member.image} />
                   <AvatarFallback>{member.name}</AvatarFallback>
                 </Avatar>
+
                 <div className="space-y-1">
-                  <div className="font-medium text-xl">{member.name}</div>
+                  <div className="font-medium text-xl">
+                    {member.squadInfo.role === "OWNER" && "⭐"}
+                    {member.name}
+                  </div>
 
                   <div className="text-xs text-muted-foreground">
                     Joined{" "}
                     {formatDistanceToNow(member.squadInfo.joinedAt, {
                       addSuffix: true,
                     })}
-                  </div>
-                  <div className="text-xs font-semibold capitalize text-primary">
-                    {member.squadInfo.role === "OWNER" && member.squadInfo.role}
                   </div>
                 </div>
               </div>
