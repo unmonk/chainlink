@@ -12,9 +12,9 @@ import { matchupReward } from "@/convex/utils";
 
 const MatchupCard = ({ matchup }: { matchup: Doc<"matchups"> }) => {
   return (
-    <Card className="rounded-t-none">
+    <Card className="rounded-t-none flex flex-col h-full">
       <MatchupCardHeader matchup={matchup} />
-      <CardTitle className="text-lg px-1 font-bold min-h-12">
+      <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2">
         {matchup.title}
       </CardTitle>
       <MatchupCardButtons matchup={matchup} />
@@ -26,7 +26,7 @@ export default MatchupCard;
 
 const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
   return (
-    <div className="p-1">
+    <div className="flex flex-col">
       <div className="grid grid-cols-3 items-center text-center">
         <p className="text-balance text-sm font-semibold">
           {matchup.awayTeam.name}
@@ -113,7 +113,7 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-3 items-center text-center p-2 min-h-12 sticky bottom-0 bg-background/20 border-t border-border">
+      <div className="grid grid-cols-3 items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border">
         <p className="text-primary text-sm">
           {matchup.featured && "Chain Builder🖇️"}
         </p>
@@ -137,7 +137,9 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
             matchup.status === "STATUS_SCHEDULED" ||
             matchup.status === "STATUS_POSTPONED"
               ? "font-extralight text-light text-sm"
-              : matchup.status === "STATUS_FINAL"
+              : matchup.status === "STATUS_FINAL" ||
+                  matchup.status === "STATUS_FINAL_OT" ||
+                  matchup.status === "STATUS_FINAL_PEN"
                 ? "font-bold font-sans"
                 : "text-red-500 animate-pulse"
           }
@@ -145,7 +147,9 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
           {matchup.status === "STATUS_SCHEDULED" ||
           matchup.status === "STATUS_POSTPONED"
             ? ""
-            : matchup.status === "STATUS_FINAL"
+            : matchup.status === "STATUS_FINAL" ||
+                matchup.status === "STATUS_FINAL_OT" ||
+                matchup.status === "STATUS_FINAL_PEN"
               ? displayWinner(matchup)
               : "Locked"}
         </p>
@@ -267,6 +271,8 @@ export const MatchupCardHeader = ({
       case "STATUS_END_PERIOD":
         return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800";
       case "STATUS_FINAL":
+      case "STATUS_FINAL_OT":
+      case "STATUS_FINAL_PEN":
         return "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400";
       case "STATUS_POSTPONED":
       case "STATUS_CANCELED":
