@@ -49,7 +49,7 @@ export const LeaderboardList = () => {
         </TabsList>
         <TabsContent value="chain">
           <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold">Current Campaign (Monthly)</h2>
+            <h2 className="text-2xl font-bold">Current Best Chain</h2>
             <div className="grid grid-cols-1 gap-6">
               {leaderboardData[0] && (
                 <BackgroundGradient
@@ -192,7 +192,7 @@ export const LeaderboardList = () => {
         </TabsContent>
         <TabsContent value="wins">
           <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-bold">All-Time Wins</h2>
+            <h2 className="text-2xl font-bold">Current Wins</h2>
             <div className="grid grid-cols-1 gap-6">
               {leaderboardData.sort((a, b) => {
                 const aWins = Object.values(a.user?.monthlyStats || {}).reduce(
@@ -203,7 +203,7 @@ export const LeaderboardList = () => {
                   (sum, month: any) => sum + (month.wins || 0),
                   0
                 );
-                return (bWins as number) - (aWins as number);
+                return (bWins as number) + (aWins as number);
               })[0] && (
                 <BackgroundGradient
                   key={leaderboardData[0].user?._id}

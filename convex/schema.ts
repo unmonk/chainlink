@@ -260,6 +260,7 @@ export default defineSchema({
       coins: v.number(),
       statsByLeague: v.any(),
     }),
+    rank: v.optional(v.number()),
     monthlyStats: v.optional(v.any()),
     score: v.number(),
     members: v.array(

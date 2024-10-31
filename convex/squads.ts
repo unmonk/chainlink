@@ -1,6 +1,8 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalAction, mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { pick_status } from "./schema";
+import { getSquadScore } from "./utils";
 
 export const getSquad = query({
   args: { squadId: v.id("squads") },
@@ -18,6 +20,18 @@ export const getSquadBySlug = query({
       .withIndex("by_slug", (q) => q.eq("slug", slug))
       .first();
     return squad;
+  },
+});
+
+export const getSquadsByScore = query({
+  args: { limit: v.number() },
+  handler: async (ctx, { limit }) => {
+    const squads = await ctx.db
+      .query("squads")
+      .withIndex("by_score")
+      .order("desc")
+      .take(limit);
+    return squads;
   },
 });
 
@@ -223,5 +237,68 @@ export const generateUploadUrl = mutation({
 
     // Return an upload URL
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const handlePickComplete = mutation({
+  args: {
+    squadId: v.id("squads"),
+    userId: v.id("users"),
+    pick: v.object({
+      _id: v.id("picks"),
+      status: pick_status,
+      coins: v.number(),
+      league: v.string(),
+    }),
+  },
+  handler: async (ctx, { squadId, userId, pick }) => {
+    const squad = await ctx.db.get(squadId);
+    if (!squad) {
+      throw new Error("Squad not found");
+    }
+
+    const squadScore = getSquadScore(squad);
+    console.log("squadScore", squadScore);
+
+    //update squad stats
+    await ctx.db.patch(squadId, {
+      score: squadScore,
+      members: squad.members.map((member) => {
+        if (member.userId === userId) {
+          return {
+            ...member,
+            stats: {
+              ...member.stats,
+              coins: member.stats.coins + pick.coins,
+              wins: member.stats.wins + (pick.status === "WIN" ? 1 : 0),
+              losses: member.stats.losses + (pick.status === "LOSS" ? 1 : 0),
+              pushes: member.stats.pushes + (pick.status === "PUSH" ? 1 : 0),
+            },
+          };
+        }
+        return member;
+      }),
+      stats: {
+        ...squad.stats,
+        coins: squad.stats.coins + pick.coins,
+        wins: squad.stats.wins + (pick.status === "WIN" ? 1 : 0),
+        losses: squad.stats.losses + (pick.status === "LOSS" ? 1 : 0),
+        pushes: squad.stats.pushes + (pick.status === "PUSH" ? 1 : 0),
+        statsByLeague: {
+          ...squad.stats.statsByLeague,
+          [pick.league]: {
+            wins:
+              (squad.stats.statsByLeague[pick.league]?.wins || 0) +
+              (pick.status === "WIN" ? 1 : 0),
+            losses:
+              (squad.stats.statsByLeague[pick.league]?.losses || 0) +
+              (pick.status === "LOSS" ? 1 : 0),
+            pushes:
+              (squad.stats.statsByLeague[pick.league]?.pushes || 0) +
+              (pick.status === "PUSH" ? 1 : 0),
+          },
+        },
+      },
+    });
   },
 });

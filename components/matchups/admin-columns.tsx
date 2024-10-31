@@ -57,8 +57,9 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
             alt={row.original.league}
             style={{
               maxWidth: "100%",
-              height: "auto"
-            }} />
+              height: "auto",
+            }}
+          />
         </div>
       );
     },
@@ -95,6 +96,7 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
             return <Badge className="bg-yellow-600">{status}</Badge>;
           case "STATUS_FINAL":
           case "STATUS_FULL_TIME":
+          case "STATUS_FULL_PEN":
             return <Badge className="bg-red-500 ">FINAL</Badge>;
           case "STATUS_SCHEDULED":
             return <Badge className="bg-teal-400">SCHEDULED</Badge>;
@@ -171,8 +173,9 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
               alt={winner.name}
               style={{
                 maxWidth: "100%",
-                height: "auto"
-              }} />
+                height: "auto",
+              }}
+            />
           </div>
         );
       } else {

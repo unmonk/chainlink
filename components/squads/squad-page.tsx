@@ -128,9 +128,16 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
       <div className="relative flex flex-col md:flex-row h-[620px] w-full items-center justify-between overflow-hidden rounded-lg border bg-background p-4 md:p-20 md:shadow-xl mb-4">
         {/* Left Number */}
         <div className="flex flex-col items-center justify-center w-1/4">
-          <div className="text-4xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
-            {squad.stats.wins || 1}
-          </div>
+          {squad.rank && (
+            <div className="text-4xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+              {squad.rank}
+            </div>
+          )}
+          {!squad.rank && (
+            <span className="text-xs md:text-sm text-muted-foreground mt-2">
+              Unranked
+            </span>
+          )}
           <span className="text-xs md:text-sm text-muted-foreground mt-2">
             RANK
           </span>
@@ -199,8 +206,8 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
 
         {/* Right Number */}
         <div className="hidden md:flex flex-col items-center justify-center w-1/4">
-          <div className="text-2xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
-            {squad.stats.coins || 0}
+          <div className="text-2xl md:text-4xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+            {squad.score || 0}
           </div>
           <span className="text-sm text-muted-foreground mt-2">
             SQUAD SCORE

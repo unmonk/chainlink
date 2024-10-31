@@ -163,14 +163,18 @@ export const sendNotification = action({
         if (err instanceof webPush.WebPushError) {
           if (err.statusCode === 410 || err.statusCode === 404) {
             //Subscription is expired or invalid
-            await fetch("/notification/metadata", {
-              method: "POST",
-              body: JSON.stringify({
-                subscription,
-                userId: clerkId,
-                type: "unsubscribe",
-              }),
-            });
+            try {
+              await fetch("/notification/metadata", {
+                method: "POST",
+                body: JSON.stringify({
+                  subscription,
+                  userId: clerkId,
+                  type: "unsubscribe",
+                }),
+              });
+            } catch (err) {
+              console.error("Error unsubscribing user", err);
+            }
           }
         }
       }

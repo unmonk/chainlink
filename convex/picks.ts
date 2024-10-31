@@ -97,7 +97,7 @@ export const handlePickWin = internalMutation({
       throw new ConvexError("MATCHUP_NOT_FOUND");
     }
 
-    //Record Win
+    ///////////////////////RECORD WIN/////////////////////
     chain.wins += 1;
     user.stats.wins += 1;
     user.stats.statsByLeague[matchup.league]
@@ -112,7 +112,7 @@ export const handlePickWin = internalMutation({
 
     console.log(`user: ${user.name} won pick: ${pick.pick.name}`);
 
-    //Reward User
+    ///////////////////////REWARD USER/////////////////////
     const reward = matchupReward(matchup.cost, matchup.featured);
     await ctx.scheduler.runAfter(0, api.users.addCoins, {
       userId: user._id,
@@ -122,17 +122,33 @@ export const handlePickWin = internalMutation({
 
     chain.cost += reward;
 
-    //Record Pick
+    ///////////////////////RECORD PICK/////////////////////
     pick.status = "WIN";
     pick.coins = reward;
     pick.active = false;
 
-    //Patch
-    await ctx.db.patch(chain._id, chain);
-    await ctx.db.patch(user._id, user);
-    await ctx.db.patch(pick._id, pick);
+    ///////////////////////PATCH/////////////////////
+    await Promise.all([
+      ctx.db.patch(chain._id, chain),
+      ctx.db.patch(user._id, user),
+      ctx.db.patch(pick._id, pick),
+    ]);
 
-    //schedule achievements
+    ///////////////////////SQUADS/////////////////////
+    if (user.squadId) {
+      await ctx.scheduler.runAfter(0, api.squads.handlePickComplete, {
+        squadId: user.squadId,
+        userId: user._id,
+        pick: {
+          _id: pick._id,
+          status: pick.status,
+          coins: pick.coins,
+          league: matchup.league,
+        },
+      });
+    }
+
+    ///////////////////////SCHEDULE ACHIEVEMENTS/////////////////////
     await ctx.scheduler.runAfter(0, api.achievements.checkPickAchievements, {
       user: {
         _id: user._id,
@@ -150,7 +166,7 @@ export const handlePickWin = internalMutation({
       },
     });
 
-    //send notification
+    ///////////////////////SEND NOTIFICATION/////////////////////
     await ctx.scheduler.runAfter(
       0,
       api.notifications.handlePickWinNotification,

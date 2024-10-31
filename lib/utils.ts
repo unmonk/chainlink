@@ -1,13 +1,6 @@
+import { Doc } from "@/convex/_generated/dataModel";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import {
-  FaBasketballBall,
-  FaFootballBall,
-  FaBaseballBall,
-  FaHockeyPuck,
-} from "react-icons/fa";
-import { MdSportsSoccer } from "react-icons/md";
-import { GiBugNet } from "react-icons/gi";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

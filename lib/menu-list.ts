@@ -120,7 +120,7 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/squads",
-          label: "My Squad",
+          label: "Squads",
           active: pathname.includes("/squads"),
           icon: RiTeamLine as LucideIcon,
           submenus: [],

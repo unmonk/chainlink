@@ -1,3 +1,4 @@
+import { Doc } from "./_generated/dataModel";
 import { League } from "./types";
 
 export function missingEnvVariableUrl(envVarName: string, whereToGet: string) {
@@ -174,3 +175,15 @@ export function getHawaiiTime() {
 
   return date;
 }
+
+export const getSquadScore = (squad: Doc<"squads">) => {
+  const winsContribution = 0.5 * squad.stats.wins;
+  const pushContribution = 0.2 * squad.stats.pushes;
+  const lossContribution = 0.2 * squad.stats.losses;
+  const coinsContribution = 0.1 * squad.stats.coins;
+  return (
+    Math.ceil(
+      winsContribution + pushContribution + lossContribution + coinsContribution
+    ) * 1000
+  );
+};

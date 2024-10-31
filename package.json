@@ -45,6 +45,7 @@
     "@uidotdev/usehooks": "^2.4.1",
     "@vercel/og": "^0.6.3",
     "@xixixao/uploadstuff": "^0.0.5",
+    "@xyflow/react": "^12.3.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^1.0.0",
