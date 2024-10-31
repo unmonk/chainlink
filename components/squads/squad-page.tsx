@@ -70,6 +70,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
 
     // Success case
     toast.success("Successfully joined squad!");
+    router.refresh();
     setLoading(false);
   };
 
@@ -84,6 +85,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
     }
 
     toast.success("Successfully left squad!");
+    router.refresh();
     setLoading(false);
   };
 

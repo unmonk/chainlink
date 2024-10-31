@@ -7,15 +7,8 @@ import {
   CardTitle,
 } from "../ui/card";
 import { api } from "@/convex/_generated/api";
-import Image from "next/image";
-import { Badge } from "../ui/badge";
-import { cn } from "@/lib/utils";
-import { formatDistance } from "date-fns";
-import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { CalendarRange, CircleArrowOutUpRightIcon } from "lucide-react";
-import { matchupReward } from "@/convex/utils";
-import AnimatedShinyText from "../ui/animated-shiny-text";
+import { CircleArrowOutUpRightIcon } from "lucide-react";
 import { RainbowButton } from "../ui/rainbow-button";
 import ActivePickCard, { UserPickWithMatchup } from "../matchups/active-pick";
 
