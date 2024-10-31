@@ -57,8 +57,8 @@ const MatchupList = ({}) => {
     }
   }
   const currentTime = new Date().getTime();
-  const minus6Hours = currentTime - 6 * 60 * 60 * 1000;
-  const plus18Hours = currentTime + 18 * 60 * 60 * 1000;
+  const minus3Hours = currentTime - 3 * 60 * 60 * 1000;
+  const plus24Hours = currentTime + 24 * 60 * 60 * 1000;
 
   const sportGroups = useMemo(() => {
     if (!matchups) return {};
@@ -196,12 +196,12 @@ const MatchupList = ({}) => {
           "No matchups available"
         ) : (
           `${matchups.length} matchups | Window: ${new Date(
-            minus6Hours
+            minus3Hours
           ).toLocaleTimeString("en-US", {
             hour: "numeric",
             minute: "numeric",
             weekday: "short",
-          })} - ${new Date(plus18Hours).toLocaleTimeString("en-US", {
+          })} - ${new Date(plus24Hours).toLocaleTimeString("en-US", {
             hour: "numeric",
             minute: "numeric",
             weekday: "short",
