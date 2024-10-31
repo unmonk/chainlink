@@ -17,9 +17,6 @@ export function BackButton() {
   if (pathSegments[0] === "u" && pathSegments.length === 2) {
     return null;
   }
-  if (pathSegments[0] === "squads" && pathSegments.length === 2) {
-    return null;
-  }
 
   const handleBack = () => {
     router.back();

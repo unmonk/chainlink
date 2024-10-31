@@ -40,6 +40,8 @@ export type UserPickWithMatchup = Doc<"picks"> & { matchup: Doc<"matchups"> };
 const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
   const cancelPick = useMutation(api.picks.cancelPick);
 
+  console.log(pick, "pick");
+
   const handleCancelPick = async () => {
     try {
       await cancelPick({ pickId: pick._id });
