@@ -26,9 +26,33 @@ export const getUserSquad = query({
   handler: async (ctx) => {
     const auth = await ctx.auth.getUserIdentity();
     if (!auth) {
-      throw new Error("Unauthorized");
+      return null;
     }
     //get user
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", auth.subject))
+      .unique();
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.squadId) {
+      return null;
+    }
+    //get squad
+    const squad = await ctx.db.get(user.squadId);
+    return squad;
+  },
+});
+
+export const leaveSquad = mutation({
+  args: { squadId: v.id("squads") },
+  handler: async (ctx, { squadId }) => {
+    const auth = await ctx.auth.getUserIdentity();
+    if (!auth) {
+      throw new Error("Unauthorized");
+    }
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("externalId", auth.subject))
@@ -39,9 +63,72 @@ export const getUserSquad = query({
     if (!user.squadId) {
       throw new Error("User does not have a squad");
     }
-    //get squad
+
     const squad = await ctx.db.get(user.squadId);
+    if (!squad) {
+      throw new Error("Squad not found");
+    }
+
+    await ctx.db.patch(user.squadId, {
+      members: squad.members.filter((member) => member.userId !== user._id),
+    });
+
+    await ctx.db.patch(user._id, {
+      squadId: undefined,
+    });
+
     return squad;
+  },
+});
+
+export const joinSquad = mutation({
+  args: { squadId: v.id("squads") },
+  handler: async (ctx, { squadId }) => {
+    const auth = await ctx.auth.getUserIdentity();
+    if (!auth) {
+      throw new Error("Unauthorized");
+    }
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", auth.subject))
+      .unique();
+    if (!user) {
+      throw new Error("User not found");
+    }
+    if (user.squadId) {
+      throw new Error("User already has a squad");
+    }
+
+    const squad = await ctx.db.get(squadId);
+    if (!squad) {
+      throw new Error("Squad not found");
+    }
+
+    await ctx.db.patch(squadId, {
+      members: [
+        ...squad.members,
+        {
+          userId: user._id,
+          role: "MEMBER",
+          joinedAt: new Date().getTime(),
+          stats: { coins: 0, wins: 0, losses: 0, pushes: 0 },
+        },
+      ],
+    });
+
+    await ctx.db.patch(user._id, {
+      squadId: squadId,
+    });
+
+    return squad;
+  },
+});
+
+export const getMostRecentSquads = query({
+  args: { limit: v.number() },
+  handler: async (ctx, { limit }) => {
+    const squads = await ctx.db.query("squads").order("desc").take(limit);
+    return squads;
   },
 });
 

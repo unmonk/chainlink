@@ -69,6 +69,7 @@ export const transaction_type = v.union(
   v.literal("BONUS"),
   v.literal("GIFT"),
   v.literal("ACHIEVEMENT"),
+  v.literal("BLACKJACK"),
   v.literal("PAYOUT"),
   v.literal("OTHER")
 );
@@ -118,6 +119,17 @@ export const bracket_game_status = v.union(
 );
 export type BracketGameStatus = Infer<typeof bracket_game_status>;
 
+export const blackjack_game_status = v.union(
+  v.literal("PLAYING"),
+  v.literal("PLAYER_BUSTED"),
+  v.literal("DEALER_BUSTED"),
+  v.literal("PLAYER_WON"),
+  v.literal("DEALER_WON"),
+  v.literal("PLAYER_BLACKJACK"),
+  v.literal("PUSH")
+);
+export type BlackjackGameStatus = Infer<typeof blackjack_game_status>;
+
 export default defineSchema({
   slotMachineSpins: defineTable({
     userId: v.id("users"),
@@ -138,6 +150,32 @@ export default defineSchema({
     ),
     spinCost: v.number(),
     freeSpinInterval: v.number(),
+  }),
+
+  blackjackGames: defineTable({
+    userId: v.id("users"),
+    playerHand: v.array(
+      v.object({
+        suit: v.string(),
+        value: v.string(),
+      })
+    ),
+    dealerHand: v.array(
+      v.object({
+        suit: v.string(),
+        value: v.string(),
+        hidden: v.optional(v.boolean()),
+      })
+    ),
+    status: blackjack_game_status,
+    betAmount: v.number(),
+    payout: v.optional(v.number()),
+    deck: v.array(
+      v.object({
+        suit: v.string(),
+        value: v.string(),
+      })
+    ),
   }),
 
   matchups: defineTable({
@@ -450,6 +488,8 @@ export default defineSchema({
         lastSlotSpin: v.optional(v.number()),
         freeSpinCount: v.optional(v.number()),
         lastFreeSpin: v.optional(v.number()),
+        lastFreeBlackjack: v.optional(v.number()),
+        lastPaidBlackjack: v.optional(v.number()),
       })
     ),
   })

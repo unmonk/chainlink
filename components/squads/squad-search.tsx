@@ -24,8 +24,6 @@ const SquadSearch = () => {
     setSearchTerm(e.target.value);
   };
 
-  console.log(debouncedSearchTerm);
-
   return (
     <Card>
       <CardHeader className="pb-2">

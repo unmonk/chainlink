@@ -20,7 +20,7 @@ export function ThemeToggle() {
       <Tooltip delayDuration={100}>
         <TooltipTrigger asChild>
           <Button
-            className="rounded-full w-8 h-8 bg-background mr-2"
+            className="rounded-md w-8 h-8 bg-background mr-2"
             variant="outline"
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

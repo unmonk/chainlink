@@ -121,6 +121,14 @@ const config = {
   				'100%': {
   					'background-position': '200%'
   				}
+  			},
+  			grid: {
+  				'0%': {
+  					transform: 'translateY(-50%)'
+  				},
+  				'100%': {
+  					transform: 'translateY(0)'
+  				}
   			}
   		},
   		animation: {
@@ -130,7 +138,8 @@ const config = {
   			'caret-blink': 'caret-blink 1.25s ease-out infinite',
   			marquee: 'marquee var(--duration, 30s) linear infinite',
   			'shiny-text': 'shiny-text 8s infinite',
-  			rainbow: 'rainbow var(--speed, 2s) infinite linear'
+  			rainbow: 'rainbow var(--speed, 2s) infinite linear',
+  			grid: 'grid 15s linear infinite'
   		}
   	}
   },

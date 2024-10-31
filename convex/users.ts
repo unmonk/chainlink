@@ -160,6 +160,35 @@ export const getCoins = query({
   },
 });
 
+export const adjustCoins = mutation({
+  args: {
+    amount: v.number(),
+    transactionType: transaction_type,
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { amount, transactionType, userId }) => {
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    const newBalance = user.coins + amount;
+    if (newBalance < 0) {
+      throw new Error("INSUFFICIENT_FUNDS");
+    }
+
+    await ctx.db.patch(user._id, { coins: newBalance });
+    await ctx.db.insert("coinTransactions", {
+      userId: user._id,
+      amount,
+      type: transactionType,
+      status: "COMPLETE",
+    });
+
+    return newBalance;
+  },
+});
+
 export const addCoins = mutation({
   args: {
     amount: v.number(),

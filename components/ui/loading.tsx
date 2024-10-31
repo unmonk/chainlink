@@ -1,6 +1,7 @@
 // src/AnimatedText.js
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { SpinningText } from "./spinning-text";
 
 const LoadingText = ({ children }: { children: React.ReactNode }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -44,12 +45,53 @@ const LoadingText = ({ children }: { children: React.ReactNode }) => {
 function Loading() {
   return (
     <div className="h-screen text-center py-20">
-      <LoadingText>
+      {/* <LoadingText>
         <h1 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-8xl text-center">
           🔗ChainLink
         </h1>
-      </LoadingText>
+      </LoadingText> */}
+      <SpinningLoader />
     </div>
+  );
+}
+
+function SpinningLoader() {
+  return (
+    <SpinningText
+      radius={5.5}
+      fontSize={1}
+      variants={{
+        container: {
+          hidden: {
+            opacity: 1,
+          },
+          visible: {
+            opacity: 1,
+            rotate: 360,
+            transition: {
+              type: "spring",
+              bounce: 0,
+              duration: 6,
+              repeat: Infinity,
+              staggerChildren: 0.03,
+            },
+          },
+        },
+        item: {
+          hidden: {
+            opacity: 0,
+            filter: "blur(4px)",
+          },
+          visible: {
+            opacity: 1,
+            filter: "blur(0px)",
+          },
+        },
+      }}
+      className="font-[450]"
+    >
+      {`ChainLink ∞	ChainLink ∞	ChainLink ∞ `}
+    </SpinningText>
   );
 }
 

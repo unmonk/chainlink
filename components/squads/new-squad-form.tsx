@@ -32,6 +32,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { PlusCircleIcon, PlusIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(5).max(50),
@@ -101,7 +102,9 @@ export function NewSquadForm() {
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full sm:w-auto">Create New Squad</Button>
+        <Button className="w-full sm:w-auto">
+          <PlusIcon className="mr-1 h-4 w-4" /> Create New Squad
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-[95%] max-w-[600px] p-0 h-[95vh] sm:h-auto">
         <DialogHeader className="p-4 sm:p-6 border-b">

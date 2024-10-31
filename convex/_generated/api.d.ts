@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as achievements from "../achievements.js";
+import type * as blackjack from "../blackjack.js";
 import type * as campaigns from "../campaigns.js";
 import type * as chains from "../chains.js";
 import type * as coingames from "../coingames.js";
@@ -40,6 +41,7 @@ import type * as utils from "../utils.js";
  */
 declare const fullApi: ApiFromModules<{
   achievements: typeof achievements;
+  blackjack: typeof blackjack;
   campaigns: typeof campaigns;
   chains: typeof chains;
   coingames: typeof coingames;

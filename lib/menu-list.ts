@@ -140,11 +140,22 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [],
         },
         {
-          href: "/spin",
-          label: "Spin",
-          active: pathname.includes("/spin"),
+          href: "/games",
+          label: "Games",
+          active: pathname.includes("/games"),
           icon: CoinsIcon,
-          submenus: [],
+          submenus: [
+            {
+              href: "/games/blackjack",
+              label: "Blackjack",
+              active: pathname.includes("/games/blackjack"),
+            },
+            {
+              href: "/games/spin",
+              label: "Spin",
+              active: pathname.includes("/games/spin"),
+            },
+          ],
         },
       ],
     },

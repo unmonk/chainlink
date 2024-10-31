@@ -1,31 +1,47 @@
 "use client";
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { ThumbsDownIcon, Trophy, User, Users2Icon } from "lucide-react";
 import { LinkIcon } from "lucide-react";
-import { RiP2PLine } from "react-icons/ri";
 import { Card, CardContent } from "../ui/card";
 import { api } from "@/convex/_generated/api";
-import { clerkClient } from "@clerk/nextjs/server";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { formatDistanceToNow } from "date-fns";
-import { useQuery } from "convex/react";
+
+import { useMutation, useQuery } from "convex/react";
 import SquadMembers from "./squad-members";
 import Loading from "../ui/loading";
 import { CopyButton } from "../ui/copy-button";
+import AnimatedGridPattern from "../ui/animated-grid-pattern";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { useUser } from "@clerk/nextjs";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { DialogContent } from "../ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
+  const currentUser = useUser();
   // Add a default empty array if members is undefined
   const memberIds = squad.members?.map((member) => member.userId) ?? [];
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const users = useQuery(api.users.queryByUserIds, {
     userIds: memberIds,
   });
 
+  const joinSquad = useMutation(api.squads.joinSquad);
+  const leaveSquad = useMutation(api.squads.leaveSquad);
+
   if (!users) return <Loading />;
-  console.log(users, "users");
 
   //loop through users and add squadInfo to each user
   const mergedUsers = users.map((user) => {
@@ -35,7 +51,23 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
     };
   });
 
-  console.log(mergedUsers, "merged users");
+  const isUserInSquad = mergedUsers.find(
+    (user) => user.externalId === currentUser?.user?.id
+  );
+
+  const handleJoinSquad = () => {
+    setLoading(true);
+    joinSquad({ squadId: squad._id });
+    router.refresh();
+    setLoading(false);
+  };
+
+  const handleLeaveSquad = () => {
+    setLoading(true);
+    leaveSquad({ squadId: squad._id });
+    router.refresh();
+    setLoading(false);
+  };
 
   // Update stats to handle potentially undefined members
   const stats = [
@@ -57,7 +89,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
       title: "Members",
       value: squad.members?.length ?? 0, // Add null check here
       icon: Users2Icon,
-      description: "Total members",
+      description: "Members",
       href: false,
     },
     {
@@ -72,49 +104,100 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
   const url = `https://chainlink.st/squads/${squad.slug}`;
   return (
     <Suspense fallback={<SquadSkeleton />}>
-      {/* Header Section with Centered Content */}
-      <div className="flex flex-col items-center text-center my-8">
-        <Image
-          src={squad.image}
-          alt={squad.name}
-          width={150}
-          height={150}
-          className="h-24 w-24 rounded-full object-cover mb-4"
-        />
-        <div>
-          <h1 className="text-4xl font-bold mb-2">{squad.name}</h1>
-          <p className="text-muted-foreground max-w-2xl">{squad.description}</p>
-          <p className="text-muted-foreground text-xs flex items-center justify-center">
-            <span className="mr-2 px-2 py-1 bg-background/40 rounded-md">
-              {url}
-            </span>
-            <CopyButton value={url} />
-          </p>
+      {/* Header Section with Three Columns */}
+      <div className="relative flex flex-col md:flex-row h-[600px] w-full items-center justify-between overflow-hidden rounded-lg border bg-background p-4 md:p-20 md:shadow-xl mb-4">
+        {/* Left Number */}
+        <div className="flex flex-col items-center justify-center w-1/4">
+          <div className="text-4xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+            {squad.stats.wins || 1}
+          </div>
+          <span className="text-xs md:text-sm text-muted-foreground mt-2">
+            RANK
+          </span>
+        </div>
+
+        {/* Center Content */}
+        <div className="flex flex-col items-center justify-center w-full md:w-2/4">
+          <span className="pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-b from-[#88d681] via-[#257532] to-[#000000] bg-clip-text text-center text-4xl md:text-7xl font-bold leading-none tracking-tighter text-transparent">
+            {squad.name}
+          </span>
+          <AnimatedGridPattern
+            numSquares={30}
+            maxOpacity={0.1}
+            duration={3}
+            repeatDelay={1}
+            className={cn(
+              "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+              "absolute inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+            )}
+          />
+
+          <div className="flex flex-col items-center text-center my-8 relative z-10">
+            <Image
+              src={squad.image}
+              alt={squad.name}
+              width={150}
+              height={150}
+              className="h-24 w-24 rounded-full object-cover mb-4"
+            />
+            <div>
+              <p className="text-muted-foreground max-w-2xl">
+                {squad.description}
+              </p>
+              <p className="text-muted-foreground text-xs flex items-center justify-center mt-2">
+                <span className="mr-2 px-2 py-1 bg-background/40 rounded-md">
+                  {url}
+                </span>
+                <CopyButton value={url} />
+              </p>
+            </div>
+          </div>
+          {/* Stats Section */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 ">
+            {stats.map((stat) => (
+              <Card key={stat.title}>
+                <CardContent className="p-2">
+                  <div className="flex items-center gap-x-2 text-center">
+                    {/* <stat.icon className="hidden md:block h-8 w-8 text-muted-foreground" /> */}
+                    <span className="text-sm font-medium text-center w-full">
+                      {stat.title}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex flex-col items-center justify-center">
+                    <div className="text-xl font-bold bg-black/50 p-1 rounded-sm">
+                      {stat.value}
+                    </div>
+                    <p className="text-xs text-nowrap text-muted-foreground">
+                      {stat.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Number */}
+        <div className="hidden md:flex flex-col items-center justify-center w-1/4">
+          <div className="text-2xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+            {squad.stats.coins || 0}
+          </div>
+          <span className="text-sm text-muted-foreground mt-2">
+            SQUAD SCORE
+          </span>
         </div>
       </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent className="p-3">
-              <div className="flex items-center gap-x-2">
-                <stat.icon className="h-8 w-8 text-muted-foreground" />
-                <span className=" font-medium">{stat.title}</span>
-              </div>
-              <div className="mt-2">
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-sm text-muted-foreground">
-                  {stat.description}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="flex items-center justify-center gap-2 mt-4">
+        {squad.open && !isUserInSquad && (
+          <Button onClick={handleJoinSquad} size={"sm"} disabled={loading}>
+            {loading ? "Joining..." : "Join Squad"}
+          </Button>
+        )}
       </div>
 
       {/* Members Section */}
-      <div className="my-8">
+      <div className="my-4">
         <h2 className="text-2xl text-center font-semibold">Members</h2>
         <p className="text-muted-foreground text-center mb-4 text-xs">
           Score is calculated based on the number of wins and links contributed
@@ -124,6 +207,37 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
         {/* @ts-ignore */}
 
         <SquadMembers members={mergedUsers} />
+        <div className="flex items-center justify-center gap-2 mt-4">
+          {isUserInSquad && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  Leave Squad
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Leave Squad</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to leave this squad?.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => {}}>
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleLeaveSquad}
+                    disabled={loading}
+                  >
+                    Leave Squad
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
       </div>
     </Suspense>
   );
