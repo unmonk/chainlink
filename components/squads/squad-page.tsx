@@ -26,6 +26,8 @@ import {
 } from "../ui/dialog";
 import { DialogContent } from "../ui/dialog";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
   const currentUser = useUser();
@@ -55,17 +57,33 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
     (user) => user.externalId === currentUser?.user?.id
   );
 
-  const handleJoinSquad = () => {
+  const handleJoinSquad = async () => {
     setLoading(true);
-    joinSquad({ squadId: squad._id });
-    router.refresh();
+    const result = await joinSquad({ squadId: squad._id });
+
+    if ("error" in result) {
+      // Show error to user (e.g., using toast)
+      toast.error(result.error);
+      setLoading(false);
+      return;
+    }
+
+    // Success case
+    toast.success("Successfully joined squad!");
     setLoading(false);
   };
 
-  const handleLeaveSquad = () => {
+  const handleLeaveSquad = async () => {
     setLoading(true);
-    leaveSquad({ squadId: squad._id });
-    router.refresh();
+    const result = await leaveSquad({ squadId: squad._id });
+
+    if ("error" in result) {
+      toast.error(result.error as string);
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Successfully left squad!");
     setLoading(false);
   };
 
@@ -105,7 +123,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
   return (
     <Suspense fallback={<SquadSkeleton />}>
       {/* Header Section with Three Columns */}
-      <div className="relative flex flex-col md:flex-row h-[600px] w-full items-center justify-between overflow-hidden rounded-lg border bg-background p-4 md:p-20 md:shadow-xl mb-4">
+      <div className="relative flex flex-col md:flex-row h-[620px] w-full items-center justify-between overflow-hidden rounded-lg border bg-background p-4 md:p-20 md:shadow-xl mb-4">
         {/* Left Number */}
         <div className="flex flex-col items-center justify-center w-1/4">
           <div className="text-4xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
@@ -118,7 +136,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
 
         {/* Center Content */}
         <div className="flex flex-col items-center justify-center w-full md:w-2/4">
-          <span className="pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-b from-[#88d681] via-[#257532] to-[#000000] bg-clip-text text-center text-4xl md:text-7xl font-bold leading-none tracking-tighter text-transparent">
+          <span className="pointer-events-none  whitespace-pre-wrap bg-gradient-to-b from-[#88d681] via-[#257532] to-[#000000] bg-clip-text text-center text-4xl md:text-7xl font-bold leading-none tracking-tighter text-transparent">
             {squad.name}
           </span>
           <AnimatedGridPattern
@@ -188,10 +206,25 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-center gap-2 mt-4">
+      <div className="flex items-center justify-center mt-4">
         {squad.open && !isUserInSquad && (
-          <Button onClick={handleJoinSquad} size={"sm"} disabled={loading}>
-            {loading ? "Joining..." : "Join Squad"}
+          <Button
+            onClick={handleJoinSquad}
+            disabled={loading}
+            className="bg-gradient-to-r from-[#88d681] to-[#257532] hover:opacity-90 transition-opacity"
+            size={"sm"}
+          >
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Joining</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Users2Icon className="h-4 w-4" />
+                <span>Join Squad</span>
+              </div>
+            )}
           </Button>
         )}
       </div>

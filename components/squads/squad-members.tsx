@@ -28,8 +28,6 @@ export default function SquadMembers({
 }) {
   if (!members) return null;
 
-  console.log(members, "members passed as props");
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {members.map((member) => (

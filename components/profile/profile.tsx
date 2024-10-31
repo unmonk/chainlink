@@ -7,6 +7,9 @@ import ProfileAchievements from "./profile-achievements";
 import AddFriendButton from "./add-friend-button";
 
 function Profile({ user }: { user: User }) {
+  const username = user.username ?? "";
+  const textSize = username.length > 12 ? "text-4xl" : "text-6xl";
+
   return (
     <div className="relative flex flex-col items-center py-4 md:py-6">
       <div className="absolute top-0 right-0">
@@ -14,16 +17,17 @@ function Profile({ user }: { user: User }) {
       </div>
 
       <Avatar className="w-28 h-28">
-        <AvatarFallback>{user.username?.charAt(0)}</AvatarFallback>
-        <AvatarImage src={user.imageUrl} alt={user.username ?? "User Avatar"} />
+        <AvatarFallback>{username.charAt(0)}</AvatarFallback>
+        <AvatarImage src={user.imageUrl} alt={username ?? "User Avatar"} />
       </Avatar>
 
       <SparklesText
-        text={user.username ?? ""}
+        text={username}
         colors={{
           first: "#13782c",
           second: "#43cd65",
         }}
+        className={`max-w-full mt-2 ${textSize}`}
       />
 
       <p className="text-sm text-muted-foreground">

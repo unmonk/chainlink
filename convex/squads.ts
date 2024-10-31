@@ -86,22 +86,22 @@ export const joinSquad = mutation({
   handler: async (ctx, { squadId }) => {
     const auth = await ctx.auth.getUserIdentity();
     if (!auth) {
-      throw new Error("Unauthorized");
+      return { error: "Unauthorized" };
     }
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("externalId", auth.subject))
       .unique();
     if (!user) {
-      throw new Error("User not found");
+      return { error: "User not found" };
     }
     if (user.squadId) {
-      throw new Error("User already has a squad");
+      return { error: "You are already in a squad" };
     }
 
     const squad = await ctx.db.get(squadId);
     if (!squad) {
-      throw new Error("Squad not found");
+      return { error: "Squad not found" };
     }
 
     await ctx.db.patch(squadId, {
@@ -120,7 +120,7 @@ export const joinSquad = mutation({
       squadId: squadId,
     });
 
-    return squad;
+    return { data: squad };
   },
 });
 
@@ -157,17 +157,17 @@ export const createSquad = mutation({
   handler: async (ctx, { name, description, storageId, slug, open }) => {
     const auth = await ctx.auth.getUserIdentity();
     if (!auth) {
-      throw new Error("Unauthorized");
+      return { error: "Unauthorized" };
     }
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("externalId", auth.subject))
       .unique();
     if (!user) {
-      throw new Error("User not found");
+      return { error: "User not found" };
     }
     if (user.squadId) {
-      throw new Error("User already has a squad");
+      return { error: "User already has a squad" };
     }
 
     const storageUrl = await ctx.storage.getUrl(storageId);
@@ -206,7 +206,7 @@ export const createSquad = mutation({
       squadId: squad,
     });
 
-    return squad;
+    return { data: squad };
   },
 });
 

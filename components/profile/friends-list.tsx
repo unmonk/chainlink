@@ -161,15 +161,15 @@ export function FriendsList() {
 
           <div>
             <h3 className="text-sm font-medium mb-2">Friends</h3>
-            <ScrollArea className="h-[200px] grid grid-cols-3 gap-2">
+            <ScrollArea className="h-[200px]">
               {mergedFriends &&
                 mergedFriends.map((friend) => {
                   return (
                     <div
                       key={friend.userId}
-                      className="flex items-center justify-between p-2 hover:bg-muted rounded-md cursor-pointer"
+                      className="flex items-center justify-between p-2 hover:bg-muted rounded-md cursor-pointer transition-all duration-300 ease-in-out border-y border-border"
                     >
-                      <Link href={`/u/${friend.user?.name}`}>
+                      <Link href={`/u/${friend.user?.name}`} className="flex-1">
                         <div className="flex items-center gap-2">
                           <Avatar>
                             <AvatarImage src={friend.user?.image} />
@@ -179,22 +179,22 @@ export function FriendsList() {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="text-sm font-medium">
-                              {friend.user?.name ?? "Loading..."}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium">
+                                {friend.user?.name ?? "Loading..."}
+                              </p>
+                              <span
+                                className={`h-2 w-2 rounded-full ${
+                                  friend.status === "ONLINE"
+                                    ? "bg-green-500"
+                                    : "bg-gray-300"
+                                }`}
+                              />
+                            </div>
                             <p className="text-xs text-muted-foreground">
                               {friend.status.toLowerCase()}
                             </p>
                           </div>
-                        </div>
-                        <div className="flex items-center">
-                          <span
-                            className={`h-2 w-2 rounded-full ${
-                              friend.status === "ONLINE"
-                                ? "bg-green-500"
-                                : "bg-gray-300"
-                            }`}
-                          />
                         </div>
                       </Link>
                       <AlertDialog>
@@ -202,7 +202,7 @@ export function FriendsList() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="ml-2 hover:bg-red-500 hover:text-white rounded-md"
+                            className="ml-2 hover:bg-red-500 hover:text-white rounded-md shrink-0"
                           >
                             <Trash className="h-4 w-4" />
                           </Button>
