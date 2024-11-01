@@ -122,7 +122,7 @@ const UserStats = ({ user }: UserStatsProps) => {
       const statsByLeague = (monthStats as any).statsByLeague;
       //transform YYYYMM to "Jan", "Feb", etc.
       const monthName = format(
-        new Date(`${month.slice(0, 4)}-${month.slice(4)}-01`),
+        new Date(`${month.slice(0, 4)}-${month.slice(4)}-15`),
         "MMM"
       );
 

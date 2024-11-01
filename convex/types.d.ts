@@ -20,3 +20,8 @@ export type League =
   | "NBAG"
   | "FRIENDLY"
   | "UFL";
+
+declare module "*.json" {
+  const value: any;
+  export default value;
+}

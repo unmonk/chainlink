@@ -444,6 +444,11 @@ export default defineSchema({
     }),
   }).index("by_tournamentId", ["tournamentId"]),
 
+  legacyUsers: defineTable({
+    userId: v.string(),
+    data: v.any(),
+  }).index("by_userId", ["userId"]),
+
   users: defineTable({
     email: v.string(),
     name: v.string(),

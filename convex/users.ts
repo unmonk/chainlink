@@ -10,6 +10,7 @@ import {
 import { transaction_type } from "./schema";
 import { api, internal } from "./_generated/api";
 import { formatDate } from "date-fns";
+
 /**
  * Insert or update the user in a Convex table then return the document's ID.
  *
@@ -67,26 +68,132 @@ export const store = mutation({
       return user._id;
     } else {
       console.log("NEW USER");
-      return await ctx.db.insert("users", {
-        name: identity.nickname ?? identity.subject,
-        tokenIdentifier: identity.tokenIdentifier,
-        email: identity.email!,
-        image: identity.pictureUrl!,
-        coins: 50,
-        stats: {
-          wins: 0,
-          losses: 0,
-          pushes: 0,
-          statsByLeague: {},
-        },
-        monthlyStats: {},
-        achievements: [],
-        friends: [],
-        squads: [],
-        role: "USER",
-        status: "ACTIVE",
-        externalId: identity.subject,
-      });
+
+      //Check if the user has legacy data
+      const legacyUser = await ctx.db
+        .query("legacyUsers")
+        .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+        .unique();
+      if (legacyUser) {
+        console.log("LEGACY USER: INSERTING NEW USER");
+
+        const newUser = await ctx.db.insert("users", {
+          name: identity.nickname ?? identity.subject,
+          tokenIdentifier: identity.tokenIdentifier,
+          email: identity.email!,
+          image: identity.pictureUrl!,
+          coins: legacyUser.data.coins,
+          stats: {
+            wins: 0,
+            losses: 0,
+            pushes: 0,
+            statsByLeague: {},
+          },
+          monthlyStats: legacyUser.data.monthlyStats,
+          coinStats: legacyUser.data.coinStats,
+          achievements: [],
+          friends: [],
+          squads: [],
+          role: "USER",
+          status: "ACTIVE",
+          externalId: identity.subject,
+        });
+
+        if (legacyUser.data.picks) {
+          console.log("LEGACY USER: INSERTING PICKS");
+
+          //get the first matchup
+          const firstMatchup = await ctx.db.query("matchups").take(1);
+          const firstCampaign = await ctx.db.query("campaigns").take(1);
+
+          if (firstMatchup && firstCampaign) {
+            for (const pick of legacyUser.data.picks) {
+              await ctx.db.insert("picks", {
+                active: false,
+                status: pick.status,
+                externalId: identity.subject,
+                userId: newUser,
+                campaignId: firstCampaign[0]._id,
+                matchupId: firstMatchup[0]._id,
+                pick: {
+                  id: pick.pick.id.toString(),
+                  name: pick.pick.name ?? "",
+                  image: pick.pick.image ?? "",
+                },
+                coins: pick.coins,
+              });
+            }
+          }
+        }
+
+        if (legacyUser.data.achievements) {
+          console.log("LEGACY USER: AWARDING ACHIEVEMENTS");
+          for (const achievement of legacyUser.data.achievements) {
+            if (achievement.achievement_type === "MONTHLYSTREAKWIN") {
+              //find the monthly streak achievement
+              const monthlyStreakAchievement = await ctx.db
+                .query("achievements")
+                .withIndex("by_type_threshold", (q) =>
+                  q.eq("type", "CAMPAIGNCHAIN").eq("threshold", 0)
+                )
+                .unique();
+              if (monthlyStreakAchievement) {
+                await ctx.scheduler.runAfter(
+                  0,
+                  api.achievements.awardAchievementToUser,
+                  {
+                    achievementId: monthlyStreakAchievement._id,
+                    userId: newUser,
+                  }
+                );
+              }
+            }
+            if (achievement.achievement_type === "MONTHLYWIN") {
+              //find the monthly win achievement
+              const monthlyWinAchievement = await ctx.db
+                .query("achievements")
+                .withIndex("by_type_threshold", (q) =>
+                  q.eq("type", "CAMPAIGNWINS").eq("threshold", 0)
+                )
+                .unique();
+              if (monthlyWinAchievement) {
+                await ctx.scheduler.runAfter(
+                  0,
+                  api.achievements.awardAchievementToUser,
+                  {
+                    achievementId: monthlyWinAchievement._id,
+                    userId: newUser,
+                  }
+                );
+              }
+            }
+          }
+        }
+
+        console.log("LEGACY USER: DELETING LEGACY USER");
+      } else {
+        console.log("NEW USER: INSERTING NEW USER");
+        return await ctx.db.insert("users", {
+          name: identity.nickname ?? identity.subject,
+          tokenIdentifier: identity.tokenIdentifier,
+          email: identity.email!,
+          image: identity.pictureUrl!,
+          coins: 50,
+          stats: {
+            wins: 0,
+            losses: 0,
+            pushes: 0,
+            statsByLeague: {},
+          },
+          monthlyStats: {},
+          achievements: [],
+          friends: [],
+          squads: [],
+          role: "USER",
+          status: "ACTIVE",
+          externalId: identity.subject,
+        });
+      }
     }
   },
 });
@@ -236,12 +343,17 @@ export const subtractCoins = mutation({
 
 export const updateUserMonthlyStats = internalMutation({
   args: {
-    userId: v.id("users"),
-    month: v.string(),
-    monthlyStats: v.any(),
+    user: v.object({
+      _id: v.id("users"),
+      monthlyStats: v.any(),
+    }),
   },
-  handler: async (ctx, { userId, month, monthlyStats }) => {
-    await ctx.db.patch(userId, { monthlyStats: { [month]: monthlyStats } });
+  handler: async (ctx, { user }) => {
+    await ctx.db.patch(user._id, {
+      monthlyStats: {
+        ...user.monthlyStats,
+      },
+    });
   },
 });
 
@@ -253,7 +365,10 @@ export const monthlyStatsRecord = internalAction({
       if (!user.monthlyStats) {
         user.monthlyStats = {};
       }
-      const currentMonth = formatDate(new Date(), "yyyyMM");
+      // Get previous month by subtracting 1 from current month
+      const date = new Date();
+      date.setMonth(date.getMonth() - 1);
+      const currentMonth = formatDate(date, "yyyyMM");
       const currentStats = user.monthlyStats[currentMonth] || {};
       currentStats.wins = user.stats.wins;
       currentStats.losses = user.stats.losses;
@@ -270,9 +385,13 @@ export const monthlyStatsRecord = internalAction({
       currentStats.statsByLeague = user.stats.statsByLeague;
 
       await ctx.runMutation(internal.users.updateUserMonthlyStats, {
-        userId: user._id,
-        month: currentMonth,
-        monthlyStats: currentStats,
+        user: {
+          _id: user._id,
+          monthlyStats: {
+            ...user.monthlyStats,
+            [currentMonth]: currentStats,
+          },
+        },
       });
     }
   },
@@ -303,5 +422,17 @@ export const getUserByWins = query({
 export const getAllUsers = query({
   handler: async (ctx) => {
     return await ctx.db.query("users").collect();
+  },
+});
+
+export const getLegacyUser = query({
+  args: {
+    userId: v.string(),
+  },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db
+      .query("legacyUsers")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
   },
 });

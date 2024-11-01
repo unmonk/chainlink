@@ -348,7 +348,7 @@ export const getAchievementsByClerkUserId = query({
   handler: async (ctx, { clerkUserId }) => {
     const user = await userQuery(ctx, clerkUserId);
     if (!user) {
-      throw new ConvexError("USER_NOT_FOUND");
+      return [];
     }
     //get achievements from user.achievements
     const achievements = await Promise.all(

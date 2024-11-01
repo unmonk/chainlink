@@ -9,7 +9,8 @@
     "dev:client": "next dev",
     "dev:init": "convex dev --until-success",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "convex deploy"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.2",
