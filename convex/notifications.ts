@@ -29,7 +29,9 @@ export const createMassNotification = action({
   },
   handler: async (ctx, { payload }) => {
     console.log("Creating mass notification", payload);
-    const users = await clerkClient().users.getUserList({
+    const users = await (
+      await clerkClient()
+    ).users.getUserList({
       limit: 1000,
     });
     const imageUrl =
@@ -126,7 +128,7 @@ export const sendNotification = action({
     }),
   },
   handler: async (ctx, { clerkId, payload, notificationType }) => {
-    const user = await clerkClient().users.getUser(clerkId);
+    const user = await (await clerkClient()).users.getUser(clerkId);
     if (!user) {
       throw new ConvexError("USER_NOT_FOUND");
     }

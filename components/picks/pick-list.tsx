@@ -1,6 +1,6 @@
 "use client";
 import { api } from "@/convex/_generated/api";
-import { usePaginatedQuery, useQuery } from "convex/react";
+import { useConvexAuth, usePaginatedQuery, useQuery } from "convex/react";
 import {
   Card,
   CardContent,
@@ -24,12 +24,15 @@ const ITEMS_PER_PAGE = 30; // Adjust this value as needed
 export const UserPickList = () => {
   const [cursor, setCursor] = useState<string | null>(null);
 
+  const { isAuthenticated } = useConvexAuth();
+
   const { results, status, loadMore } = usePaginatedQuery(
     api.picks.getUserPicks,
     { paginationOpts: { numItems: ITEMS_PER_PAGE, cursor } },
     { initialNumItems: ITEMS_PER_PAGE }
   );
 
+  if (!isAuthenticated) return null;
   if (status === "LoadingFirstPage") return <Loading />;
 
   if (!results) return null;

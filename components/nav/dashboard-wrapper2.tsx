@@ -5,6 +5,7 @@ import { useStore } from "@/hooks/use-store";
 import { Sidebar } from "@/components/nav/sidebar";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 import useStoreUserEffect from "@/hooks/use-store-user";
+import { SignedIn } from "@clerk/nextjs";
 
 export default function DashboardWrapper2({
   children,
@@ -17,7 +18,7 @@ export default function DashboardWrapper2({
   if (!sidebar) return null;
 
   return (
-    <>
+    <SignedIn>
       <Sidebar />
       <main
         className={cn(
@@ -35,6 +36,6 @@ export default function DashboardWrapper2({
       >
         <p className="text-xs text-muted text-center">Chainlink 2024</p>
       </footer>
-    </>
+    </SignedIn>
   );
 }

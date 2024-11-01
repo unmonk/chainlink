@@ -29,9 +29,11 @@ export function Navbar({ title }: NavbarProps) {
         <div className="flex flex-1 items-center justify-end">
           <div className="relative ml-auto flex-initial md:grow-0">
             <div className="flex flex-row gap-2 mr-2 items-center">
-              <Coins />
-              |
-              <UserChain />
+              <SignedIn>
+                <Coins />
+                |
+                <UserChain />
+              </SignedIn>
             </div>
           </div>
           <SignedIn>
@@ -47,7 +49,6 @@ export function Navbar({ title }: NavbarProps) {
           </SignedIn>
           <SignedOut>
             <RedirectToSignIn />
-            <SignInButton />
           </SignedOut>
         </div>
       </div>
