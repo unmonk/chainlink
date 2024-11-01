@@ -76,7 +76,9 @@ export const createActiveChain = mutation({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error("USER_NOT_FOUND");
+      console.log("USER_NOT_FOUND");
+      //throw new Error("USER_NOT_FOUND");
+      return null;
     }
 
     //check if user has an active chain
