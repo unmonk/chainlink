@@ -20,11 +20,13 @@ import { LoaderCircleIcon } from "lucide-react";
 import BlurFade from "../ui/blur-fade";
 
 const ITEMS_PER_PAGE = 30; // Adjust this value as needed
-let cursor: string | null = null;
+
 export const UserPickList = () => {
+  const [cursor, setCursor] = useState<string | null>(null);
+
   const { results, status, loadMore } = usePaginatedQuery(
     api.picks.getUserPicks,
-    { paginationOpts: { numItems: ITEMS_PER_PAGE, cursor: cursor } },
+    { paginationOpts: { numItems: ITEMS_PER_PAGE, cursor } },
     { initialNumItems: ITEMS_PER_PAGE }
   );
 
@@ -39,7 +41,6 @@ export const UserPickList = () => {
           <BlurFade key={pick._id} delay={0.25 * idx * 0.05} inView>
             <Link
               href={`/matchups/${pick.matchupId}`}
-              key={pick._id}
               passHref
               prefetch={false}
             >

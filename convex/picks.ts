@@ -446,7 +446,7 @@ export const getUserPicks = query({
   handler: async (ctx, args) => {
     const user = await ctx.auth.getUserIdentity();
     if (!user) {
-      return [];
+      throw new ConvexError("USER_NOT_FOUND");
     }
     const picks = await ctx.db
       .query("picks")
