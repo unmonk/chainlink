@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
   manifest: "/manifest.json",
+  themeColor: "#161616",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -44,7 +45,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
+  themeColor: "#161616",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

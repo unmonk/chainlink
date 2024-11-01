@@ -1,5 +1,11 @@
 import { SheetMenu } from "@/components/nav/sheet-menu";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import {
+  RedirectToSignIn,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/nextjs";
 import Coins from "../coins/coins";
 import { UserChain } from "../chains/user-chain";
 
@@ -40,6 +46,7 @@ export function Navbar({ title }: NavbarProps) {
             />
           </SignedIn>
           <SignedOut>
+            <RedirectToSignIn />
             <SignInButton />
           </SignedOut>
         </div>

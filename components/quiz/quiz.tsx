@@ -72,7 +72,7 @@ export default function QuizPage() {
                 <Label htmlFor={option.id}>{option.text}</Label>
                 {activeQuiz.percentagePerOption[option.id] && (
                   <p className="text-sm text-muted-foreground">
-                    {activeQuiz.percentagePerOption[option.id] * 100}%
+                    {activeQuiz.percentagePerOption[option.id]} votes{" "}
                   </p>
                 )}
               </div>

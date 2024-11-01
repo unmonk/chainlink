@@ -2,6 +2,7 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { SpinningText } from "./spinning-text";
+import { cn } from "@/lib/utils";
 
 const LoadingText = ({ children }: { children: React.ReactNode }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -42,9 +43,9 @@ const LoadingText = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-function Loading() {
+function Loading({ className }: { className?: string }) {
   return (
-    <div className="h-screen text-center py-20">
+    <div className={cn("h-screen text-center py-20", className)}>
       {/* <LoadingText>
         <h1 className="mt-6 text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-8xl text-center">
           🔗ChainLink

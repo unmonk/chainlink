@@ -127,7 +127,18 @@ export const checkIfFriends = query({
       .unique();
     if (!user) return false;
 
-    return user.friends.some((friend) => friend.userId === args.userId);
+    const pendingRequests = await ctx.db
+      .query("friendRequests")
+      .withIndex("by_receiver", (q) => q.eq("receiverId", identity.subject))
+      .filter((q) => q.eq(q.field("status"), "PENDING"))
+      .take(1);
+
+    const isPending = pendingRequests.length > 0;
+
+    return {
+      isFriend: user.friends.some((friend) => friend.userId === args.userId),
+      isPending,
+    };
   },
 });
 

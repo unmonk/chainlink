@@ -51,6 +51,11 @@ export function getAdminMenuList(pathname: string): Group[] {
           icon: ShieldAlertIcon,
           submenus: [
             {
+              href: "/admin/actions",
+              label: "Actions",
+              active: pathname.includes("/admin/actions"),
+            },
+            {
               href: "/shop",
               label: "Shop",
               active: pathname.includes("/shop"),

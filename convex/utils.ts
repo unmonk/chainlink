@@ -1,5 +1,35 @@
+import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
 import { League } from "./types";
+
+export const listScheduledMessages = query({
+  args: {},
+  handler: async (ctx, args) => {
+    return await ctx.db.system
+      .query("_scheduled_functions")
+      .order("desc")
+      .take(20);
+  },
+});
+
+export const getScheduledMessage = query({
+  args: {
+    id: v.id("_scheduled_functions"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.system.get(args.id);
+  },
+});
+
+export const cancelMessage = mutation({
+  args: {
+    id: v.id("_scheduled_functions"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.scheduler.cancel(args.id);
+  },
+});
 
 export function missingEnvVariableUrl(envVarName: string, whereToGet: string) {
   const deployment = deploymentName();

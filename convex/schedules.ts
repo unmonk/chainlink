@@ -1,4 +1,4 @@
-import { internalAction, internalMutation } from "./_generated/server";
+import { action, internalAction, internalMutation } from "./_generated/server";
 import { MatchupType } from "./schema";
 import { ScheduleResponse } from "./espn";
 import { League } from "./types";
@@ -7,7 +7,7 @@ import { v } from "convex/values";
 import { ACTIVE_LEAGUES, STATS_BY_LEAGUE } from "./utils";
 import { Doc } from "./_generated/dataModel";
 
-export const schedules = internalAction({
+export const schedules = action({
   args: {},
   handler: async (ctx) => {
     let actionResponse: Record<
@@ -55,10 +55,6 @@ export const schedules = internalAction({
           return acc;
         },
         {} as Record<string, Doc<"matchups">>
-      );
-
-      console.log(
-        `Existing matchups for ${league}: ${existingMatchups.toString()}`
       );
 
       const leaguePromises = [];

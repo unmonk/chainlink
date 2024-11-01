@@ -30,8 +30,14 @@ export default function AddFriendButton({ userId }: { userId: string }) {
 
   const handleAddFriend = async () => {
     setPending(true);
-    await sendFriendRequest({ receiverId: userId });
-    toast.success("Friend request sent");
+    try {
+      await sendFriendRequest({ receiverId: userId });
+      toast.success("Friend request sent");
+    } catch (error) {
+      toast.error(`Failed to send friend request: ${error}`);
+    } finally {
+      setPending(false);
+    }
   };
 
   const handleUnfriend = async () => {
@@ -49,7 +55,7 @@ export default function AddFriendButton({ userId }: { userId: string }) {
     <SignedIn>
       {!isCurrentUser && (
         <>
-          {checkIfFriends ? (
+          {checkIfFriends && checkIfFriends.isFriend ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
@@ -86,9 +92,9 @@ export default function AddFriendButton({ userId }: { userId: string }) {
               variant="outline"
               size="sm"
               onClick={handleAddFriend}
-              disabled={pending}
+              disabled={pending || (checkIfFriends && checkIfFriends.isPending)}
             >
-              {pending ? (
+              {pending || (checkIfFriends && checkIfFriends.isPending) ? (
                 "Sent"
               ) : (
                 <div className="flex items-center gap-2">
