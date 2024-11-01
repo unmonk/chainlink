@@ -85,6 +85,7 @@ export function CreateAchievementForm() {
     form.reset();
     setImage(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    router.push("/admin/achievements");
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
