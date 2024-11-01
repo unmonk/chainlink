@@ -7,7 +7,6 @@ export default function Page() {
         <SignUp
           path="/sign-up"
           signInUrl="/sign-in"
-          redirectUrl={"/dashboard"}
           afterSignOutUrl={"/"}
           signInFallbackRedirectUrl={"/dashboard"}
           appearance={{
