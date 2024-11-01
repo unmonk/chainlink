@@ -39,6 +39,14 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "capi.chainlink.st",
+      },
+      {
+        protocol: "https",
+        hostname: "cactchainlink.st",
+      },
+      {
+        protocol: "https",
         hostname: "img.clerk.com",
       },
       {
