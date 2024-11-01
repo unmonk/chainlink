@@ -1,32 +1,56 @@
-import { Button } from "../ui/button";
-import { UserNav } from "@/components/nav/user-nav";
-import { Logo } from "@/components/ui/logo";
-import { SignedIn, SignedOut, auth } from "@clerk/nextjs";
-import Link from "next/link";
+import { SheetMenu } from "@/components/nav/sheet-menu";
+import {
+  RedirectToSignIn,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from "@clerk/nextjs";
+import Coins from "../coins/coins";
+import { UserChain } from "../chains/user-chain";
 
-export function Navbar() {
+import { BackButton } from "../ui/back-button";
+
+interface NavbarProps {
+  title: string;
+}
+
+export function Navbar({ title }: NavbarProps) {
   return (
-    <nav className="flex h-16 items-center px-4">
-      <Logo />
-      <SignedIn>
-        <Link href="/play" className="text-primary" prefetch={false}>
-          ChainLink
-        </Link>
-      </SignedIn>
-      <SignedOut>
-        <Link href="/" className="text-primary">
-          ChainLink
-        </Link>
-      </SignedOut>
-
-      <div className="ml-auto flex items-center space-x-4">
-        <Button asChild>
-          <Link href={"/play"}>Play ⚾</Link>
-        </Button>
-        <SignedIn>
-          <UserNav />
-        </SignedIn>
+    <header className="sticky top-0 z-10 w-full bg-background/95">
+      <div className="mx-4 sm:mx-8 flex h-14 items-center">
+        <div className="flex items-center space-x-1 lg:space-x-4 lg:gap-4 mr-2">
+          <SheetMenu />
+          <BackButton />
+          <h1 className="overflow-hidden text-wrap whitespace-nowrap">
+            {title}
+          </h1>
+        </div>
+        <div className="flex flex-1 items-center justify-end">
+          <div className="relative ml-auto flex-initial md:grow-0">
+            <div className="flex flex-row gap-2 mr-2 items-center">
+              <Coins />
+              |
+              <UserChain />
+            </div>
+          </div>
+          <SignedIn>
+            <UserButton
+              userProfileMode="navigation"
+              userProfileUrl="/settings"
+              appearance={{
+                variables: {
+                  colorPrimary: "#12a150",
+                },
+              }}
+            />
+          </SignedIn>
+          <SignedOut>
+            <RedirectToSignIn />
+            <SignInButton />
+          </SignedOut>
+        </div>
       </div>
-    </nav>
+    </header>
   );
 }

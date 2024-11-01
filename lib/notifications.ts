@@ -1,113 +1,52 @@
-export async function registerServiceWorker() {
-  if (!("serviceWorker" in navigator)) {
-    throw Error("Service worker not supported");
-  }
-  await navigator.serviceWorker.register("/serviceworker.js");
+"use server";
+
+import webpush from "web-push";
+
+webpush.setVapidDetails(
+  process.env.WEB_PUSH_EMAIL!,
+  process.env.NEXT_PUBLIC_WEB_PUSH_KEY!,
+  process.env.WEB_PUSH_PRIVATE_KEY!
+);
+
+let subscription: PushSubscription | null = null;
+
+export async function subscribeUser(sub: PushSubscription) {
+  subscription = sub;
+  // In a production environment, you would want to store the subscription in a database
+  // For example: await db.subscriptions.create({ data: sub })
+  return { success: true };
 }
 
-export async function getReadyServiceWorker() {
-  if (!("serviceWorker" in navigator)) {
-    throw Error("Service worker not supported");
-  }
-  const registration = await navigator.serviceWorker.ready;
-  return registration;
+export async function unsubscribeUser() {
+  subscription = null;
+  // In a production environment, you would want to remove the subscription from the database
+  // For example: await db.subscriptions.delete({ where: { ... } })
+  return { success: true };
 }
 
-export async function getSubscription(): Promise<PushSubscription | null> {
-  const sw = await getReadyServiceWorker();
-  const subscription = await sw.pushManager.getSubscription();
-  return subscription;
-}
-
-export async function registerPushNotifications() {
-  if (!("PushManager" in window)) {
-    throw Error("Push notifications not supported");
+export async function sendNotification(message: string) {
+  if (!subscription) {
+    throw new Error("No subscription available");
   }
 
-  const existingSubscription = await getSubscription();
-  if (existingSubscription) {
-    throw Error("Push subscription already exists");
-  }
-  const sw = await getReadyServiceWorker();
-  const subscription = await sw.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY,
-  });
-
-  await sendPushSubscriptionToServer(subscription);
-  return subscription;
-}
-
-export async function unregisterPushNotifications() {
-  const existingSubscription = await getSubscription();
-  if (!existingSubscription) {
-    throw Error("Push subscription does not exist");
-  }
-  await deletePushSubscriptionFromServer(existingSubscription);
-  await existingSubscription.unsubscribe();
-}
-
-export async function sendPushSubscriptionToServer(
-  subscription: PushSubscription,
-) {
-  const response = await fetch("/api/notifications", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(subscription),
-  });
-  if (!response.ok) {
-    throw Error("Could not send push subscription to server");
-  }
-}
-
-export async function deletePushSubscriptionFromServer(
-  subscription: PushSubscription,
-) {
-  const response = await fetch("/api/notifications", {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(subscription),
-  });
-  if (!response.ok) {
-    throw Error("Could not delete push subscription from server");
-  }
-
-  console.log("deletePushSubscriptionFromServer");
-}
-
-export async function sendPushNotificationToUser(
-  userId: string,
-  notification: {
-    title: string;
-    body: string;
-    icon?: string;
-    image?: string;
-    badge?: string;
-    vibrate?: number[];
-    tag?: string;
-    data?: any;
-  },
-) {
-  const baseurl = process.env.NEXT_PUBLIC_APP_URL!;
-  const url = `${baseurl}/api/notifications/push`;
-
-  console.log("sendPushNotificationToUser", url, userId, notification);
-
-  const response = await fetch(`${baseurl}/api/notifications/push`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userId,
-      notification,
-    }),
-  });
-  if (!response.ok) {
-    throw Error("Could not send push subscription to server");
+  try {
+    await webpush.sendNotification(
+      {
+        endpoint: subscription.endpoint,
+        keys: {
+          p256dh: subscription.getKey("p256dh") as unknown as string,
+          auth: subscription.getKey("auth") as unknown as string,
+        },
+      },
+      JSON.stringify({
+        title: "Test Notification",
+        body: message,
+        icon: "/icon.png",
+      })
+    );
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending push notification:", error);
+    return { success: false, error: "Failed to send notification" };
   }
 }

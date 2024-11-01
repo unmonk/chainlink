@@ -1,41 +1,28 @@
-# 🔗ChainLink🔗
+# ChainLink
 
-An open source clone of a popular streak game. Currently in development.
-The objective of the game is to either link together the longest win Chain in a month by selecting consecutive winners OR Win the most matchups in a month, regardless of the length of your Chain.
+ChainLink is a game where you try to build the highest chain of correct guesses to sports matchups and challenges. Wager your Links and climb the leaderboard to become the best ChainLink player in the world. Add your friends and build a squad to compete against other squads.
 
-## Features
 
-- Daily generated matchups from the NBA, WNBA, NHL, MLB, NFL, College Football, and College Basketball.
-- Matchup picks are locked after the game starts.
-- Score updates are provided every 2 minutes.
-- Leaderboard to see how you stack up against the competition.
-- Streaks are tracked and displayed on the leaderboard, and your profile.
+## Getting Started
 
-[![Preview](/public/images/screenshot.png "Preview")](https://chainlink.st)
+To get started, clone the repository, fill in a .env.local file with the necessary environment variables, and run the following commands:
 
-## Tech Stack
+```
+npm install
+npm run dev
+```
+open [http://localhost:3000](http://localhost:3000)
 
-- Built using **Next.js**
-- Authentication using **Clerk**
-- ORM using **Drizzle**
-- Database on **Planetscale**
-- Caching using **Upstash Redis**
-- UI Components built using **Radix UI** and **Shadcn/ui**
-- Styled using **Tailwind CSS**
-- Written in **TypeScript** ... mostly
-- Deployed to **Vercel**
-- Github Actions
-- CRON Jobs
-- Webhooks
 
-### Roadmap
+## Built With
 
-- [ ] Groups
-- [ ] Group Leaderboards
-- [x] Notifications
-- [ ] Pick Temperature Gauge
-- [ ] Pick Confidence
-- [ ] Admin Panel: Control Crons
-- [ ] Admin Panel: CRUD Matchups
-- [x] Admin Panel: View Active Picks
-- [ ] Groups: Create Custom Streak Campaign
+- [Next.js](https://nextjs.org/)
+- [Convex](https://convex.dex/)
+- [Clerk](https://clerk.dev/)
+- [Shadcn/ui](https://shadcn/ui)
+- [Serwist](https://github.com/serwist/serwist)
+
+
+## Preview
+
+![Preview](preview.png)

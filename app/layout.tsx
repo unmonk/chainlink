@@ -1,92 +1,80 @@
-import "./globals.css"
-import { Navbar } from "@/components/nav/navbar"
-import { ModalProvider } from "@/components/providers/modal-provider"
-import { ThemeProvider } from "@/components/providers/theme-provider"
-import { siteConfig } from "@/lib/config"
-import { cn } from "@/lib/utils"
-import { ClerkProvider } from "@clerk/nextjs"
-import { dark } from "@clerk/themes"
-import { Analytics } from "@vercel/analytics/react"
-import type { Metadata, Viewport } from "next"
-import { Inter as FontSans } from "next/font/google"
-import { Toaster } from "sonner"
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
+import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import ConvexClientProvider from "@/components/nav/convex-client-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@sentry/nextjs";
+import { CookiesProvider } from "next-client-cookies/server";
+import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
-export const viewport: Viewport = {
-  themeColor: "#1f821f",
-  width: "device-width",
-  height: "device-height",
-  initialScale: 1,
-  maximumScale: 1,
-  minimumScale: 1,
-}
+const APP_NAME = "ChainLink";
+const APP_DESCRIPTION = "Build the biggest chain.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: siteConfig.title,
-  description: siteConfig.description,
-  twitter: {
-    card: "summary_large_image",
-    site: siteConfig.twitterSite,
-    title: siteConfig.twitterTitle,
-    description: siteConfig.twitterDescription,
-    creator: siteConfig.twitterCreator,
-    creatorId: siteConfig.twitterCreatorId,
+  applicationName: APP_NAME,
+  title: {
+    default: APP_NAME,
+    template: "%s - ChainLink",
   },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: siteConfig.url,
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [
+  description: APP_DESCRIPTION,
+  manifest: "/manifest.json",
+  themeColor: "#161616",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_NAME,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    shortcut: "/favicon.ico",
+    apple: [
       {
-        url: `${siteConfig.url}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.title,
+        url: "/icons/apple-touch-icon.png",
+        sizes: "180x180",
       },
     ],
   },
-  applicationName: siteConfig.name,
-  keywords: siteConfig.keywords,
-  manifest: "/manifest.json",
-}
+};
+
+export const viewport: Viewport = {
+  themeColor: "#161616",
+  colorScheme: "dark",
+};
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode
-}) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-      }}
-    >
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={cn(
-            "bg-background relative z-10 min-h-screen w-full font-sans antialiased",
-            fontSans.variable
-          )}
-        >
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="absolute -z-20 h-full w-full bg-[radial-gradient(#bbf7d0_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:bg-[radial-gradient(#052e16_1px,transparent_1px)]"></div>
-            <Navbar />
-
-            {children}
-
-            <Toaster />
-            <ModalProvider />
-          </ThemeProvider>
-          <Analytics />
+    <CookiesProvider>
+      <html lang="en">
+        <body className={cn("antialiased font-sans", inter.variable)}>
+          <NuqsAdapter>
+            <ConvexClientProvider>
+              <ConvexQueryCacheProvider expiration={60000}>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="dark"
+                  enableSystem
+                  disableTransitionOnChange
+                >
+                  <main>{children}</main>
+                  <Toaster />
+                </ThemeProvider>
+              </ConvexQueryCacheProvider>
+            </ConvexClientProvider>
+          </NuqsAdapter>
         </body>
       </html>
-    </ClerkProvider>
-  )
+    </CookiesProvider>
+  );
 }

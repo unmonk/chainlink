@@ -1,3 +1,4 @@
+import { Doc } from "@/convex/_generated/dataModel";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -5,24 +6,55 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getPacifictime(date?: Date | string | number) {
-  if (!date) {
-    date = new Date();
+export async function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    throw Error("Service workers are not supported by this browser");
   }
-  let america_datetime_str = new Date(date).toLocaleString("en-US", {
-    timeZone: "America/Los_Angeles",
-  });
-  let date_america = new Date(america_datetime_str);
-  let year = date_america.getFullYear();
-  let month = ("0" + (date_america.getMonth() + 1)).slice(-2);
-  let day = ("0" + date_america.getDate()).slice(-2);
-
-  return {
-    url: `${year}${month}${day}`,
-    redis: `${month}/${day}/${year}`,
-  };
+  await navigator.serviceWorker.register("/serviceWorker.js");
 }
 
-export function absoluteUrl(path: string) {
-  return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
+export async function getReadyServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    throw Error("Service workers are not supported by this browser");
+  }
+  return navigator.serviceWorker.ready;
 }
+export const getSportFromLeague = (league: string): string => {
+  if (["NBA", "WNBA", "MBB", "WBB"].includes(league)) return "basketball";
+  if (["NFL", "COLLEGE-FOOTBALL", "UFL"].includes(league)) return "football";
+  if (["MLB"].includes(league)) return "baseball";
+  if (["NHL"].includes(league)) return "hockey";
+  if (
+    ["MLS", "NWSL", "EPL", "RPL", "CSL", "ARG", "TUR", "FRIENDLY"].includes(
+      league
+    )
+  )
+    return "soccer";
+  if (["PLL"].includes(league)) return "lacrosse";
+
+  return "other";
+};
+
+export const achievementTypes = [
+  "CHAINWIN",
+  "CHAINLOSS",
+  "CHAINPUSH",
+  "CAMPAIGNCHAIN",
+  "CAMPAIGNWINS",
+  "MONTHLYWIN",
+  "MONTHLYLOSS",
+  "MONTHLYPUSH",
+  "WEEKLYWIN",
+  "WEEKLYLOSS",
+  "DAILYWIN",
+  "DAILYLOSS",
+  "WINS",
+  "LOSS",
+  "PUSH",
+  "SQUADWIN",
+  "SQUADLOSS",
+  "REFERRAL",
+  "COINS",
+  "FRIENDS",
+  "OTHER",
+] as const;
