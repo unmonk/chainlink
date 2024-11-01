@@ -70,7 +70,7 @@ export const MonthlyStatsChart: React.FC<MonthlyStatsChartProps> = ({
   return (
     <Card className="bg-background/20">
       <CardHeader className="items-center pb-4">
-        <CardTitle>Monthly Stats</CardTitle>
+        <CardTitle>Monthly Wins and Losses</CardTitle>
         <CardDescription>Wins and Losses last 12 months.</CardDescription>
       </CardHeader>
       <CardContent>

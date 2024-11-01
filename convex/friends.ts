@@ -119,13 +119,13 @@ export const checkIfFriends = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
+    if (!identity) return false;
 
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("externalId", identity.subject))
       .unique();
-    if (!user) throw new Error("User not found");
+    if (!user) return false;
 
     return user.friends.some((friend) => friend.userId === args.userId);
   },

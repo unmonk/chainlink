@@ -244,6 +244,20 @@ export const handlePickLoss = internalMutation({
     await ctx.db.patch(user._id, user);
     await ctx.db.patch(pick._id, pick);
 
+    ///////////////////////SQUADS/////////////////////
+    if (user.squadId) {
+      await ctx.scheduler.runAfter(0, api.squads.handlePickComplete, {
+        squadId: user.squadId,
+        userId: user._id,
+        pick: {
+          _id: pick._id,
+          status: pick.status,
+          coins: pick.coins,
+          league: matchup.league,
+        },
+      });
+    }
+
     //schedule achievements
     await ctx.scheduler.runAfter(0, api.achievements.checkPickAchievements, {
       user: {
@@ -327,6 +341,20 @@ export const handlePickPush = internalMutation({
     await ctx.db.patch(chain._id, chain);
     await ctx.db.patch(user._id, user);
     await ctx.db.patch(pick._id, pick);
+
+    ///////////////////////SQUADS/////////////////////
+    if (user.squadId) {
+      await ctx.scheduler.runAfter(0, api.squads.handlePickComplete, {
+        squadId: user.squadId,
+        userId: user._id,
+        pick: {
+          _id: pick._id,
+          status: pick.status,
+          coins: pick.coins,
+          league: matchup.league,
+        },
+      });
+    }
 
     //schedule achievements
     await ctx.scheduler.runAfter(0, api.achievements.checkPickAchievements, {

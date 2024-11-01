@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -14,6 +15,11 @@ import { LeaguePieChart } from "./league-pie-chart";
 import { Skeleton } from "../ui/skeleton";
 import { Doc } from "@/convex/_generated/dataModel";
 import NumberTicker from "../ui/number-ticker";
+import { LeagueMonthlyPerformanceChart } from "./league-performance";
+import { format } from "date-fns";
+import { LeagueWinsMonthlyChart } from "./league-wins-monthly";
+import BlurFade from "../ui/blur-fade";
+import { motion } from "framer-motion";
 
 interface UserStatsProps {
   user: Doc<"users">;
@@ -110,8 +116,68 @@ const UserStats = ({ user }: UserStatsProps) => {
     });
   }
 
+  //format  as [{month: "", league: {wins: number, losses: number, pushes: number}}]
+  const leagueMonthlyStats = Object.entries(user?.monthlyStats).map(
+    ([month, monthStats]) => {
+      const statsByLeague = (monthStats as any).statsByLeague;
+      //transform YYYYMM to "Jan", "Feb", etc.
+      const monthName = format(
+        new Date(`${month.slice(0, 4)}-${month.slice(4)}-01`),
+        "MMM"
+      );
+
+      return {
+        month: monthName,
+        ...Object.entries(
+          statsByLeague as Record<
+            string,
+            {
+              wins: number;
+              losses: number;
+              pushes: number;
+              winRate: number;
+              totalPicks: number;
+            }
+          >
+        ).reduce(
+          (acc, [league, stats]) => ({
+            ...acc,
+            [league]: {
+              wins: stats.wins || 0,
+              losses: stats.losses || 0,
+              pushes: stats.pushes || 0,
+              winRate: stats.wins / (stats.wins + stats.losses),
+              totalPicks: stats.wins + stats.losses + stats.pushes,
+            },
+          }),
+          {} as Record<
+            string,
+            {
+              wins: number;
+              losses: number;
+              pushes: number;
+              winRate: number;
+              totalPicks: number;
+            }
+          >
+        ),
+      };
+    }
+  );
+
   const ratio = totalWins / (totalWins + totalLosses);
   const winRate = ratio * 100;
+
+  const pullupVariant = {
+    initial: { y: 100, opacity: 0 },
+    animate: (i: any) => ({
+      y: 0,
+      opacity: 1,
+      transition: {
+        delay: i * 0.05, // Delay each letter's animation by 0.05 seconds
+      },
+    }),
+  };
 
   return (
     <Card className="bg-background/20">
@@ -123,6 +189,7 @@ const UserStats = ({ user }: UserStatsProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center px-2 py-2 flex-wrap gap-1">
+        <LeagueWinsMonthlyChart leagueMonthlyStats={leagueMonthlyStats} />
         {!user && (
           <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
         )}
@@ -151,6 +218,7 @@ const UserStats = ({ user }: UserStatsProps) => {
       <CardContent className="grid gap-2 grid-cols-1">
         <LeagueRadarChart leagueData={leagueChartData} />
       </CardContent>
+
       <CardContent>
         <div className="flex flex-col gap-2 border rounded-lg p-2">
           <h3 className="text-2xl mt-2 text-center font-semibold">
@@ -194,9 +262,13 @@ const UserStats = ({ user }: UserStatsProps) => {
                   const totalB = statsB.wins + statsB.losses + statsB.pushes;
                   return totalB - totalA; // Sort in descending order
                 })
-                .map(([league, stats]) => (
-                  <div
+                .map(([league, stats], i) => (
+                  <motion.div
                     key={league}
+                    variants={pullupVariant}
+                    initial="initial"
+                    animate="animate"
+                    custom={i}
                     className="flex flex-col items-center rounded-lg bg-accent/40 text-center p-1 w-full h-full"
                   >
                     <span className="sr-only">{league}</span>
@@ -216,17 +288,22 @@ const UserStats = ({ user }: UserStatsProps) => {
                     <p className="text-xs font-light text-muted-foreground">
                       {league}
                     </p>
-                  </div>
+                  </motion.div>
                 ))}
           </div>
         </div>
       </CardContent>
       <CardContent>
-        <MonthlyStatsChart monthlyData={monthlyChartData} />
+        <BlurFade inView>
+          <LeagueMonthlyPerformanceChart
+            leagueMonthlyStats={leagueMonthlyStats}
+          />
+        </BlurFade>
       </CardContent>
-
       <CardContent>
-        <LeaguePieChart leagueChartData={leagueChartData} />
+        <BlurFade inView>
+          <MonthlyStatsChart monthlyData={monthlyChartData} />
+        </BlurFade>
       </CardContent>
     </Card>
   );

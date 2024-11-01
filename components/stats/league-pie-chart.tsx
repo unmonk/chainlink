@@ -111,7 +111,7 @@ export function LeaguePieChart({
 
   return (
     <>
-      <Card className="flex flex-col bg-background/20">
+      <Card className="flex flex-col bg-transparent border-none">
         <CardHeader className="items-center pb-0">
           <CardTitle>Picks Distribution</CardTitle>
           <CardDescription>Picks by League</CardDescription>
