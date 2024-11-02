@@ -6,7 +6,7 @@ const crons = cronJobs();
 crons.interval(
   "Scoreboards for all active leagues",
   { minutes: 2 }, // every minute
-  internal.scoreboards.scoreboards
+  api.scoreboards.scoreboards
 );
 
 crons.daily(

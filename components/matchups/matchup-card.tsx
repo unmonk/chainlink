@@ -1,13 +1,11 @@
 import { Doc, Id } from "@/convex/_generated/dataModel";
-import { Card, CardContent, CardTitle } from "../ui/card";
+import { Card, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { ConvexError } from "convex/values";
-import { formatDistance } from "date-fns";
-import { Logo } from "../ui/logo";
 import { matchupReward } from "@/convex/utils";
 
 const MatchupCard = ({ matchup }: { matchup: Doc<"matchups"> }) => {
@@ -214,14 +212,16 @@ const MatchupPickButton = ({
       if (errorMessage === "USER_NOT_FOUND") {
         toast.error("Please sign in to make a pick");
       }
-      if (errorMessage === "INSUFFICIENT_FUNDS") {
-        toast.error("You do not have enough Links to make this pick");
-      }
       if (errorMessage === "EXISTING_PICK_FOUND") {
         toast.error("You already have an active pick");
       }
+      if (errorMessage === "INSUFFICIENT_FUNDS") {
+        toast.error("You do not have enough Links to make this pick");
+      }
       if (errorMessage === "MATCHUP_LOCKED") {
         toast.error("This matchup is locked");
+      } else {
+        toast.error("Something went wrong");
       }
     }
   };

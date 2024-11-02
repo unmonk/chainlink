@@ -257,13 +257,7 @@ export const listAchievements = query({
   handler: async (ctx) => {
     //get storage url
     const achievements = await ctx.db.query("achievements").collect();
-    const achievementsWithImage = await Promise.all(
-      achievements.map(async (achievement) => ({
-        ...achievement,
-        image: await ctx.storage.getUrl(achievement.imageStorageId),
-      }))
-    );
-    return achievementsWithImage;
+    return achievements;
   },
 });
 
@@ -289,10 +283,12 @@ export const createAchievement = mutation({
     ctx,
     { name, description, image, coins, type, weight, threshold, imageStorageId }
   ) => {
+    const storageUrl = await ctx.storage.getUrl(imageStorageId);
+
     return await ctx.db.insert("achievements", {
       name,
       description,
-      image,
+      image: storageUrl || "",
       coins,
       type,
       weight,

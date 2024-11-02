@@ -1,38 +1,67 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { internal } from "./_generated/api";
 import { SlotSymbolType } from "./schema";
 
-// Check if user can spin
-export const canSpin = query({
-  args: { userId: v.id("users") },
-  handler: async (ctx, { userId }) => {
-    const user = await ctx.db.get(userId);
-    if (!user) return false;
+export const SLOT_MACHINE_CONFIG = {
+  active: true,
+  symbolWeights: {
+    CHERRY: 35,
+    BAR: 25,
+    SEVEN: 20,
+    STAR: 10,
+    DIAMOND: 7,
+    COIN: 3,
+  },
+  payouts: [
+    { line: 5, payout: 1000 }, // 5 matching symbols
+    { line: 4, payout: 100 }, // 4 matching symbols
+    { line: 3, payout: 50 }, // 3 matching symbols
+    { line: 2, payout: 10 }, // 2 matching symbols
+  ],
+  spinCost: 10,
+  freeSpinInterval: 86400000, // 24 hours in milliseconds
+};
 
-    const config = await ctx.db
-      .query("slotMachineConfig")
-      .filter((q) => q.eq(q.field("active"), true))
-      .first();
-    if (!config) return false;
+export const getSpinGame = query({
+  args: {},
+  handler: async (ctx) => {
+    const clerkUser = await ctx.auth.getUserIdentity();
+    if (!clerkUser) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", clerkUser.tokenIdentifier)
+      )
+      .unique();
+    if (!user) return null;
 
     // Check if user has enough coins for paid spin
-    const hasEnoughCoins = user.coins >= config.spinCost;
+    const hasEnoughCoins = user.coins >= SLOT_MACHINE_CONFIG.spinCost;
 
     // Check if user has free spin available
     const lastFreeSpin = user.coinGames?.lastFreeSpin ?? 0;
-    const canFreeSpin = Date.now() - lastFreeSpin >= config.freeSpinInterval;
+    const canFreeSpin =
+      Date.now() - lastFreeSpin >= SLOT_MACHINE_CONFIG.freeSpinInterval;
 
     // Calculate next free spin time if can't spin now
     const nextFreeSpinTime = canFreeSpin
       ? null
-      : new Date(lastFreeSpin + config.freeSpinInterval).getTime();
+      : new Date(lastFreeSpin + SLOT_MACHINE_CONFIG.freeSpinInterval).getTime();
+
+    const spins = await ctx.db
+      .query("slotMachineSpins")
+      .withIndex("by_userId", (q) => q.eq("userId", user._id))
+      .order("desc")
+      .take(10);
 
     return {
+      userId: user._id,
+      hasEnoughCoins,
       canFreeSpin,
-      canPaidSpin: hasEnoughCoins,
-      spinCost: config.spinCost,
+      spinCost: SLOT_MACHINE_CONFIG.spinCost,
       nextFreeSpinTime,
+      spins,
     };
   },
 });
@@ -43,28 +72,21 @@ export const spin = mutation({
   handler: async (ctx, { userId, useFreeSpin }) => {
     const user = await ctx.db.get(userId);
     if (!user) throw new Error("User not found");
-
-    const config = await ctx.db
-      .query("slotMachineConfig")
-      .filter((q) => q.eq(q.field("active"), true))
-      .first();
-    if (!config) throw new Error("Slot machine not configured");
-
     // Validate spin eligibility
     if (useFreeSpin) {
       const lastFreeSpin = user.coinGames?.lastFreeSpin ?? 0;
-      if (Date.now() - lastFreeSpin < config.freeSpinInterval) {
+      if (Date.now() - lastFreeSpin < SLOT_MACHINE_CONFIG.freeSpinInterval) {
         throw new Error("Free spin not available yet");
       }
     } else {
-      if (user.coins < config.spinCost) {
+      if (user.coins < SLOT_MACHINE_CONFIG.spinCost) {
         throw new Error("Not enough coins");
       }
     }
 
     // Generate result
-    const result = generateSpinResult(config.symbolWeights);
-    const payout = calculatePayout(result, config.payouts);
+    const result = generateSpinResult(SLOT_MACHINE_CONFIG.symbolWeights);
+    const payout = calculatePayout(result, SLOT_MACHINE_CONFIG.payouts);
 
     // Record the spin
     await ctx.db.insert("slotMachineSpins", {
@@ -76,9 +98,11 @@ export const spin = mutation({
     });
 
     // Update user's coins and spin timestamp
-    const coinUpdate = useFreeSpin ? payout : payout - config.spinCost;
+    const coinUpdate = useFreeSpin
+      ? payout
+      : payout - SLOT_MACHINE_CONFIG.spinCost;
 
-    console.log("coinUpdate", coinUpdate);
+    // Update user's coins and spin timestamp
     await ctx.db.patch(userId, {
       coins: user.coins + coinUpdate,
       coinGames: {
@@ -173,17 +197,5 @@ export const initializeSlotMachine = mutation({
         freeSpinInterval: 86400000, // 24 hours in milliseconds
       });
     }
-  },
-});
-
-// Get all spins for a user
-export const getSpins = query({
-  args: { userId: v.id("users") },
-  handler: async (ctx, { userId }) => {
-    return await ctx.db
-      .query("slotMachineSpins")
-      .filter((q) => q.eq(q.field("userId"), userId))
-      .order("desc")
-      .take(10);
   },
 });

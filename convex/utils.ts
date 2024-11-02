@@ -1,7 +1,27 @@
 import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import { action, mutation, query } from "./_generated/server";
 import { League } from "./types";
+import { api } from "./_generated/api";
+
+export interface ScheduledMessage {
+  _id: string;
+  _creationTime: number;
+  name: string;
+  scheduledTime: number;
+  completedTime?: number;
+  state: {
+    kind: string;
+  };
+  args: any[];
+}
+
+export const getScheduledMessages = action({
+  args: {},
+  handler: async (ctx, args): Promise<ScheduledMessage[]> => {
+    return await ctx.runQuery(api.utils.listScheduledMessages);
+  },
+});
 
 export const listScheduledMessages = query({
   args: {},

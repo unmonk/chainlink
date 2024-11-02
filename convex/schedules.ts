@@ -13,40 +13,65 @@ export const schedules = action({
     let actionResponse: Record<
       string,
       {
+        error: string;
         gamesOnSchedule: number;
-        updatedTimeOrStatus: number;
+        inactiveMatchups: number;
+        activeMatchups: number;
         scoreMatchupsCreated: number;
         statMatchupsCreated: number;
+        matchupsUpdated: number;
+        games: {
+          game: string;
+          result: string;
+          details?: string;
+        }[];
       }
     > = {};
     ////////////////LOOP ALL ACTIVE LEAGUES/////////////////////
     for (const league of ACTIVE_LEAGUES) {
       let leagueResponse = {
-        updatedTimeOrStatus: 0,
         scoreMatchupsCreated: 0,
         statMatchupsCreated: 0,
+        inactiveMatchups: 0,
+        activeMatchups: 0,
+        matchupsUpdated: 0,
         gamesOnSchedule: 0,
+        games: [] as { game: string; result: string; details?: string }[],
+        error: "",
       };
       const endpoint = getScheduleEndpoint(league);
       if (!endpoint) {
-        console.log(`No endpoint found for ${league}`);
+        leagueResponse.error = `No endpoint found for ${league}`;
         continue;
       }
 
       const response = await fetch(endpoint);
       const data = (await response.json()) as ScheduleResponse;
       if (!data.content.schedule) {
-        console.log(`No schedule found for ${league}`);
+        leagueResponse.error = `No schedule found for ${league}`;
         continue;
       }
 
       ////GET ACTIVE MATCHUPS FOR LEAGUE ////
       const existingMatchups = await ctx.runQuery(
-        api.matchups.getActiveMatchupsByLeague,
+        api.matchups.getMatchupsByLeagueAndTime,
         {
           league,
+          startTime: new Date().getTime(),
         }
       );
+
+      //count active matchups
+      leagueResponse.activeMatchups = existingMatchups.reduce(
+        (acc, matchup) => {
+          if (matchup.active) acc++;
+          return acc;
+        },
+        0
+      );
+
+      leagueResponse.inactiveMatchups =
+        existingMatchups.length - leagueResponse.activeMatchups;
 
       //Create dictionary of existing matchups by gameId
       const existingMatchupsByGameId = existingMatchups.reduce(
@@ -67,33 +92,48 @@ export const schedules = action({
           leagueResponse.gamesOnSchedule++;
           const competition = game.competitions[0];
           //skip if no competition or less than 2 competitors or already started
-          if (!competition) continue;
-          if (!competition.competitors) continue;
-          if (competition.competitors.length < 2) continue;
+
+          if (
+            !competition ||
+            !competition.competitors ||
+            competition.competitors.length < 2
+          ) {
+            leagueResponse.games.push({
+              game: game.shortName,
+              result: `Skipped with less than 2 competitors`,
+            });
+            continue;
+          }
           if (
             competition.competitors[0].team.name === "TBD" ||
             competition.competitors[1].team.name === "TBD"
-          )
+          ) {
+            leagueResponse.games.push({
+              game: game.shortName,
+              result: `Skipped with TBD team names`,
+            });
             continue;
+          }
 
+          //get competition status
           const competitionStatus =
             competition.status?.type?.name ?? "STATUS_SCHEDULED";
+
+          //skip if not scheduled, postponed, or delayed
           if (
             competitionStatus !== "STATUS_SCHEDULED" &&
             competitionStatus !== "STATUS_POSTPONED" &&
             competitionStatus !== "STATUS_DELAYED"
           ) {
-            console.log(
-              `${league} skipped game ${game.id} with status ${competitionStatus}`
-            );
+            leagueResponse.games.push({
+              game: game.shortName,
+              result: `Skipped with status ${competitionStatus}`,
+            });
             continue;
           }
 
           /////check if matchup already exists, if so update the scheduled time, else create new matchups////////////
           if (existingMatchupsByGameId[game.id]) {
-            console.log(
-              `Matchup already exists for ${league}: ${game.shortName}`
-            );
             //check for changes
             let hasChanged = false;
             let hasChangedDetails = `${league}: ${game.shortName} -`;
@@ -116,9 +156,14 @@ export const schedules = action({
                 startTime: Date.parse(game.date),
                 status: competitionStatus,
               });
-              console.log(hasChangedDetails);
-              leagueResponse.updatedTimeOrStatus++;
+              leagueResponse.matchupsUpdated++;
+              leagueResponse.games.push({
+                game: game.shortName,
+                result: `Updated scheduled time or status`,
+                details: hasChangedDetails,
+              });
             }
+
             continue;
           }
 
@@ -128,7 +173,13 @@ export const schedules = action({
           const away = competition.competitors.find(
             (c) => c.homeAway === "away"
           );
-          if (!home || !away) continue;
+          if (!home || !away) {
+            leagueResponse.games.push({
+              game: game.shortName,
+              result: `Skipped with no home or away team`,
+            });
+            continue;
+          }
           const ACTIVE_MATCHUP_TYPES: MatchupType[] = ["SCORE"];
           ///////////////////LOOP ALL ACTIVE MATCHUP TYPES////////////////////////
           for (const matchup_type of ACTIVE_MATCHUP_TYPES) {
@@ -150,14 +201,16 @@ export const schedules = action({
                         name: home.team.name || "Home Team",
                         score: 0,
                         image:
-                          home.team.logo || "https://via.placeholder.com/150",
+                          home.team.logo ||
+                          "https://chainlink.st/icons/icon-256x256.png",
                       },
                       awayTeam: {
                         id: away.id,
                         name: away.team.name || "Away Team",
                         score: 0,
                         image:
-                          away.team.logo || "https://via.placeholder.com/150",
+                          away.team.logo ||
+                          "https://chainlink.st/icons/icon-256x256.png",
                       },
                       cost: 0,
                       metadata: {
@@ -170,6 +223,10 @@ export const schedules = action({
                   );
                   leaguePromises.push(statsMatchup);
                   leagueResponse.statMatchupsCreated++;
+                  leagueResponse.games.push({
+                    game: game.shortName,
+                    result: `Created stats matchup`,
+                  });
                 }
               }
             }
@@ -188,13 +245,17 @@ export const schedules = action({
                     id: home.id,
                     name: home.team.name || "Home Team",
                     score: 0,
-                    image: home.team.logo || "https://via.placeholder.com/150",
+                    image:
+                      home.team.logo ||
+                      "https://chainlink.st/icons/icon-256x256.png",
                   },
                   awayTeam: {
                     id: away.id,
                     name: away.team.name || "Away Team",
                     score: 0,
-                    image: away.team.logo || "https://via.placeholder.com/150",
+                    image:
+                      away.team.logo ||
+                      "https://chainlink.st/icons/icon-256x256.png",
                   },
                   cost: 0,
                   metadata: {
@@ -205,6 +266,10 @@ export const schedules = action({
               );
               leaguePromises.push(scoreMatchup);
               leagueResponse.scoreMatchupsCreated++;
+              leagueResponse.games.push({
+                game: game.shortName,
+                result: `Created new score matchup`,
+              });
             }
           }
         }
@@ -212,6 +277,7 @@ export const schedules = action({
       await Promise.all(leaguePromises);
       actionResponse[league] = leagueResponse;
     }
+    console.log(actionResponse);
     return actionResponse;
   },
 });

@@ -1,8 +1,16 @@
+"use client";
+
 import AddToHomeScreen from "@/components/addtohome/add-to-home";
 import DashboardWrapper2 from "@/components/nav/dashboard-wrapper2";
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/nextjs";
+import { useConvexAuth } from "convex/react";
+import { redirect } from "next/navigation";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useConvexAuth();
+  if (!isAuthenticated) {
+    redirect("/sign-in");
+  }
   return (
     <>
       <SignedIn>

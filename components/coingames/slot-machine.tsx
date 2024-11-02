@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Id } from "@/convex/_generated/dataModel";
 import {
   Table,
   TableBody,
@@ -24,6 +23,8 @@ import {
 import { Separator } from "../ui/separator";
 import { formatDistanceToNow } from "date-fns";
 import { RainbowButton } from "../ui/rainbow-button";
+import Loading from "../ui/loading";
+import { toast } from "sonner";
 
 const SYMBOLS = {
   CHERRY: "🍒",
@@ -34,11 +35,7 @@ const SYMBOLS = {
   COIN: "🔗",
 };
 
-interface SlotMachineProps {
-  userId: Id<"users">;
-}
-
-export function SlotMachine({ userId }: SlotMachineProps) {
+export function SlotMachine() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentSymbols, setCurrentSymbols] = useState<string[]>(
     Array(5).fill(SYMBOLS.DIAMOND)
@@ -48,12 +45,12 @@ export function SlotMachine({ userId }: SlotMachineProps) {
     matches: number;
   } | null>(null);
 
-  const spinStatus = useQuery(api.coingames.canSpin, { userId });
+  const spinGame = useQuery(api.coingames.getSpinGame);
   const spin = useMutation(api.coingames.spin);
-  const spins = useQuery(api.coingames.getSpins, { userId });
 
   const handleSpin = async (useFreeSpin: boolean) => {
     if (isSpinning) return;
+    if (!spinGame) return;
 
     try {
       setIsSpinning(true);
@@ -72,7 +69,7 @@ export function SlotMachine({ userId }: SlotMachineProps) {
       }, 100);
 
       // Perform actual spin
-      const result = await spin({ userId, useFreeSpin });
+      const result = await spin({ userId: spinGame.userId, useFreeSpin });
 
       // Stop animation and show result
       setTimeout(() => {
@@ -98,10 +95,11 @@ export function SlotMachine({ userId }: SlotMachineProps) {
     } catch (error) {
       setIsSpinning(false);
       setLastWin(null);
+      toast.error("Something went wrong");
     }
   };
 
-  if (!spinStatus) return <div>Loading...</div>;
+  if (!spinGame) return <Loading />;
 
   return (
     <Card className="p-6 w-full max-w-2xl mx-auto">
@@ -158,8 +156,8 @@ export function SlotMachine({ userId }: SlotMachineProps) {
           <div className="flex flex-col gap-2">
             <Button
               size="lg"
-              variant={spinStatus.canFreeSpin ? "default" : "outline"}
-              disabled={isSpinning || !spinStatus.canFreeSpin}
+              variant={spinGame.canFreeSpin ? "default" : "outline"}
+              disabled={isSpinning || !spinGame.canFreeSpin}
               onClick={() => handleSpin(true)}
               className="relative overflow-hidden"
             >
@@ -167,28 +165,28 @@ export function SlotMachine({ userId }: SlotMachineProps) {
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  {spinStatus.canFreeSpin && (
+                  {spinGame.canFreeSpin && (
                     <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-75 animate-pulse blur-sm" />
                   )}
                   <span className="relative z-10">Free Spin</span>
                 </>
               )}
             </Button>
-            {!spinStatus.canFreeSpin && (
+            {!spinGame.canFreeSpin && (
               <p className="text-xs text-muted-foreground text-center text-pretty">
-                Come back in {formatDistanceToNow(spinStatus.nextFreeSpinTime!)}
+                Come back in {formatDistanceToNow(spinGame.nextFreeSpinTime!)}
               </p>
             )}
           </div>
 
           <RainbowButton
-            disabled={isSpinning || !spinStatus.canPaidSpin}
+            disabled={isSpinning || !spinGame.hasEnoughCoins}
             onClick={() => handleSpin(false)}
           >
             {isSpinning ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              `Spin (🔗${spinStatus.spinCost})`
+              `Spin (🔗${spinGame.spinCost})`
             )}
           </RainbowButton>
         </div>
@@ -254,7 +252,7 @@ export function SlotMachine({ userId }: SlotMachineProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {spins?.map((spin) => (
+            {spinGame.spins?.map((spin) => (
               <TableRow key={spin._id}>
                 <TableCell className="text-center">
                   {formatDistanceToNow(spin.spunAt)} ago

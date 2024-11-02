@@ -176,7 +176,7 @@ export default defineSchema({
         value: v.string(),
       })
     ),
-  }),
+  }).index("by_userId", ["userId"]),
 
   matchups: defineTable({
     updatedAt: v.optional(v.number()),
@@ -207,6 +207,7 @@ export default defineSchema({
     metadata: v.optional(v.any()),
   })
     .index("by_active_league", ["league", "active"])
+    .index("by_league_time", ["league", "startTime"])
     .index("by_active_dates", ["active", "startTime"])
     .index("by_startTime", ["startTime"])
     .index("by_gameId", ["gameId"]),

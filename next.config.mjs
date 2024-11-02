@@ -39,11 +39,15 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "keen-warbler-964.convex.cloud",
+      },
+      {
+        protocol: "https",
         hostname: "capi.chainlink.st",
       },
       {
         protocol: "https",
-        hostname: "cactchainlink.st",
+        hostname: "cact.chainlink.st",
       },
       {
         protocol: "https",

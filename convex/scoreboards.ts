@@ -1,19 +1,22 @@
 import { internal } from "./_generated/api";
-import { internalAction } from "./_generated/server";
+import { action, internalAction } from "./_generated/server";
 import { ScoreboardResponse } from "./espn";
 import { League } from "./types";
 import { ACTIVE_LEAGUES, getHawaiiTime } from "./utils";
 
-export const scoreboards = internalAction({
+export const scoreboards = action({
   args: {},
   handler: async (ctx) => {
     let actionResponse: Record<
       string,
       {
+        fetchedEvents: number;
+        fetchedMatchups: number;
         matchupsStarted: number;
         matchupsFinished: number;
         matchupsUpdated: number;
         message: string;
+        games: { game: string; result: string }[];
       }
     > = {};
 
@@ -116,42 +119,46 @@ export const scoreboards = internalAction({
       }
     );
 
-    console.log(
-      `Total matchups (from db): ${allMatchups.length}.Total events (from espn): ${allGameIds.length}`
-    );
-
     // Process each league
     for (const league of ACTIVE_LEAGUES) {
       let leagueResponse = {
+        fetchedEvents: 0,
+        fetchedMatchups: 0,
         matchupsStarted: 0,
         matchupsFinished: 0,
         matchupsUpdated: 0,
         message: "",
+        games: [] as { game: string; result: string }[],
       };
 
       const data = leagueData[league];
 
+      //check if no events found
       if (!data.events || data.events.length === 0) {
-        console.log(`${league}: no events fetched`);
         leagueResponse.message = "NO EVENTS FOUND";
         actionResponse[league] = leagueResponse;
         continue;
       }
 
+      //filter matchups by league
       const leagueMatchups = allMatchups.filter((m) => m.league === league);
 
-      console.log(
-        `${league}: total fetched matchups (from db): ${leagueMatchups.length} :: total fetched events (from espn): ${data.events.length}`
-      );
+      leagueResponse.fetchedEvents = data.events.length;
+      leagueResponse.fetchedMatchups = leagueMatchups.length;
 
       // Process events for the current league
       for (const event of data.events) {
         const matchup = leagueMatchups.find((m) => m.gameId === event.id);
+        //check if no matchup found
         if (!matchup) {
-          console.log(`${league}: no matchup found for ${event.shortName}`);
+          leagueResponse.games.push({
+            game: event.shortName || "",
+            result: `Skipped with no matchup`,
+          });
           continue;
         }
 
+        //get event status
         const eventStatus = event.competitions[0].status?.type?.name;
         const statusDetails = event.competitions[0].status?.type?.detail;
         const homeTeam = event.competitions[0].competitors.find(
@@ -160,10 +167,12 @@ export const scoreboards = internalAction({
         const awayTeam = event.competitions[0].competitors.find(
           (competitor) => competitor.homeAway === "away"
         );
+        //check if no home or away team found
         if (!homeTeam || !awayTeam) {
-          console.log(
-            `${league}: no home or away team found for ${event.shortName}`
-          );
+          leagueResponse.games.push({
+            game: event.shortName || "",
+            result: `Skipped with no home or away team`,
+          });
           continue;
         }
         const homeScore = parseInt(homeTeam.score);
@@ -177,9 +186,6 @@ export const scoreboards = internalAction({
           (eventStatus === "STATUS_IN_PROGRESS" ||
             eventStatus === "STATUS_FIRST_HALF")
         ) {
-          console.log(
-            `${league}: processing matchup started ${event.shortName} :: ${event.competitions[0].status?.type?.name} :: ${matchup.status}`
-          );
           await ctx.runMutation(internal.matchups.handleMatchupStarted, {
             matchupId: matchup._id,
             status: eventStatus,
@@ -201,7 +207,10 @@ export const scoreboards = internalAction({
             },
           });
           leagueResponse.matchupsStarted++;
-          console.log(`${league}: matchup started for ${event.shortName}`);
+          leagueResponse.games.push({
+            game: event.shortName || "",
+            result: `Matchup started`,
+          });
         }
 
         ///////////////////MATCHUP ENDED////////////////////////
@@ -214,9 +223,6 @@ export const scoreboards = internalAction({
             eventStatus === "STATUS_FULL_TIME" ||
             eventStatus === "STATUS_FINAL_PEN")
         ) {
-          console.log(
-            `${league}: processing matchup ended ${event.shortName} :: ${event.competitions[0].status?.type?.name} :: ${matchup.status}`
-          );
           await ctx.runMutation(internal.matchups.handleMatchupFinished, {
             matchupId: matchup._id,
             homeTeam: {
@@ -240,7 +246,10 @@ export const scoreboards = internalAction({
             },
           });
           leagueResponse.matchupsFinished++;
-          console.log(`${league}: matchup finished for ${event.shortName}`);
+          leagueResponse.games.push({
+            game: event.shortName || "",
+            result: `Matchup finished`,
+          });
         }
 
         /////////////MATCHUP POSTPONED///////////////////////////
@@ -278,13 +287,12 @@ export const scoreboards = internalAction({
           }
           //#endregion
           if (!hasChanged) {
-            console.log(
-              `${league}: no changes for ${event.shortName}, skipping update`
-            );
+            leagueResponse.games.push({
+              game: event.shortName || "",
+              result: `No changes for ${event.shortName}, skipping update`,
+            });
             continue;
           } else {
-            console.log(hasChangedDetails);
-
             await ctx.runMutation(internal.matchups.handleMatchupUpdated, {
               matchupId: matchup._id,
               status: eventStatus,
@@ -306,9 +314,10 @@ export const scoreboards = internalAction({
               },
             });
             leagueResponse.matchupsUpdated++;
-            console.log(
-              `${league}: matchup updated for ${event.shortName} with ${hasChangedDetails}`
-            );
+            leagueResponse.games.push({
+              game: event.shortName || "",
+              result: `Matchup updated with ${hasChangedDetails}`,
+            });
           }
         }
         // #endregion
@@ -317,7 +326,7 @@ export const scoreboards = internalAction({
       leagueResponse.message = "SUCCESS";
       actionResponse[league] = leagueResponse;
     }
-
+    console.log(actionResponse);
     return actionResponse;
   },
 });
@@ -331,30 +340,31 @@ export const scoreboards = internalAction({
  * @throws {Error} If an invalid league is provided.
  */
 function getScoreboardUrl(league: League) {
-  const date = getHawaiiTime();
+  const hawaiiDate = getHawaiiTime();
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
   const limit = 300;
   switch (league) {
     case "MLB":
-      return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NFL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "COLLEGE-FOOTBALL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "WNBA":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NBA":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NHL":
-      return `http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "MLS":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "MBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "WBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "UFL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "ARG":
       return `http://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${date}&limit=${limit}`;
     case "CSL":
