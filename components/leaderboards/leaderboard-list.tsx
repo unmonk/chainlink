@@ -35,6 +35,12 @@ export const LeaderboardList = () => {
     return bWins - aWins;
   });
 
+  const sortByUserCoins = leaderboardData.sort((a, b) => {
+    const aCoins = a.user?.coins || 0;
+    const bCoins = b.user?.coins || 0;
+    return bCoins - aCoins;
+  });
+
   // Get top 3 winners and the rest
   const topThreeWinners = sortedByWins.slice(0, 3);
   const remainingWinners = sortedByWins.slice(3);
@@ -46,6 +52,7 @@ export const LeaderboardList = () => {
           <TabsTrigger value="chain">Chain</TabsTrigger>
           <TabsTrigger value="wins">Wins</TabsTrigger>
           <TabsTrigger value="alltime">All-Time</TabsTrigger>
+          <TabsTrigger value="links">Links</TabsTrigger>
         </TabsList>
         <TabsContent value="chain">
           <div className="flex flex-col gap-4">
@@ -415,6 +422,125 @@ export const LeaderboardList = () => {
                         )}
                       </span>
                     </h2>
+                  </div>
+                </Link>
+              ))}
+            </Card>
+          </div>
+        </TabsContent>
+        <TabsContent value="links">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-2xl font-bold">Most Links</h2>
+            <div className="grid grid-cols-1 gap-6">
+              {sortByUserCoins[0] && (
+                <BackgroundGradient
+                  key={sortByUserCoins[0].user?._id}
+                  animate={true}
+                  className="rounded-lg overflow-hidden shadow-lg"
+                >
+                  <Link href={`/u/${sortByUserCoins[0].user?.name}`} passHref>
+                    <Card
+                      key={sortByUserCoins[0].user?._id}
+                      className="flex flex-col items-center gap-2 p-4"
+                    >
+                      <Avatar className="w-20 h-20">
+                        <AvatarImage
+                          src={sortByUserCoins[0].user?.image}
+                          alt={sortByUserCoins[0].user?.name}
+                        />
+                        <AvatarFallback>
+                          {sortByUserCoins[0].user?.name}
+                        </AvatarFallback>
+                      </Avatar>
+                      <h3 className="text-xl font-semibold">
+                        {sortByUserCoins[0].user?.name}
+                      </h3>
+                      <div className="flex flex-row gap-2 items-center justify-center ">
+                        <span className="text-cyan-600 text-nowrap text-xl">
+                          🔗{" "}
+                          {sortByUserCoins[0].user?.coins.toLocaleString(
+                            "en-US"
+                          )}
+                        </span>
+                      </div>
+                      <p className="text-sm font-bold">Leader</p>
+                    </Card>
+                  </Link>
+                </BackgroundGradient>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {sortByUserCoins[1] && (
+                <Link href={`/u/${sortByUserCoins[1].user?.name}`} passHref>
+                  <Card
+                    key={sortByUserCoins[1].user?._id}
+                    className="flex flex-col items-center gap-1 p-2"
+                  >
+                    <Avatar className="w-20 h-20">
+                      <AvatarImage
+                        src={sortByUserCoins[1].user?.image}
+                        alt={sortByUserCoins[1].user?.name}
+                      />
+                      <AvatarFallback>
+                        {sortByUserCoins[1].user?.name}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h3 className="text-xl font-semibold">
+                      {sortByUserCoins[1].user?.name}
+                    </h3>
+                    <div className="flex flex-row gap-2 items-center justify-center ">
+                      <span className="text-cyan-600 text-nowrap text-xl">
+                        🔗{" "}
+                        {sortByUserCoins[1].user?.coins.toLocaleString("en-US")}
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold">2nd</p>
+                  </Card>
+                </Link>
+              )}
+              {sortByUserCoins[2] && (
+                <Link href={`/u/${sortByUserCoins[2].user?.name}`} passHref>
+                  <Card
+                    key={sortByUserCoins[2].user?._id}
+                    className="flex flex-col items-center gap-1 p-2"
+                  >
+                    <Avatar className="w-20 h-20">
+                      <AvatarImage
+                        src={sortByUserCoins[2].user?.image}
+                        alt={sortByUserCoins[2].user?.name}
+                      />
+                      <AvatarFallback>
+                        {sortByUserCoins[2].user?.name}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h3 className="text-xl font-semibold">
+                      {sortByUserCoins[2].user?.name}
+                    </h3>
+                    <div className="flex flex-row gap-2 items-center justify-center ">
+                      <span className="text-cyan-600 text-nowrap text-xl">
+                        🔗{" "}
+                        {sortByUserCoins[2].user?.coins.toLocaleString("en-US")}
+                      </span>
+                    </div>
+                    <p className="text-sm font-bold">3rd</p>
+                  </Card>
+                </Link>
+              )}
+            </div>
+            <Card className="">
+              {sortByUserCoins.slice(3).map((leaderboard, index) => (
+                <Link
+                  href={`/u/${leaderboard.user?.name}`}
+                  key={leaderboard.user?._id}
+                  passHref
+                >
+                  <div className="flex items-center gap-4 p-2">
+                    <p className="text-xl font-bold">{index + 4}</p>
+                    <p className="text-sm text-muted-foreground">\</p>
+                    <p>{leaderboard.user?.name}</p>
+                    <span className="text-cyan-600 text-nowrap text-xl">
+                      🔗 {leaderboard.user?.coins?.toLocaleString("en-US")}
+                    </span>
                   </div>
                 </Link>
               ))}
