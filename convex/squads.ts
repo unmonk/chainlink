@@ -186,8 +186,6 @@ export const createSquad = mutation({
 
     const storageUrl = await ctx.storage.getUrl(storageId);
 
-    console.log("storageUrl", storageUrl);
-
     const squad = await ctx.db.insert("squads", {
       name,
       description,

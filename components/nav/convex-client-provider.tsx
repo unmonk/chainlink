@@ -6,7 +6,10 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ClerkProvider, useAuth } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+const convex = new ConvexReactClient(
+  process.env.NEXT_PUBLIC_CUSTOM_DOMAIN_CONVEX ??
+    process.env.NEXT_PUBLIC_CONVEX_URL!
+);
 
 export default function ConvexClientProvider({
   children,

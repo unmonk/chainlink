@@ -61,41 +61,41 @@ export default function Page({ params }: { params: { id: string } }) {
 const getSummaryUrlByLeagueAndGameId = (league: string, gameId: string) => {
   switch (league) {
     case "COLLEGE-FOOTBALL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/college-football/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/football/college-football/summary?event=${gameId}`;
     case "NFL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=${gameId}`;
     case "UFL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/ufl/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/football/ufl/summary?event=${gameId}`;
     case "MBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/college-basketball/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/basketball/college-basketball/summary?event=${gameId}`;
     case "WBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/college-basketball/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/basketball/college-basketball/summary?event=${gameId}`;
     case "MLB":
-      return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/summary?event=${gameId}`;
     case "NBA":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=${gameId}`;
     case "WNBA":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/wnba/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/summary?event=${gameId}`;
     case "NHL":
-      return `http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/summary?event=${gameId}`;
     case "MLS":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/summary?event=${gameId}`;
     case "NWSL":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.2/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/usa.2/summary?event=${gameId}`;
     case "EPL":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/summary?event=${gameId}`;
     case "RPL":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/rus.1/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/rus.1/summary?event=${gameId}`;
     case "CSL":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/chn.1/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/chn.1/summary?event=${gameId}`;
     case "ARG":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/summary?event=${gameId}`;
     case "TUR":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/summary?event=${gameId}`;
     case "FRIENDLY":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/friendly/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/soccer/friendly/summary?event=${gameId}`;
     case "PLL":
-      return `http://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/summary?event=${gameId}`;
 
     default:
       return null;
