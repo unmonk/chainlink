@@ -41,7 +41,7 @@ export function QuizList({
 
   const filteredQuizzes = sortedQuizzes.filter((quiz) => {
     if (showDrafts) return true;
-    return quiz.status !== "DRAFT";
+    return quiz.status !== "DRAFT" && quiz.status !== "CLOSED";
   });
 
   console.log(filteredQuizzes, "filteredQuizzes");

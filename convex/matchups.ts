@@ -118,6 +118,11 @@ export const getAdminMatchups = query({
   },
 });
 
+export type MatchupWithPickCounts = Doc<"matchups"> & {
+  homePicks: number;
+  awayPicks: number;
+};
+
 export const getActiveMatchups = query({
   args: {},
   handler: async (ctx) => {
@@ -133,7 +138,45 @@ export const getActiveMatchups = query({
           .lte("startTime", plus24Hours)
       )
       .collect();
-    return matchups;
+
+    // Get pick counts for each matchup
+    const matchupsWithPickCounts: MatchupWithPickCounts[] = [];
+    for (let matchup of matchups) {
+      if (
+        matchup.status === "STATUS_IN_PROGRESS" ||
+        matchup.status === "STATUS_FIRST_HALF" ||
+        matchup.status === "STATUS_SECOND_HALF" ||
+        matchup.status === "STATUS_END_PERIOD" ||
+        matchup.status === "STATUS_FINAL" ||
+        matchup.status === "STATUS_FULL_TIME" ||
+        matchup.status === "STATUS_FULL_PEN"
+      ) {
+        const picks = await ctx.db
+          .query("picks")
+          .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
+          .collect();
+
+        const homeTeamPicks = picks.filter(
+          (p) => p.pick.id === matchup.homeTeam.id
+        ).length;
+        const awayTeamPicks = picks.filter(
+          (p) => p.pick.id === matchup.awayTeam.id
+        ).length;
+
+        matchupsWithPickCounts.push({
+          ...matchup,
+          homePicks: homeTeamPicks,
+          awayPicks: awayTeamPicks,
+        });
+      } else {
+        matchupsWithPickCounts.push({
+          ...matchup,
+          homePicks: 0,
+          awayPicks: 0,
+        });
+      }
+    }
+    return matchupsWithPickCounts;
   },
 });
 
@@ -450,7 +493,7 @@ export const patchActive = mutation({
 
 export const updateMatchup = mutation({
   args: {
-    matchupId: v.id("matchups"),
+    _id: v.id("matchups"),
     title: v.string(),
     league: v.string(),
     type: matchup_type,
@@ -460,32 +503,25 @@ export const updateMatchup = mutation({
     active: v.boolean(),
     featured: v.boolean(),
     featuredType: v.optional(featured_type),
+    gameId: v.string(),
+    status: v.string(),
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    metadata: v.optional(v.any()),
   },
-  handler: async (
-    ctx,
-    {
-      matchupId,
-      title,
-      league,
-      type,
-      typeDetails,
-      cost,
-      startTime,
-      active,
-      featured,
-      featuredType,
-    }
-  ) => {
-    await ctx.db.patch(matchupId, {
-      title,
-      league,
-      type,
-      typeDetails,
-      cost,
-      startTime,
-      active,
-      featured,
-      featuredType,
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args._id, {
+      ...args,
     });
   },
 });

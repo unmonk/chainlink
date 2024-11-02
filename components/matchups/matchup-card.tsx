@@ -7,11 +7,12 @@ import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { ConvexError } from "convex/values";
 import { matchupReward } from "@/convex/utils";
+import { MatchupWithPickCounts } from "@/convex/matchups";
 
-const MatchupCard = ({ matchup }: { matchup: Doc<"matchups"> }) => {
+const MatchupCard = ({ matchup }: { matchup: MatchupWithPickCounts }) => {
   return (
     <Card className="rounded-t-none flex flex-col h-full">
-      <MatchupCardHeader matchup={matchup} />
+      <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
       <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2">
         {matchup.title}
       </CardTitle>
@@ -22,7 +23,18 @@ const MatchupCard = ({ matchup }: { matchup: Doc<"matchups"> }) => {
 
 export default MatchupCard;
 
-const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
+const MatchupCardButtons = ({
+  matchup,
+}: {
+  matchup: MatchupWithPickCounts;
+}) => {
+  const currentlyWinning =
+    matchup.awayTeam.score === matchup.homeTeam.score
+      ? null
+      : matchup.awayTeam.score > matchup.homeTeam.score
+        ? matchup.awayTeam.id
+        : matchup.homeTeam.id;
+
   return (
     <div className="flex flex-col">
       <div className="grid grid-cols-3 items-center text-center">
@@ -48,55 +60,148 @@ const MatchupCardButtons = ({ matchup }: { matchup: Doc<"matchups"> }) => {
             }
             winnerId={matchup.winnerId}
             matchupId={matchup._id}
+            currentlyWinning={currentlyWinning}
           />
         </div>
         {(matchup.status === "STATUS_SCHEDULED" ||
           matchup.status === "STATUS_POSTPONED") && (
-          <p className="col-span-2"></p>
-          // <div className="col-span-2 bg-accent/40 flex flex-col items-center justify-center rounded-sm p-2 mx-auto ">
-          //   <span className="text-primary text-center text-xs font-bold">
-          //     Locks in:
-          //   </span>
-          //   <Logo size={50} />{" "}
-          //   <span className="text-primary text-center text-xs font-bold">
-          //     {formatDistance(new Date(matchup.startTime), new Date(), {
-          //       includeSeconds: true,
-          //     })}
-          //   </span>
-          // </div>
+          <>
+            <div className="col-span-1 flex items-center justify-center px-1">
+              <div className="h-2 w-full rounded-full bg-foreground/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-100 via-yellow-500 to-red-500"
+                  style={{
+                    width: `${(matchup.awayPicks / (matchup.homePicks + matchup.awayPicks || 1)) * 100}%`,
+                    transition: "width 0.3s ease-in-out",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="col-span-1 flex items-center justify-center px-1">
+              <div className="h-2 w-full rounded-full bg-foreground/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-l from-blue-100 via-yellow-500 to-red-500"
+                  style={{
+                    width: `${(matchup.homePicks / (matchup.homePicks + matchup.awayPicks || 1)) * 100}%`,
+                    transition: "width 0.3s ease-in-out",
+                    marginLeft: "auto",
+                  }}
+                />
+              </div>
+            </div>
+          </>
         )}
         {matchup.status !== "STATUS_SCHEDULED" &&
           matchup.status !== "STATUS_POSTPONED" && (
-            <p
-              className={
-                matchup.status === "STATUS_FINAL" &&
-                matchup.winnerId === matchup.awayTeam.id
-                  ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
-                  : "text-center col-span-1 bg-accent rounded-sm mx-1"
-              }
-            >
-              {matchup.status !== "STATUS_SCHEDULED" &&
-              matchup.status !== "STATUS_POSTPONED"
-                ? matchup.awayTeam.score
-                : ""}
-            </p>
+            <div className="flex flex-col col-span-1">
+              <p
+                className={
+                  matchup.status === "STATUS_FINAL" &&
+                  matchup.winnerId === matchup.awayTeam.id
+                    ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+                    : currentlyWinning === matchup.awayTeam.id
+                      ? "text-center col-span-1 bg-accent/90 rounded-sm mx-1 border-2 border-accent-foreground/30"
+                      : "text-center col-span-1 bg-accent/50 rounded-sm mx-1"
+                }
+              >
+                {matchup.status !== "STATUS_SCHEDULED" &&
+                matchup.status !== "STATUS_POSTPONED" ? (
+                  <span
+                    className={
+                      currentlyWinning === matchup.awayTeam.id
+                        ? "font-bold"
+                        : ""
+                    }
+                  >
+                    {matchup.awayTeam.score}
+                  </span>
+                ) : (
+                  ""
+                )}
+                <div className="col-span-1 flex items-center justify-center px-1">
+                  <div className="h-2 w-full rounded-full bg-foreground/10">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-blue-100 via-yellow-500 to-red-500"
+                      style={{
+                        width: `${(matchup.awayPicks / (matchup.homePicks + matchup.awayPicks || 1)) * 100}%`,
+                        transition: "width 0.3s ease-in-out",
+                      }}
+                    />
+                  </div>
+                </div>
+              </p>
+              <p className="text-xs text-foreground/50 min-h-4">
+                {Math.round(
+                  (matchup.awayPicks /
+                    (matchup.homePicks + matchup.awayPicks || 1)) *
+                    100
+                ) > 0
+                  ? `${Math.round(
+                      (matchup.awayPicks /
+                        (matchup.homePicks + matchup.awayPicks || 1)) *
+                        100
+                    )}%`
+                  : ""}
+              </p>
+            </div>
           )}
         {matchup.status !== "STATUS_SCHEDULED" &&
           matchup.status !== "STATUS_POSTPONED" && (
-            <p
-              className={
-                matchup.status === "STATUS_FINAL" &&
-                matchup.winnerId === matchup.homeTeam.id
-                  ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
-                  : "text-center col-span-1 bg-accent rounded-sm mx-1"
-              }
-            >
-              {matchup.status !== "STATUS_SCHEDULED" &&
-              matchup.status !== "STATUS_POSTPONED"
-                ? matchup.homeTeam.score
-                : " "}
-            </p>
+            <div className="flex flex-col col-span-1">
+              <p
+                className={
+                  matchup.status === "STATUS_FINAL" &&
+                  matchup.winnerId === matchup.homeTeam.id
+                    ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+                    : currentlyWinning === matchup.homeTeam.id
+                      ? "text-center col-span-1 bg-accent/90 rounded-sm mx-1 border-2 border-accent-foreground/30"
+                      : "text-center col-span-1 bg-accent/50 rounded-sm mx-1"
+                }
+              >
+                {matchup.status !== "STATUS_SCHEDULED" &&
+                matchup.status !== "STATUS_POSTPONED" ? (
+                  <span
+                    className={
+                      currentlyWinning === matchup.homeTeam.id
+                        ? "font-bold"
+                        : ""
+                    }
+                  >
+                    {matchup.homeTeam.score}
+                  </span>
+                ) : (
+                  " "
+                )}
+                <div className="col-span-1 flex items-center justify-center px-1">
+                  <div className="h-2 w-full rounded-full bg-foreground/10 opacity-80">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-l from-blue-100 via-yellow-500 to-red-500"
+                      style={{
+                        width: `${(matchup.homePicks / (matchup.homePicks + matchup.awayPicks || 1)) * 100}%`,
+                        transition: "width 0.3s ease-in-out",
+                        marginLeft: "auto",
+                      }}
+                    />
+                  </div>
+                </div>
+              </p>
+              <p className="text-xs text-foreground/50 min-h-4">
+                {Math.round(
+                  (matchup.homePicks /
+                    (matchup.homePicks + matchup.awayPicks || 1)) *
+                    100
+                ) > 0
+                  ? `${Math.round(
+                      (matchup.homePicks /
+                        (matchup.homePicks + matchup.awayPicks || 1)) *
+                        100
+                    )}%`
+                  : ""}
+              </p>
+            </div>
           )}
+
         <div className="col-span-2">
           <MatchupPickButton
             name={matchup.homeTeam.name}
@@ -174,6 +279,7 @@ const MatchupPickButton = ({
   disabled,
   matchupId,
   winnerId,
+  currentlyWinning,
 }: {
   name: string;
   image: string;
@@ -181,6 +287,7 @@ const MatchupPickButton = ({
   disabled: boolean;
   matchupId: Id<"matchups">;
   winnerId?: string;
+  currentlyWinning?: string | null;
 }) => {
   const makePick = useMutation(api.picks.makePick);
 
@@ -221,7 +328,7 @@ const MatchupPickButton = ({
       if (errorMessage === "MATCHUP_LOCKED") {
         toast.error("This matchup is locked");
       } else {
-        toast.error("Something went wrong");
+        console.log(errorMessage);
       }
     }
   };
@@ -232,7 +339,9 @@ const MatchupPickButton = ({
       className={
         winnerId === id
           ? "border-primary border relative aspect-square h-5/6 w-5/6 overflow-hidden"
-          : "relative aspect-square h-5/6 w-5/6 overflow-hidden"
+          : currentlyWinning === id
+            ? "border-accent-foreground/50 border-4 relative aspect-square h-5/6 w-5/6 overflow-hidden"
+            : "relative aspect-square h-5/6 w-5/6 overflow-hidden"
       }
       disabled={disabled}
       onClick={handleClick}
