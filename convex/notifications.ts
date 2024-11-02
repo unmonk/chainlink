@@ -5,6 +5,28 @@ import { api } from "./_generated/api";
 import { clerkClient } from "@clerk/nextjs/server";
 import webPush from "web-push";
 
+// Add a shared interface for notification payload
+interface PickNotificationPayload {
+  notification: {
+    title: string;
+    message: string;
+    icon: string;
+    actions: Array<{ action: string; title: string }>;
+    data: {
+      onActionClick: {
+        default: {
+          operation: string;
+          pick: {
+            operation: string;
+            url: string;
+          };
+        };
+      };
+    };
+  };
+}
+
+// Fix error handling in createMassNotification
 export const createMassNotification = action({
   args: {
     payload: v.object({
@@ -85,14 +107,21 @@ export const createMassNotification = action({
           if (err instanceof webPush.WebPushError) {
             if (err.statusCode === 410 || err.statusCode === 404) {
               //Subscription is expired or invalid
-              await fetch("/notification/metadata", {
-                method: "POST",
-                body: JSON.stringify({
-                  subscription,
-                  userId: user.id,
-                  type: "unsubscribe",
-                }),
-              });
+              try {
+                await fetch(
+                  `${process.env.NEXT_PUBLIC_APP_URL}/notification/metadata`,
+                  {
+                    method: "POST",
+                    body: JSON.stringify({
+                      subscription,
+                      userId: user.id,
+                      type: "unsubscribe",
+                    }),
+                  }
+                );
+              } catch (err) {
+                console.error("Error unsubscribing user", err);
+              }
             }
           }
         }
@@ -144,10 +173,11 @@ export const sendNotification = action({
     ) {
       return;
     }
-    const userPushSubscriptions = user.privateMetadata
-      .pushSubscriptions as webPush.PushSubscription[];
-    if (!userPushSubscriptions) {
-      //throw new ConvexError("USER_PUSH_SUBSCRIPTIONS_NOT_FOUND");
+    const userPushSubscriptions = user.privateMetadata.pushSubscriptions as
+      | webPush.PushSubscription[]
+      | undefined;
+    if (!userPushSubscriptions?.length) {
+      return;
     }
 
     for (const subscription of userPushSubscriptions) {
@@ -166,14 +196,17 @@ export const sendNotification = action({
           if (err.statusCode === 410 || err.statusCode === 404) {
             //Subscription is expired or invalid
             try {
-              await fetch("/notification/metadata", {
-                method: "POST",
-                body: JSON.stringify({
-                  subscription,
-                  userId: clerkId,
-                  type: "unsubscribe",
-                }),
-              });
+              await fetch(
+                `${process.env.NEXT_PUBLIC_APP_URL}/notification/metadata`,
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    subscription,
+                    userId: clerkId,
+                    type: "unsubscribe",
+                  }),
+                }
+              );
             } catch (err) {
               console.error("Error unsubscribing user", err);
             }
@@ -184,7 +217,32 @@ export const sendNotification = action({
   },
 });
 
-//handle pick win notification
+// Create a helper function for pick notifications
+function createPickNotificationPayload(
+  title: string,
+  matchup: any
+): PickNotificationPayload {
+  return {
+    notification: {
+      title,
+      message: `${matchup.title} has concluded! Make your next pick now.`,
+      icon: "/images/icon-512x512.png",
+      actions: [{ action: "pick", title: "Pick Now" }],
+      data: {
+        onActionClick: {
+          default: {
+            operation: "openWindow",
+            pick: {
+              operation: "focusLastFocusedOrOpen",
+              url: "/play",
+            },
+          },
+        },
+      },
+    },
+  };
+}
+
 export const handlePickWinNotification = action({
   args: {
     matchupId: v.id("matchups"),
@@ -194,29 +252,9 @@ export const handlePickWinNotification = action({
     const matchup = await ctx.runQuery(api.matchups.getMatchupById, {
       matchupId,
     });
-    if (!matchup) {
-      throw new ConvexError("MATCHUP_NOT_FOUND");
-    }
+    if (!matchup) throw new ConvexError("MATCHUP_NOT_FOUND");
 
-    const payload = {
-      notification: {
-        title: `Your Pick Won!`,
-        message: `${matchup.title} has concluded! Make your next pick now.`,
-        icon: "/images/icon-512x512.png",
-        actions: [{ action: "pick", title: "Pick Now" }],
-        data: {
-          onActionClick: {
-            default: {
-              operation: "openWindow",
-              pick: {
-                operation: "focusLastFocusedOrOpen",
-                url: "/play",
-              },
-            },
-          },
-        },
-      },
-    };
+    const payload = createPickNotificationPayload("Your Pick Won!", matchup);
     await ctx.runAction(api.notifications.sendNotification, {
       notificationType: "pickCompletion",
       clerkId,
@@ -235,29 +273,9 @@ export const handlePickLossNotification = action({
     const matchup = await ctx.runQuery(api.matchups.getMatchupById, {
       matchupId,
     });
-    if (!matchup) {
-      throw new ConvexError("MATCHUP_NOT_FOUND");
-    }
+    if (!matchup) throw new ConvexError("MATCHUP_NOT_FOUND");
 
-    const payload = {
-      notification: {
-        title: `Your Pick Lost!`,
-        message: `${matchup.title} has concluded! Make your next pick now.`,
-        icon: "/images/icon-512x512.png",
-        actions: [{ action: "pick", title: "Pick Now" }],
-        data: {
-          onActionClick: {
-            default: {
-              operation: "openWindow",
-              pick: {
-                operation: "focusLastFocusedOrOpen",
-                url: "/play",
-              },
-            },
-          },
-        },
-      },
-    };
+    const payload = createPickNotificationPayload("Your Pick Lost!", matchup);
     await ctx.runAction(api.notifications.sendNotification, {
       notificationType: "pickCompletion",
       clerkId,
@@ -280,25 +298,7 @@ export const handlePickPushNotification = action({
       throw new ConvexError("MATCHUP_NOT_FOUND");
     }
 
-    const payload = {
-      notification: {
-        title: `Your Pick Pushed!`,
-        message: `${matchup.title} has concluded! Make your next pick now.`,
-        icon: "/images/icon-512x512.png",
-        actions: [{ action: "pick", title: "Pick Now" }],
-        data: {
-          onActionClick: {
-            default: {
-              operation: "openWindow",
-              pick: {
-                operation: "focusLastFocusedOrOpen",
-                url: "/play",
-              },
-            },
-          },
-        },
-      },
-    };
+    const payload = createPickNotificationPayload("Your Pick Pushed!", matchup);
     await ctx.runAction(api.notifications.sendNotification, {
       notificationType: "pickCompletion",
       clerkId,

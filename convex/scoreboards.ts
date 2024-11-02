@@ -340,31 +340,31 @@ export const scoreboards = action({
  * @throws {Error} If an invalid league is provided.
  */
 function getScoreboardUrl(league: League) {
-  //const date = getHawaiiTime();
+  const hawaiiDate = getHawaiiTime();
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
   const limit = 300;
   switch (league) {
     case "MLB":
-      return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NFL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "COLLEGE-FOOTBALL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "WNBA":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/wnba/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NBA":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NHL":
-      return `http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "MLS":
-      return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "MBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "WBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "UFL":
-      return `http://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard?dates=${date}&limit=${limit}`;
+      return `http://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "ARG":
       return `http://site.api.espn.com/apis/site/v2/sports/soccer/arg.1/scoreboard?dates=${date}&limit=${limit}`;
     case "CSL":
