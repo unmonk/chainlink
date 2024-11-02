@@ -141,6 +141,12 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
           <span className="text-xs md:text-sm text-muted-foreground mt-2">
             RANK
           </span>
+          <div className="md:hidden text-xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+            {squad.score}
+          </div>
+          <span className="md:hidden text-xs md:text-sm text-muted-foreground">
+            SCORE
+          </span>
         </div>
 
         {/* Center Content */}
