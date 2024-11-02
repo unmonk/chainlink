@@ -340,7 +340,8 @@ export const scoreboards = action({
  * @throws {Error} If an invalid league is provided.
  */
 function getScoreboardUrl(league: League) {
-  const date = getHawaiiTime();
+  //const date = getHawaiiTime();
+  const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
   const limit = 300;
   switch (league) {

@@ -58,19 +58,21 @@ export default function RootLayout({
       <html lang="en">
         <body className={cn("antialiased font-sans", inter.variable)}>
           <NuqsAdapter>
-            <ConvexClientProvider>
-              <ConvexQueryCacheProvider expiration={60000}>
-                <ThemeProvider
-                  attribute="class"
-                  defaultTheme="dark"
-                  enableSystem
-                  disableTransitionOnChange
-                >
-                  <main>{children}</main>
-                  <Toaster />
-                </ThemeProvider>
-              </ConvexQueryCacheProvider>
-            </ConvexClientProvider>
+            <ErrorBoundary>
+              <ConvexClientProvider>
+                <ConvexQueryCacheProvider expiration={60000}>
+                  <ThemeProvider
+                    attribute="class"
+                    defaultTheme="dark"
+                    enableSystem
+                    disableTransitionOnChange
+                  >
+                    <main>{children}</main>
+                    <Toaster />
+                  </ThemeProvider>
+                </ConvexQueryCacheProvider>
+              </ConvexClientProvider>
+            </ErrorBoundary>
           </NuqsAdapter>
         </body>
       </html>

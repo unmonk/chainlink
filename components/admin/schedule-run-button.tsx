@@ -45,7 +45,11 @@ export default function ScheduleRunButton() {
 
   return (
     <div className="flex gap-2">
-      <Button onClick={handleRunSchedules} disabled={loading}>
+      <Button
+        onClick={handleRunSchedules}
+        disabled={loading}
+        variant="destructive"
+      >
         {loading ? (
           <>
             <Loader2Icon className="w-4 h-4 animate-spin mr-2" /> Running...

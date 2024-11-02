@@ -23,18 +23,19 @@ const ITEMS_PER_PAGE = 30; // Adjust this value as needed
 
 export const UserPickList = () => {
   const [cursor, setCursor] = useState<string | null>(null);
-
   const { isAuthenticated } = useConvexAuth();
 
-  const { results, status, loadMore } = usePaginatedQuery(
+  const result = usePaginatedQuery(
     api.picks.getUserPicks,
     { paginationOpts: { numItems: ITEMS_PER_PAGE, cursor } },
     { initialNumItems: ITEMS_PER_PAGE }
   );
 
   if (!isAuthenticated) return null;
-  if (status === "LoadingFirstPage") return <Loading />;
 
+  const { results, status, loadMore } = result;
+
+  if (status === "LoadingFirstPage") return <Loading />;
   if (!results) return null;
 
   return (

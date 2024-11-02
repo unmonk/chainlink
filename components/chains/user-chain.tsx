@@ -1,13 +1,14 @@
 "use client";
 
 import { api } from "@/convex/_generated/api";
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { Skeleton } from "../ui/skeleton";
 
 export const UserChain = () => {
+  const { isAuthenticated } = useConvexAuth();
   const chain = useQuery(api.chains.getUserActiveChain, {});
   const createChain = useMutation(api.chains.createActiveChain);
-  if (chain === null) {
+  if (chain === null && isAuthenticated) {
     createChain();
   }
 
