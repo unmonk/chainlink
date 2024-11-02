@@ -14,7 +14,7 @@ export default function Page() {
               <TabsTrigger value="create">Create New Challenge</TabsTrigger>
             </TabsList>
             <TabsContent value="list">
-              <QuizList />
+              <QuizList isAdmin={true} showDrafts={true} limit={15} />
             </TabsContent>
             <TabsContent value="create">
               <CreateQuizForm />
