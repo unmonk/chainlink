@@ -39,6 +39,7 @@ import {
 
 import { formatDistance } from "date-fns";
 import { matchupReward } from "@/convex/utils";
+import Link from "next/link";
 
 export type UserPickWithMatchup = Doc<"picks"> & { matchup: Doc<"matchups"> };
 
@@ -67,7 +68,11 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
     <Card
       className={cn(
         "mb-4 rounded-t-none w-full",
-        pick.matchup.featured ? "border-primary border-2" : "border-accent"
+        pick.matchup.featured && pick.matchup.featuredType === "CHAINBUILDER"
+          ? "border-primary border-4"
+          : pick.matchup.featured && pick.matchup.featuredType === "SPONSORED"
+            ? `border-${pick.matchup.metadata.sponsoredData.color}-500 border-4`
+            : "border-accent"
       )}
     >
       <MatchupCardHeader matchup={pick.matchup} />
@@ -219,15 +224,21 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
             pick.matchup.status === "STATUS_POSTPONED") && (
             <CancelButton onConfirm={handleCancelPick} />
           )}
-          <p className="text-primary text-sm">
-            {pick.matchup.featured &&
-              pick.matchup.featuredType === "CHAINBUILDER" &&
-              "ChainBuilder"}
 
-            {pick.matchup.featured &&
-              pick.matchup.featuredType === "SPONSORED" &&
-              "Sponsored"}
-          </p>
+          {pick.matchup.featured &&
+            pick.matchup.featuredType === "CHAINBUILDER" && (
+              <p className="text-primary text-sm">ChainBuilder</p>
+            )}
+
+          {pick.matchup.featured &&
+            pick.matchup.featuredType === "SPONSORED" && (
+              <p
+                className={`text-${pick.matchup.metadata.sponsoredData.color}-500 text-sm`}
+              >
+                Sponsored
+              </p>
+            )}
+
           <p
             className={
               pick.matchup.status === "STATUS_SCHEDULED" ||
@@ -250,6 +261,24 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
                 : "Locked"}
           </p>
         </div>
+        {pick.matchup.featured &&
+          pick.matchup.featuredType === "SPONSORED" &&
+          pick.matchup.metadata.sponsoredData && (
+            <Link href={pick.matchup.metadata.sponsoredData.url}>
+              <div className="flex flex-row justify-center items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border text-sm">
+                <p className="flex flex-row justify-center items-center gap-1">
+                  {pick.matchup.metadata.sponsoredData.description}
+                </p>
+                <Image
+                  src={pick.matchup.metadata.sponsoredData.image}
+                  alt={pick.matchup.metadata.sponsoredData.name}
+                  width={24}
+                  height={24}
+                  className="ml-1 items-center justify-center self-center"
+                />
+              </div>
+            </Link>
+          )}
       </div>
     </Card>
   );

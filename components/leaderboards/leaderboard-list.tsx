@@ -14,8 +14,13 @@ import { UserMonthlyStats } from "@/convex/utils";
 export const LeaderboardList = () => {
   const leaderboardData = useQuery(api.leaderboards.getChainLeaderboard, {});
   if (!leaderboardData) return null;
+
   leaderboardData.sort((a, b) => b.chain.chain - a.chain.chain);
   const leaderboardList = leaderboardData.slice(3, leaderboardData.length);
+
+  const sortedByChainWins = leaderboardData.sort(
+    (a, b) => b.chain.wins - a.chain.wins
+  );
 
   // Function to calculate total wins from monthly stats
   const calculateTotalWins = (
@@ -29,7 +34,7 @@ export const LeaderboardList = () => {
   };
 
   // Sort leaderboard data by total wins
-  const sortedByWins = [...leaderboardData].sort((a, b) => {
+  const sortedByAllTimeWins = [...leaderboardData].sort((a, b) => {
     const aWins = calculateTotalWins(a.user?.monthlyStats as UserMonthlyStats);
     const bWins = calculateTotalWins(b.user?.monthlyStats as UserMonthlyStats);
     return bWins - aWins;
@@ -42,8 +47,8 @@ export const LeaderboardList = () => {
   });
 
   // Get top 3 winners and the rest
-  const topThreeWinners = sortedByWins.slice(0, 3);
-  const remainingWinners = sortedByWins.slice(3);
+  const topThreeWinners = sortedByAllTimeWins.slice(0, 3);
+  const remainingWinners = sortedByAllTimeWins.slice(3);
 
   return (
     <div className="flex flex-col items-center">
@@ -201,43 +206,33 @@ export const LeaderboardList = () => {
           <div className="flex flex-col gap-4">
             <h2 className="text-2xl font-bold">Current Wins</h2>
             <div className="grid grid-cols-1 gap-6">
-              {leaderboardData.sort((a, b) => {
-                const aWins = Object.values(a.user?.monthlyStats || {}).reduce(
-                  (sum, month: any) => sum + (month.wins || 0),
-                  0
-                );
-                const bWins = Object.values(b.user?.monthlyStats || {}).reduce(
-                  (sum, month: any) => sum + (month.wins || 0),
-                  0
-                );
-                return (bWins as number) + (aWins as number);
-              })[0] && (
+              {sortedByChainWins[0] && (
                 <BackgroundGradient
-                  key={leaderboardData[0].user?._id}
+                  key={sortedByChainWins[0].user?._id}
                   animate={true}
                   className="rounded-lg overflow-hidden shadow-lg"
                 >
-                  <Link href={`/u/${leaderboardData[0].user?.name}`} passHref>
+                  <Link href={`/u/${sortedByChainWins[0].user?.name}`} passHref>
                     <Card
-                      key={leaderboardData[0].user?._id}
+                      key={sortedByChainWins[0].user?._id}
                       className="flex flex-col items-center gap-2 p-4"
                     >
                       <Avatar className="w-20 h-20">
                         <AvatarImage
-                          src={leaderboardData[0].user?.image}
-                          alt={leaderboardData[0].user?.name}
+                          src={sortedByChainWins[0].user?.image}
+                          alt={sortedByChainWins[0].user?.name}
                         />
                         <AvatarFallback>
-                          {leaderboardData[0].user?.name}
+                          {sortedByChainWins[0].user?.name}
                         </AvatarFallback>
                       </Avatar>
                       <h3 className="text-xl font-semibold">
-                        {leaderboardData[0].user?.name}
+                        {sortedByChainWins[0].user?.name}
                       </h3>
                       <h2>
                         Total Wins:{" "}
                         <span className="font-bold text-xl text-primary">
-                          {leaderboardData[0].chain.wins}
+                          {sortedByChainWins[0].chain.wins}
                         </span>
                       </h2>
                       <p className="text-sm font-bold">Leader</p>
@@ -247,56 +242,56 @@ export const LeaderboardList = () => {
               )}
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {leaderboardData[1] && (
-                <Link href={`/u/${leaderboardData[1].user?.name}`} passHref>
+              {sortedByChainWins[1] && (
+                <Link href={`/u/${sortedByChainWins[1].user?.name}`} passHref>
                   <Card
-                    key={leaderboardData[1].user?._id}
+                    key={sortedByChainWins[1].user?._id}
                     className="flex flex-col items-center gap-1 p-2"
                   >
                     <Avatar className="w-20 h-20">
                       <AvatarImage
-                        src={leaderboardData[1].user?.image}
-                        alt={leaderboardData[1].user?.name}
+                        src={sortedByChainWins[1].user?.image}
+                        alt={sortedByChainWins[1].user?.name}
                       />
                       <AvatarFallback>
-                        {leaderboardData[1].user?.name}
+                        {sortedByChainWins[1].user?.name}
                       </AvatarFallback>
                     </Avatar>
                     <h3 className="text-xl font-semibold">
-                      {leaderboardData[1].user?.name}
+                      {sortedByChainWins[1].user?.name}
                     </h3>
                     <h2>
                       Total Wins:{" "}
                       <span className="font-bold text-xl text-primary">
-                        {leaderboardData[1].chain.wins}
+                        {sortedByChainWins[1].chain.wins}
                       </span>
                     </h2>
                     <p className="text-sm font-bold">2nd</p>
                   </Card>
                 </Link>
               )}
-              {leaderboardData[2] && (
-                <Link href={`/u/${leaderboardData[2].user?.name}`} passHref>
+              {sortedByChainWins[2] && (
+                <Link href={`/u/${sortedByChainWins[2].user?.name}`} passHref>
                   <Card
-                    key={leaderboardData[2].user?._id}
+                    key={sortedByChainWins[2].user?._id}
                     className="flex flex-col items-center gap-1 p-2"
                   >
                     <Avatar className="w-20 h-20">
                       <AvatarImage
-                        src={leaderboardData[2].user?.image}
-                        alt={leaderboardData[2].user?.name}
+                        src={sortedByChainWins[2].user?.image}
+                        alt={sortedByChainWins[2].user?.name}
                       />
                       <AvatarFallback>
-                        {leaderboardData[2].user?.name}
+                        {sortedByChainWins[2].user?.name}
                       </AvatarFallback>
                     </Avatar>
                     <h3 className="text-xl font-semibold">
-                      {leaderboardData[2].user?.name}
+                      {sortedByChainWins[2].user?.name}
                     </h3>
                     <h2>
                       Total Wins:{" "}
                       <span className="font-bold text-xl text-primary">
-                        {leaderboardData[2].chain.wins}
+                        {sortedByChainWins[2].chain.wins}
                       </span>
                     </h2>
                     <p className="text-sm font-bold">3rd</p>
@@ -305,7 +300,7 @@ export const LeaderboardList = () => {
               )}
             </div>
             <Card className="">
-              {leaderboardData.slice(3).map((leaderboard, index) => (
+              {sortedByChainWins.slice(3).map((leaderboard, index) => (
                 <Link
                   href={`/u/${leaderboard.user?.name}`}
                   key={leaderboard.user?._id}
