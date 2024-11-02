@@ -220,7 +220,7 @@ export function NewSquadForm() {
                         checked={field.value}
                         value={field.value.toString()}
                         onCheckedChange={field.onChange}
-                        disabled={isLoading}
+                        disabled={true}
                       />
                     </FormControl>
                     <FormMessage />

@@ -20,6 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
 import * as z from "zod";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -41,6 +42,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function CreateQuizForm() {
   const createQuiz = useMutation(api.quiz.createQuiz);
+  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -64,8 +66,8 @@ export function CreateQuizForm() {
       });
 
       toast.success("Challenge created successfully");
-
       form.reset();
+      router.refresh();
     } catch (error) {
       toast.error("Error creating challenge", {
         description: "Please try again later",

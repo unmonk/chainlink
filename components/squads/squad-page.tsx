@@ -8,7 +8,7 @@ import { LinkIcon } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
 import { api } from "@/convex/_generated/api";
 
-import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import SquadMembers from "./squad-members";
 import Loading from "../ui/loading";
 import { CopyButton } from "../ui/copy-button";
@@ -28,6 +28,30 @@ import { DialogContent } from "../ui/dialog";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
+
+function EditSquadButton({
+  ownerId,
+  squadSlug,
+}: {
+  ownerId: Id<"users">;
+  squadSlug: string;
+}) {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const user = useQuery(api.users.currentUser);
+  const isOwner = ownerId === user?._id;
+
+  if (!isOwner) return null;
+
+  return (
+    <Link href={`/squads/${squadSlug}/edit`} prefetch={false}>
+      <Button variant="outline" size="sm">
+        Edit Squad
+      </Button>
+    </Link>
+  );
+}
 
 export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
   const currentUser = useUser();
@@ -140,6 +164,12 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
           )}
           <span className="text-xs md:text-sm text-muted-foreground mt-2">
             RANK
+          </span>
+          <div className="md:hidden text-xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+            {squad.score}
+          </div>
+          <span className="md:hidden text-xs md:text-sm text-muted-foreground">
+            SCORE
           </span>
         </div>
 
@@ -279,6 +309,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
               </DialogContent>
             </Dialog>
           )}
+          <EditSquadButton ownerId={squad.ownerId} squadSlug={squad.slug} />
         </div>
       </div>
     </Suspense>

@@ -35,7 +35,7 @@ export default function QuizPage() {
     }
   }, [userHasResponded, activeQuiz]);
 
-  if (!user || !activeQuiz) return null;
+  if (!user) return null;
 
   const handleSubmitAnswer = async () => {
     if (!activeQuiz) return;
@@ -49,7 +49,27 @@ export default function QuizPage() {
     setIsPending(false);
   };
 
-  if (!activeQuiz) return <div>No active quiz, check back later!</div>;
+  if (!activeQuiz)
+    return (
+      <div className="container max-w-2xl mx-auto py-8">
+        <Card className="text-center p-8">
+          <CardHeader>
+            <CardTitle className="text-2xl">No Active Challenge</CardTitle>
+            <CardDescription>
+              There are no challenges available at the moment. Check back soon
+              for new opportunities to earn Links!
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-6xl mb-4">🎯</div>
+            <p className="text-muted-foreground">
+              Challenges let you test your knowledge and earn Links by making
+              correct predictions or participating in a poll.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
 
   return (
     <div className="container max-w-2xl mx-auto py-8">

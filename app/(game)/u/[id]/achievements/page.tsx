@@ -1,14 +1,11 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
 import { api } from "@/convex/_generated/api";
-import { currentUser } from "@clerk/nextjs/server";
 import { getUserByUsername } from "@/lib/auth";
 import { fetchQuery } from "convex/nextjs";
 import { ContentLayout } from "@/components/nav/content-layout";
 import AchievementCard from "@/components/achievements/achievement-card";
 import Marquee from "@/components/magicui/marquee";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -27,14 +24,14 @@ type Props = {
 export default async function UserAchievementsPage({ params: { id } }: Props) {
   const clerkUser = await getUserByUsername(id);
   if (!clerkUser) {
-    notFound();
+    return null;
   }
 
   const user = await fetchQuery(api.users.queryByClerkId, {
     clerkUserId: clerkUser.id,
   });
   if (!user) {
-    notFound();
+    return null;
   }
 
   const achievementIds = user.achievements.map(

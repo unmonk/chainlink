@@ -85,6 +85,11 @@ export function getAdminMenuList(pathname: string): Group[] {
               label: "Notifications",
               active: pathname.includes("/admin/notifications"),
             },
+            {
+              href: "/admin/squads",
+              label: "Squads",
+              active: pathname.includes("/admin/squads"),
+            },
           ],
         },
       ],

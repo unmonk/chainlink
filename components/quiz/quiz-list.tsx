@@ -15,27 +15,44 @@ import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
+import { ClockIcon, Users2Icon } from "lucide-react";
 
-export function QuizList() {
+export function QuizList({
+  limit = 15,
+  isAdmin = false,
+  showDrafts = false,
+}: {
+  limit?: number;
+  isAdmin?: boolean;
+  showDrafts?: boolean;
+}) {
   const quizzes = useQuery(api.quiz.listQuizzes);
 
   if (!quizzes) {
     return <QuizListSkeleton />;
   }
 
-  // Separate drafts and published quizzes
-  const drafts = quizzes.filter((quiz) => quiz.status === "DRAFT");
-  const published = quizzes.filter(
-    (quiz) => quiz.status === "ACTIVE" || quiz.status === "CLOSED"
-  );
+  // sort by status
+  const sortedQuizzes = quizzes.sort((a, b) => {
+    if (a.status === "DRAFT") return -1;
+    if (b.status === "DRAFT") return 1;
+    return 0;
+  });
 
-  // Combine with drafts first
-  const sortedQuizzes = [...drafts, ...published];
+  const filteredQuizzes = sortedQuizzes.filter((quiz) => {
+    if (showDrafts) return true;
+    return quiz.status !== "DRAFT";
+  });
+
+  console.log(filteredQuizzes, "filteredQuizzes");
 
   return (
     <div className="space-y-4 gap-2 flex flex-col">
-      {sortedQuizzes.map((quiz) => (
-        <Link key={quiz._id} href={`/admin/quiz/${quiz._id}`}>
+      {filteredQuizzes.map((quiz) => (
+        <Link
+          key={quiz._id}
+          href={isAdmin ? `/admin/quiz/${quiz._id}` : `/challenge/${quiz._id}`}
+        >
           <Card className="hover:bg-muted/50 transition-colors">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -52,27 +69,38 @@ export function QuizList() {
                   <Badge variant="destructive">Closed</Badge>
                 )}
                 {quiz.status === "COMPLETE" && (
-                  <Badge variant="outline">Completed</Badge>
+                  <Badge variant="outline" className="bg-violet-600">
+                    Completed
+                  </Badge>
                 )}
               </div>
               <CardDescription>
                 {quiz.description || "No description provided"}
               </CardDescription>
             </CardHeader>
+            <CardContent>{}</CardContent>
             <CardContent>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">
-                  Closes{" "}
-                  {formatDistanceToNow(quiz.expiresAt, { addSuffix: true })}
-                </p>
-                <Separator orientation="vertical" className="mx-2 h-4" />
-                <p className="text-sm text-muted-foreground">
-                  {quiz.totalParticipants} votes
-                </p>
-                <Separator orientation="vertical" className="mx-2 h-4" />
-                <p className="text-sm text-muted-foreground">
-                  🔗 {quiz.totalWagers} wagered
-                </p>
+              <div className="flex items-center justify-between text-sm text-muted-foreground font-mono">
+                <div className="flex items-center ">
+                  <ClockIcon className="h-4 w-4 mr-1.5" />
+                  <span>
+                    {formatDistanceToNow(quiz.expiresAt, { addSuffix: true })}
+                  </span>
+                </div>
+
+                <Separator orientation="vertical" className="h-4" />
+
+                <div className="flex items-center">
+                  <Users2Icon className="h-4 w-4 mr-1.5" />
+                  <span>{quiz.totalParticipants} votes</span>
+                </div>
+
+                <Separator orientation="vertical" className="h-4" />
+
+                <div className="flex items-center">
+                  <span className="mr-1.5">🔗</span>
+                  <span>{quiz.totalWagers} wagered</span>
+                </div>
               </div>
             </CardContent>
           </Card>

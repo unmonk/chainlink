@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface QuizOptionsProps {
   quiz: Doc<"globalQuiz">;
@@ -22,6 +23,7 @@ interface QuizOptionsProps {
 }
 
 export function QuizResults({ quiz, currentAnswer }: QuizOptionsProps) {
+  const router = useRouter();
   const [selectedOption, setSelectedOption] = useState<string>(
     currentAnswer || ""
   );
@@ -42,6 +44,8 @@ export function QuizResults({ quiz, currentAnswer }: QuizOptionsProps) {
         status: "COMPLETE",
       });
       toast.success("Correct answer saved successfully");
+      router.push("/admin/quiz");
+      setIsPending(false);
     } catch (error) {
       toast.error("Failed to save correct answer");
     } finally {

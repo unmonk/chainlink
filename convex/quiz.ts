@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { question_status } from "./schema";
 import { api, internal } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
 
 export const updateQuizStatus = mutation({
   args: { quizId: v.id("globalQuiz"), status: question_status },
@@ -57,7 +58,8 @@ export const submitAnswer = mutation({
 export const listQuizzes = query({
   args: {},
   handler: async ({ db }) => {
-    const quizzes = await db.query("globalQuiz").collect();
+    const quizzes = await db.query("globalQuiz").order("desc").take(15);
+    console.log(quizzes, "quizzes");
     const quizzesWithResponses = await Promise.all(
       quizzes.map(async (quiz) => {
         const responses = await db
@@ -131,7 +133,27 @@ export const updateQuiz = mutation({
   },
   handler: async (ctx, { quizId, status, correctAnswerId }) => {
     if (status === "COMPLETE") {
-      console.log("COMPLETE");
+      //pay out winners
+      const quiz = await ctx.db.get(quizId);
+      if (!quiz) return;
+      const winningOption = quiz.options.find(
+        (option) => option.id === correctAnswerId
+      );
+      if (!winningOption) return;
+      const quizResponses = await ctx.db
+        .query("quizResponses")
+        .withIndex("by_quizId", (q) => q.eq("quizId", quizId))
+        .filter((q) => q.eq(q.field("selectedOptionId"), winningOption.id))
+        .collect();
+
+      for (const response of quizResponses) {
+        const payout = response.wager * 10;
+        await ctx.scheduler.runAfter(0, api.users.adjustCoins, {
+          amount: payout,
+          transactionType: "PAYOUT",
+          userId: response.userId,
+        });
+      }
     }
 
     await ctx.db.patch(quizId, { status, correctAnswerId });
@@ -181,6 +203,35 @@ export const getQuizById = query({
       .withIndex("by_quizId", (q) => q.eq("quizId", quiz?._id))
       .collect();
 
+    const userIds = Array.from(
+      new Set(quizResponses.map((response) => response.userId))
+    );
+
+    const users = await Promise.all(
+      userIds.map(async (userId) => {
+        const user = await ctx.db.get(userId);
+        return user;
+      })
+    );
+
+    const userMap = users.reduce(
+      (acc, user) => {
+        if (user) {
+          acc[user._id] = {
+            name: user.name,
+            image: user.image,
+          };
+        }
+        return acc;
+      },
+      {} as Record<string, { name: string; image: string }>
+    );
+
+    const responsesWithUsers = quizResponses.map((response) => ({
+      ...response,
+      user: userMap[response.userId] || { name: "Unknown User", image: "" },
+    }));
+
     const totalParticipants = quizResponses.length;
     const totalWagers = quizResponses.reduce(
       (acc, curr) => acc + curr.wager,
@@ -206,6 +257,7 @@ export const getQuizById = query({
     );
     return {
       quiz,
+      responses: responsesWithUsers,
       totalParticipants,
       totalWagers,
       percentagePerOption,

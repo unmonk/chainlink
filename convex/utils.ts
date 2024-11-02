@@ -67,6 +67,15 @@ export function getImageUrl(storageId: string) {
   return getImageUrl.href;
 }
 
+export const removeImageFromStorage = mutation({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.storage.delete(args.storageId);
+  },
+});
+
 export interface UserMonthlyStats {
   [key: string]: {
     wins: number;
