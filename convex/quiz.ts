@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { question_status } from "./schema";
 import { api, internal } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
 
 export const updateQuizStatus = mutation({
   args: { quizId: v.id("globalQuiz"), status: question_status },
@@ -202,9 +203,10 @@ export const getQuizById = query({
       .withIndex("by_quizId", (q) => q.eq("quizId", quiz?._id))
       .collect();
 
-    const userIds = [
-      ...new Set(quizResponses.map((response) => response.userId)),
-    ];
+    const userIds = Array.from(
+      new Set(quizResponses.map((response) => response.userId))
+    );
+
     const users = await Promise.all(
       userIds.map(async (userId) => {
         const user = await ctx.db.get(userId);
