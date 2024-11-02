@@ -107,7 +107,7 @@ export function AwardAchievementForm() {
                       <SelectItem key={achievement._id} value={achievement._id}>
                         <div className="flex items-center gap-2">
                           <Image
-                            src={achievement.image ?? ""}
+                            src={achievement.image}
                             alt={achievement.name}
                             width={20}
                             height={20}

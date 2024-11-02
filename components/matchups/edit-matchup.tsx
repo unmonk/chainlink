@@ -47,6 +47,7 @@ import {
 import { manuallyFinalizeMatchup } from "@/convex/matchups";
 import { toast } from "sonner";
 import { forceCancelPicks, releasePicksAllWinners } from "@/convex/picks";
+import { useRouter } from "next/navigation";
 
 const EditMatchupFormSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
@@ -91,6 +92,8 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
     api.matchups.manuallyFinalizeMatchup
   );
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const methods = useForm<z.infer<typeof EditMatchupFormSchema>>({
     resolver: zodResolver(EditMatchupFormSchema),
@@ -125,6 +128,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
 
   async function handleFinalize(finalizeType: string) {
     try {
+      setLoading(true);
       if (finalizeType === "ALL_WINNERS") {
         await manuallyFinalizeMatchup({
           matchupId: row._id as Id<"matchups">,
@@ -154,14 +158,18 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
         toast.success("Matchup finalized, standard scoring");
       }
       setOpen(false);
+      setLoading(false);
     } catch (error) {
       console.error("Failed to finalize matchup:", error);
       toast.error("Failed to finalize matchup");
+      setOpen(false);
+      setLoading(false);
     }
   }
 
   async function handleReleasePicks(releaseType: string) {
     try {
+      setLoading(true);
       if (releaseType === "DELETE") {
         await forceCancelPicks({
           matchupId: row._id as Id<"matchups">,
@@ -187,23 +195,32 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
         toast.success("Picks released, all pushes");
       }
       setOpen(false);
+      setLoading(false);
     } catch (error) {
       console.error("Failed to release picks:", error);
       toast.error("Failed to release picks");
+      setOpen(false);
+      setLoading(false);
     }
   }
 
   async function onSubmit(values: z.infer<typeof EditMatchupFormSchema>) {
     try {
+      setLoading(true);
       await updateMatchup({
-        matchupId: row._id as Id<"matchups">,
+        _id: row._id as Id<"matchups">,
         ...values,
         startTime: values.startTime,
       });
       setOpen(false);
+      setLoading(false);
+      toast.success("Matchup updated");
+      router.refresh();
     } catch (error) {
       console.error("Failed to update matchup:", error);
       toast.error("Failed to update matchup");
+      setOpen(false);
+      setLoading(false);
     }
   }
 
@@ -579,6 +596,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleFinalize("STANDARD_FINAL")}
                         variant={"secondary"}
+                        disabled={loading}
                       >
                         Score Regularly
                       </Button>
@@ -587,6 +605,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleFinalize("ALL_WINNERS")}
                         variant={"outline"}
+                        disabled={loading}
                       >
                         All Picks Win
                       </Button>
@@ -595,6 +614,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleFinalize("ALL_LOSERS")}
                         variant={"outline"}
+                        disabled={loading}
                       >
                         All Picks Lose
                       </Button>
@@ -603,6 +623,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleFinalize("ALL_PUSHES")}
                         variant={"outline"}
+                        disabled={loading}
                       >
                         All Picks Push
                       </Button>
@@ -633,6 +654,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleReleasePicks("DELETE")}
                         variant={"destructive"}
+                        disabled={loading}
                       >
                         Delete All Picks
                       </Button>
@@ -641,6 +663,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleReleasePicks("ALL_WINNERS")}
                         variant={"outline"}
+                        disabled={loading}
                       >
                         All Picks Win
                       </Button>
@@ -649,6 +672,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleReleasePicks("ALL_LOSERS")}
                         variant={"outline"}
+                        disabled={loading}
                       >
                         All Picks Lose
                       </Button>
@@ -657,6 +681,7 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
                       <Button
                         onClick={() => handleReleasePicks("ALL_PUSHES")}
                         variant={"outline"}
+                        disabled={loading}
                       >
                         All Picks Push
                       </Button>
@@ -670,7 +695,9 @@ export function EditMatchupForm({ row, totalPicks }: EditMatchupFormProps) {
               <DrawerClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DrawerClose>
-              <Button type="submit">Update Matchup</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Updating..." : "Update Matchup"}
+              </Button>
             </div>
           </form>
         </FormProvider>

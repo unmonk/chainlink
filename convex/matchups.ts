@@ -450,7 +450,7 @@ export const patchActive = mutation({
 
 export const updateMatchup = mutation({
   args: {
-    matchupId: v.id("matchups"),
+    _id: v.id("matchups"),
     title: v.string(),
     league: v.string(),
     type: matchup_type,
@@ -460,32 +460,25 @@ export const updateMatchup = mutation({
     active: v.boolean(),
     featured: v.boolean(),
     featuredType: v.optional(featured_type),
+    gameId: v.string(),
+    status: v.string(),
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    metadata: v.optional(v.any()),
   },
-  handler: async (
-    ctx,
-    {
-      matchupId,
-      title,
-      league,
-      type,
-      typeDetails,
-      cost,
-      startTime,
-      active,
-      featured,
-      featuredType,
-    }
-  ) => {
-    await ctx.db.patch(matchupId, {
-      title,
-      league,
-      type,
-      typeDetails,
-      cost,
-      startTime,
-      active,
-      featured,
-      featuredType,
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args._id, {
+      ...args,
     });
   },
 });
