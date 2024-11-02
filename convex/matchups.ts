@@ -127,14 +127,14 @@ export const getActiveMatchups = query({
   args: {},
   handler: async (ctx) => {
     const currentTime = new Date().getTime();
-    const minus3Hours = currentTime - 3 * 60 * 60 * 1000;
+    const minus6Hours = currentTime - 6 * 60 * 60 * 1000;
     const plus24Hours = currentTime + 24 * 60 * 60 * 1000;
     const matchups = await ctx.db
       .query("matchups")
       .withIndex("by_active_dates", (q) =>
         q
           .eq("active", true)
-          .gte("startTime", minus3Hours)
+          .gte("startTime", minus6Hours)
           .lte("startTime", plus24Hours)
       )
       .collect();
