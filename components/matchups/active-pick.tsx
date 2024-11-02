@@ -2,7 +2,12 @@ import { Doc } from "@/convex/_generated/dataModel";
 import { Card, CardTitle } from "../ui/card";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { CheckIcon } from "lucide-react";
+import {
+  CheckIcon,
+  ChevronsDownIcon,
+  ChevronsUp,
+  LinkIcon,
+} from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Logo } from "../ui/logo";
 import { Button } from "../ui/button";
@@ -40,8 +45,6 @@ export type UserPickWithMatchup = Doc<"picks"> & { matchup: Doc<"matchups"> };
 const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
   const cancelPick = useMutation(api.picks.cancelPick);
 
-  console.log(pick, "pick");
-
   const handleCancelPick = async () => {
     try {
       await cancelPick({ pickId: pick._id });
@@ -53,11 +56,18 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
   if (!pick) return null;
   if (!pick.matchup) return null;
 
+  const currentlyWinningId =
+    pick.matchup.awayTeam.score === pick.matchup.homeTeam.score
+      ? "false"
+      : pick.matchup.awayTeam.score > pick.matchup.homeTeam.score
+        ? pick.matchup.awayTeam.id
+        : pick.matchup.homeTeam.id;
+
   return (
     <Card
       className={cn(
-        "mb-4 rounded-t-none w-full max-w-[645px]",
-        pick.matchup.featured ? "border-primary border-2" : "border-primary/20"
+        "mb-4 rounded-t-none w-full",
+        pick.matchup.featured ? "border-primary border-2" : "border-accent"
       )}
     >
       <MatchupCardHeader matchup={pick.matchup} />
@@ -84,7 +94,9 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
                 " border relative aspect-square h-5/6 w-5/6 overflow-hidden rounded-md items-center justify-center inline-flex",
                 pick.pick.id === pick.matchup.awayTeam.id
                   ? "bg-accent border-primary"
-                  : "bg-accent/40 opacity-30 border-foreground/15"
+                  : currentlyWinningId === pick.matchup.awayTeam.id
+                    ? "bg-accent/90 border-2 border-accent-foreground/30"
+                    : "bg-accent/40 opacity-30 border-foreground/15"
               )}
             >
               <Image
@@ -101,7 +113,7 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
               />
               {pick.pick.id === pick.matchup.awayTeam.id && (
                 <Badge className="absolute right-1 top-1">
-                  <CheckIcon size={12} />
+                  <LinkIcon size={12} />
                 </Badge>
               )}
             </div>
@@ -120,32 +132,40 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
             </div>
           )}
           {pick.matchup.status !== "STATUS_SCHEDULED" && (
-            <p
-              className={
-                pick.matchup.status === "STATUS_FINAL" &&
-                pick.matchup.winnerId === pick.matchup.awayTeam.id
-                  ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
-                  : "text-center col-span-1 bg-accent rounded-sm mx-1"
-              }
-            >
-              {pick.matchup.status !== "STATUS_SCHEDULED"
-                ? pick.matchup.awayTeam.score
-                : ""}
-            </p>
+            <div className="flex flex-col">
+              <p
+                className={
+                  pick.matchup.status === "STATUS_FINAL" &&
+                  pick.matchup.winnerId === pick.matchup.awayTeam.id
+                    ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+                    : currentlyWinningId === pick.matchup.awayTeam.id
+                      ? "text-center col-span-1 bg-accent/90 border-2 border-accent-foreground/30 font-bold rounded-sm mx-1"
+                      : "text-center col-span-1 bg-accent/50 rounded-sm mx-1"
+                }
+              >
+                {pick.matchup.status !== "STATUS_SCHEDULED"
+                  ? pick.matchup.awayTeam.score
+                  : ""}
+              </p>
+            </div>
           )}
           {pick.matchup.status !== "STATUS_SCHEDULED" && (
-            <p
-              className={
-                pick.matchup.status === "STATUS_FINAL" &&
-                pick.matchup.winnerId === pick.matchup.homeTeam.id
-                  ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
-                  : "text-center col-span-1 bg-accent rounded-sm mx-1"
-              }
-            >
-              {pick.matchup.status !== "STATUS_SCHEDULED"
-                ? pick.matchup.homeTeam.score
-                : " "}
-            </p>
+            <div className="flex flex-col">
+              <p
+                className={
+                  pick.matchup.status === "STATUS_FINAL" &&
+                  pick.matchup.winnerId === pick.matchup.homeTeam.id
+                    ? "text-center col-span-1 bg-primary font-bold rounded-sm mx-1"
+                    : currentlyWinningId === pick.matchup.homeTeam.id
+                      ? "text-center col-span-1 bg-accent/90 border-2 border-accent-foreground/30 font-bold rounded-sm mx-1"
+                      : "text-center col-span-1 bg-accent/50 rounded-sm mx-1"
+                }
+              >
+                {pick.matchup.status !== "STATUS_SCHEDULED"
+                  ? pick.matchup.homeTeam.score
+                  : " "}
+              </p>
+            </div>
           )}
 
           <div className="col-span-2 ">
@@ -154,7 +174,9 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
                 "border-primary border relative aspect-square h-5/6 w-5/6 overflow-hidden rounded-md items-center justify-center inline-flex",
                 pick.pick.id === pick.matchup.homeTeam.id
                   ? "bg-accent border-primary"
-                  : "bg-accent/40 opacity-30  border-foreground/15"
+                  : currentlyWinningId === pick.matchup.homeTeam.id
+                    ? "bg-accent/90 border-2 border-accent-foreground/30"
+                    : "bg-accent/40 opacity-30  border-foreground/15"
               )}
             >
               <Image
@@ -171,7 +193,7 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
               />
               {pick.pick.id === pick.matchup.homeTeam.id && (
                 <Badge className="absolute right-1 top-1">
-                  <CheckIcon size={12} />
+                  <LinkIcon size={12} />
                 </Badge>
               )}
             </div>
@@ -198,7 +220,34 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
             <CancelButton onConfirm={handleCancelPick} />
           )}
           <p className="text-primary text-sm">
-            {pick.matchup.featured && "Chain Builder"}
+            {pick.matchup.featured &&
+              pick.matchup.featuredType === "CHAINBUILDER" &&
+              "ChainBuilder"}
+
+            {pick.matchup.featured &&
+              pick.matchup.featuredType === "SPONSORED" &&
+              "Sponsored"}
+          </p>
+          <p
+            className={
+              pick.matchup.status === "STATUS_SCHEDULED" ||
+              pick.matchup.status === "STATUS_POSTPONED"
+                ? "font-extralight text-light text-sm"
+                : pick.matchup.status === "STATUS_FINAL" ||
+                    pick.matchup.status === "STATUS_FINAL_OT" ||
+                    pick.matchup.status === "STATUS_FINAL_PEN"
+                  ? "font-bold font-sans"
+                  : "text-red-500 animate-pulse"
+            }
+          >
+            {pick.matchup.status === "STATUS_SCHEDULED" ||
+            pick.matchup.status === "STATUS_POSTPONED"
+              ? ""
+              : pick.matchup.status === "STATUS_FINAL" ||
+                  pick.matchup.status === "STATUS_FINAL_OT" ||
+                  pick.matchup.status === "STATUS_FINAL_PEN"
+                ? displayWinner(pick.matchup)
+                : "Locked"}
           </p>
         </div>
       </div>
