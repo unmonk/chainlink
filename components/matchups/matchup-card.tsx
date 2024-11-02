@@ -8,6 +8,9 @@ import { toast } from "sonner";
 import { ConvexError } from "convex/values";
 import { matchupReward } from "@/convex/utils";
 import { MatchupWithPickCounts } from "@/convex/matchups";
+import Link from "next/link";
+import { Logo } from "../ui/logo";
+import { cn } from "@/lib/utils";
 
 const MatchupCard = ({ matchup }: { matchup: MatchupWithPickCounts }) => {
   return (
@@ -217,20 +220,29 @@ const MatchupCardButtons = ({
         </div>
       </div>
       <div className="grid grid-cols-3 items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border">
-        <p className="text-primary text-sm">
-          {matchup.featured && "Chain Builder🖇️"}
+        <p className="text-sm">
+          {matchup.featured && matchup.featuredType === "CHAINBUILDER" && (
+            <span className="text-primary">Chain Builder🖇️</span>
+          )}
+          {matchup.featured && matchup.featuredType === "SPONSORED" && (
+            <span
+              className={cn(`text-${matchup.metadata.sponsoredData.color}-500`)}
+            >
+              Sponsored
+            </span>
+          )}
         </p>
         <div className="flex flex-col items-center justify-center">
           {(matchup.status === "STATUS_SCHEDULED" ||
             matchup.status === "STATUS_POSTPONED") && (
             <p className="text-light text-xs text-nowrap">
               Wager: 🔗
-              <span className="text-yellow-500">{matchup.cost}</span>
+              <span className="text-cyan-500">{matchup.cost}</span>
             </p>
           )}
           <p className="text-light text-xs text-nowrap">
             Reward: 🔗
-            <span className="text-yellow-500">
+            <span className="text-cyan-500">
               {matchupReward(matchup.cost, matchup.featured)}
             </span>
           </p>
@@ -257,6 +269,24 @@ const MatchupCardButtons = ({
               : "Locked"}
         </p>
       </div>
+      {matchup.featured &&
+        matchup.featuredType === "SPONSORED" &&
+        matchup.metadata.sponsoredData && (
+          <Link href={matchup.metadata.sponsoredData.url}>
+            <div className="flex flex-row justify-center items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border text-sm">
+              <p className="flex flex-row justify-center items-center gap-1">
+                {matchup.metadata.sponsoredData.description}
+              </p>
+              <Image
+                src={matchup.metadata.sponsoredData.image}
+                alt={matchup.metadata.sponsoredData.name}
+                width={24}
+                height={24}
+                className="ml-1 items-center justify-center self-center"
+              />
+            </div>
+          </Link>
+        )}
     </div>
   );
 };

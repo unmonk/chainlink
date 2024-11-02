@@ -22,6 +22,7 @@ import { MdSportsSoccer } from "react-icons/md";
 import { getSportFromLeague } from "@/lib/utils";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import BlurFade from "../ui/blur-fade";
+import { BackgroundGradientSponsored } from "../ui/background-gradient-sponsored";
 
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
@@ -165,13 +166,25 @@ const MatchupList = ({}) => {
                       delay={0.25 * idx * 0.01}
                       inView
                     >
-                      <BackgroundGradient
-                        key={matchup._id}
-                        animate={true}
-                        className="rounded-lg overflow-hidden shadow-lg"
-                      >
-                        <MatchupCard matchup={matchup} />
-                      </BackgroundGradient>
+                      {matchup.featuredType === "CHAINBUILDER" && (
+                        <BackgroundGradient
+                          key={matchup._id}
+                          animate={true}
+                          className="rounded-lg overflow-hidden shadow-lg"
+                        >
+                          <MatchupCard matchup={matchup} />
+                        </BackgroundGradient>
+                      )}
+                      {matchup.featuredType === "SPONSORED" && (
+                        <BackgroundGradientSponsored
+                          key={matchup._id}
+                          animate={true}
+                          className="rounded-lg overflow-hidden shadow-lg"
+                          color={matchup.metadata.sponsoredData.color}
+                        >
+                          <MatchupCard matchup={matchup} />
+                        </BackgroundGradientSponsored>
+                      )}
                     </BlurFade>
                   );
                 } else {
