@@ -176,7 +176,7 @@ export default defineSchema({
         value: v.string(),
       })
     ),
-  }),
+  }).index("by_userId", ["userId"]),
 
   matchups: defineTable({
     updatedAt: v.optional(v.number()),
