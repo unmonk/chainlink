@@ -249,6 +249,7 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     image: v.string(),
+    imageStorageId: v.optional(v.id("_storage")),
     active: v.boolean(),
     featured: v.boolean(),
     slug: v.string(),

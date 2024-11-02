@@ -48,7 +48,6 @@ export function ImageUpload({
           body: file,
         });
         const { storageId } = await result.json();
-        console.log("storageId", storageId);
 
         onChange(storageId);
       } catch (error) {

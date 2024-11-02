@@ -4,6 +4,78 @@ import { Id } from "./_generated/dataModel";
 import { pick_status } from "./schema";
 import { getSquadScore } from "./utils";
 
+export const updateSquad = mutation({
+  args: {
+    _id: v.id("squads"),
+    name: v.string(),
+    description: v.string(),
+    active: v.boolean(),
+    featured: v.boolean(),
+    open: v.boolean(),
+    image: v.string(),
+    imageStorageId: v.optional(v.string()),
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    //get squad
+    const squad = await ctx.db.get(args._id);
+    if (!squad) {
+      throw new Error("Squad not found");
+    }
+
+    if (squad.slug !== args.slug) {
+      //check if slug is unique
+      const squadWithSameSlug = await ctx.db
+        .query("squads")
+        .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+        .unique();
+      if (squadWithSameSlug) {
+        throw new Error("Slug already exists");
+      }
+    }
+
+    if (args.imageStorageId) {
+      const storageUrl = await ctx.storage.getUrl(args.imageStorageId);
+      args.image = storageUrl || "https://chainlink.st/icons/icon-256x256.png";
+    }
+
+    return await ctx.db.patch(args._id, {
+      name: args.name,
+      description: args.description,
+      active: args.active,
+      featured: args.featured,
+      open: args.open,
+      image: args.image,
+      imageStorageId: args.imageStorageId as Id<"_storage"> | undefined,
+      slug: args.slug,
+    });
+  },
+});
+
+export const deleteSquadImage = mutation({
+  args: {
+    squadId: v.id("squads"),
+    storageId: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    if (args.storageId) {
+      await ctx.storage.delete(args.storageId);
+    }
+    await ctx.db.patch(args.squadId, {
+      image: "https://chainlink.st/icons/icon-256x256.png",
+      imageStorageId: undefined,
+    });
+  },
+});
+
+export const list = query({
+  args: {},
+  handler: async (ctx) => {
+    const squads = await ctx.db.query("squads").collect();
+    return squads;
+  },
+});
+
 export const getSquad = query({
   args: { squadId: v.id("squads") },
   handler: async (ctx, { squadId }) => {
@@ -190,6 +262,7 @@ export const createSquad = mutation({
       name,
       description,
       image: storageUrl || "",
+      imageStorageId: storageId,
       slug,
       open,
       active: true,
