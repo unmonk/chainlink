@@ -85,8 +85,12 @@ export default function QuizEditPage({ params }: QuizEditPageProps) {
                 </div>
               </CardContent>
             </Card>
-            <QuizStatusToggle quiz={quiz.quiz} />
-            <QuizResults quiz={quiz.quiz} />
+            {quiz.quiz.status !== "COMPLETE" && (
+              <>
+                <QuizStatusToggle quiz={quiz.quiz} />
+                <QuizResults quiz={quiz.quiz} />
+              </>
+            )}
           </div>
         </div>
       </Suspense>
