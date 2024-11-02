@@ -150,6 +150,23 @@ export const getActiveMatchupsByLeague = query({
   },
 });
 
+export const getMatchupsByLeagueAndTime = query({
+  args: { league: v.string(), startTime: v.number() },
+  handler: async (ctx, { league, startTime }) => {
+    const minus24Hours = startTime - 24 * 60 * 60 * 1000;
+    const plus72Hours = startTime + 72 * 60 * 60 * 1000;
+    return await ctx.db
+      .query("matchups")
+      .withIndex("by_league_time", (q) =>
+        q
+          .eq("league", league)
+          .gte("startTime", minus24Hours)
+          .lte("startTime", plus72Hours)
+      )
+      .take(300);
+  },
+});
+
 export const handleMatchupStarted = internalMutation({
   args: {
     matchupId: v.id("matchups"),
