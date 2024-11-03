@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { Doc } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 import { action, mutation, query } from "./_generated/server";
 import { League } from "./types";
 import { api } from "./_generated/api";
@@ -15,6 +15,28 @@ export interface ScheduledMessage {
   };
   args: any[];
 }
+
+export const fixPreviousPicks = mutation({
+  args: {},
+  handler: async (ctx, args) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) =>
+        q.eq("matchupId", "kd7emz7fq5fp87mx8qfyx0v33d73r4qs" as Id<"matchups">)
+      )
+      .collect();
+
+    console.log(picks.length);
+
+    for (const pick of picks) {
+      await ctx.db.patch(pick._id, {
+        matchupId: "kd7a0zjrt9fjvbrq2grte05ve973r9qk" as Id<"matchups">,
+        status: "STATUS_UNKNOWN",
+        active: false,
+      });
+    }
+  },
+});
 
 export const getScheduledMessages = action({
   args: {},
