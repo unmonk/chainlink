@@ -97,12 +97,12 @@ export const getAdminMatchups = query({
     type MatchupWithPicks = Doc<"matchups"> & { picks: Doc<"picks">[] };
 
     const currentTime = new Date().getTime();
-    const minus3Hours = currentTime - 3 * 60 * 60 * 1000;
+    const minus8Hours = currentTime - 8 * 60 * 60 * 1000;
     const plus48Hours = currentTime + 48 * 60 * 60 * 1000;
     const matchups = (await ctx.db
       .query("matchups")
       .withIndex("by_startTime", (q) =>
-        q.gte("startTime", minus3Hours).lte("startTime", plus48Hours)
+        q.gte("startTime", minus8Hours).lte("startTime", plus48Hours)
       )
       .collect()) as MatchupWithPicks[];
 
@@ -127,14 +127,14 @@ export const getActiveMatchups = query({
   args: {},
   handler: async (ctx) => {
     const currentTime = new Date().getTime();
-    const minus6Hours = currentTime - 6 * 60 * 60 * 1000;
+    const minus8Hours = currentTime - 8 * 60 * 60 * 1000;
     const plus24Hours = currentTime + 24 * 60 * 60 * 1000;
     const matchups = await ctx.db
       .query("matchups")
       .withIndex("by_active_dates", (q) =>
         q
           .eq("active", true)
-          .gte("startTime", minus6Hours)
+          .gte("startTime", minus8Hours)
           .lte("startTime", plus24Hours)
       )
       .collect();
