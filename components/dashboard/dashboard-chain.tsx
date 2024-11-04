@@ -28,7 +28,7 @@ export const DashboardChain = () => {
         <CardDescription className="text-xs text-muted-foreground whitespace-nowrap">
           Global Game:
           {isAuthenticated && chain && (
-            <> {chain.wins + chain.losses + chain.pushes} total picks </>
+            <> {chain.wins + chain.losses + chain.pushes} picks </>
           )}
         </CardDescription>
       </CardHeader>
