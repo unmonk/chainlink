@@ -38,40 +38,44 @@ export default function DashboardQuiz() {
           </Tooltip>
         </TooltipProvider>
       </CardHeader>
-      <CardContent>
+      <CardContent className="h-full">
         {quizData === null && (
           <div className="text-center text-sm text-muted-foreground">
             No active challenge. Come back later!
           </div>
         )}
         {quizData && (
-          <>
+          <div className="flex flex-col h-full gap-2 pb-4">
             <div className="text-lg text-balance font-semibold">
               {quizData.quiz.title}
             </div>
-
-            <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground gap-2">
-              <div className="flex items-center text-balance">
-                <Clock className="mr-1 h-4 w-4" />
-                {formatDistanceToNow(quizData.quiz.expiresAt)} remaining
-              </div>
-              <Separator orientation="vertical" className="h-4" />
-              <div className="flex items-center text-balance">
-                <Users2Icon className="mr-1 h-4 w-4" />
-                {quizData.totalParticipants} participants
-              </div>
+            <div className="text-muted-foreground text-sm flex-grow">
+              {quizData.quiz.description}
             </div>
-            <Link href={"/challenge"}>
-              <Button
-                className="mt-4 w-full "
-                disabled={!!userHasResponded}
-                variant={userHasResponded ? "secondary" : "default"}
-              >
-                {!userHasResponded && "Wager Now"}{" "}
-                {userHasResponded && "Already Voted"}
-              </Button>
-            </Link>
-          </>
+            <div className="mt-auto flex flex-col gap-2 flex-grow">
+              <div className="flex items-center justify-between text-sm text-muted-foreground gap-2 ">
+                <div className="flex items-center text-balance">
+                  <Clock className="mr-1 h-4 w-4" />
+                  {formatDistanceToNow(quizData.quiz.expiresAt)} remaining
+                </div>
+                <Separator orientation="vertical" className="h-4" />
+                <div className="flex items-center text-balance">
+                  <Users2Icon className="mr-1 h-4 w-4" />
+                  {quizData.totalParticipants} participants
+                </div>
+              </div>
+              <Link href={"/challenge"}>
+                <Button
+                  className="w-full"
+                  disabled={!!userHasResponded}
+                  variant={userHasResponded ? "secondary" : "default"}
+                >
+                  {!userHasResponded && "Wager Now"}{" "}
+                  {userHasResponded && "Already Voted"}
+                </Button>
+              </Link>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

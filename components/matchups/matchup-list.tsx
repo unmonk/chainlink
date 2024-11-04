@@ -23,6 +23,7 @@ import { getSportFromLeague } from "@/lib/utils";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import BlurFade from "../ui/blur-fade";
 import { BackgroundGradientSponsored } from "../ui/background-gradient-sponsored";
+import MatchupSkeleton from "./matchup-skeleton";
 
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
@@ -74,13 +75,39 @@ const MatchupList = ({}) => {
 
   return (
     <div className="flex flex-col">
-      {userPickWithMatchup && userPickWithMatchup.matchup && (
+      {!matchups ? (
+        <div className="flex flex-col items-center">
+          <h3 className="text-lg font-semibold my-2">My Pick</h3>
+          <Card className="w-full max-w-md">
+            <div className="bg-secondary">
+              <div className="grid grid-cols-2 p-1.5">
+                <Skeleton className="h-4 w-16" /> {/* League */}
+                <Skeleton className="h-4 w-24 ml-auto" /> {/* Time/Status */}
+              </div>
+            </div>
+            <div className="p-4 space-y-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-12 w-12 rounded" />
+                <div className="flex flex-col items-center gap-2">
+                  <Skeleton className="h-4 w-20" /> {/* VS text */}
+                  <Skeleton className="h-4 w-24" /> {/* Status/Time */}
+                </div>
+                <Skeleton className="h-12 w-12 rounded" />
+              </div>
+              <div className="flex justify-center">
+                <Skeleton className="h-4 w-32" /> {/* Pick details */}
+              </div>
+            </div>
+          </Card>
+          <Separator orientation="horizontal" className="my-4" />
+        </div>
+      ) : userPickWithMatchup && userPickWithMatchup.matchup ? (
         <div className="flex flex-col items-center">
           <h3 className="text-lg font-semibold my-2">My Pick</h3>
           <ActivePickCard pick={userPickWithMatchup} />
           <Separator orientation="horizontal" className="my-4" />
         </div>
-      )}
+      ) : null}
 
       {/* Status Filters - Always visible */}
       <div className="flex flex-col md:flex-row justify-center items-center gap-2 mb-4">
@@ -132,23 +159,7 @@ const MatchupList = ({}) => {
       <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3 flex-grow">
         {!matchups
           ? Array.from({ length: 12 }).map((_, i) => (
-              <Card key={i} className="w-full">
-                <CardHeader className="space-y-2">
-                  <Skeleton className="h-4 w-1/3" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <Skeleton className="h-6 w-16" />
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                  </div>
-                  <Skeleton className="h-4 w-full" />
-                </CardContent>
-                <CardFooter>
-                  <Skeleton className="h-8 w-full" />
-                </CardFooter>
-              </Card>
+              <MatchupSkeleton key={i} />
             ))
           : filteredMatchups.length > 0 &&
             filteredMatchups

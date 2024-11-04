@@ -235,7 +235,15 @@ export default defineSchema({
     .index("by_matchupId", ["matchupId"])
     .index("by_userId", ["userId"])
     .index("by_active_externalId", ["active", "externalId"])
+    .index("by_active_userId", ["active", "userId"])
     .index("by_externalId", ["externalId"]),
+
+  pickQueue: defineTable({
+    userId: v.id("users"),
+    maxQueueSize: v.number(),
+    queue: v.array(v.id("picks")),
+    updatedAt: v.number(),
+  }).index("by_userId", ["userId"]),
 
   //////////////////SQUADS//////////////////////////////
   squads: defineTable({
@@ -372,39 +380,39 @@ export default defineSchema({
     .index("by_tournamentId", ["tournamentId"])
     .index("by_userId", ["userId"]),
 
-  bracketTeams: defineTable({
-    name: v.string(),
-    image: v.string(),
-    seed: v.number(),
-    region: v.string(),
-    espnId: v.optional(v.string()),
-    tournamentId: v.id("bracketTournaments"),
-  }).index("by_tournamentId", ["tournamentId"]),
-
   bracketGames: defineTable({
     tournamentId: v.id("bracketTournaments"),
     round: v.number(),
     gamePosition: v.number(),
-    homeTeamId: v.id("bracketTeams"),
-    awayTeamId: v.id("bracketTeams"),
-    winnerId: v.optional(v.id("bracketTeams")),
-    homeTeamScore: v.optional(v.number()),
-    awayTeamScore: v.optional(v.number()),
+    region: v.string(),
+    teams: v.array(
+      v.object({
+        name: v.string(),
+        image: v.string(),
+        seed: v.number(),
+        region: v.string(),
+        order: v.number(),
+        homeAway: v.union(v.literal("HOME"), v.literal("AWAY")),
+        winner: v.optional(v.boolean()),
+        score: v.optional(v.number()),
+        espnId: v.optional(v.string()),
+        id: v.optional(v.string()),
+      })
+    ),
     status: bracket_game_status,
     scheduledAt: v.number(),
   }).index("by_tournamentId", ["tournamentId"]),
 
   bracketGamePredictions: defineTable({
     tournamentId: v.id("bracketTournaments"),
-    userId: v.id("users"),
     gameId: v.id("bracketGames"),
+    userId: v.id("users"),
     roundNumber: v.number(),
     gamePosition: v.number(),
     prediction: v.object({
       homeTeamScore: v.number(),
       awayTeamScore: v.number(),
-      winnerId: v.id("bracketTeams"),
-      score: v.optional(v.number()),
+      winnerId: v.optional(v.string()),
     }),
   }).index("by_tournamentId", ["tournamentId"]),
 

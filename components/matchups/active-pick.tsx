@@ -67,7 +67,7 @@ const ActivePickCard = ({ pick }: { pick: UserPickWithMatchup }) => {
   return (
     <Card
       className={cn(
-        "mb-4 rounded-t-none w-full h-full",
+        "rounded-t-none w-full",
         pick.matchup.featured && pick.matchup.featuredType === "CHAINBUILDER"
           ? "border-primary border-4"
           : pick.matchup.featured && pick.matchup.featuredType === "SPONSORED"

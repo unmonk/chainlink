@@ -13,9 +13,10 @@ import DashboardAdsSponsors from "@/components/dashboard/dashboard-ads-sponsors"
 export default function Dashboard() {
   return (
     <ContentLayout title="Dashboard">
-      <main className="grid w-full grid-cols-1 gap-4 lg:grid-cols-4 lg:grid-rows-6">
-        <div className="lg:col-span-3 lg:row-span-1">
+      <main className="grid w-full grid-cols-1 gap-4 lg:grid-cols-4">
+        <div className="lg:col-span-3 lg:row-span-1 flex flex-col gap-4 h-full">
           <DashboardActivePick />
+          <DashboardAchievements />
         </div>
         <div className="lg:col-span-1 lg:row-span-1 flex flex-col gap-4 h-full">
           <DashboardChain />
@@ -24,11 +25,10 @@ export default function Dashboard() {
 
         <DashboardAnnouncements />
 
-        <div className="lg:col-span-4 lg:row-span-2">
+        <div className="lg:col-span-4 lg:row-span-2 h-full">
           <DashboardStats />
         </div>
         <div className="lg:col-span-2 lg:row-span-1 flex flex-col gap-4 h-full">
-          <DashboardAchievements />
           <DashboardQuiz />
         </div>
         <div className="lg:col-span-1 lg:row-span-1 flex flex-col gap-4 h-full"></div>
