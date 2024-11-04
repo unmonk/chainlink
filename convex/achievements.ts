@@ -257,7 +257,15 @@ export const listAchievements = query({
   handler: async (ctx) => {
     //get storage url
     const achievements = await ctx.db.query("achievements").collect();
-    return achievements;
+
+    //get image
+    const achievementsWithUrls = await Promise.all(
+      achievements.map(async (a) => ({
+        ...a,
+        image: await ctx.storage.getUrl(a.imageStorageId),
+      }))
+    );
+    return achievementsWithUrls;
   },
 });
 
