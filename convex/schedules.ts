@@ -451,7 +451,6 @@ function getScheduleEndpoint(league: League) {
       return `http://cdn.espn.com/core/soccer/schedule/_/league/arg.1??dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
     case "TUR":
       return `http://cdn.espn.com/core/soccer/schedule/_/league/tur.1??dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
-
     case "CSL":
       return `http://cdn.espn.com/core/soccer/schedule/_/league/chn.1??dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
     case "NBAG":
@@ -468,6 +467,9 @@ function getScheduleEndpoint(league: League) {
       return `http://cdn.espn.com/core/wnba/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
     case "UFL":
       return `http://cdn.espn.com/core/ufl/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
+    case "PLL":
+      return `http://cdn.espn.com/core/pll/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`;
+
     default:
       return null;
   }

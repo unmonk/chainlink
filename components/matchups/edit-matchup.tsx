@@ -322,7 +322,7 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
                   <FormItem>
                     <FormLabel>Away Team Score</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} type="number" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -379,7 +379,7 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
                   <FormItem>
                     <FormLabel>Home Team Score</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} type="number" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
