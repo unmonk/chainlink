@@ -136,7 +136,7 @@ export default function DashboardAnnouncements() {
               <Badge
                 key={type}
                 variant={activeFilter === type ? "default" : "outline"}
-                className={`cursor-pointer hover:opacity-80 transition-all px-2 sm:px-3 py-1 text-xs sm:text-sm ${
+                className={`cursor-pointer hover:opacity-80 transition-all px-2 sm:px-3 py-1 text-xs ${
                   activeFilter === type
                     ? getAnnouncementColor(type)
                     : "hover:" + getAnnouncementColor(type)
@@ -145,7 +145,7 @@ export default function DashboardAnnouncements() {
               >
                 <span className="flex items-center gap-1">
                   {getAnnouncementIcon(type)}
-                  <span className="hidden sm:inline">
+                  <span className="hidden sm:inline text-xs">
                     {type === "ALL" ? "All" : type}
                   </span>
                 </span>

@@ -1,6 +1,5 @@
 "use client";
 
-import { Bracket } from "react-brackets";
 import { useEffect, useMemo, useState } from "react";
 import { Id } from "@/convex/_generated/dataModel";
 
@@ -58,7 +57,7 @@ export function BracketViewer({ games }: BracketViewerProps) {
   return (
     <div className="relative w-full h-full overflow-x-auto rounded-lg border bg-background p-4 gap-4">
       <div className="w-full">
-        <Bracket
+        {/* <Bracket
           rounds={rounds}
           roundClassName="mb-4"
           bracketClassName="gap-4"
@@ -81,7 +80,7 @@ export function BracketViewer({ games }: BracketViewerProps) {
               ))}
             </div>
           )}
-        />
+        /> */}
       </div>
     </div>
   );

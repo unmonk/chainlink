@@ -15,9 +15,6 @@
   "dependencies": {
     "@clerk/nextjs": "^5.2.2",
     "@clerk/themes": "^2.1.10",
-    "@convex-dev/aggregate": "^0.1.15",
-    "@convex-dev/expo-push-notifications": "^0.1.2",
-    "@g-loot/react-tournament-brackets": "^1.0.30",
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
@@ -62,7 +59,6 @@
     "next-themes": "^0.3.0",
     "nuqs": "^2.0.4",
     "react": "^18.3.1",
-    "react-brackets": "^0.4.7",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.51.3",
