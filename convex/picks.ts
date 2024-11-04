@@ -596,3 +596,10 @@ export const setPickComplete = internalMutation({
     });
   },
 });
+
+export const setPickActive = internalMutation({
+  args: { pickId: v.id("picks") },
+  handler: async (ctx, { pickId }) => {
+    await ctx.db.patch(pickId, { active: true });
+  },
+});

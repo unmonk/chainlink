@@ -7,13 +7,9 @@ import {
   CardTitle,
 } from "../ui/card";
 import { api } from "@/convex/_generated/api";
-import { leagueLogos } from "@/convex/utils";
-import Image from "next/image";
-import { Badge } from "../ui/badge";
-import { Skeleton } from "../ui/skeleton";
-import { LeagueRadarChart } from "./league-radar-chart";
-import { MonthlyStatsChart } from "./monthly-stats-chart";
-import { LeaguePieChart } from "./league-pie-chart";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LeagueRadarChart } from "@/components/stats/league-radar-chart";
 
 const DashboardStats = () => {
   const user = useQuery(api.users.currentUser, {});
@@ -108,7 +104,7 @@ const DashboardStats = () => {
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Stats</CardTitle>
         <CardDescription>All-Time Statistics</CardDescription>

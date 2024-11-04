@@ -102,13 +102,39 @@ export const scoreboards = action({
     const allGameIds: string[] = [];
 
     for (const league of ACTIVE_LEAGUES) {
-      const url = getScoreboardUrl(league);
-      const response = await fetch(url);
-      const data = (await response.json()) as ScoreboardResponse;
-      leagueData[league] = data;
+      const urlOrUrls = getScoreboardUrl(league);
 
-      if (data.events && data.events.length > 0) {
-        allGameIds.push(...data.events.map((event) => event.id));
+      if (Array.isArray(urlOrUrls)) {
+        // Handle WBB/MBB case with multiple URLs
+        const allResponses = await Promise.all(
+          urlOrUrls.map((url) =>
+            fetch(url).then((res) => res.json() as Promise<ScoreboardResponse>)
+          )
+        );
+
+        // Merge all responses into one
+        leagueData[league] = allResponses.reduce(
+          (acc, curr) => ({
+            events: [...(acc.events || []), ...(curr.events || [])],
+            leagues: curr.leagues, // Take the last one or handle as needed
+          }),
+          { events: [], leagues: undefined }
+        );
+      } else {
+        // Handle single URL case for other leagues
+        const response = await fetch(urlOrUrls);
+        const data = (await response.json()) as ScoreboardResponse;
+        leagueData[league] = data;
+      }
+
+      if (leagueData[league].events && leagueData[league].events.length > 0) {
+        //remove duplicates from events
+        leagueData[league].events = leagueData[league].events.filter(
+          (event, index, self) =>
+            index === self.findIndex((t) => t.id === event.id)
+        );
+
+        allGameIds.push(...leagueData[league].events.map((event) => event.id));
       }
     }
     // Query all matchups at once
@@ -218,6 +244,8 @@ export const scoreboards = action({
           (matchup.status === "STATUS_IN_PROGRESS" ||
             matchup.status === "STATUS_END_PERIOD" ||
             matchup.status === "STATUS_SECOND_HALF" ||
+            matchup.status === "STATUS_SHOOTOUT" ||
+            matchup.status === "STATUS_END_OF_EXTRATIME" ||
             matchup.status === "STATUS_SCHEDULED") &&
           (eventStatus === "STATUS_FINAL" ||
             eventStatus === "STATUS_FULL_TIME" ||
@@ -275,7 +303,7 @@ export const scoreboards = action({
           let hasChangedDetails = "";
           if (matchup.status !== eventStatus) {
             hasChanged = true;
-            hasChangedDetails += `status changed from ${matchup.status} to ${eventStatus} for ${event.shortName}`;
+            hasChangedDetails += `status difference ours: ${matchup.status} espn: ${eventStatus} for ${event.shortName}`;
           }
           if (matchup.homeTeam.score !== homeScore) {
             hasChanged = true;
@@ -344,7 +372,12 @@ function getScoreboardUrl(league: League) {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
 
   const limit = 300;
+
   switch (league) {
+    case "MBB":
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}&groups=50`;
+    case "WBB":
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}&groups=50`;
     case "MLB":
       return `http://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NFL":
@@ -359,10 +392,6 @@ function getScoreboardUrl(league: League) {
       return `http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "MLS":
       return `http://site.api.espn.com/apis/site/v2/sports/soccer/usa.1/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
-    case "MBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
-    case "WBB":
-      return `http://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "UFL":
       return `http://site.api.espn.com/apis/site/v2/sports/football/ufl/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "ARG":
@@ -379,6 +408,10 @@ function getScoreboardUrl(league: League) {
       return `http://site.api.espn.com/apis/site/v2/sports/soccer/tur.1/scoreboard?dates=${date}&limit=${limit}`;
     case "RPL":
       return `http://site.api.espn.com/apis/site/v2/sports/soccer/rus.1/scoreboard?dates=${date}&limit=${limit}`;
+    case "PLL":
+      return `http://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/scoreboard?dates=${date}&limit=${limit}`;
+    case "NBAG":
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba-g-league/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     default:
       throw new Error("Invalid league");
   }

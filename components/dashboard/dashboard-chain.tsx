@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { streakColor, streakLetter } from "./user-chain";
+import { streakColor, streakLetter } from "@/components/chains/user-chain";
 import { Badge } from "../ui/badge";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -22,7 +22,7 @@ export const DashboardChain = () => {
   }
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col h-full">
       <CardHeader className="pb-2">
         <CardTitle>My Chain</CardTitle>
         <CardDescription className="text-xs text-muted-foreground whitespace-nowrap">

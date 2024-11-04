@@ -48,7 +48,7 @@ export const LeagueRadarChart: React.FC<LeagueRadarChartProps> = ({
 
   return (
     <Card className="bg-background/20">
-      <CardContent className="pb-0 w-full flex flex-col md:flex-row justify-center gap-2">
+      <CardContent className="pb-0 w-full flex flex-col xl:flex-row justify-center gap-2">
         <Card className="w-full bg-background/20 border-none">
           <CardHeader className="items-center pb-0">
             <CardTitle>League Radar</CardTitle>

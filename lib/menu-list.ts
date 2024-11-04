@@ -51,34 +51,36 @@ export function getAdminMenuList(pathname: string): Group[] {
           icon: ShieldAlertIcon,
           submenus: [
             {
-              href: "/admin/actions",
-              label: "Actions",
-              active: pathname.includes("/admin/actions"),
-            },
-            {
-              href: "/shop",
-              label: "Shop",
-              active: pathname.includes("/shop"),
-            },
-            {
               href: "/admin/matchups",
               label: "Matchups",
               active: pathname.includes("/admin/matchups"),
             },
+            {
+              href: "/admin/users",
+              label: "Users",
+              active: pathname.includes("/admin/users"),
+            },
+
+            {
+              href: "/admin/announcements",
+              label: "Announcements",
+              active: pathname.includes("/admin/announcements"),
+            },
+
             {
               href: "/admin/achievements",
               label: "Achievements",
               active: pathname.includes("/admin/achievements"),
             },
             {
+              href: "/admin/actions",
+              label: "Actions",
+              active: pathname.includes("/admin/actions"),
+            },
+            {
               href: "/admin/quiz",
               label: "Challenge",
               active: pathname.includes("/admin/quiz"),
-            },
-            {
-              href: "/admin/users",
-              label: "Users",
-              active: pathname.includes("/admin/users"),
             },
             {
               href: "/admin/notifications",
@@ -89,6 +91,11 @@ export function getAdminMenuList(pathname: string): Group[] {
               href: "/admin/squads",
               label: "Squads",
               active: pathname.includes("/admin/squads"),
+            },
+            {
+              href: "/shop",
+              label: "Shop",
+              active: pathname.includes("/shop"),
             },
           ],
         },

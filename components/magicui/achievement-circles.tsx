@@ -42,13 +42,13 @@ const AchievementCircles = ({
   const avatarUrls = uniqueAchievements
     .map((a) => a.image)
     .filter((url): url is string => url !== null)
-    .slice(0, 5);
+    .slice(0, 10);
 
   const numPeople = achievements.length - avatarUrls.length;
 
   return (
     <div className={cn("z-10 flex -space-x-4 rtl:space-x-reverse")}>
-      {uniqueAchievements.slice(0, 5).map((a, index) => (
+      {uniqueAchievements.slice(0, 10).map((a, index) => (
         <TooltipProvider key={index}>
           <Tooltip>
             <TooltipTrigger>

@@ -198,7 +198,11 @@ export function FriendsList() {
                   },
                 }}
               >
-                {mergedFriends &&
+                {!mergedFriends || mergedFriends.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-4">
+                    No friends yet
+                  </div>
+                ) : (
                   mergedFriends.map((friend) => {
                     return (
                       <motion.div
@@ -278,7 +282,8 @@ export function FriendsList() {
                         </AlertDialog>
                       </motion.div>
                     );
-                  })}
+                  })
+                )}
               </motion.div>
             </ScrollArea>
           </div>

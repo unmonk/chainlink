@@ -1,6 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
 
+//////////////////MATCHUPS AND PICKS//////////////////////////////
 export const featured_type = v.union(
   v.literal("CHAINBUILDER"),
   v.literal("SPONSORED")
@@ -15,16 +16,6 @@ export const matchup_type = v.union(
 );
 export type MatchupType = Infer<typeof matchup_type>;
 
-export const campaign_type = v.union(
-  v.literal("GLOBAL"),
-  v.literal("CHAIN"),
-  v.literal("SQUAD"),
-  v.literal("TOURNAMENT"),
-  v.literal("BRACKET"),
-  v.literal("ACHIEVEMENT")
-);
-export type CampaignType = Infer<typeof campaign_type>;
-
 export const pick_status = v.union(
   v.literal("PENDING"),
   v.literal("WIN"),
@@ -35,6 +26,19 @@ export const pick_status = v.union(
 );
 export type PickStatus = Infer<typeof pick_status>;
 
+//////////////////CAMPAIGNS//////////////////////////////
+
+export const campaign_type = v.union(
+  v.literal("GLOBAL"),
+  v.literal("CHAIN"),
+  v.literal("SQUAD"),
+  v.literal("TOURNAMENT"),
+  v.literal("BRACKET"),
+  v.literal("ACHIEVEMENT")
+);
+export type CampaignType = Infer<typeof campaign_type>;
+
+//////////////////ACHIEVEMENTS//////////////////////////////
 export const achievement_type = v.union(
   v.literal("CHAINWIN"),
   v.literal("CHAINLOSS"),
@@ -60,6 +64,8 @@ export const achievement_type = v.union(
 );
 export type AchievementType = Infer<typeof achievement_type>;
 
+//////////////////TRANSACTIONS AND COINS//////////////////////////////
+
 export const transaction_type = v.union(
   v.literal("DEPOSIT"),
   v.literal("WITHDRAW"),
@@ -81,10 +87,13 @@ export const trasaction_status = v.union(
 export type TransactionStatus = Infer<typeof trasaction_status>;
 export type TransactionType = Infer<typeof transaction_type>;
 
+//////////////////SQUADS AND USERS//////////////////////////////
 export const squad_role = v.union(v.literal("MEMBER"), v.literal("OWNER"));
 export type SquadRole = Infer<typeof squad_role>;
 export const user_role = v.union(v.literal("USER"), v.literal("ADMIN"));
 export type UserRole = Infer<typeof user_role>;
+
+//////////////////SLOT MACHINE//////////////////////////////
 
 export const slot_symbol_type = v.union(
   v.literal("COIN"),
@@ -96,6 +105,19 @@ export const slot_symbol_type = v.union(
 );
 export type SlotSymbolType = Infer<typeof slot_symbol_type>;
 
+export const blackjack_game_status = v.union(
+  v.literal("PLAYING"),
+  v.literal("PLAYER_BUSTED"),
+  v.literal("DEALER_BUSTED"),
+  v.literal("PLAYER_WON"),
+  v.literal("DEALER_WON"),
+  v.literal("PLAYER_BLACKJACK"),
+  v.literal("PUSH")
+);
+export type BlackjackGameStatus = Infer<typeof blackjack_game_status>;
+
+//////////////////QUIZZES//////////////////////////////
+
 export const question_status = v.union(
   v.literal("DRAFT"),
   v.literal("ACTIVE"),
@@ -103,6 +125,8 @@ export const question_status = v.union(
   v.literal("COMPLETE")
 );
 export type QuestionStatus = Infer<typeof question_status>;
+
+//////////////////BRACKETS//////////////////////////////
 
 export const bracket_tournament_status = v.union(
   v.literal("DRAFT"),
@@ -119,65 +143,18 @@ export const bracket_game_status = v.union(
 );
 export type BracketGameStatus = Infer<typeof bracket_game_status>;
 
-export const blackjack_game_status = v.union(
-  v.literal("PLAYING"),
-  v.literal("PLAYER_BUSTED"),
-  v.literal("DEALER_BUSTED"),
-  v.literal("PLAYER_WON"),
-  v.literal("DEALER_WON"),
-  v.literal("PLAYER_BLACKJACK"),
-  v.literal("PUSH")
+//////////////////NEWS, ANNOUNCEMENTS, AND NOTIFICATIONS//////////////////////////////
+export const announcement_type = v.union(
+  v.literal("NEWS"),
+  v.literal("MAINTENANCE"),
+  v.literal("FEATURE"),
+  v.literal("PROMOTION"),
+  v.literal("ALERT")
 );
-export type BlackjackGameStatus = Infer<typeof blackjack_game_status>;
+export type AnnouncementType = Infer<typeof announcement_type>;
 
 export default defineSchema({
-  slotMachineSpins: defineTable({
-    userId: v.id("users"),
-    spunAt: v.number(),
-    result: v.array(slot_symbol_type),
-    payout: v.number(),
-    freeSpin: v.boolean(),
-  }).index("by_userId", ["userId"]),
-
-  slotMachineConfig: defineTable({
-    active: v.boolean(),
-    symbolWeights: v.record(v.string(), v.number()),
-    payouts: v.array(
-      v.object({
-        line: v.number(),
-        payout: v.number(),
-      })
-    ),
-    spinCost: v.number(),
-    freeSpinInterval: v.number(),
-  }),
-
-  blackjackGames: defineTable({
-    userId: v.id("users"),
-    playerHand: v.array(
-      v.object({
-        suit: v.string(),
-        value: v.string(),
-      })
-    ),
-    dealerHand: v.array(
-      v.object({
-        suit: v.string(),
-        value: v.string(),
-        hidden: v.optional(v.boolean()),
-      })
-    ),
-    status: blackjack_game_status,
-    betAmount: v.number(),
-    payout: v.optional(v.number()),
-    deck: v.array(
-      v.object({
-        suit: v.string(),
-        value: v.string(),
-      })
-    ),
-  }).index("by_userId", ["userId"]),
-
+  //////////////////MATCHUPS AND PICKS//////////////////////////////
   matchups: defineTable({
     updatedAt: v.optional(v.number()),
     startTime: v.number(),
@@ -212,6 +189,21 @@ export default defineSchema({
     .index("by_startTime", ["startTime"])
     .index("by_gameId", ["gameId"]),
 
+  chains: defineTable({
+    userId: v.string(),
+    campaignId: v.id("campaigns"),
+    active: v.boolean(),
+    chain: v.number(),
+    wins: v.number(),
+    losses: v.number(),
+    pushes: v.number(),
+    best: v.number(),
+    cost: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_active_userId", ["active", "userId"])
+    .index("by_active", ["active"]),
+
   campaigns: defineTable({
     name: v.string(),
     description: v.string(),
@@ -243,8 +235,17 @@ export default defineSchema({
     .index("by_matchupId", ["matchupId"])
     .index("by_userId", ["userId"])
     .index("by_active_externalId", ["active", "externalId"])
+    .index("by_active_userId", ["active", "userId"])
     .index("by_externalId", ["externalId"]),
 
+  pickQueue: defineTable({
+    userId: v.id("users"),
+    maxQueueSize: v.number(),
+    queue: v.array(v.id("picks")),
+    updatedAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
+  //////////////////SQUADS//////////////////////////////
   squads: defineTable({
     name: v.string(),
     description: v.string(),
@@ -287,11 +288,7 @@ export default defineSchema({
       filterFields: ["active", "open"],
     }),
 
-  referrals: defineTable({
-    userId: v.string(),
-    referredBy: v.string(),
-    coins: v.number(),
-  }),
+  //////////////////ACHIEVEMENTS//////////////////////////////
 
   achievements: defineTable({
     name: v.string(),
@@ -304,6 +301,8 @@ export default defineSchema({
     type: achievement_type,
   }).index("by_type_threshold", ["type", "threshold"]),
 
+  //////////////////TRANSACTIONS//////////////////////////////
+
   coinTransactions: defineTable({
     userId: v.string(),
     amount: v.number(),
@@ -313,21 +312,7 @@ export default defineSchema({
     metadata: v.optional(v.object({})),
   }),
 
-  chains: defineTable({
-    userId: v.string(),
-    campaignId: v.id("campaigns"),
-    active: v.boolean(),
-    chain: v.number(),
-    wins: v.number(),
-    losses: v.number(),
-    pushes: v.number(),
-    best: v.number(),
-    cost: v.number(),
-  })
-    .index("by_userId", ["userId"])
-    .index("by_active_userId", ["active", "userId"])
-    .index("by_active", ["active"]),
-
+  //////////////////OTHER GAMES//////////////////////////////
   pickemGames: defineTable({
     title: v.string(),
     description: v.string(),
@@ -376,21 +361,6 @@ export default defineSchema({
     .index("by_quizId", ["quizId"])
     .index("by_quizId_userId", ["quizId", "userId"]),
 
-  friendRequests: defineTable({
-    senderId: v.string(),
-    receiverId: v.string(),
-    status: v.union(
-      v.literal("PENDING"),
-      v.literal("ACCEPTED"),
-      v.literal("DECLINED")
-    ),
-    sentAt: v.number(),
-    updatedAt: v.optional(v.number()),
-  })
-    .index("by_receiver", ["receiverId", "status"])
-    .index("by_sender", ["senderId", "status"])
-    .index("by_users", ["senderId", "receiverId"]),
-
   bracketTournaments: defineTable({
     name: v.string(),
     description: v.string(),
@@ -410,41 +380,125 @@ export default defineSchema({
     .index("by_tournamentId", ["tournamentId"])
     .index("by_userId", ["userId"]),
 
-  bracketTeams: defineTable({
-    name: v.string(),
-    image: v.string(),
-    seed: v.number(),
-    region: v.string(),
-    espnId: v.optional(v.string()),
-    tournamentId: v.id("bracketTournaments"),
-  }).index("by_tournamentId", ["tournamentId"]),
-
   bracketGames: defineTable({
     tournamentId: v.id("bracketTournaments"),
     round: v.number(),
     gamePosition: v.number(),
-    homeTeamId: v.id("bracketTeams"),
-    awayTeamId: v.id("bracketTeams"),
-    winnerId: v.optional(v.id("bracketTeams")),
-    homeTeamScore: v.optional(v.number()),
-    awayTeamScore: v.optional(v.number()),
+    region: v.string(),
+    teams: v.array(
+      v.object({
+        name: v.string(),
+        image: v.string(),
+        seed: v.number(),
+        region: v.string(),
+        order: v.number(),
+        homeAway: v.union(v.literal("HOME"), v.literal("AWAY")),
+        winner: v.optional(v.boolean()),
+        score: v.optional(v.number()),
+        espnId: v.optional(v.string()),
+        id: v.optional(v.string()),
+      })
+    ),
     status: bracket_game_status,
     scheduledAt: v.number(),
   }).index("by_tournamentId", ["tournamentId"]),
 
   bracketGamePredictions: defineTable({
     tournamentId: v.id("bracketTournaments"),
-    userId: v.id("users"),
     gameId: v.id("bracketGames"),
+    userId: v.id("users"),
     roundNumber: v.number(),
     gamePosition: v.number(),
     prediction: v.object({
       homeTeamScore: v.number(),
       awayTeamScore: v.number(),
-      winnerId: v.id("bracketTeams"),
-      score: v.optional(v.number()),
+      winnerId: v.optional(v.string()),
     }),
   }).index("by_tournamentId", ["tournamentId"]),
+
+  slotMachineSpins: defineTable({
+    userId: v.id("users"),
+    spunAt: v.number(),
+    result: v.array(slot_symbol_type),
+    payout: v.number(),
+    freeSpin: v.boolean(),
+  }).index("by_userId", ["userId"]),
+
+  slotMachineConfig: defineTable({
+    active: v.boolean(),
+    symbolWeights: v.record(v.string(), v.number()),
+    payouts: v.array(
+      v.object({
+        line: v.number(),
+        payout: v.number(),
+      })
+    ),
+    spinCost: v.number(),
+    freeSpinInterval: v.number(),
+  }),
+
+  blackjackGames: defineTable({
+    userId: v.id("users"),
+    playerHand: v.array(
+      v.object({
+        suit: v.string(),
+        value: v.string(),
+      })
+    ),
+    dealerHand: v.array(
+      v.object({
+        suit: v.string(),
+        value: v.string(),
+        hidden: v.optional(v.boolean()),
+      })
+    ),
+    status: blackjack_game_status,
+    betAmount: v.number(),
+    payout: v.optional(v.number()),
+    deck: v.array(
+      v.object({
+        suit: v.string(),
+        value: v.string(),
+      })
+    ),
+  }).index("by_userId", ["userId"]),
+
+  //////////////////NEWS, ANNOUNCEMENTS, AND NOTIFICATIONS//////////////////////////////
+
+  announcements: defineTable({
+    title: v.string(),
+    content: v.string(),
+    type: announcement_type,
+    priority: v.number(),
+    active: v.boolean(),
+    expiresAt: v.number(),
+    link: v.optional(v.string()),
+    image: v.optional(v.string()),
+    imageStorageId: v.optional(v.id("_storage")),
+  }).index("by_active_expiresAt", ["active", "expiresAt"]),
+
+  //////////////////USERS//////////////////////////////
+
+  friendRequests: defineTable({
+    senderId: v.string(),
+    receiverId: v.string(),
+    status: v.union(
+      v.literal("PENDING"),
+      v.literal("ACCEPTED"),
+      v.literal("DECLINED")
+    ),
+    sentAt: v.number(),
+    updatedAt: v.optional(v.number()),
+  })
+    .index("by_receiver", ["receiverId", "status"])
+    .index("by_sender", ["senderId", "status"])
+    .index("by_users", ["senderId", "receiverId"]),
+
+  referrals: defineTable({
+    userId: v.string(),
+    referredBy: v.string(),
+    coins: v.number(),
+  }),
 
   legacyUsers: defineTable({
     userId: v.string(),

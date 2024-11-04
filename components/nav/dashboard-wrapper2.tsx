@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/nav/sidebar";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 import useStoreUserEffect from "@/hooks/use-store-user";
 import { SignedIn } from "@clerk/nextjs";
+import { QueueDetails } from "../picks/queue/queue-details";
 
 export default function DashboardWrapper2({
   children,
@@ -27,6 +28,7 @@ export default function DashboardWrapper2({
         )}
       >
         {children}
+        {/* <QueueDetails /> */}
       </main>
       <footer
         className={cn(
