@@ -3,24 +3,18 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { DataTable } from "./admin-datatable";
 import { AdminColumns } from "./admin-columns";
+import { useMemo } from "react";
+import { ScrollArea } from "../ui/scroll-area";
 
 const AdminMatchupList = () => {
   const matchups = useQuery(api.matchups.getAdminMatchups, {});
 
-  const getAdanaGames = matchups?.filter((matchup) =>
-    matchup.title.includes("Adana Demirspor")
+  const memoizedTable = useMemo(
+    () => matchups && <DataTable columns={AdminColumns} data={matchups} />,
+    [matchups]
   );
-  if (getAdanaGames) {
-    for (const game of getAdanaGames) {
-      console.log(game);
-    }
-  }
 
-  return (
-    <div className="p-1">
-      {matchups && <DataTable columns={AdminColumns} data={matchups} />}
-    </div>
-  );
+  return <div className="mt-2">{memoizedTable}</div>;
 };
 
 export default AdminMatchupList;

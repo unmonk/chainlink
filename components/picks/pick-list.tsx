@@ -44,13 +44,24 @@ export const UserPickList = () => {
         {results.map((pick, idx) => (
           <BlurFade key={pick._id} delay={0.25 * idx * 0.05} inView>
             <Link
-              href={`/matchups/${pick.matchupId}`}
+              href={`/matchups/${pick.status === "STATUS_UNKNOWN" ? "" : pick.matchupId}`}
               passHref
               prefetch={false}
             >
               <Card
                 key={pick._id}
-                className={`h-full flex items-center flex-col text-center ${pick.status === "PENDING" || pick.status === "STATUS_IN_PROGRESS" ? "bg-blue-500/10" : pick.status === "WIN" ? "bg-green-500/10" : pick.status === "LOSS" ? "bg-red-500/10" : ""}`}
+                className={`h-full flex items-center flex-col text-center ${
+                  pick.status === "PENDING" ||
+                  pick.status === "STATUS_IN_PROGRESS"
+                    ? "bg-blue-500/10"
+                    : pick.status === "WIN"
+                      ? "bg-green-500/10"
+                      : pick.status === "LOSS"
+                        ? "bg-red-500/10"
+                        : pick.status === "STATUS_UNKNOWN"
+                          ? "bg-yellow-500/10"
+                          : ""
+                }`}
               >
                 <CardHeader>
                   <CardTitle className="text-balance font-normal text-md min-h-12">
@@ -59,7 +70,9 @@ export const UserPickList = () => {
                   <CardDescription>
                     {pick.status === "STATUS_IN_PROGRESS"
                       ? "In Progress"
-                      : pick.status}
+                      : pick.status === "STATUS_UNKNOWN"
+                        ? "Legacy Pick"
+                        : pick.status}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

@@ -218,6 +218,8 @@ export const scoreboards = action({
           (matchup.status === "STATUS_IN_PROGRESS" ||
             matchup.status === "STATUS_END_PERIOD" ||
             matchup.status === "STATUS_SECOND_HALF" ||
+            matchup.status === "STATUS_SHOOTOUT" ||
+            matchup.status === "STATUS_END_OF_EXTRATIME" ||
             matchup.status === "STATUS_SCHEDULED") &&
           (eventStatus === "STATUS_FINAL" ||
             eventStatus === "STATUS_FULL_TIME" ||
@@ -275,7 +277,7 @@ export const scoreboards = action({
           let hasChangedDetails = "";
           if (matchup.status !== eventStatus) {
             hasChanged = true;
-            hasChangedDetails += `status changed from ${matchup.status} to ${eventStatus} for ${event.shortName}`;
+            hasChangedDetails += `status difference ours: ${matchup.status} espn: ${eventStatus} for ${event.shortName}`;
           }
           if (matchup.homeTeam.score !== homeScore) {
             hasChanged = true;

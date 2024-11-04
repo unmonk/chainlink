@@ -1,16 +1,9 @@
 "use client";
 import { useQuery } from "convex/react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { api } from "@/convex/_generated/api";
 import { Skeleton } from "../ui/skeleton";
-import { CoinHistoryChart } from "./coin-history-chart";
+import { CoinHistoryChart } from "@/components/coins/coin-history-chart";
 import { formatDate, subMonths } from "date-fns";
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 
@@ -23,7 +16,7 @@ const DashboardCoins = () => {
   const coinDifference = user.coins - lastMonthsCoins;
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col h-full">
       <CardHeader className="pb-2 flex-grow">
         <CardTitle>Link Balance</CardTitle>
       </CardHeader>
@@ -43,7 +36,7 @@ const DashboardCoins = () => {
             {!Number.isNaN(coinDifference) && (
               <>
                 {coinDifference < 0 ? "-" : "+"}
-                {Math.abs(coinDifference)} this month (
+                {Math.abs(coinDifference)} mtd (
                 {((coinDifference / user.coins) * 100).toFixed(2)}%)
               </>
             )}

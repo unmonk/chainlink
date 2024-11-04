@@ -58,7 +58,7 @@ const MatchupList = ({}) => {
     }
   }
   const currentTime = new Date().getTime();
-  const minus3Hours = currentTime - 3 * 60 * 60 * 1000;
+  const minus8Hours = currentTime - 8 * 60 * 60 * 1000;
   const plus24Hours = currentTime + 24 * 60 * 60 * 1000;
 
   const sportGroups = useMemo(() => {
@@ -209,7 +209,7 @@ const MatchupList = ({}) => {
           "No matchups available"
         ) : (
           `${matchups.length} matchups | Window: ${new Date(
-            minus3Hours
+            minus8Hours
           ).toLocaleTimeString("en-US", {
             hour: "numeric",
             minute: "numeric",

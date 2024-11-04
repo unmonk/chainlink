@@ -20,7 +20,7 @@ const DashboardActivePick = () => {
   //Todo loading skeleton
   if (!pick)
     return (
-      <Card className="col-span-2">
+      <Card className="h-full">
         <CardHeader>
           <CardTitle>My Pick</CardTitle>
           <CardDescription>No Active Pick</CardDescription>
@@ -42,11 +42,7 @@ const DashboardActivePick = () => {
     matchup: pick.matchup,
   };
 
-  return (
-    <div className="col-span-2">
-      <ActivePickCard pick={pickWithMatchup} />
-    </div>
-  );
+  return <ActivePickCard pick={pickWithMatchup} />;
 };
 
 export default DashboardActivePick;

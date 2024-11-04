@@ -9,14 +9,13 @@ import { ConvexError } from "convex/values";
 import { matchupReward } from "@/convex/utils";
 import { MatchupWithPickCounts } from "@/convex/matchups";
 import Link from "next/link";
-import { Logo } from "../ui/logo";
 import { cn } from "@/lib/utils";
 
 const MatchupCard = ({ matchup }: { matchup: MatchupWithPickCounts }) => {
   return (
     <Card className="rounded-t-none flex flex-col h-full">
       <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
-      <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2">
+      <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
         {matchup.title}
       </CardTitle>
       <MatchupCardButtons matchup={matchup} />
@@ -253,8 +252,8 @@ const MatchupCardButtons = ({
             matchup.status === "STATUS_POSTPONED"
               ? "font-extralight text-light text-sm"
               : matchup.status === "STATUS_FINAL" ||
-                  matchup.status === "STATUS_FINAL_OT" ||
-                  matchup.status === "STATUS_FINAL_PEN"
+                  matchup.status === "STATUS_FULL_TIME" ||
+                  matchup.status === "STATUS_FULL_PEN"
                 ? "font-bold font-sans"
                 : "text-red-500 animate-pulse"
           }
@@ -263,8 +262,8 @@ const MatchupCardButtons = ({
           matchup.status === "STATUS_POSTPONED"
             ? ""
             : matchup.status === "STATUS_FINAL" ||
-                matchup.status === "STATUS_FINAL_OT" ||
-                matchup.status === "STATUS_FINAL_PEN"
+                matchup.status === "STATUS_FULL_TIME" ||
+                matchup.status === "STATUS_FULL_PEN"
               ? displayWinner(matchup)
               : "Locked"}
         </p>
@@ -408,10 +407,11 @@ export const MatchupCardHeader = ({
       case "STATUS_FIRST_HALF":
       case "STATUS_SECOND_HALF":
       case "STATUS_END_PERIOD":
+      case "STATUS_SHOOTOUT":
         return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800";
       case "STATUS_FINAL":
-      case "STATUS_FINAL_OT":
-      case "STATUS_FINAL_PEN":
+      case "STATUS_FULL_TIME":
+      case "STATUS_FULL_PEN":
         return "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400";
       case "STATUS_POSTPONED":
       case "STATUS_CANCELED":

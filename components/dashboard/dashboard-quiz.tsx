@@ -24,7 +24,7 @@ export default function DashboardQuiz() {
   );
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle>Challenge Question</CardTitle>
         <TooltipProvider>
