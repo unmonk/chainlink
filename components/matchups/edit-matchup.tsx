@@ -49,13 +49,13 @@ const EditMatchupFormSchema = z.object({
   homeTeam: z.object({
     id: z.string(),
     name: z.string(),
-    score: z.number(),
+    score: z.coerce.number(),
     image: z.string(),
   }),
   awayTeam: z.object({
     id: z.string(),
     name: z.string(),
-    score: z.number(),
+    score: z.coerce.number(),
     image: z.string(),
   }),
   startTime: z.number(),
@@ -207,6 +207,29 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
     }
   }
 
+  const MATCHUP_STATUSES = {
+    SCHEDULED: "STATUS_SCHEDULED",
+    HALF_TIME: "STATUS_HALF_TIME",
+    END_PERIOD: "STATUS_END_PERIOD",
+    FIRST_HALF: "STATUS_FIRST_HALF",
+    SECOND_HALF: "STATUS_SECOND_HALF",
+    SHOOTOUT: "STATUS_SHOOTOUT",
+    END_OF_EXTRATIME: "STATUS_END_OF_EXTRATIME",
+    IN_PROGRESS: "STATUS_IN_PROGRESS",
+    FINAL: "STATUS_FINAL",
+    FULL_TIME: "STATUS_FULL_TIME",
+    FINAL_PEN: "STATUS_FINAL_PEN",
+    CANCELLED: "STATUS_CANCELLED",
+    POSTPONED: "STATUS_POSTPONED",
+  } as const;
+
+  const FINAL_STATUSES = [
+    "STATUS_FINAL",
+    "STATUS_CANCELLED",
+    "STATUS_FULL_TIME",
+    "STATUS_FINAL_PEN",
+  ];
+
   return (
     <div className="space-y-8">
       <div>
@@ -267,6 +290,46 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
                     ))}
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={methods.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(MATCHUP_STATUSES).map((status) => (
+                        <SelectItem
+                          key={status}
+                          value={status}
+                          disabled={
+                            FINAL_STATUSES.includes(status) &&
+                            status !== row.status
+                          }
+                        >
+                          {status}
+                          {FINAL_STATUSES.includes(status) &&
+                            status !== row.status && (
+                              <span className="text-red-500">
+                                (Cannot change from a final status)
+                              </span>
+                            )}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -539,6 +602,7 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
               )}
             />
           )}
+
           <hr className="my-4" />
           <div className="flex flex-col space-y-2">
             <h4 className="text-lg font-medium">In Progress Actions</h4>
