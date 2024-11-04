@@ -1,6 +1,5 @@
 import { ContentLayout } from "@/components/nav/content-layout";
 import Profile from "@/components/profile/profile";
-import DashboardStats from "@/components/stats/dashboard-stats";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { getUserByUsername } from "@/lib/auth";
