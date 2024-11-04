@@ -416,6 +416,7 @@ export const MatchupCardHeader = ({
       case "STATUS_POSTPONED":
       case "STATUS_CANCELED":
       case "STATUS_SUSPENDED":
+      case "STATUS_DELAYED":
       case "STATUS_RAIN_DELAY":
       case "STATUS_DELAY":
         return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600";
