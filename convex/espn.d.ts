@@ -12,18 +12,28 @@ export type Event = {
 export type ScheduleResponse = {
   type: string;
   content: ScheduleContent;
-}
+};
 
 export type ScheduleContent = {
   schedule: Schedule;
   league: string;
   activeDate: string;
   sport: string;
-}
+};
 
 export type Schedule = {
   [day: string]: ScheduleDay;
-}
+};
+
+export type ScoreboardScheduleResponse = {
+  leagues: ELeague[];
+  events: Event[];
+  eventsDate: {
+    date: string;
+    seasonType: number;
+  };
+  groups: number[];
+};
 
 export type ScheduleDay = {
   leagueName: string;
@@ -31,15 +41,13 @@ export type ScheduleDay = {
   label: string;
   seasonObj: SeasonObj;
   games: Game[];
-
-}
+};
 
 export type SeasonObj = {
   year: number;
   type: number;
   slug: string;
-}
-
+};
 
 export type Game = {
   date: string;
@@ -50,7 +58,7 @@ export type Game = {
   shortName: string;
   status: EventStatus;
   season: SeasonObj;
-}
+};
 
 export type Competition = {
   id?: string;

@@ -130,7 +130,9 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
             width={40}
             className="object-fill"
           />
-          <p className="text-xs text-muted-foreground">{league}</p>
+          <p className="text-xs text-muted-foreground">
+            {league === "COLLEGE-FOOTBALL" ? "CFB" : league}
+          </p>
         </div>
       );
     },

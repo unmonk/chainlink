@@ -14,12 +14,13 @@ export default function ScheduleRunButton() {
       string,
       {
         error: string;
-        gamesOnSchedule: number;
-        inactiveMatchups: number;
-        activeMatchups: number;
         scoreMatchupsCreated: number;
         statMatchupsCreated: number;
+        matchupsFromDatabase: number;
+        matchupsFromEspn: number;
+        existingMatchups: number;
         matchupsUpdated: number;
+        gamesOnSchedule: number;
         games: {
           game: string;
           result: string;
@@ -74,21 +75,19 @@ export default function ScheduleRunButton() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-2 mb-4">
                   <div className="p-3 bg-muted rounded-lg">
                     <div className="text-sm text-muted-foreground">
-                      From ESPN
+                      ESPN Games
                     </div>
                     <div className="text-lg font-medium">
                       {scheduleResponse[league].gamesOnSchedule}
                     </div>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
-                    <div className="text-sm text-muted-foreground">
-                      Active/Inactive
-                    </div>
+                    <div className="text-sm text-muted-foreground"></div>
                     <div className="text-lg font-medium">
+                      Existing Matchups
                       <span className="font-bold">
-                        {scheduleResponse[league].activeMatchups}
-                      </span>{" "}
-                      /{scheduleResponse[league].inactiveMatchups}
+                        {scheduleResponse[league].existingMatchups}
+                      </span>
                     </div>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">

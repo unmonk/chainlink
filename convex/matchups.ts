@@ -11,6 +11,21 @@ import { internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 import { featured_type, matchup_type } from "./schema";
 
+export const deleteMatchup = mutation({
+  args: { matchupId: v.id("matchups") },
+  handler: async (ctx, { matchupId }) => {
+    //get picks
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+    for (const pick of picks) {
+      await ctx.db.delete(pick._id);
+    }
+    await ctx.db.delete(matchupId);
+  },
+});
+
 export const manuallyFinalizeMatchup = mutation({
   args: { matchupId: v.id("matchups"), type: v.string() },
   handler: async (ctx, { matchupId, type }) => {
@@ -197,16 +212,16 @@ export const getMatchupsByLeagueAndTime = query({
   args: { league: v.string(), startTime: v.number() },
   handler: async (ctx, { league, startTime }) => {
     const minus24Hours = startTime - 24 * 60 * 60 * 1000;
-    const plus72Hours = startTime + 72 * 60 * 60 * 1000;
+    const plusOneMonth = startTime + 30 * 24 * 60 * 60 * 1000;
     return await ctx.db
       .query("matchups")
       .withIndex("by_league_time", (q) =>
         q
           .eq("league", league)
           .gte("startTime", minus24Hours)
-          .lte("startTime", plus72Hours)
+          .lte("startTime", plusOneMonth)
       )
-      .take(300);
+      .take(500);
   },
 });
 
