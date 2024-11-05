@@ -20,7 +20,6 @@ export default function Page() {
   const [clerkUser, setClerkUser] = useState<User | null>(null);
 
   useEffect(() => {
-    console.log("userId", userId);
     async function fetchClerkUser() {
       if (!userId) {
         setClerkUser(null);

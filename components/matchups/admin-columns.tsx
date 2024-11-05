@@ -68,7 +68,7 @@ const STATUS_OPTIONS = [
   { value: "STATUS_SUSPENDED", label: "🚫 Suspended" },
   { value: "STATUS_RAIN_DELAY", label: "🌧️ Rain Delay" },
   { value: "STATUS_DELAY", label: "🕒 Delay" },
-
+  { value: "STATUS_DELAYED", label: "🕒 Delayed" },
   // Add other statuses as needed
 ];
 
@@ -130,7 +130,9 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
             width={40}
             className="object-fill"
           />
-          <p className="text-xs text-muted-foreground">{league}</p>
+          <p className="text-xs text-muted-foreground">
+            {league === "COLLEGE-FOOTBALL" ? "CFB" : league}
+          </p>
         </div>
       );
     },
@@ -275,6 +277,7 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
           case "STATUS_SUSPENDED":
           case "STATUS_RAIN_DELAY":
           case "STATUS_DELAY":
+          case "STATUS_DELAYED":
             return <Badge className="bg-yellow-600">{status}</Badge>;
           case "STATUS_FINAL":
           case "STATUS_FULL_TIME":

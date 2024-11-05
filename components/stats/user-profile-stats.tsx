@@ -184,8 +184,12 @@ const UserStats = ({ user }: UserStatsProps) => {
       <CardHeader>
         <CardTitle className="text-center">{user?.name}&apos;s Stats</CardTitle>
         <CardDescription className="text-center text-xl font-bold">
-          <NumberTicker value={winRate} decimalPlaces={2} direction="up" />% Win
-          Rate
+          <NumberTicker
+            value={isNaN(winRate) ? 0 : winRate}
+            decimalPlaces={2}
+            direction="up"
+          />
+          % Win Rate
         </CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center px-2 py-2 flex-wrap gap-1">

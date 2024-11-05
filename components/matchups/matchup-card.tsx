@@ -10,6 +10,7 @@ import { matchupReward } from "@/convex/utils";
 import { MatchupWithPickCounts } from "@/convex/matchups";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { formatDistanceToNow } from "date-fns";
 
 const MatchupCard = ({ matchup }: { matchup: MatchupWithPickCounts }) => {
   return (
@@ -416,6 +417,7 @@ export const MatchupCardHeader = ({
       case "STATUS_POSTPONED":
       case "STATUS_CANCELED":
       case "STATUS_SUSPENDED":
+      case "STATUS_DELAYED":
       case "STATUS_RAIN_DELAY":
       case "STATUS_DELAY":
         return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600";
@@ -445,13 +447,24 @@ export const MatchupCardHeader = ({
           {matchup.status === "STATUS_SCHEDULED" ||
           matchup.status === "STATUS_POSTPONED" ? (
             <p className="text-xs text-gray-800 dark:text-gray-300  font-light">
-              locks at:{" "}
-              {new Date(matchup.startTime).toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "numeric",
-                day: "numeric",
-                month: "short",
-              })}
+              Locks:{" "}
+              {new Date(matchup.startTime).getTime() - Date.now() <
+              1 * 60 * 60 * 1000
+                ? formatDistanceToNow(new Date(matchup.startTime), {
+                    addSuffix: true,
+                  })
+                : new Date(matchup.startTime).setHours(0, 0, 0, 0) ===
+                    new Date().setHours(0, 0, 0, 0)
+                  ? new Date(matchup.startTime).toLocaleString("en-US", {
+                      hour: "numeric",
+                      minute: "numeric",
+                    })
+                  : new Date(matchup.startTime).toLocaleString("en-US", {
+                      hour: "numeric",
+                      minute: "numeric",
+                      day: "numeric",
+                      month: "short",
+                    })}
             </p>
           ) : (
             <div className="">

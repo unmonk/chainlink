@@ -115,7 +115,7 @@ export function AdminUserInfo({
               <div>
                 <p className="text-muted-foreground">Created</p>
                 <p>
-                  {formatDistanceToNow(new Date(user.createdAt), {
+                  {formatDistanceToNow(new Date(user.createdAt ?? 0), {
                     addSuffix: true,
                   })}
                 </p>
@@ -247,10 +247,16 @@ const CoinGamesTag = ({
   return (
     <div className="">
       <Badge variant="outline">
-        🎰{formatDistanceToNow(coinGames.lastSlotSpin)}
+        🎰
+        {coinGames.lastSlotSpin
+          ? formatDistanceToNow(coinGames.lastSlotSpin)
+          : "Not yet played"}
       </Badge>
       <Badge variant="outline">
-        🔄{formatDistanceToNow(coinGames.lastFreeSpin)}
+        🔄
+        {coinGames.lastFreeSpin
+          ? formatDistanceToNow(coinGames.lastFreeSpin)
+          : "Not yet played"}
       </Badge>
     </div>
   );

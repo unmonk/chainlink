@@ -4,6 +4,26 @@ import { action, mutation, query } from "./_generated/server";
 import { League } from "./types";
 import { api } from "./_generated/api";
 
+export const ACTIVE_LEAGUES: League[] = [
+  "NFL",
+  "NBA",
+  "MLB",
+  "NHL",
+  "COLLEGE-FOOTBALL",
+  "MBB",
+  "WBB",
+  "WNBA",
+  "MLS",
+  "NWSL",
+  "EPL",
+  "UFL",
+  "ARG",
+  "TUR",
+  "FRIENDLY",
+  "CSL",
+  "RPL",
+];
+
 export interface ScheduledMessage {
   _id: string;
   _creationTime: number;
@@ -130,26 +150,6 @@ export const matchupReward = (cost: number, featured: boolean) => {
     return cost * 2 > 0 ? cost * 2 : 10;
   }
 };
-
-export const ACTIVE_LEAGUES: League[] = [
-  "NFL",
-  "NBA",
-  "MLB",
-  "NHL",
-  "COLLEGE-FOOTBALL",
-  "MBB",
-  "WBB",
-  "WNBA",
-  "MLS",
-  "NWSL",
-  "EPL",
-  "UFL",
-  "ARG",
-  "TUR",
-  "FRIENDLY",
-  "CSL",
-  "RPL",
-];
 
 export const leagueLogos: {
   [key: string]: string;
