@@ -20,22 +20,18 @@ import {
 import { GiBugNet } from "react-icons/gi";
 import { MdSportsSoccer } from "react-icons/md";
 import { getSportFromLeague } from "@/lib/utils";
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
+import { Card } from "../ui/card";
 import BlurFade from "../ui/blur-fade";
 import { BackgroundGradientSponsored } from "../ui/background-gradient-sponsored";
 import MatchupSkeleton from "./matchup-skeleton";
-import { useUser } from "@clerk/nextjs";
 
 const MatchupList = ({}) => {
-  const { user } = useUser();
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
   const userPick = useQuery(api.picks.getUserActivePick, {});
   const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "available" | "chainBuilder">(
     "all"
   );
-
-  const userIsAdmin = user?.publicMetadata.isAdmin as boolean | false;
 
   const filteredMatchups = useMemo(() => {
     if (!matchups) return [];
@@ -187,10 +183,7 @@ const MatchupList = ({}) => {
                           animate={true}
                           className="rounded-lg overflow-hidden shadow-lg"
                         >
-                          <MatchupCard
-                            matchup={matchup}
-                            isAdmin={userIsAdmin}
-                          />
+                          <MatchupCard matchup={matchup} />
                         </BackgroundGradient>
                       )}
                       {matchup.featuredType === "SPONSORED" && (
@@ -200,10 +193,7 @@ const MatchupList = ({}) => {
                           className="rounded-lg overflow-hidden shadow-lg"
                           color={matchup.metadata.sponsoredData.color}
                         >
-                          <MatchupCard
-                            matchup={matchup}
-                            isAdmin={userIsAdmin}
-                          />
+                          <MatchupCard matchup={matchup} />
                         </BackgroundGradientSponsored>
                       )}
                     </BlurFade>
@@ -215,7 +205,7 @@ const MatchupList = ({}) => {
                       delay={0.25 * idx * 0.01}
                       inView
                     >
-                      <MatchupCard matchup={matchup} isAdmin={userIsAdmin} />
+                      <MatchupCard matchup={matchup} />
                     </BlurFade>
                   );
                 }

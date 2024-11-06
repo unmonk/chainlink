@@ -15,13 +15,7 @@ import html2canvas from "html2canvas";
 import { useRef } from "react";
 import { DownloadIcon } from "lucide-react";
 
-const MatchupCard = ({
-  matchup,
-  isAdmin,
-}: {
-  matchup: MatchupWithPickCounts;
-  isAdmin: boolean;
-}) => {
+const MatchupCard = ({ matchup }: { matchup: MatchupWithPickCounts }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleShare = async () => {
@@ -72,11 +66,7 @@ const MatchupCard = ({
         <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
           <Link href={`/matchups/${matchup._id}`}>{matchup.title}</Link>
         </CardTitle>
-        <MatchupCardButtons
-          matchup={matchup}
-          isAdmin={isAdmin}
-          handleShare={handleShare}
-        />
+        <MatchupCardButtons matchup={matchup} handleShare={handleShare} />
       </Card>
     </div>
   );
@@ -86,11 +76,9 @@ export default MatchupCard;
 
 const MatchupCardButtons = ({
   matchup,
-  isAdmin,
   handleShare,
 }: {
   matchup: MatchupWithPickCounts;
-  isAdmin: boolean;
   handleShare: () => void;
 }) => {
   const currentlyWinning =
