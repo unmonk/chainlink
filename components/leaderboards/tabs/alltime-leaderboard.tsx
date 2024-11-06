@@ -34,7 +34,7 @@ export function AllTimeLeaderboard({ data }: { data: any[] }) {
             stats={
               <div className="flex flex-row gap-2 items-center justify-center">
                 Total Wins:{" "}
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-primary">
                   {calculateTotalWins(
                     sortedData[0].user?.monthlyStats as UserMonthlyStats
                   )}
@@ -54,7 +54,7 @@ export function AllTimeLeaderboard({ data }: { data: any[] }) {
             stats={
               <div className="flex flex-row gap-2 items-center justify-center">
                 Total Wins:{" "}
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-primary">
                   {calculateTotalWins(
                     sortedData[1].user?.monthlyStats as UserMonthlyStats
                   )}
@@ -70,7 +70,7 @@ export function AllTimeLeaderboard({ data }: { data: any[] }) {
             stats={
               <div className="flex flex-row gap-2 items-center justify-center">
                 Total Wins:{" "}
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-primary">
                   {calculateTotalWins(
                     sortedData[2].user?.monthlyStats as UserMonthlyStats
                   )}
@@ -97,7 +97,7 @@ export function AllTimeLeaderboard({ data }: { data: any[] }) {
                 </div>
                 <div className="flex items-center gap-2">
                   Total Wins:{" "}
-                  <h2 className="text-xl font-bold">
+                  <h2 className="text-xl font-bold text-primary">
                     {calculateTotalWins(
                       entry.user?.monthlyStats as UserMonthlyStats
                     )}

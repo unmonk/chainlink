@@ -540,3 +540,37 @@ export const updateMatchup = mutation({
     });
   },
 });
+
+export const getNextChainBuilderMatchup = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("matchups")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("featured"), true),
+          q.eq(q.field("featuredType"), "CHAINBUILDER"),
+          q.gte(q.field("startTime"), new Date().getTime())
+        )
+      )
+      .order("asc")
+      .first();
+  },
+});
+
+export const getNext3ChainBuilderMatchups = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("matchups")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("featured"), true),
+          q.eq(q.field("featuredType"), "CHAINBUILDER"),
+          q.gte(q.field("startTime"), new Date().getTime())
+        )
+      )
+      .order("asc")
+      .take(5);
+  },
+});

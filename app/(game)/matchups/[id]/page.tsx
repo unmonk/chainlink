@@ -2,10 +2,13 @@
 import MatchupView from "@/components/matchups/matchup-view";
 import { ContentLayout } from "@/components/nav/content-layout";
 import { BackButton } from "@/components/ui/back-button";
+import { Button } from "@/components/ui/button";
 import Loading from "@/components/ui/loading";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
+import { ExternalLinkIcon } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 
@@ -53,7 +56,29 @@ export default function Page({ params }: { params: { id: string } }) {
     <ContentLayout
       title={`${matchup?.homeTeam.name} vs ${matchup?.awayTeam.name}`}
     >
-      <MatchupView data={summary} league={matchup?.league as string} />
+      <Suspense fallback={<Loading />}>
+        {matchup?.league === "MBB" || matchup?.league === "WBB" ? (
+          <div className="text-center text-muted-foreground">
+            <p>Summary view for this league is not supported yet.</p>
+            <p>Check back soon!</p>
+            <Link
+              href={`https://www.espn.com/${
+                matchup?.league === "MBB"
+                  ? "mens-college-basketball"
+                  : "womens-college-basketball"
+              }/game/_/gameId/${matchup.gameId}`}
+              target="_blank"
+              passHref
+            >
+              <Button variant="outline">
+                <ExternalLinkIcon className="w-4 h-4 mr-2" /> View Game on ESPN
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <MatchupView data={summary} league={matchup?.league as string} />
+        )}
+      </Suspense>
     </ContentLayout>
   );
 }
@@ -67,9 +92,9 @@ const getSummaryUrlByLeagueAndGameId = (league: string, gameId: string) => {
     case "UFL":
       return `https://site.api.espn.com/apis/site/v2/sports/football/ufl/summary?event=${gameId}`;
     case "MBB":
-      return `https://site.api.espn.com/apis/site/v2/sports/basketball/college-basketball/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/?event=${gameId}`;
     case "WBB":
-      return `https://site.api.espn.com/apis/site/v2/sports/basketball/college-basketball/summary?event=${gameId}`;
+      return `https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/summary?event=${gameId}`;
     case "MLB":
       return `https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/summary?event=${gameId}`;
     case "NBA":

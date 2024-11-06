@@ -11,16 +11,74 @@ import { MatchupWithPickCounts } from "@/convex/matchups";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import html2canvas from "html2canvas";
+import { useRef } from "react";
+import { DownloadIcon } from "lucide-react";
 
-const MatchupCard = ({ matchup }: { matchup: MatchupWithPickCounts }) => {
+const MatchupCard = ({
+  matchup,
+  isAdmin,
+}: {
+  matchup: MatchupWithPickCounts;
+  isAdmin: boolean;
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleShare = async () => {
+    if (!cardRef.current) return;
+
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2, // Higher quality
+      });
+
+      // Convert to blob
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+
+        // Create sharing data
+        const files = [new File([blob], "matchup.png", { type: "image/png" })];
+
+        // if (navigator.share && navigator.canShare({ files })) {
+        //   // Use native sharing if available
+        //   navigator
+        //     .share({
+        //       files,
+        //       title: matchup.title,
+        //       text: `Check out this matchup: ${matchup.title}`,
+        //     })
+        //     .catch(console.error);
+        // } else {
+        // Fallback: download the image
+        const link = document.createElement("a");
+        link.download = "matchup.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        // }
+      }, "image/png");
+
+      toast.success("Image generated successfully!");
+    } catch (error) {
+      console.error("Error generating image:", error);
+      toast.error("Failed to generate image");
+    }
+  };
+
   return (
-    <Card className="rounded-t-none flex flex-col h-full">
-      <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
-      <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
-        {matchup.title}
-      </CardTitle>
-      <MatchupCardButtons matchup={matchup} />
-    </Card>
+    <div>
+      <Card className="rounded-t-none flex flex-col h-full" ref={cardRef}>
+        <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
+        <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
+          <Link href={`/matchups/${matchup._id}`}>{matchup.title}</Link>
+        </CardTitle>
+        <MatchupCardButtons
+          matchup={matchup}
+          isAdmin={isAdmin}
+          handleShare={handleShare}
+        />
+      </Card>
+    </div>
   );
 };
 
@@ -28,8 +86,12 @@ export default MatchupCard;
 
 const MatchupCardButtons = ({
   matchup,
+  isAdmin,
+  handleShare,
 }: {
   matchup: MatchupWithPickCounts;
+  isAdmin: boolean;
+  handleShare: () => void;
 }) => {
   const currentlyWinning =
     matchup.awayTeam.score === matchup.homeTeam.score
@@ -222,7 +284,9 @@ const MatchupCardButtons = ({
       <div className="grid grid-cols-3 items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border">
         <p className="text-sm">
           {matchup.featured && matchup.featuredType === "CHAINBUILDER" && (
-            <span className="text-primary">Chain Builder🖇️</span>
+            <div className="flex flex-col">
+              <span className="text-primary">🖇️Chain Builder</span>
+            </div>
           )}
           {matchup.featured && matchup.featuredType === "SPONSORED" && (
             <span
@@ -231,6 +295,13 @@ const MatchupCardButtons = ({
               Sponsored
             </span>
           )}
+          <div
+            onClick={handleShare}
+            className="text-xs cursor-pointer flex flex-row items-center justify-center hover:bg-accent/50 rounded-sm px-1"
+          >
+            <DownloadIcon className="w-3 h-3 mr-1" />
+            <span>Share Matchup</span>
+          </div>
         </p>
         <div className="flex flex-col items-center justify-center">
           {(matchup.status === "STATUS_SCHEDULED" ||
@@ -368,10 +439,10 @@ const MatchupPickButton = ({
       variant={"outline"}
       className={
         winnerId === id
-          ? "border-primary border relative aspect-square h-5/6 w-5/6 overflow-hidden"
+          ? "border-primary border relative aspect-square h-26 md:h-36 w-26 md:w-36 p-1 overflow-hidden"
           : currentlyWinning === id
-            ? "border-accent-foreground/50 border-4 relative aspect-square h-5/6 w-5/6 overflow-hidden"
-            : "relative aspect-square h-5/6 w-5/6 overflow-hidden"
+            ? "border-accent-foreground/50 border-4 relative aspect-square h-26 md:h-36 w-26 md:w-36 p-1 overflow-hidden"
+            : "relative aspect-square h-26 md:h-36 w-26 md:w-36 p-1 overflow-hidden"
       }
       disabled={disabled}
       onClick={handleClick}
@@ -379,15 +450,15 @@ const MatchupPickButton = ({
       <Image
         src={image}
         alt={name}
-        className="hover:scale-110 transition-transform duration-300 ease-in-out"
-        sizes={"100%"}
+        className="hover:scale-110 transition-transform duration-300 ease-in-out object-contain"
+        sizes="100%"
         width={100}
-        priority={true}
         height={100}
+        priority={true}
         style={{
-          maxWidth: "100%",
-          height: "auto",
           width: "100%",
+          height: "100%",
+          objectFit: "contain",
         }}
       />
     </Button>
@@ -487,3 +558,20 @@ export const MatchupCardHeader = ({
     </div>
   );
 };
+
+const ShareIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+    <polyline points="16 6 12 2 8 6" />
+    <line x1="12" y1="2" x2="12" y2="15" />
+  </svg>
+);

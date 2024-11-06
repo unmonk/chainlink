@@ -5,6 +5,7 @@ import { Card, CardContent } from "../ui/card";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
 import { getImageUrl } from "@/convex/utils";
+import { Badge } from "../ui/badge";
 
 export default function AchievementCard({
   achievement,
@@ -40,6 +41,14 @@ export default function AchievementCard({
             <p className="text-sm text-muted-foreground text-pretty">
               {achievement.description}
             </p>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">
+                <p className="text-lg font-semibold mr-1 text-primary">
+                  {achievement.count}
+                </p>
+                x
+              </Badge>
+            </div>
           </div>
         </div>
       </CardContent>
