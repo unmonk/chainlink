@@ -18,7 +18,7 @@ export function WinsLeaderboard({ data }: { data: any[] }) {
             stats={
               <div className="flex flex-row gap-2 items-center justify-center">
                 Current Wins:{" "}
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-primary">
                   {sortedData[0].chain.wins}
                 </h2>
               </div>
@@ -36,7 +36,7 @@ export function WinsLeaderboard({ data }: { data: any[] }) {
             stats={
               <div className="flex flex-row gap-2 items-center justify-center">
                 Current Wins:{" "}
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-primary">
                   {sortedData[1].chain.wins}
                 </h2>
               </div>
@@ -50,7 +50,7 @@ export function WinsLeaderboard({ data }: { data: any[] }) {
             stats={
               <div className="flex flex-row gap-2 items-center justify-center">
                 Current Wins:{" "}
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-primary">
                   {sortedData[2].chain.wins}
                 </h2>
               </div>
@@ -75,7 +75,9 @@ export function WinsLeaderboard({ data }: { data: any[] }) {
                 </div>
                 <div className="flex items-center gap-2">
                   Current Wins:{" "}
-                  <h2 className="text-xl font-bold">{entry.chain.wins}</h2>
+                  <h2 className="text-xl font-bold text-primary">
+                    {entry.chain.wins}
+                  </h2>
                 </div>
               </div>
             </Card>

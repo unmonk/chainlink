@@ -21,6 +21,7 @@ import type * as campaigns from "../campaigns.js";
 import type * as chains from "../chains.js";
 import type * as coingames from "../coingames.js";
 import type * as crons from "../crons.js";
+import type * as discord from "../discord.js";
 import type * as espnbracket from "../espnbracket.js";
 import type * as friends from "../friends.js";
 import type * as leaderboards from "../leaderboards.js";
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   chains: typeof chains;
   coingames: typeof coingames;
   crons: typeof crons;
+  discord: typeof discord;
   espnbracket: typeof espnbracket;
   friends: typeof friends;
   leaderboards: typeof leaderboards;

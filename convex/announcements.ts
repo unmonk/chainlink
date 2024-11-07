@@ -1,6 +1,8 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { announcement_type } from "./schema";
+import { sendNewsNotification } from "./discord";
+import { api } from "./_generated/api";
 
 export const getActive = query({
   args: {},
@@ -65,6 +67,17 @@ export const createAnnouncement = mutation({
       imageStorageId: args.announcement.imageStorageId,
       link: args.announcement.link,
     });
+    // try {
+    //   await ctx.scheduler.runAfter(0, api.discord.sendNewsNotification, {
+    //     title: args.announcement.title,
+    //     description: args.announcement.content,
+    //     type: args.announcement.type,
+    //     image: args.announcement.image || undefined,
+    //     url: args.announcement.link || undefined,
+    //   });
+    // } catch (error) {
+    //   console.error(error);
+    // }
     return announcement;
   },
 });

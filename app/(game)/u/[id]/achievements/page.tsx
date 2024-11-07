@@ -146,7 +146,14 @@ export default async function UserAchievementsPage({ params: { id } }: Props) {
               )}
               {mergedAchievements.map((achievement) => (
                 <TableRow key={achievement._id}>
-                  <TableCell>{achievement.name}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <p className="font-semibold">{achievement.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {achievement.description}
+                      </p>
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
                     {achievement.count}
                   </TableCell>
