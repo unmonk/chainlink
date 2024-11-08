@@ -51,10 +51,9 @@ export const createMassNotification = action({
   },
   handler: async (ctx, { payload }) => {
     console.log("Starting mass notification");
-    const users = await (
-      await clerkClient()
-    ).users.getUserList({
+    const users = await clerkClient().users.getUserList({
       limit: 1000,
+      orderBy: "+username",
     });
     console.log(`Found ${users.data.length} users`);
 
