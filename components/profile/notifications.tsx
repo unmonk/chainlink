@@ -80,10 +80,10 @@ export default function SendNotification() {
   const updateMetadata = async (key: string, value: boolean) => {
     if (user) {
       try {
-        await fetch("/notification/metadata", {
+        const response = await fetch("/notification/metadata", {
           method: "POST",
           headers: {
-            "Content-type": "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             userId: user.user?.id,
@@ -91,6 +91,15 @@ export default function SendNotification() {
             value: value,
           }),
         });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error("Failed to update metadata");
+        }
       } catch (error) {
         console.error("Error updating metadata:", error);
       }
@@ -132,29 +141,39 @@ export default function SendNotification() {
       console.error("No SW registration available.");
       return;
     }
-    const sub = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: base64ToUint8Array(
-        process.env.NEXT_PUBLIC_WEB_PUSH_KEY
-      ),
-    });
-    // TODO: you should call your API to save subscription data on the server in order to send web push notification from the server
-    const response = await fetch("/notification/metadata", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        subscription: sub,
-        userId: user.user?.id,
-        type: "subscribe",
-      }),
-    });
-    const data = await response.json();
-    if (data.success) {
-      setSubscription(sub);
-      setIsSubscribed(true);
-    } else {
+    try {
+      const sub = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: base64ToUint8Array(
+          process.env.NEXT_PUBLIC_WEB_PUSH_KEY
+        ),
+      });
+
+      const response = await fetch("/notification/metadata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscription: JSON.parse(JSON.stringify(sub)),
+          userId: user.user?.id,
+          type: "subscribe",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setSubscription(sub);
+        setIsSubscribed(true);
+      } else {
+        throw new Error("Subscription failed");
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
       setSubscription(null);
       setIsSubscribed(false);
     }
@@ -169,7 +188,7 @@ export default function SendNotification() {
     const response = await fetch("/notification/metadata", {
       method: "POST",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         subscription: subscription,
@@ -198,7 +217,7 @@ export default function SendNotification() {
       await fetch("/notification", {
         method: "POST",
         headers: {
-          "Content-type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           subscription,
@@ -228,7 +247,6 @@ export default function SendNotification() {
       } else {
         console.error(err);
       }
-      alert("An error happened.");
     }
   };
 

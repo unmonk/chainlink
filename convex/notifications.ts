@@ -50,46 +50,42 @@ export const createMassNotification = action({
     }),
   },
   handler: async (ctx, { payload }) => {
-    console.log("Creating mass notification", payload);
+    console.log("Starting mass notification");
     const users = await (
       await clerkClient()
     ).users.getUserList({
       limit: 1000,
     });
+    console.log(`Found ${users.data.length} users`);
+
     const imageUrl =
       payload.notification.storageId &&
       (await ctx.storage.getUrl(payload.notification.storageId));
 
     let notificationsSent = 0;
+    let skippedUsers = 0;
+
     for (const user of users.data) {
       const userPushSubscriptions = user.privateMetadata
         .pushSubscriptions as webPush.PushSubscription[];
-      if (!userPushSubscriptions) {
-        continue;
-        //throw new ConvexError("USER_PUSH_SUBSCRIPTIONS_NOT_FOUND");
-      }
-      for (const subscription of userPushSubscriptions) {
-        console.log(
-          "Sending notification to",
-          user.username,
-          subscription.endpoint
-        );
 
+      if (!userPushSubscriptions?.length) {
+        skippedUsers++;
+        console.log(`Skipping user ${user.id} - no push subscriptions`);
+        continue;
+      }
+
+      console.log(
+        `Processing user ${user.id} with ${userPushSubscriptions.length} subscriptions`
+      );
+
+      for (const subscription of userPushSubscriptions) {
         try {
           webPush.setVapidDetails(
             `mailto:${process.env.WEB_PUSH_EMAIL}`,
             process.env.NEXT_PUBLIC_WEB_PUSH_KEY!,
             process.env.WEB_PUSH_PRIVATE_KEY!
           );
-
-          console.log("Sending notification", {
-            ...payload.notification,
-            image: imageUrl,
-            badge: imageUrl,
-            icon: imageUrl,
-            url: payload.notification.clickActionUrl,
-            tag: payload.notification.tag,
-          });
 
           await webPush.sendNotification(
             subscription,
@@ -104,30 +100,37 @@ export const createMassNotification = action({
           );
           notificationsSent++;
         } catch (err) {
+          console.error(`Error sending notification to user ${user.id}:`, err);
+
           if (err instanceof webPush.WebPushError) {
             if (err.statusCode === 410 || err.statusCode === 404) {
-              //Subscription is expired or invalid
+              console.log(`Removing invalid subscription for user ${user.id}`);
               try {
-                await fetch(
-                  `${process.env.NEXT_PUBLIC_APP_URL}/notification/metadata`,
-                  {
-                    method: "POST",
-                    body: JSON.stringify({
-                      subscription,
-                      userId: user.id,
-                      type: "unsubscribe",
-                    }),
-                  }
+                await unsubscribeUserFromPush(subscription, user.id);
+              } catch (unsubErr) {
+                console.error(
+                  "Error in mass notification unsubscribe:",
+                  unsubErr
                 );
-              } catch (err) {
-                console.error("Error unsubscribing user", err);
+                // Continue with other notifications even if unsubscribe fails
               }
             }
           }
         }
       }
     }
-    return notificationsSent;
+
+    console.log(`Mass notification complete:
+      - Total users: ${users.data.length}
+      - Notifications sent: ${notificationsSent}
+      - Users skipped: ${skippedUsers}
+    `);
+
+    return {
+      totalUsers: users.data.length,
+      notificationsSent,
+      skippedUsers,
+    };
   },
 });
 
@@ -194,21 +197,14 @@ export const sendNotification = action({
       } catch (err) {
         if (err instanceof webPush.WebPushError) {
           if (err.statusCode === 410 || err.statusCode === 404) {
-            //Subscription is expired or invalid
             try {
-              await fetch(
-                `${process.env.NEXT_PUBLIC_APP_URL}/notification/metadata`,
-                {
-                  method: "POST",
-                  body: JSON.stringify({
-                    subscription,
-                    userId: clerkId,
-                    type: "unsubscribe",
-                  }),
-                }
+              await unsubscribeUserFromPush(subscription, clerkId);
+            } catch (unsubErr) {
+              console.error(
+                "Error in single notification unsubscribe:",
+                unsubErr
               );
-            } catch (err) {
-              console.error("Error unsubscribing user", err);
+              // Continue with other subscriptions even if unsubscribe fails
             }
           }
         }
@@ -216,6 +212,29 @@ export const sendNotification = action({
     }
   },
 });
+
+async function unsubscribeUserFromPush(
+  subscription: webPush.PushSubscription,
+  userId: string
+) {
+  try {
+    await fetch("/notification/metadata", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        subscription: subscription,
+        userId: userId,
+        type: "unsubscribe",
+      }),
+    });
+  } catch (unknownError) {
+    const error = unknownError as Error;
+    console.error("Failed to unsubscribe user:", userId, error);
+    throw new ConvexError(`Failed to unsubscribe user: ${error.message}`);
+  }
+}
 
 // Create a helper function for pick notifications
 function createPickNotificationPayload(
