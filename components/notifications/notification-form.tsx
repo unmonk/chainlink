@@ -298,57 +298,56 @@ export default function NotificationForm() {
                       <AlertDialogDescription>
                         This action will send a push notification to all users
                         of the application. This action cannot be undone.
-                        <div className="bg-slate-100 p-4 rounded-lg shadow-inner mt-4">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <Image
-                              src="/icons/icon-192x192.png"
-                              width={192}
-                              height={192}
-                              className="h-5 w-5 text-black"
-                              alt="Notification icon"
-                            />
-                            <span className="font-semibold text-sm text-slate-600">
-                              ChainLink
-                            </span>
-                          </div>
-                          <div className="flex">
-                            {showImage && (
-                              <div className="mr-3">
-                                <Image
-                                  src={
-                                    image
-                                      ? URL.createObjectURL(image)
-                                      : "/icons/favicon-16x16.png"
-                                  }
-                                  alt="Notification image"
-                                  width={64}
-                                  height={64}
-                                  className="w-16 h-16 object-cover rounded"
-                                />
-                              </div>
-                            )}
-                            <div>
-                              <h3 className="font-bold mb-1 text-black">
-                                {form.watch("title") || "Notification Title"}
-                              </h3>
-                              <p className="text-sm text-slate-600">
-                                {form.watch("message") ||
-                                  "Notification body will appear here."}
-                              </p>
-                              {showCta && (
-                                <Button
-                                  variant="link"
-                                  className="p-0 h-auto mt-2 text-blue-500"
-                                >
-                                  {form.watch("cta") || "Click here"}
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
                       </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogContent></AlertDialogContent>
+                    <div className="bg-slate-100 p-4 rounded-lg shadow-inner mt-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Image
+                          src="/icons/icon-192x192.png"
+                          width={192}
+                          height={192}
+                          className="h-5 w-5 text-black"
+                          alt="Notification icon"
+                        />
+                        <span className="font-semibold text-sm text-slate-600">
+                          ChainLink
+                        </span>
+                      </div>
+                      <div className="flex">
+                        {showImage && (
+                          <div className="mr-3">
+                            <Image
+                              src={
+                                image
+                                  ? URL.createObjectURL(image)
+                                  : "/icons/favicon-16x16.png"
+                              }
+                              alt="Notification image"
+                              width={64}
+                              height={64}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <h3 className="font-bold mb-1 text-black">
+                            {form.watch("title") || "Notification Title"}
+                          </h3>
+                          <p className="text-sm text-slate-600">
+                            {form.watch("message") ||
+                              "Notification body will appear here."}
+                          </p>
+                          {showCta && (
+                            <Button
+                              variant="link"
+                              className="p-0 h-auto mt-2 text-blue-500"
+                            >
+                              {form.watch("cta") || "Click here"}
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
@@ -372,56 +371,55 @@ export default function NotificationForm() {
               How your notification will appear on web.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="bg-slate-100 p-4 rounded-lg shadow-inner">
-              <div className="flex items-center space-x-2 mb-2">
-                <Image
-                  src="/icons/icon-192x192.png"
-                  width={192}
-                  height={192}
-                  className="h-5 w-5 text-black"
-                  alt="Notification icon"
-                />
-                <span className="font-semibold text-sm text-slate-600">
-                  ChainLink
-                </span>
-              </div>
-              <div className="flex">
-                {showImage && (
-                  <div className="mr-3">
-                    <Image
-                      src={
-                        image
-                          ? URL.createObjectURL(image)
-                          : "/icons/favicon-16x16.png"
-                      }
-                      alt="Notification image"
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  </div>
-                )}
-                <div>
-                  <h3 className="font-bold mb-1 text-black">
-                    {form.watch("title") || "Notification Title"}
-                  </h3>
-                  <p className="text-sm text-slate-600">
-                    {form.watch("message") ||
-                      "Notification body will appear here."}
-                  </p>
-                  {showCta && (
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto mt-2 text-blue-500"
-                    >
-                      {form.watch("cta") || "Click here"}
-                    </Button>
-                  )}
+
+          <div className="bg-slate-100 p-4 rounded-lg shadow-inner">
+            <div className="flex items-center space-x-2 mb-2">
+              <Image
+                src="/icons/icon-192x192.png"
+                width={192}
+                height={192}
+                className="h-5 w-5 text-black"
+                alt="Notification icon"
+              />
+              <span className="font-semibold text-sm text-slate-600">
+                ChainLink
+              </span>
+            </div>
+            <div className="flex">
+              {showImage && (
+                <div className="mr-3">
+                  <Image
+                    src={
+                      image
+                        ? URL.createObjectURL(image)
+                        : "/icons/favicon-16x16.png"
+                    }
+                    alt="Notification image"
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 object-cover rounded"
+                  />
                 </div>
+              )}
+              <div>
+                <h3 className="font-bold mb-1 text-black">
+                  {form.watch("title") || "Notification Title"}
+                </h3>
+                <p className="text-sm text-slate-600">
+                  {form.watch("message") ||
+                    "Notification body will appear here."}
+                </p>
+                {showCta && (
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto mt-2 text-blue-500"
+                  >
+                    {form.watch("cta") || "Click here"}
+                  </Button>
+                )}
               </div>
             </div>
-          </CardContent>
+          </div>
         </Card>
 
         <Card>
@@ -431,69 +429,68 @@ export default function NotificationForm() {
               How your notification will appear on Android.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="bg-slate-100 p-4 rounded-lg shadow-inner">
-              <div className="flex justify-between items-center mb-2 text-xs text-slate-600">
-                <span>12:00</span>
-                <div className="flex items-center space-x-1">
-                  <Wifi className="h-4 w-4" />
-                  <Battery className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="bg-white rounded-md shadow-sm p-3">
-                <div className="flex items-start">
-                  <div className="bg-white rounded-full p-2 mr-3">
-                    <Image
-                      src="/icons/icon-192x192.png"
-                      width={192}
-                      height={192}
-                      className="h-4 w-4 text-black"
-                      alt="Notification icon"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-start">
-                      <span className="font-semibold text-sm text-black">
-                        ChainLink
-                      </span>
-                      <span className="text-xs text-slate-500">now</span>
-                    </div>
-                    <h4 className="font-bold text-sm mt-1 text-black">
-                      {form.watch("title") || "Notification Title"}
-                    </h4>
-                    <p className="text-xs text-slate-600 mt-1">
-                      {form.watch("message") ||
-                        "Notification body will appear here."}
-                    </p>
-                    {showImage && (
-                      <div className="mt-2">
-                        <Image
-                          src={
-                            image
-                              ? URL.createObjectURL(image)
-                              : "/icons/favicon-16x16.png"
-                          }
-                          alt="Notification image"
-                          className="w-full h-32 object-cover rounded"
-                          width={128}
-                          height={128}
-                        />
-                      </div>
-                    )}
-                    {showCta && (
-                      <Button
-                        variant="link"
-                        className="p-0 h-auto mt-2 text-blue-500 text-xs"
-                      >
-                        {form.watch("cta") || "Click here"}
-                      </Button>
-                    )}
-                  </div>
-                  <MoreVertical className="h-4 w-4 text-slate-400 ml-2" />
-                </div>
+
+          <div className="bg-slate-100 p-4 rounded-lg shadow-inner">
+            <div className="flex justify-between items-center mb-2 text-xs text-slate-600">
+              <span>12:00</span>
+              <div className="flex items-center space-x-1">
+                <Wifi className="h-4 w-4" />
+                <Battery className="h-4 w-4" />
               </div>
             </div>
-          </CardContent>
+            <div className="bg-white rounded-md shadow-sm p-3">
+              <div className="flex items-start">
+                <div className="bg-white rounded-full p-2 mr-3">
+                  <Image
+                    src="/icons/icon-192x192.png"
+                    width={192}
+                    height={192}
+                    className="h-4 w-4 text-black"
+                    alt="Notification icon"
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <span className="font-semibold text-sm text-black">
+                      ChainLink
+                    </span>
+                    <span className="text-xs text-slate-500">now</span>
+                  </div>
+                  <h4 className="font-bold text-sm mt-1 text-black">
+                    {form.watch("title") || "Notification Title"}
+                  </h4>
+                  <p className="text-xs text-slate-600 mt-1">
+                    {form.watch("message") ||
+                      "Notification body will appear here."}
+                  </p>
+                  {showImage && (
+                    <div className="mt-2">
+                      <Image
+                        src={
+                          image
+                            ? URL.createObjectURL(image)
+                            : "/icons/favicon-16x16.png"
+                        }
+                        alt="Notification image"
+                        className="w-full h-32 object-cover rounded"
+                        width={128}
+                        height={128}
+                      />
+                    </div>
+                  )}
+                  {showCta && (
+                    <Button
+                      variant="link"
+                      className="p-0 h-auto mt-2 text-blue-500 text-xs"
+                    >
+                      {form.watch("cta") || "Click here"}
+                    </Button>
+                  )}
+                </div>
+                <MoreVertical className="h-4 w-4 text-slate-400 ml-2" />
+              </div>
+            </div>
+          </div>
         </Card>
       </div>
     </div>

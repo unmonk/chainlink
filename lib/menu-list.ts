@@ -116,6 +116,13 @@ export function getMenuList(pathname: string): Group[] {
           icon: LayoutGrid,
           submenus: [],
         },
+        {
+          href: "/u",
+          label: "My Profile",
+          active: pathname.includes("/u/"),
+          icon: UserRound,
+          submenus: [],
+        },
       ],
     },
     {
@@ -179,13 +186,6 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: "Other",
       menus: [
-        {
-          href: "/u",
-          label: "My Profile",
-          active: pathname.includes("/u/"),
-          icon: UserRound,
-          submenus: [],
-        },
         {
           href: "/friends",
           label: "Friends",
