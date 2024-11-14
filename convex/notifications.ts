@@ -217,16 +217,21 @@ async function unsubscribeUserFromPush(
   userId: string
 ) {
   try {
-    await fetch("/notification/metadata", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    // Use the Clerk API directly instead of making a fetch request
+    const clerk = await clerkClient();
+    const user = await clerk.users.getUser(userId);
+
+    const currentSubscriptions = (user.privateMetadata.pushSubscriptions ||
+      []) as webPush.PushSubscription[];
+    const updatedSubscriptions = currentSubscriptions.filter(
+      (sub) => sub.endpoint !== subscription.endpoint
+    );
+
+    await clerk.users.updateUser(userId, {
+      privateMetadata: {
+        ...user.privateMetadata,
+        pushSubscriptions: updatedSubscriptions,
       },
-      body: JSON.stringify({
-        subscription: subscription,
-        userId: userId,
-        type: "unsubscribe",
-      }),
     });
   } catch (unknownError) {
     const error = unknownError as Error;
