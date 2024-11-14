@@ -23,6 +23,7 @@ import {
   TableHead,
 } from "../ui/table";
 import { Badge } from "../ui/badge";
+import { toast } from "sonner";
 
 export default function Blackjack({ userId }: { userId: Id<"users"> }) {
   const [betAmount, setBetAmount] = useState(10);
@@ -37,21 +38,33 @@ export default function Blackjack({ userId }: { userId: Id<"users"> }) {
   const hit = useMutation(api.blackjack.hit);
   const stand = useMutation(api.blackjack.stand);
 
-  console.log(game);
+  console.log(canPlay);
 
   const handleStartGame = (useFreePlay = false) => {
-    startGame({ betAmount, useFreePlay });
+    try {
+      startGame({ betAmount, useFreePlay });
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
   };
 
   const handleHit = () => {
     if (game?._id) {
-      hit({ gameId: game._id });
+      try {
+        hit({ gameId: game._id });
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
     }
   };
 
   const handleStand = () => {
     if (game?._id) {
-      stand({ gameId: game._id });
+      try {
+        stand({ gameId: game._id });
+      } catch (error) {
+        toast.error((error as Error).message);
+      }
     }
   };
 
@@ -160,7 +173,6 @@ export default function Blackjack({ userId }: { userId: Id<"users"> }) {
                 {canPlay?.canPlayFree && (
                   <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-75 animate-pulse blur-sm" />
                 )}
-
                 <span className="relative z-10">Free Play</span>
               </Button>
               <p className="text-xs text-muted-foreground">

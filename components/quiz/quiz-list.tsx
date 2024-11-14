@@ -44,8 +44,6 @@ export function QuizList({
     return quiz.status !== "DRAFT" && quiz.status !== "CLOSED";
   });
 
-  console.log(filteredQuizzes, "filteredQuizzes");
-
   return (
     <div className="space-y-4 gap-2 flex flex-col">
       {filteredQuizzes.map((quiz) => (

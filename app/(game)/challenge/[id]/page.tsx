@@ -96,7 +96,7 @@ export default function ChallengePage({ params }: QuizPageProps) {
                   Wager Range
                 </span>
                 <Badge variant="outline">
-                  {quiz.quiz.minWager} - {quiz.quiz.maxWager} coins
+                  {quiz.quiz.minWager} - {quiz.quiz.maxWager} 🔗 Links
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
@@ -121,7 +121,7 @@ export default function ChallengePage({ params }: QuizPageProps) {
       </Suspense>
       <Suspense fallback={<Loading />}>
         {!quiz.responses || quiz.responses.length === 0 ? (
-          <Card>
+          <Card className="mt-4">
             <CardHeader>
               <CardTitle>Responses</CardTitle>
             </CardHeader>

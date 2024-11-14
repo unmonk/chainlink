@@ -354,7 +354,9 @@ export const scoreboards = action({
       leagueResponse.message = "SUCCESS";
       actionResponse[league] = leagueResponse;
     }
-    console.log(actionResponse);
+    if (process.env.NODE_ENV === "development") {
+      console.log(actionResponse);
+    }
     return actionResponse;
   },
 });

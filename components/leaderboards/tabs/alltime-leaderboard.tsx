@@ -24,7 +24,7 @@ export function AllTimeLeaderboard({ data }: { data: any[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold">Current Best Chain</h2>
+      <h2 className="text-2xl font-bold">All Time Wins</h2>
 
       {/* Leader Card */}
       <div className="grid grid-cols-1 gap-6">

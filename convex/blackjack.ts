@@ -170,13 +170,16 @@ export const canPlay = query({
     let canPlay = false;
     if (user.coins >= betAmount) canPlay = true;
 
-    const lastFreeBlackjack = user.coinGames?.lastFreeBlackjack ?? 0;
-    const canPlayFree = Date.now() - lastFreeBlackjack >= freePeriod;
+    const lastFreeBlackjack = user.coinGames?.lastFreeBlackjack;
 
-    // Calculate next free spin time if can't spin now
-    const nextFreeBlackjack = canPlayFree
-      ? null
-      : new Date(lastFreeBlackjack + freePeriod).getTime();
+    let canPlayFree = false;
+    let nextFreeBlackjack = null;
+    if (!lastFreeBlackjack) {
+      canPlayFree = true;
+    } else {
+      canPlayFree = Date.now() - lastFreeBlackjack >= freePeriod;
+      nextFreeBlackjack = new Date(lastFreeBlackjack + freePeriod).getTime();
+    }
 
     return {
       canPlay,
