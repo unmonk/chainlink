@@ -56,6 +56,7 @@ export const checkPickAchievements = mutation({
     //check if chain is negative
     let isNegative = chain.chain < 0;
     let absoluteChain = Math.abs(chain.chain);
+
     //check if chain is dividable by 5 or 10
     if (
       absoluteChain !== 0 &&
@@ -65,6 +66,7 @@ export const checkPickAchievements = mutation({
       const achievementType: AchievementType = isNegative
         ? "CHAINLOSS"
         : "CHAINWIN";
+
       const achievement = await ctx.db
         .query("achievements")
         .withIndex("by_type_threshold", (q) =>
@@ -110,7 +112,7 @@ export const checkPickAchievements = mutation({
 
     if (chain.wins !== 0 && (chain.wins % 5 === 0 || chain.wins % 10 === 0)) {
       //handle wins achievement
-      const achievementType: AchievementType = "WINS";
+      const achievementType: AchievementType = "MONTHLYWIN";
       const achievement = await ctx.db
         .query("achievements")
         .withIndex("by_type_threshold", (q) =>
@@ -127,6 +129,7 @@ export const checkPickAchievements = mutation({
             return;
           }
         });
+
         await awardAchievementToUser(ctx, {
           userId: user._id,
           achievementId: achievement._id,
@@ -154,11 +157,11 @@ export const checkPickAchievements = mutation({
       }
     }
     if (
-      user.stats.losses !== 0 &&
-      (user.stats.losses % 5 === 0 || user.stats.losses % 10 === 0)
+      chain.losses !== 0 &&
+      (chain.losses % 5 === 0 || chain.losses % 10 === 0)
     ) {
       //handle losses achievement
-      const achievementType: AchievementType = "LOSS";
+      const achievementType: AchievementType = "MONTHLYLOSS";
       const achievement = await ctx.db
         .query("achievements")
         .withIndex("by_type_threshold", (q) =>
@@ -202,11 +205,11 @@ export const checkPickAchievements = mutation({
       }
     }
     if (
-      user.stats.pushes !== 0 &&
-      (user.stats.pushes % 5 === 0 || user.stats.pushes % 10 === 0)
+      chain.pushes !== 0 &&
+      (chain.pushes % 5 === 0 || chain.pushes % 10 === 0)
     ) {
       //handle pushes achievement
-      const achievementType: AchievementType = "PUSH";
+      const achievementType: AchievementType = "MONTHLYPUSH";
       const achievement = await ctx.db
         .query("achievements")
         .withIndex("by_type_threshold", (q) =>
@@ -414,9 +417,12 @@ export const awardAchievementToUser = mutation({
     if (!user) {
       throw new ConvexError("USER_NOT_FOUND");
     }
+
+    //check if user has already won this achievement for some types
     if (
-      achievement.type !== "CAMPAIGNCHAIN" &&
-      achievement.type !== "CAMPAIGNWINS"
+      achievement.type === "COINS" ||
+      achievement.type === "FRIENDS" ||
+      achievement.type === "REFERRAL"
     ) {
       user.achievements.forEach((a) => {
         if (a.achievementId === achievementId) {
@@ -427,6 +433,7 @@ export const awardAchievementToUser = mutation({
         }
       });
     }
+
     //give achievement
     await ctx.db.patch(user._id, {
       achievements: user.achievements.concat({
