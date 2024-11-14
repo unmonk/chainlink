@@ -58,3 +58,16 @@ export const achievementTypes = [
   "FRIENDS",
   "OTHER",
 ] as const;
+
+export const knownMatchupStatuses = [
+  "STATUS_FINAL",
+  "STATUS_FULL_TIME",
+  "STATUS_FULL_PEN",
+  "STATUS_IN_PROGRESS",
+  "STATUS_END_PERIOD",
+  "STATUS_SECOND_HALF",
+  "STATUS_SHOOTOUT",
+  "STATUS_END_OF_EXTRATIME",
+  "STATUS_SCHEDULED",
+  "STATUS_UNKNOWN",
+] as const;
