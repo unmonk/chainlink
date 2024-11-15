@@ -83,30 +83,33 @@ export const checkPickAchievements = mutation({
             return;
           }
         });
-        await awardAchievementToUser(ctx, {
-          userId: user._id,
-          achievementId: achievement._id,
-        });
-        //send notification
-        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
-          notificationType: "achievement",
-          clerkId: user.externalId,
-          payload: {
-            notification: {
-              title: `${achievement.name} Achievement Unlocked!`,
-              message: achievement.description,
-              icon: "/images/icon-512x512.png",
-              actions: [{ action: "achievement", title: "View Achievement" }],
-              data: {
-                onActionClick: {
-                  default: {
-                    operation: "openWindow",
+
+        if (achievement.threshold === absoluteChain) {
+          await awardAchievementToUser(ctx, {
+            userId: user._id,
+            achievementId: achievement._id,
+          });
+          //send notification
+          await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+            notificationType: "achievement",
+            clerkId: user.externalId,
+            payload: {
+              notification: {
+                title: `${achievement.name} Achievement Unlocked!`,
+                message: achievement.description,
+                icon: "/images/icon-512x512.png",
+                actions: [{ action: "achievement", title: "View Achievement" }],
+                data: {
+                  onActionClick: {
+                    default: {
+                      operation: "openWindow",
+                    },
                   },
                 },
               },
             },
-          },
-        });
+          });
+        }
       }
     }
 
@@ -130,30 +133,32 @@ export const checkPickAchievements = mutation({
           }
         });
 
-        await awardAchievementToUser(ctx, {
-          userId: user._id,
-          achievementId: achievement._id,
-        });
-        //send notification
-        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
-          notificationType: "achievement",
-          clerkId: user.externalId,
-          payload: {
-            notification: {
-              title: `${achievement.name} Achievement Unlocked!`,
-              message: achievement.description,
-              icon: "/images/icon-512x512.png",
-              actions: [{ action: "achievement", title: "View Achievement" }],
-              data: {
-                onActionClick: {
-                  default: {
-                    operation: "openWindow",
+        if (achievement.threshold === chain.wins) {
+          await awardAchievementToUser(ctx, {
+            userId: user._id,
+            achievementId: achievement._id,
+          });
+          //send notification
+          await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+            notificationType: "achievement",
+            clerkId: user.externalId,
+            payload: {
+              notification: {
+                title: `${achievement.name} Achievement Unlocked!`,
+                message: achievement.description,
+                icon: "/images/icon-512x512.png",
+                actions: [{ action: "achievement", title: "View Achievement" }],
+                data: {
+                  onActionClick: {
+                    default: {
+                      operation: "openWindow",
+                    },
                   },
                 },
               },
             },
-          },
-        });
+          });
+        }
       }
     }
     if (
@@ -178,30 +183,32 @@ export const checkPickAchievements = mutation({
             return;
           }
         });
-        await awardAchievementToUser(ctx, {
-          userId: user._id,
-          achievementId: achievement._id,
-        });
-        //send notification
-        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
-          notificationType: "achievement",
-          clerkId: user.externalId,
-          payload: {
-            notification: {
-              title: `${achievement.name} Achievement Unlocked!`,
-              message: achievement.description,
-              icon: "/images/icon-512x512.png",
-              actions: [{ action: "achievement", title: "View Achievement" }],
-              data: {
-                onActionClick: {
-                  default: {
-                    operation: "openWindow",
+        if (achievement.threshold === user.stats.losses) {
+          await awardAchievementToUser(ctx, {
+            userId: user._id,
+            achievementId: achievement._id,
+          });
+          //send notification
+          await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+            notificationType: "achievement",
+            clerkId: user.externalId,
+            payload: {
+              notification: {
+                title: `${achievement.name} Achievement Unlocked!`,
+                message: achievement.description,
+                icon: "/images/icon-512x512.png",
+                actions: [{ action: "achievement", title: "View Achievement" }],
+                data: {
+                  onActionClick: {
+                    default: {
+                      operation: "openWindow",
+                    },
                   },
                 },
               },
             },
-          },
-        });
+          });
+        }
       }
     }
     if (
@@ -226,30 +233,32 @@ export const checkPickAchievements = mutation({
             return;
           }
         });
-        await awardAchievementToUser(ctx, {
-          userId: user._id,
-          achievementId: achievement._id,
-        });
-        //send notification
-        await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
-          notificationType: "achievement",
-          clerkId: user.externalId,
-          payload: {
-            notification: {
-              title: `${achievement.name} Achievement Unlocked!`,
-              message: achievement.description,
-              icon: "/images/icon-512x512.png",
-              actions: [{ action: "achievement", title: "View Achievement" }],
-              data: {
-                onActionClick: {
-                  default: {
-                    operation: "openWindow",
+        if (achievement.threshold === user.stats.pushes) {
+          await awardAchievementToUser(ctx, {
+            userId: user._id,
+            achievementId: achievement._id,
+          });
+          //send notification
+          await ctx.scheduler.runAfter(0, api.notifications.sendNotification, {
+            notificationType: "achievement",
+            clerkId: user.externalId,
+            payload: {
+              notification: {
+                title: `${achievement.name} Achievement Unlocked!`,
+                message: achievement.description,
+                icon: "/images/icon-512x512.png",
+                actions: [{ action: "achievement", title: "View Achievement" }],
+                data: {
+                  onActionClick: {
+                    default: {
+                      operation: "openWindow",
+                    },
                   },
                 },
               },
             },
-          },
-        });
+          });
+        }
       }
     }
   },
