@@ -56,17 +56,24 @@ export default function DashboardQuiz() {
 
             {/* Preview Options in 2x2 Grid */}
             <div className="grid grid-cols-2 gap-2 my-2">
-              {quizData.quiz.options.slice(0, 4).map((option, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "p-1.5 text-xs border rounded-md bg-muted/50",
-                    "hover:bg-muted/80 transition-colors cursor-default truncate"
-                  )}
-                >
-                  {option.text}
-                </div>
-              ))}
+              {quizData.quiz.options.slice(0, 4).map((option, index) => {
+                const isSelected =
+                  userHasResponded?.selectedOptionId === option.id;
+                return (
+                  <div
+                    key={index}
+                    className={cn(
+                      "p-1.5 text-xs border rounded-md bg-muted/50",
+                      "hover:bg-muted/80 transition-colors cursor-default truncate"
+                    )}
+                  >
+                    {option.text}
+                    {isSelected && (
+                      <span className="ml-2 text-green-500">✔️</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             {quizData.quiz.options.length > 4 && (
               <p className="text-xs text-muted-foreground text-center -mt-1">
@@ -88,7 +95,7 @@ export default function DashboardQuiz() {
                 </div>
               </div>
 
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-row gap-2  items-center w-full justify-between">
                 <div className="flex items-center justify-between text-sm text-muted-foreground bg-muted/50 p-2 rounded-md ">
                   <span className="text-balance text-xs">Wager Range: </span>
                   <span className="font-sm text-cyan-500 text-nowrap">

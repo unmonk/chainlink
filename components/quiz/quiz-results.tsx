@@ -32,7 +32,7 @@ export function QuizResults({ quiz, currentAnswer }: QuizOptionsProps) {
 
   const handleSaveAnswer = async () => {
     if (!selectedOption) {
-      toast.error("Please select an answer first");
+      toast.error("Please select an answer or declare a tie");
       return;
     }
 
@@ -43,11 +43,14 @@ export function QuizResults({ quiz, currentAnswer }: QuizOptionsProps) {
         correctAnswerId: selectedOption,
         status: "COMPLETE",
       });
-      toast.success("Correct answer saved successfully");
+      toast.success(
+        selectedOption === "TIE"
+          ? "Quiz marked as tie"
+          : "Correct answer saved successfully"
+      );
       router.push("/admin/quiz");
-      setIsPending(false);
     } catch (error) {
-      toast.error("Failed to save correct answer");
+      toast.error("Failed to save result");
     } finally {
       setIsPending(false);
     }
@@ -56,9 +59,9 @@ export function QuizResults({ quiz, currentAnswer }: QuizOptionsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Set Correct Answer</CardTitle>
-        <CardDescription className="text-destructive ">
-          This will set the correct answer for the quiz, and close it. This
+        <CardTitle>Set Quiz Result</CardTitle>
+        <CardDescription className="text-destructive">
+          Select a winning answer or declare a tie. This will close the quiz and
           cannot be undone.
         </CardDescription>
       </CardHeader>
@@ -76,6 +79,12 @@ export function QuizResults({ quiz, currentAnswer }: QuizOptionsProps) {
               </Label>
             </div>
           ))}
+          <div className="flex items-center space-x-2 pt-2 border-t">
+            <RadioGroupItem value="TIE" id="tie-option" />
+            <Label htmlFor="tie-option" className="text-sm font-medium">
+              Declare a Tie
+            </Label>
+          </div>
         </RadioGroup>
 
         <Button
@@ -83,7 +92,7 @@ export function QuizResults({ quiz, currentAnswer }: QuizOptionsProps) {
           disabled={isPending || !selectedOption}
           className="w-full"
         >
-          Save Correct Answer
+          {selectedOption === "TIE" ? "Save as Tie" : "Save Correct Answer"}
         </Button>
       </CardContent>
     </Card>

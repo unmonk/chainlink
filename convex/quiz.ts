@@ -133,28 +133,49 @@ export const updateQuiz = mutation({
   },
   handler: async (ctx, { quizId, status, correctAnswerId }) => {
     if (status === "COMPLETE") {
-      //pay out winners
       const quiz = await ctx.db.get(quizId);
       if (!quiz) return;
-      const winningOption = quiz.options.find(
-        (option) => option.id === correctAnswerId
-      );
-      if (!winningOption) return;
+
+      // Get all responses for this quiz
       const quizResponses = await ctx.db
         .query("quizResponses")
         .withIndex("by_quizId", (q) => q.eq("quizId", quizId))
-        .filter((q) => q.eq(q.field("selectedOptionId"), winningOption.id))
         .collect();
 
-      for (const response of quizResponses) {
-        const payout = response.wager * 10;
-        await ctx.scheduler.runAfter(0, api.users.adjustCoins, {
-          amount: payout,
-          transactionType: "PAYOUT",
-          userId: response.userId,
-        });
-        const userWin = response.selectedOptionId === correctAnswerId;
-        await ctx.db.patch(response._id, { win: userWin });
+      if (correctAnswerId === "TIE") {
+        // In case of a tie, pay out everyone who participated
+        for (const response of quizResponses) {
+          const payout = response.wager * 10;
+          await ctx.scheduler.runAfter(0, api.users.adjustCoins, {
+            amount: payout,
+            transactionType: "PAYOUT",
+            userId: response.userId,
+          });
+          await ctx.db.patch(response._id, { win: true });
+        }
+      } else {
+        // Original winning logic
+        const winningOption = quiz.options.find(
+          (option) => option.id === correctAnswerId
+        );
+        if (!winningOption) return;
+
+        const winningResponses = await ctx.db
+          .query("quizResponses")
+          .withIndex("by_quizId", (q) => q.eq("quizId", quizId))
+          .filter((q) => q.eq(q.field("selectedOptionId"), winningOption.id))
+          .collect();
+
+        for (const response of winningResponses) {
+          const payout = response.wager * 10;
+          await ctx.scheduler.runAfter(0, api.users.adjustCoins, {
+            amount: payout,
+            transactionType: "PAYOUT",
+            userId: response.userId,
+          });
+          const userWin = response.selectedOptionId === correctAnswerId;
+          await ctx.db.patch(response._id, { win: userWin });
+        }
       }
     }
 

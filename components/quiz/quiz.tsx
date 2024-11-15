@@ -121,7 +121,7 @@ export default function QuizPage() {
               </div>
               <div className="text-center border-x border-border">
                 <p className="text-sm text-muted-foreground mb-1">Your Wager</p>
-                <p className="font-semibold text-cyan-500">🔗 {wager}</p>
+                <p className="font-bold text-lg text-cyan-500">🔗 {wager}</p>
               </div>
               <div className="text-center">
                 <p className="text-sm text-muted-foreground mb-1">Max Wager</p>
