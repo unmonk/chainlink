@@ -35,6 +35,8 @@ export function AdminSearchBox({
       return;
     }
 
+    if (debouncedQuery.length < 3) return;
+
     startTransition(async () => {
       const response = await fetch(
         `/api/clerk?query=${encodeURIComponent(debouncedQuery)}`

@@ -12,6 +12,7 @@ import {
   UserCog,
 } from "lucide-react";
 import Link from "next/link";
+import { CoinAdjustmentModal } from "./admin-coin-adjust";
 
 interface AdminUserActionsProps {
   user: Doc<"users"> | null;
@@ -34,6 +35,8 @@ export function AdminUserActions({ user }: AdminUserActionsProps) {
           View Public Profile
         </Button>
       </Link>
+
+      <CoinAdjustmentModal userId={user._id} />
     </div>
   );
 }

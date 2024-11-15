@@ -124,6 +124,7 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
           type: "ALL_WINNERS",
         });
         toast.success("Matchup finalized, all winners");
+        router.push("/admin/matchups");
       }
       if (finalizeType === "ALL_LOSERS") {
         await manuallyFinalizeMatchup({
@@ -131,6 +132,7 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
           type: "ALL_LOSERS",
         });
         toast.success("Matchup finalized, all losers");
+        router.push("/admin/matchups");
       }
       if (finalizeType === "ALL_PUSHES") {
         await manuallyFinalizeMatchup({
@@ -138,6 +140,7 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
           type: "ALL_PUSHES",
         });
         toast.success("Matchup finalized, all pushes");
+        router.push("/admin/matchups");
       }
       if (finalizeType === "STANDARD_FINAL") {
         await manuallyFinalizeMatchup({
@@ -145,6 +148,7 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
           type: "STANDARD_FINAL",
         });
         toast.success("Matchup finalized, standard scoring");
+        router.push("/admin/matchups");
       }
       setLoading(false);
     } catch (error) {

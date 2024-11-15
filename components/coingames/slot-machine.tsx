@@ -25,6 +25,7 @@ import { formatDistanceToNow } from "date-fns";
 import { RainbowButton } from "../ui/rainbow-button";
 import Loading from "../ui/loading";
 import { toast } from "sonner";
+import ResultBox from "./result-box";
 
 const SYMBOLS = {
   CHERRY: "🍒",
@@ -129,27 +130,7 @@ export function SlotMachine() {
         </div>
 
         {/* Result Box */}
-        <div className="text-center p-4 rounded-lg bg-gray-100 dark:bg-background/50 min-h-[80px] flex items-center justify-center">
-          {isSpinning ? (
-            <div className="text-lg font-semibold animate-pulse">
-              Spinning...
-            </div>
-          ) : lastWin ? (
-            <div className="space-y-2">
-              <div className="text-2xl font-bold text-yellow-500">
-                🎉 Winner! 🎉
-              </div>
-              <div className="text-lg text-balance">
-                {lastWin.matches} matching symbols - You won 🔗{lastWin.payout}{" "}
-                links!
-              </div>
-            </div>
-          ) : (
-            <div className="text-lg text-muted-foreground text-balance">
-              Match 2 or more symbols in a row to win!
-            </div>
-          )}
-        </div>
+        <ResultBox isSpinning={isSpinning} win={lastWin} />
 
         {/* Controls */}
         <div className="grid grid-cols-2 gap-2">
@@ -211,25 +192,25 @@ export function SlotMachine() {
                   <TableRow>
                     <TableCell className="text-center">5 Symbols</TableCell>
                     <TableCell className="text-center font-medium">
-                      1000 coins
+                      🔗1000 links
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="text-center">4 Symbols</TableCell>
                     <TableCell className="text-center font-medium">
-                      100 coins
+                      🔗 100 links
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="text-center">3 Symbols</TableCell>
                     <TableCell className="text-center font-medium">
-                      50 coins
+                      🔗 50 links
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="text-center">2 Symbols</TableCell>
                     <TableCell className="text-center font-medium">
-                      10 coins
+                      🔗 10 links
                     </TableCell>
                   </TableRow>
                 </TableBody>

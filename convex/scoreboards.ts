@@ -184,6 +184,19 @@ export const scoreboards = action({
           continue;
         }
 
+        // Skip if matchup is already final
+        if (
+          matchup.status === "STATUS_FINAL" ||
+          matchup.status === "STATUS_FULL_TIME" ||
+          matchup.status === "STATUS_FULL_PEN"
+        ) {
+          leagueResponse.games.push({
+            game: event.shortName || "",
+            result: `Skipped - already final`,
+          });
+          continue;
+        }
+
         //get event status
         const eventStatus = event.competitions[0].status?.type?.name;
         const statusDetails = event.competitions[0].status?.type?.detail;
@@ -249,7 +262,7 @@ export const scoreboards = action({
             matchup.status === "STATUS_SCHEDULED") &&
           (eventStatus === "STATUS_FINAL" ||
             eventStatus === "STATUS_FULL_TIME" ||
-            eventStatus === "STATUS_FINAL_PEN")
+            eventStatus === "STATUS_FULL_PEN")
         ) {
           await ctx.runMutation(internal.matchups.handleMatchupFinished, {
             matchupId: matchup._id,
@@ -354,7 +367,9 @@ export const scoreboards = action({
       leagueResponse.message = "SUCCESS";
       actionResponse[league] = leagueResponse;
     }
-    console.log(actionResponse);
+    if (process.env.NODE_ENV === "development") {
+      console.log(actionResponse);
+    }
     return actionResponse;
   },
 });
