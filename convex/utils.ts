@@ -36,6 +36,25 @@ export interface ScheduledMessage {
   args: any[];
 }
 
+export const fixPreviousQuizResponses = mutation({
+  args: {},
+  handler: async (ctx, args) => {
+    // Get all quiz responses
+    const quizResponses = await ctx.db.query("quizResponses").collect();
+
+    for (const response of quizResponses) {
+      // Get the associated quiz
+      const quiz = await ctx.db.get(response.quizId);
+      if (!quiz) continue;
+
+      // Update win status based on selected option matching correct answer
+      await ctx.db.patch(response._id, {
+        win: response.selectedOptionId === quiz.correctAnswerId,
+      });
+    }
+  },
+});
+
 export const fixPreviousPicks = mutation({
   args: {},
   handler: async (ctx, args) => {
