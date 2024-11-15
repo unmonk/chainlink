@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Chainlink",
     short_name: "Chainlink",
     description: "Build your Chain",
-    start_url: "/",
+    start_url: "/dashboard",
     display: "standalone",
     orientation: "portrait",
     background_color: "#161616",
