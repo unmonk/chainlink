@@ -77,7 +77,8 @@ export function QuizList({
                 {quiz.status === "COMPLETE" &&
                 quiz.responses.find((r) => r.userId === userId) ? (
                   quiz.responses.find((r) => r.userId === userId)
-                    ?.selectedOptionId === quiz.correctAnswerId ? (
+                    ?.selectedOptionId === quiz.correctAnswerId ||
+                  quiz.correctAnswerId === "TIE" ? (
                     <Badge variant="outline" className="bg-green-700">
                       WIN
                     </Badge>

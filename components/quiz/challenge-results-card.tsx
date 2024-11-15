@@ -26,7 +26,8 @@ export default function ChallengeResultsCard({ quiz }: { quiz: QuizResults }) {
           )}
           {quiz.quiz.status === "COMPLETE" ? (
             quiz.responses.find((r) => r.user._id === userId)
-              ?.selectedOptionId === quiz.quiz.correctAnswerId ? (
+              ?.selectedOptionId === quiz.quiz.correctAnswerId ||
+            quiz.quiz.correctAnswerId === "TIE" ? (
               <Badge variant="outline" className="bg-green-700">
                 WIN
               </Badge>
@@ -45,11 +46,11 @@ export default function ChallengeResultsCard({ quiz }: { quiz: QuizResults }) {
             <div className="bg-green-100 dark:bg-green-900/20 p-4 rounded-lg">
               <h3 className="font-semibold mb-2">Winning Option</h3>
               <p>
-                {
-                  quiz.quiz.options.find(
-                    (opt) => opt.id === quiz.quiz.correctAnswerId
-                  )?.text
-                }
+                {quiz.quiz.correctAnswerId === "TIE"
+                  ? "Tie"
+                  : quiz.quiz.options.find(
+                      (opt) => opt.id === quiz.quiz.correctAnswerId
+                    )?.text}
               </p>
             </div>
           )}
