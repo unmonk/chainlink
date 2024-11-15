@@ -356,6 +356,7 @@ export default defineSchema({
     selectedOptionId: v.string(),
     wager: v.number(),
     timestamp: v.number(),
+    win: v.optional(v.boolean()),
   })
     .index("by_userId", ["userId"])
     .index("by_quizId", ["quizId"])

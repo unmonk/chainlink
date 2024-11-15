@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import {
   Card,
@@ -16,6 +16,9 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
 import { ClockIcon, Users2Icon } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import useStoreUserEffect from "@/hooks/use-store-user";
+import UserQuizRecord from "./user-quiz-record";
 
 export function QuizList({
   limit = 15,
@@ -27,6 +30,7 @@ export function QuizList({
   showDrafts?: boolean;
 }) {
   const quizzes = useQuery(api.quiz.listQuizzes);
+  const userId = useStoreUserEffect();
 
   if (!quizzes) {
     return <QuizListSkeleton />;
@@ -45,7 +49,9 @@ export function QuizList({
   });
 
   return (
-    <div className="space-y-4 gap-2 flex flex-col">
+    <div className="gap-2 flex flex-col">
+      {userId && <UserQuizRecord userId={userId} />}
+      <Separator className="my-2" />
       {filteredQuizzes.map((quiz) => (
         <Link
           key={quiz._id}
@@ -61,22 +67,35 @@ export function QuizList({
                   <Badge variant="secondary">Draft</Badge>
                 )}
                 {quiz.status === "ACTIVE" && (
-                  <Badge variant="default">Active</Badge>
+                  <Badge variant="outline" className="bg-sky-700">
+                    Active
+                  </Badge>
                 )}
                 {quiz.status === "CLOSED" && (
                   <Badge variant="destructive">Closed</Badge>
                 )}
-                {quiz.status === "COMPLETE" && (
+                {quiz.status === "COMPLETE" &&
+                quiz.responses.find((r) => r.userId === userId) ? (
+                  quiz.responses.find((r) => r.userId === userId)
+                    ?.selectedOptionId === quiz.correctAnswerId ? (
+                    <Badge variant="outline" className="bg-green-700">
+                      WIN
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-red-600">
+                      LOSS
+                    </Badge>
+                  )
+                ) : quiz.status === "COMPLETE" ? (
                   <Badge variant="outline" className="bg-violet-600">
-                    Completed
+                    COMPLETED
                   </Badge>
-                )}
+                ) : null}
               </div>
               <CardDescription>
                 {quiz.description || "No description provided"}
               </CardDescription>
             </CardHeader>
-            <CardContent>{}</CardContent>
             <CardContent>
               <div className="flex items-center justify-between text-sm text-muted-foreground font-mono">
                 <div className="flex items-center ">

@@ -51,8 +51,8 @@ export default function QuizPage() {
 
   if (!activeQuiz)
     return (
-      <div className="container max-w-2xl mx-auto py-8">
-        <Card className="text-center p-8">
+      <div className="mx-auto">
+        <Card className="text-center p-2">
           <CardHeader>
             <CardTitle className="text-2xl">No Active Challenge</CardTitle>
             <CardDescription>
@@ -72,7 +72,7 @@ export default function QuizPage() {
     );
 
   return (
-    <div className="container max-w-2xl mx-auto py-8">
+    <div className="mx-auto mb-4">
       <Card>
         <CardHeader>
           <CardTitle>{activeQuiz.quiz.title}</CardTitle>
@@ -111,22 +111,35 @@ export default function QuizPage() {
               step={1}
               disabled={!!userHasResponded}
             />
-            <div className="text-sm text-muted-foreground font-bold">
-              Selected: <span className="text-cyan-500">🔗 {wager}</span> Links
+
+            <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-1">Min Wager</p>
+                <p className="font-semibold text-cyan-500">
+                  🔗 {activeQuiz.quiz.minWager}
+                </p>
+              </div>
+              <div className="text-center border-x border-border">
+                <p className="text-sm text-muted-foreground mb-1">Your Wager</p>
+                <p className="font-semibold text-cyan-500">🔗 {wager}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground mb-1">Max Wager</p>
+                <p className="font-semibold text-cyan-500">
+                  🔗 {activeQuiz.quiz.maxWager}
+                </p>
+              </div>
             </div>
-            <div className="space-y-2">
-              {/* min and max wagers */}
-              <p className="text-sm text-muted-foreground">
-                Min Wager:{" "}
-                <span className="text-cyan-500">
-                  🔗{activeQuiz.quiz.minWager}
-                </span>
+
+            <div className="bg-green-500/10 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground mb-1">
+                Potential Win Amount
               </p>
-              <p className="text-sm text-muted-foreground">
-                Max Wager:{" "}
-                <span className="text-cyan-500">
-                  🔗{activeQuiz.quiz.maxWager}
-                </span>
+              <p className="font-bold text-green-500 text-lg">
+                🔗 {wager * 10 > 0 ? wager * 10 : 10}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Win 10x your wager if your prediction is correct
               </p>
             </div>
           </div>

@@ -31,8 +31,8 @@ export default function Dashboard() {
         <div className="lg:col-span-2 lg:row-span-1 flex flex-col gap-4 h-full">
           <DashboardQuiz />
         </div>
-        <div className="lg:col-span-1 lg:row-span-1 flex flex-col gap-4 h-full"></div>
-        <div className="lg:col-span-1 lg:row-span-1">
+        {/* <div className="lg:col-span-1 lg:row-span-1 flex flex-col gap-4 h-full"></div> */}
+        <div className="lg:col-span-2 lg:row-span-1">
           <DashboardAdsSponsors />
         </div>
       </main>

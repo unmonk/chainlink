@@ -14,6 +14,7 @@ import { Separator } from "../ui/separator";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function DashboardQuiz() {
   const quizData = useQuery(api.quiz.getActiveQuiz);
@@ -49,11 +50,33 @@ export default function DashboardQuiz() {
             <div className="text-lg text-balance font-semibold">
               {quizData.quiz.title}
             </div>
-            <div className="text-muted-foreground text-sm flex-grow">
+            <div className="text-muted-foreground text-sm">
               {quizData.quiz.description}
             </div>
-            <div className="mt-auto flex flex-col gap-2 flex-grow">
-              <div className="flex items-center justify-between text-sm text-muted-foreground gap-2 ">
+
+            {/* Preview Options in 2x2 Grid */}
+            <div className="grid grid-cols-2 gap-2 my-2">
+              {quizData.quiz.options.slice(0, 4).map((option, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "p-1.5 text-xs border rounded-md bg-muted/50",
+                    "hover:bg-muted/80 transition-colors cursor-default truncate"
+                  )}
+                >
+                  {option.text}
+                </div>
+              ))}
+            </div>
+            {quizData.quiz.options.length > 4 && (
+              <p className="text-xs text-muted-foreground text-center -mt-1">
+                +{quizData.quiz.options.length - 4} more options
+              </p>
+            )}
+
+            <div className="flex flex-col gap-2 mt-6">
+              {/* Stats and timer section */}
+              <div className="flex items-center justify-between text-sm text-muted-foreground gap-2">
                 <div className="flex items-center text-balance">
                   <Clock className="mr-1 h-4 w-4" />
                   {formatDistanceToNow(quizData.quiz.expiresAt)} remaining
@@ -64,6 +87,22 @@ export default function DashboardQuiz() {
                   {quizData.totalParticipants} participants
                 </div>
               </div>
+
+              <div className="flex flex-row gap-2">
+                <div className="flex items-center justify-between text-sm text-muted-foreground bg-muted/50 p-2 rounded-md ">
+                  <span className="text-balance text-xs">Wager Range: </span>
+                  <span className="font-sm text-cyan-500 text-nowrap">
+                    🔗 {quizData.quiz.minWager} - {quizData.quiz.maxWager}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm text-muted-foreground bg-green-500/10 p-2 rounded-md ">
+                  <span className="text-balance text-xs">Potential Win: </span>
+                  <span className="font-sm text-green-500 text-nowrap">
+                    Up to 🔗 {quizData.quiz.maxWager * 10}
+                  </span>
+                </div>
+              </div>
+
               <Link href={"/challenge"}>
                 <Button
                   className="w-full"

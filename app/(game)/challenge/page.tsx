@@ -7,7 +7,7 @@ export default function Page() {
   return (
     <ContentLayout title="Challenge">
       <QuizPage />
-      <Separator className="my-6" />
+      <Separator className="my-2" />
       <QuizList isAdmin={false} showDrafts={false} limit={15} />
     </ContentLayout>
   );
