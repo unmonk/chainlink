@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { question_status } from "./schema";
 import { api, internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
 
 export const updateQuizStatus = mutation({
   args: { quizId: v.id("globalQuiz"), status: question_status },
@@ -153,6 +153,8 @@ export const updateQuiz = mutation({
           transactionType: "PAYOUT",
           userId: response.userId,
         });
+        const userWin = response.selectedOptionId === correctAnswerId;
+        await ctx.db.patch(response._id, { win: userWin });
       }
     }
 
@@ -192,6 +194,14 @@ export const createQuiz = mutation({
     });
   },
 });
+
+interface ResponseWithUser extends Doc<"quizResponses"> {
+  user: {
+    name: string;
+    image: string;
+    _id: Id<"users">;
+  };
+}
 
 export const getQuizById = query({
   args: { quizId: v.id("globalQuiz") },
@@ -262,6 +272,28 @@ export const getQuizById = query({
       totalWagers,
       percentagePerOption,
       percentageResults,
-    };
+    } as QuizResults;
+  },
+});
+
+export interface QuizResults {
+  quiz: Doc<"globalQuiz">;
+  responses: ResponseWithUser[];
+  totalParticipants: number;
+  totalWagers: number;
+  percentagePerOption: Record<string, number>;
+  percentageResults: { optionId: string; percentage: number }[];
+}
+
+export const getUserQuizRecord = query({
+  args: { userId: v.optional(v.id("users")) },
+  handler: async (ctx, { userId }) => {
+    if (!userId) return [];
+
+    const responses = await ctx.db
+      .query("quizResponses")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+    return responses;
   },
 });
