@@ -156,7 +156,9 @@ const MatchupList = ({}) => {
                           key={matchup._id}
                           animate={true}
                           className="rounded-lg overflow-hidden shadow-lg"
-                          color={matchup.metadata.sponsoredData.color}
+                          color={
+                            matchup.metadata?.sponsoredData?.color || "white"
+                          }
                         >
                           <MatchupCard matchup={matchup} />
                         </BackgroundGradientSponsored>

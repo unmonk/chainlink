@@ -41,7 +41,9 @@ export default function MatchupCardFooter({
           )}
           {matchup.featured && matchup.featuredType === "SPONSORED" && (
             <span
-              className={cn(`text-${matchup.metadata.sponsoredData.color}-500`)}
+              className={cn(
+                `text-${matchup.metadata?.sponsoredData?.color || "white"}-500`
+              )}
             >
               Sponsored
             </span>

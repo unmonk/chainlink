@@ -79,7 +79,7 @@ const MatchupCard = ({
           key={matchup._id}
           animate={true}
           className={`rounded-lg overflow-hidden shadow-lg h-full w-full`}
-          color={matchup.metadata.sponsoredData.color}
+          color={matchup.metadata?.sponsoredData?.color || "white"}
         >
           <Card
             className="rounded-t-none flex flex-col h-full w-full"
