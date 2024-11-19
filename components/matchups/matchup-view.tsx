@@ -254,7 +254,11 @@ const PlayerStats = ({
                                 <TableRow key={athlete.athlete.id}>
                                   <TableCell>
                                     <div className="flex items-center">
-                                      <Avatar className="h-10 w-10 mr-2">
+                                      <Avatar
+                                        className="mr-2"
+                                        height="h-10"
+                                        width="w-10"
+                                      >
                                         <AvatarImage
                                           src={
                                             athlete.athlete.headshot?.href || ""
@@ -379,7 +383,11 @@ const PlayerStats = ({
                                 <TableRow key={athlete.athlete.id}>
                                   <TableCell>
                                     <div className="flex items-center">
-                                      <Avatar className="h-10 w-10 mr-2">
+                                      <Avatar
+                                        className="mr-2"
+                                        height="h-10"
+                                        width="w-10"
+                                      >
                                         <AvatarImage
                                           src={
                                             athlete.athlete.headshot?.href || ""
@@ -464,7 +472,7 @@ const VenueAndWeather = ({ venue, weather }: any) => (
 );
 
 const TeamLogo = ({ team }: any) => (
-  <Avatar className="h-24 w-24">
+  <Avatar height="h-24" width="w-24">
     <AvatarImage src={team.logo} alt={team.displayName} />
     <AvatarFallback>{team.abbreviation}</AvatarFallback>
   </Avatar>

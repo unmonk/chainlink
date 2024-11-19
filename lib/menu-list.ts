@@ -1,22 +1,17 @@
-import { Logo } from "@/components/ui/logo";
 import {
-  Tag,
   Users,
   Settings,
-  Bookmark,
-  SquarePen,
   LayoutGrid,
   LucideIcon,
   Link,
   TrophyIcon,
   UserCheckIcon,
   ShieldAlertIcon,
-  ListIcon,
   UserRound,
   CoinsIcon,
-  ShirtIcon,
   ScrollTextIcon,
 } from "lucide-react";
+import { MdDatasetLinked } from "react-icons/md";
 
 import { RiTeamLine } from "react-icons/ri";
 
@@ -93,9 +88,14 @@ export function getAdminMenuList(pathname: string): Group[] {
               active: pathname.includes("/admin/squads"),
             },
             {
-              href: "/shop",
+              href: "/admin/sponsors",
+              label: "Sponsors",
+              active: pathname.includes("/admin/sponsors"),
+            },
+            {
+              href: "/admin/shop",
               label: "Shop",
-              active: pathname.includes("/shop"),
+              active: pathname.includes("/admin/shop"),
             },
           ],
         },
@@ -161,6 +161,13 @@ export function getMenuList(pathname: string): Group[] {
           label: "Challenge",
           active: pathname.includes("/challenge"),
           icon: ScrollTextIcon,
+          submenus: [],
+        },
+        {
+          href: "/shop",
+          label: "Link Shop",
+          active: pathname.includes("/shop"),
+          icon: MdDatasetLinked as LucideIcon,
           submenus: [],
         },
         {

@@ -2,6 +2,7 @@ import { LeaderCard, RunnerUpCard } from "./leaderboard-cards";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { COSMETIC_STYLE } from "@/lib/utils";
 
 export function WinsLeaderboard({ data }: { data: any[] }) {
   const sortedData = [...data].sort((a, b) => b.chain.wins - a.chain.wins);
@@ -67,7 +68,14 @@ export function WinsLeaderboard({ data }: { data: any[] }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <p className="text-xl font-bold">{index + 4}</p>
-                  <Avatar className="h-8 w-8">
+                  <Avatar
+                    height="h-8"
+                    width="w-8"
+                    cosmetic={
+                      entry.user.metadata?.avatarBackground as COSMETIC_STYLE
+                    }
+                    hasGlow={!!entry.user.metadata?.avatarBackground}
+                  >
                     <AvatarImage src={entry.user.image} alt={entry.user.name} />
                     <AvatarFallback>{entry.user.name[0]}</AvatarFallback>
                   </Avatar>

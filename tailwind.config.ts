@@ -68,11 +68,33 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      backgroundSize: {
+        auto: "auto",
+        cover: "cover",
+        contain: "contain",
+        "200%": "200% 200%",
+      },
       keyframes: {
+        fluidSpin: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
         marquee: {
           to: {
             transform: "translateX(-50%)",
           },
+        },
+        wave: {
+          "0%": { transform: "scale(1.2) rotate(0deg)" },
+          "100%": { transform: "scale(1.2) rotate(360deg)" },
+        },
+        gradient: {
+          "0%": { backgroundPosition: "0% 50%" },
+          "100%": { backgroundPosition: "100% 50%" },
+        },
+        rainbow: {
+          "0%": { filter: "hue-rotate(0deg)" },
+          "100%": { filter: "hue-rotate(360deg)" },
         },
         "accordion-down": {
           from: {
@@ -116,7 +138,7 @@ const config = {
             "background-position": "calc(100% + var(--shiny-width)) 0",
           },
         },
-        rainbow: {
+        rainbowbtn: {
           "0%": {
             "background-position": "0%",
           },
@@ -132,16 +154,66 @@ const config = {
             transform: "translateY(0)",
           },
         },
+        wobble: {
+          "0%, 100%": { transform: "translateX(0)" },
+          "15%": { transform: "translateX(-6px) rotate(-3deg) scale(1.03)" },
+          "30%": { transform: "translateX(4px) rotate(2deg) scale(1.04)" },
+          "45%": { transform: "translateX(-3px) rotate(-1.5deg) scale(1.05)" },
+          "60%": { transform: "translateX(2px) rotate(1deg) scale(1.04)" },
+          "75%": { transform: "translateX(-1px) rotate(-0.5deg) scale(1.03)" },
+        },
+        breathe: {
+          "0%, 100%": { transform: "scale(1.03)" },
+          "50%": { transform: "scale(1.08)" },
+        },
+        spiral: {
+          "0%": { transform: "rotate(0deg) scale(1.03)" },
+          "50%": { transform: "rotate(180deg) scale(1.08)" },
+          "100%": { transform: "rotate(360deg) scale(1.03)" },
+        },
+        ripple: {
+          "0%": { transform: "scale(0.95)", opacity: "1.03" },
+          "50%": { transform: "scale(1.1)", opacity: "0.8" },
+          "100%": { transform: "scale(0.95)", opacity: "1.03" },
+        },
+        "bounce-subtle": {
+          "0%, 100%": { transform: "translateY(0) scale(1)" },
+          "50%": { transform: "translateY(-4px) scale(1.02)" },
+        },
+        "rotate-pulse": {
+          "0%": { transform: "rotate(0deg) scale(1.02)" },
+          "50%": { transform: "rotate(180deg) scale(1.08)" },
+          "100%": { transform: "rotate(360deg) scale(1.02)" },
+        },
+        "wave-pulse": {
+          "0%": { transform: "scale(1)", opacity: "1.03" },
+          "25%": { transform: "scale(1.08) rotate(5deg)", opacity: "0.8" },
+          "50%": { transform: "scale(1.1) rotate(0deg)", opacity: "0.6" },
+          "75%": { transform: "scale(1.08) rotate(-5deg)", opacity: "0.8" },
+          "100%": { transform: "scale(1)", opacity: "1.03" },
+        },
       },
       animation: {
+        fluidSpin: "fluidSpin 3s linear infinite",
         orbit: "orbit calc(var(--duration)*1s) linear infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
         marquee: "marquee var(--duration, 30s) linear infinite",
         "shiny-text": "shiny-text 8s infinite",
-        rainbow: "rainbow var(--speed, 2s) infinite linear",
+        rainbowbtn: "rainbow var(--speed, 2s) infinite linear",
         grid: "grid 15s linear infinite",
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        wobble: "wobble 2s ease-in-out infinite",
+        breathe: "breathe 3s ease-in-out infinite",
+        spiral: "spiral 2s ease-in-out infinite",
+        ripple: "ripple 3s ease-in-out infinite",
+        "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
+        "rotate-pulse": "rotate-pulse 4s ease-in-out infinite",
+        "wave-pulse": "wave-pulse 3s ease-in-out infinite",
+      },
+      boxShadow: {
+        glow: "0 0 35px -5px var(--tw-shadow-color)",
       },
     },
   },

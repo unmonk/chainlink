@@ -157,39 +157,23 @@ export const getActiveMatchups = query({
     // Get pick counts for each matchup
     const matchupsWithPickCounts: MatchupWithPickCounts[] = [];
     for (let matchup of matchups) {
-      if (
-        matchup.status === "STATUS_IN_PROGRESS" ||
-        matchup.status === "STATUS_FIRST_HALF" ||
-        matchup.status === "STATUS_SECOND_HALF" ||
-        matchup.status === "STATUS_END_PERIOD" ||
-        matchup.status === "STATUS_FINAL" ||
-        matchup.status === "STATUS_FULL_TIME" ||
-        matchup.status === "STATUS_FULL_PEN"
-      ) {
-        const picks = await ctx.db
-          .query("picks")
-          .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
-          .collect();
+      const picks = await ctx.db
+        .query("picks")
+        .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
+        .collect();
 
-        const homeTeamPicks = picks.filter(
-          (p) => p.pick.id === matchup.homeTeam.id
-        ).length;
-        const awayTeamPicks = picks.filter(
-          (p) => p.pick.id === matchup.awayTeam.id
-        ).length;
+      const homeTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.homeTeam.id
+      ).length;
+      const awayTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.awayTeam.id
+      ).length;
 
-        matchupsWithPickCounts.push({
-          ...matchup,
-          homePicks: homeTeamPicks,
-          awayPicks: awayTeamPicks,
-        });
-      } else {
-        matchupsWithPickCounts.push({
-          ...matchup,
-          homePicks: 0,
-          awayPicks: 0,
-        });
-      }
+      matchupsWithPickCounts.push({
+        ...matchup,
+        homePicks: homeTeamPicks || 0,
+        awayPicks: awayTeamPicks || 0,
+      });
     }
     return matchupsWithPickCounts;
   },

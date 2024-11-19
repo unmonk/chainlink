@@ -11,12 +11,14 @@ import {
   TableCell,
 } from "../ui/table";
 import { QuizResults } from "@/convex/quiz";
+import { COSMETIC_STYLE } from "@/lib/utils";
 
 export default function ChallengeResponsesList({
   quiz,
 }: {
   quiz: QuizResults;
 }) {
+  console.log(quiz.responses, "quiz.responses");
   return quiz.responses.length === 0 ? (
     <Card className="mt-4">
       <CardHeader>
@@ -45,10 +47,18 @@ export default function ChallengeResponsesList({
               .sort((a, b) => b.wager - a.wager)
               .map((response) => (
                 <TableRow key={response._id}>
-                  <Link href={`/u/${response.user.name}`}>
-                    <TableCell>
+                  <TableCell>
+                    <Link href={`/u/${response.user.name}`}>
                       <div className="flex items-center gap-2">
-                        <Avatar>
+                        <Avatar
+                          height="h-12"
+                          width="w-12"
+                          cosmetic={
+                            response.user.metadata
+                              ?.avatarBackground as COSMETIC_STYLE
+                          }
+                          hasGlow={!!response.user.metadata?.avatarBackground}
+                        >
                           <AvatarImage
                             src={response.user.image}
                             alt={response.user.name}
@@ -59,8 +69,8 @@ export default function ChallengeResponsesList({
                         </Avatar>
                         <span>{response.user.name}</span>
                       </div>
-                    </TableCell>
-                  </Link>
+                    </Link>
+                  </TableCell>
                   <TableCell>
                     {
                       quiz.quiz.options.find(

@@ -121,7 +121,7 @@ export const HeroCards = () => {
                 )}
                 {matchups && (
                   <>
-                    <Avatar>
+                    <Avatar height="h-10" width="w-10">
                       <AvatarImage src={matchups[0].awayTeam.image} />
                       <AvatarFallback>
                         {matchups[0].awayTeam.name[0]}
@@ -137,7 +137,7 @@ export const HeroCards = () => {
                 )}
                 {matchups && (
                   <>
-                    <Avatar>
+                    <Avatar height="h-10" width="w-10">
                       <AvatarImage src={matchups[0].homeTeam.image} />
                       <AvatarFallback>
                         {matchups[0].homeTeam.name[0]}
@@ -165,7 +165,7 @@ export const HeroCards = () => {
                 )}
                 {matchups && (
                   <>
-                    <Avatar>
+                    <Avatar height="h-10" width="w-10">
                       <AvatarImage src={matchups[1].awayTeam.image} />
                       <AvatarFallback>
                         {matchups[1].awayTeam.name[1]}
@@ -181,7 +181,7 @@ export const HeroCards = () => {
                 )}
                 {matchups && (
                   <>
-                    <Avatar>
+                    <Avatar height="h-10" width="w-10">
                       <AvatarImage src={matchups[1].homeTeam.image} />
                       <AvatarFallback>
                         {matchups[1].homeTeam.name[1]}

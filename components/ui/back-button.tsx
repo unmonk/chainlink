@@ -24,7 +24,7 @@ export function BackButton() {
 
   return (
     <Button
-      className="h-8"
+      className="hidden md:flex h-8"
       variant="outline"
       size="icon"
       onClick={handleBack}

@@ -127,7 +127,7 @@ export default function AdminEditSquad({ squadId }: { squadId: Id<"squads"> }) {
       </CardHeader>
       <CardContent className="pt-6">
         <div className="flex flex-col items-center justify-center gap-4">
-          <Avatar className="w-24 h-24">
+          <Avatar height="h-24" width="w-24">
             <AvatarImage src={squad?.image} alt={squad?.name} />
             <AvatarFallback>{squad?.name}</AvatarFallback>
           </Avatar>

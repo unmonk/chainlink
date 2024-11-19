@@ -39,6 +39,7 @@ import { leagueLogos } from "@/convex/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { EditIcon } from "lucide-react";
+import { SponsoredMatchupForm } from "./sponsored-matchup-form";
 
 const EditMatchupFormSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
@@ -606,6 +607,18 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
               )}
             />
           )}
+
+          {methods.watch("featured") &&
+            methods.watch("featuredType") === "SPONSORED" && (
+              <SponsoredMatchupForm
+                onChange={(sponsoredData) => {
+                  methods.setValue("metadata.sponsored", sponsoredData, {
+                    shouldValidate: true,
+                  });
+                }}
+                initialData={methods.getValues().metadata?.sponsored}
+              />
+            )}
 
           <hr className="my-4" />
           <div className="flex flex-col space-y-2">

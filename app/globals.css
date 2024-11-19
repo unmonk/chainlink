@@ -166,6 +166,30 @@
   }
 }
 
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 .cl-formButtonPrimary {
   @apply inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
 }
@@ -310,4 +334,19 @@ button[data-localization-key="userProfile.start.dangerSection.deleteAccountButto
 
 .cl-formButtonReset {
   @apply text-foreground hover:bg-secondary;
+}
+
+@keyframes glow {
+  0% {
+    opacity: 0.3;
+    transform: scale(1.05) rotate(0deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1) rotate(180deg);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1.05) rotate(360deg);
+  }
 }

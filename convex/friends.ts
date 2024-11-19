@@ -179,8 +179,6 @@ export const getFriends = query({
       .withIndex("by_clerk_id", (q) => q.eq("externalId", identity.subject))
       .unique();
 
-    console.log(user, "user");
-
     if (!user) throw new Error("User not found");
 
     return user.friends || [];

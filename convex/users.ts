@@ -419,6 +419,15 @@ export const getUserByWins = query({
   },
 });
 
+export const getUser = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, { userId }) => {
+    return await ctx.db.get(userId);
+  },
+});
+
 export const getAllUsers = query({
   handler: async (ctx) => {
     return await ctx.db.query("users").collect();
@@ -434,5 +443,32 @@ export const getLegacyUser = query({
       .query("legacyUsers")
       .withIndex("by_userId", (q) => q.eq("userId", userId))
       .unique();
+  },
+});
+
+export const addAvatarBackground = mutation({
+  args: {
+    userId: v.id("users"),
+    background: v.string(),
+  },
+  handler: async (ctx, { userId, background }) => {
+    const user = await ctx.db.get(userId);
+    if (!user) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    if (!user.metadata) {
+      user.metadata = {
+        avatarBackgrounds: [],
+      };
+    }
+    if (!user.metadata.avatarBackgrounds) {
+      user.metadata.avatarBackgrounds = [];
+    }
+    await ctx.db.patch(userId, {
+      metadata: {
+        avatarBackgrounds: [...user.metadata.avatarBackgrounds, background],
+      },
+    });
+    return user.metadata.avatarBackgrounds;
   },
 });

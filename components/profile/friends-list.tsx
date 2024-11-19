@@ -33,6 +33,7 @@ import {
 } from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
 import { motion } from "framer-motion";
+import { cn, COSMETIC_STYLE, COSMETIC_STYLES } from "@/lib/utils";
 
 export function FriendsList() {
   const user = useUser();
@@ -138,7 +139,17 @@ export function FriendsList() {
                       >
                         <Link href={`/u/${request.user?.name}`} passHref>
                           <div className="flex items-center gap-2">
-                            <Avatar>
+                            <Avatar
+                              height="h-10"
+                              width="w-10"
+                              cosmetic={
+                                request.user?.metadata
+                                  ?.avatarBackground as COSMETIC_STYLE
+                              }
+                              hasGlow={
+                                !!request.user?.metadata?.avatarBackground
+                              }
+                            >
                               <AvatarImage src={request.user?.image} />
                               <AvatarFallback>
                                 {request.user?.name
@@ -215,13 +226,24 @@ export function FriendsList() {
                           className="flex-1"
                         >
                           <div className="flex items-center gap-2">
-                            <Avatar>
+                            <Avatar
+                              cosmetic={
+                                friend.user?.metadata
+                                  ?.avatarBackground as COSMETIC_STYLE
+                              }
+                              hasGlow={
+                                !!friend.user?.metadata?.avatarBackground
+                              }
+                              height="h-10"
+                              width="w-10"
+                            >
                               <AvatarImage src={friend.user?.image} />
                               <AvatarFallback>
                                 {friend.user?.name?.slice(0, 2).toUpperCase() ??
                                   "??"}
                               </AvatarFallback>
                             </Avatar>
+
                             <div>
                               <div className="flex items-center gap-2">
                                 <p className="text-sm font-medium">

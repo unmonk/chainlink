@@ -10,7 +10,7 @@ import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { CircleArrowOutUpRightIcon } from "lucide-react";
 import { RainbowButton } from "../ui/rainbow-button";
-import ActivePickCard, { UserPickWithMatchup } from "../matchups/active-pick";
+import MatchupCard from "../matchups/matchup-card";
 
 const DashboardActivePick = () => {
   const pick = useQuery(api.picks.getUserActivePickWithMatchup, {});
@@ -37,12 +37,7 @@ const DashboardActivePick = () => {
       </Card>
     );
 
-  const pickWithMatchup: UserPickWithMatchup = {
-    ...pick.pick,
-    matchup: pick.matchup,
-  };
-
-  return <ActivePickCard pick={pickWithMatchup} />;
+  return <MatchupCard matchup={pick.matchupWithPicks} activePick={pick.pick} />;
 };
 
 export default DashboardActivePick;

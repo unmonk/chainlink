@@ -14,6 +14,7 @@ import { AdminUserActions } from "./admin-user-actions";
 import AdminUserStats from "./admin-user-stats";
 import { GiCard2Spades } from "react-icons/gi";
 import { Doc } from "@/convex/_generated/dataModel";
+import { COSMETIC_STYLE } from "@/lib/utils";
 
 export function AdminUserInfo({
   user,
@@ -76,7 +77,12 @@ export function AdminUserInfo({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-x-4">
-            <Avatar className="h-12 w-12">
+            <Avatar
+              height="h-12"
+              width="w-12"
+              hasGlow={!!convexUser.metadata?.avatarBackground}
+              cosmetic={convexUser.metadata?.avatarBackground as COSMETIC_STYLE}
+            >
               <AvatarImage src={user.imageUrl} />
               <AvatarFallback>
                 {user.firstName?.[0]}
