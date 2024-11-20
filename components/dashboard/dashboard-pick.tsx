@@ -37,7 +37,13 @@ const DashboardActivePick = () => {
       </Card>
     );
 
-  return <MatchupCard matchup={pick.matchupWithPicks} activePick={pick.pick} />;
+  return (
+    <MatchupCard
+      matchup={pick.matchupWithPicks}
+      activePick={pick.pick}
+      userId={pick.pick.userId}
+    />
+  );
 };
 
 export default DashboardActivePick;
