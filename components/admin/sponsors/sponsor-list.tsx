@@ -47,8 +47,8 @@ export function SponsorsList() {
             <TableRow>
               <TableHead>Sponsor</TableHead>
               <TableHead>URL</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Featured</TableHead>
+              <TableHead>Active (Dashboard)</TableHead>
+              <TableHead>Featured (Matchups)</TableHead>
               <TableHead>Clicks</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -94,17 +94,22 @@ export function SponsorsList() {
                 </TableCell>
                 <TableCell>
                   <Badge variant={sponsor.active ? "default" : "outline"}>
-                    {sponsor.active ? "Active" : "Inactive"}
+                    {sponsor.active ? "Dashboard" : "Inactive"}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={sponsor.featured ? "default" : "outline"}>
-                    {sponsor.featured ? "Featured" : "No"}
+                    {sponsor.featured ? "Matchups" : "No"}
                   </Badge>
                 </TableCell>
                 <TableCell>{sponsor.metadata?.clicks || 0}</TableCell>
                 <TableCell className="text-right">
-                  <SponsorActions sponsor={sponsor} />
+                  <SponsorActions
+                    sponsor={{
+                      ...sponsor,
+                      imageStorageId: sponsor.imageStorageId?.toString() ?? "",
+                    }}
+                  />
                 </TableCell>
               </TableRow>
             ))}

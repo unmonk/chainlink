@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
-import { Smile } from "lucide-react";
+import { Loader2, Smile } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -17,97 +17,114 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import Image from "next/image";
 import { toast } from "sonner";
-import useStoreUserEffect from "@/hooks/use-store-user";
-
-interface ReactionType {
-  _id: string;
-  code: string;
-  name: string;
-  imageUrl?: string;
-  count: number;
-}
 
 interface ReactionsInputProps {
   position: "HOME" | "AWAY";
   matchupId: Id<"matchups">;
+  userId: Id<"users">;
+  matchupReactions: Doc<"matchupReactions">[];
 }
 
 export default function ReactionsInput({
   position,
   matchupId,
+  userId,
+  matchupReactions,
 }: ReactionsInputProps) {
-  const userId = useStoreUserEffect();
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //queries
-  const reactions = useQuery(api.reactions.list, { activeOnly: true }) || [];
-
-  const matchupReactions = useQuery(api.reactions.getMatchupReactions, {
-    matchupId,
-  });
+  const reactions = useQuery(api.reactions.list, { activeOnly: true });
 
   //mutations
   const addReaction = useMutation(api.reactions.addUserReaction);
   const deleteReaction = useMutation(api.reactions.removeMatchupReaction);
 
   //get a list of reactions for the team from matchupReactions and use that for the tooltip
-  const teamReactions = matchupReactions?.filter((mr) => mr.team === position);
-
-  // Group reactions by reactionId and count them
-  const reactionCounts = teamReactions?.reduce(
-    (acc, mr) => {
-      acc[mr.reactionId] = (acc[mr.reactionId] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
+  const teamReactions = useMemo(
+    () => matchupReactions?.filter((mr) => mr.team === position),
+    [matchupReactions, position]
   );
 
-  // Combine with reaction details and only include reactions that exist for this team
-  const formattedTeamReactions = reactions
-    .filter((reaction) => reactionCounts?.[reaction._id])
-    .map((reaction) => ({
-      _id: reaction._id,
-      code: reaction.code,
-      name: reaction.name,
-      imageUrl: reaction.imageUrl,
-      count: reactionCounts?.[reaction._id] || 0,
-    }));
+  // Group reactions by reactionId and count them
+  const reactionCounts = useMemo(
+    () =>
+      teamReactions?.reduce(
+        (acc, mr) => {
+          acc[mr.reactionId] = (acc[mr.reactionId] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+    [teamReactions]
+  );
 
-  async function handleReaction(reactionId: string) {
-    try {
-      await addReaction({
-        matchupId,
-        reactionId: reactionId as Id<"reactions">,
-        team: position,
-      });
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes("User already has a reaction")
-      ) {
-        toast.error("You already have a reaction for this team");
-      } else {
-        toast.error("Failed to add reaction");
+  // Memoize the formatted reactions
+  const formattedTeamReactions = useMemo(
+    () =>
+      (reactions || [])
+        .filter((reaction) => reactionCounts?.[reaction._id])
+        .map((reaction) => ({
+          _id: reaction._id,
+          code: reaction.code,
+          name: reaction.name,
+          imageUrl: reaction.imageUrl,
+          count: reactionCounts?.[reaction._id] || 0,
+        })),
+    [reactions, reactionCounts]
+  );
+
+  const handleReaction = useCallback(
+    async (reactionId: string) => {
+      setIsSubmitting(true);
+      try {
+        await addReaction({
+          matchupId,
+          reactionId: reactionId as Id<"reactions">,
+          team: position,
+        });
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes("User already has a reaction")
+        ) {
+          toast.error("You already have a reaction for this team");
+        } else {
+          toast.error("Failed to add reaction");
+        }
+      } finally {
+        setIsSubmitting(false);
+        setOpen(false);
       }
-    }
-    setOpen(false);
-  }
+    },
+    [addReaction, matchupId, position]
+  );
 
-  async function handleDeleteReaction(reactionId: Id<"reactions">) {
-    //find the matchupReaction with the same reactionId and userId
-    const matchupReaction = matchupReactions?.find(
-      (mr) =>
-        mr.reactionId === reactionId &&
-        mr.userId === userId &&
-        mr.team === position
-    );
-    if (matchupReaction) {
-      await deleteReaction({ id: matchupReaction._id });
-    }
-  }
+  const handleDeleteReaction = useCallback(
+    async (reactionId: Id<"reactions">) => {
+      setIsSubmitting(true);
+      try {
+        const matchupReaction = matchupReactions?.find(
+          (mr) =>
+            mr.reactionId === reactionId &&
+            mr.userId === userId &&
+            mr.team === position
+        );
+        if (matchupReaction) {
+          await deleteReaction({ id: matchupReaction._id });
+        }
+      } catch (error) {
+        toast.error("Failed to delete reaction");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [matchupReactions, userId, position, deleteReaction]
+  );
 
   //disable if user already has a reaction for this team
   const inputDisabled = matchupReactions?.some(
@@ -150,7 +167,7 @@ export default function ReactionsInput({
                             "hover:scale-125 transition-all transform active:scale-95 relative",
                             deleteDisabled(_id) && "cursor-not-allowed"
                           )}
-                          disabled={deleteDisabled(_id)}
+                          disabled={deleteDisabled(_id) || isSubmitting}
                         >
                           <span>
                             {!imageUrl ? (
@@ -190,9 +207,10 @@ export default function ReactionsInput({
                 "opacity-80 hover:opacity-100",
                 inputDisabled && "opacity-50 cursor-not-allowed"
               )}
-              disabled={inputDisabled}
+              disabled={inputDisabled || isSubmitting}
             >
-              <TbMoodPlus className="w-4 h-4" />
+              {!isSubmitting && <TbMoodPlus className="w-4 h-4" />}
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-[280px] p-2">
@@ -207,8 +225,10 @@ export default function ReactionsInput({
                       "flex flex-col items-center gap-1 p-2",
                       "rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800",
                       "transition-colors",
-                      "hover:scale-115 transition-all transform active:scale-95"
+                      "hover:scale-115 transition-all transform active:scale-95",
+                      inputDisabled && "cursor-not-allowed"
                     )}
+                    disabled={inputDisabled || isSubmitting}
                   >
                     <span className="text-2xl">
                       {!imageUrl ? (
@@ -221,6 +241,7 @@ export default function ReactionsInput({
                         />
                       )}
                     </span>
+
                     <span className="text-xs text-zinc-600 dark:text-zinc-400">
                       {name}
                     </span>

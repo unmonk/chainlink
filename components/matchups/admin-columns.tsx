@@ -217,6 +217,12 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
             row.original.featuredType === "CHAINBUILDER" && (
               <Badge variant={"default"}>ChainBuilder</Badge>
             )}
+          {row.original.featured &&
+            row.original.featuredType === "SPONSORED" && (
+              <Badge variant={"default"} className="bg-pink-400">
+                Sponsored
+              </Badge>
+            )}
         </div>
       );
     },

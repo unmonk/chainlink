@@ -7,7 +7,7 @@ import {
 import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
 import { matchupReward } from "./utils";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 import { featured_type, matchup_type } from "./schema";
 
@@ -136,6 +136,7 @@ export const getAdminMatchups = query({
 export type MatchupWithPickCounts = Doc<"matchups"> & {
   homePicks: number;
   awayPicks: number;
+  reactions: Doc<"matchupReactions">[];
 };
 
 export const getActiveMatchups = query({
@@ -157,6 +158,7 @@ export const getActiveMatchups = query({
     // Get pick counts for each matchup
     const matchupsWithPickCounts: MatchupWithPickCounts[] = [];
     for (let matchup of matchups) {
+      //get picks
       const picks = await ctx.db
         .query("picks")
         .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
@@ -169,10 +171,30 @@ export const getActiveMatchups = query({
         (p) => p.pick.id === matchup.awayTeam.id
       ).length;
 
+      // Include reactions in the matchup data
+      const reactions = await ctx.db
+        .query("matchupReactions")
+        .withIndex("by_matchup", (q) => q.eq("matchupId", matchup._id))
+        .collect();
+
+      if (
+        matchup.featured &&
+        matchup.featuredType === "SPONSORED" &&
+        matchup.metadata?.sponsored
+      ) {
+        const sponsor = await ctx.runQuery(api.sponsors.getById, {
+          id: matchup.metadata.sponsored.sponsorId,
+        });
+        if (sponsor) {
+          matchup.metadata.sponsored = sponsor;
+        }
+      }
+
       matchupsWithPickCounts.push({
         ...matchup,
         homePicks: homeTeamPicks || 0,
         awayPicks: awayTeamPicks || 0,
+        reactions,
       });
     }
     return matchupsWithPickCounts;

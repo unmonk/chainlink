@@ -21,12 +21,14 @@ import { Card } from "../ui/card";
 import BlurFade from "../ui/blur-fade";
 import { BackgroundGradientSponsored } from "../ui/background-gradient-sponsored";
 import MatchupSkeleton from "./matchup-skeleton";
+import { useConvexUser } from "@/hooks/use-convex-user";
 
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
   const userPickWithMatchup = useQuery(api.picks.getUserActivePickWithMatchup);
+  const { userId } = useConvexUser();
 
-  const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
+  const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "available" | "chainBuilder">(
     "all"
   );
@@ -34,15 +36,16 @@ const MatchupList = ({}) => {
   const filteredMatchups = useMemo(() => {
     if (!matchups) return [];
     return matchups.filter((m) => {
-      const leagueMatch = !selectedLeague || m.league === selectedLeague;
+      const sportMatch =
+        !selectedSport || getSportFromLeague(m.league) === selectedSport;
       const availableMatch =
         filter === "all" ||
         (filter === "available" && m.status === "STATUS_SCHEDULED");
       const chainBuilderMatch =
         filter === "all" || (filter === "chainBuilder" && m.featured === true);
-      return leagueMatch && (availableMatch || chainBuilderMatch);
+      return sportMatch && (availableMatch || chainBuilderMatch);
     });
-  }, [matchups, selectedLeague, filter]);
+  }, [matchups, selectedSport, filter]);
 
   const currentTime = new Date().getTime();
   const minus8Hours = currentTime - 8 * 60 * 60 * 1000;
@@ -59,6 +62,8 @@ const MatchupList = ({}) => {
     return groups;
   }, [matchups]);
 
+  if (!userId) return null;
+
   return (
     <div className="flex flex-col">
       {userPickWithMatchup && (
@@ -67,6 +72,7 @@ const MatchupList = ({}) => {
           <MatchupCard
             matchup={userPickWithMatchup.matchupWithPicks}
             activePick={userPickWithMatchup.pick}
+            userId={userId}
           />
           <Separator orientation="horizontal" className="my-4" />
         </div>
@@ -99,7 +105,7 @@ const MatchupList = ({}) => {
           <TabsList className="">
             <TabsTrigger
               value="all"
-              onClick={() => setSelectedLeague(null)}
+              onClick={() => setSelectedSport(null)}
               className="text-xs"
             >
               All
@@ -108,7 +114,7 @@ const MatchupList = ({}) => {
               <TabsTrigger
                 key={sport}
                 value={sport}
-                onClick={() => setSelectedLeague(leagues[0])}
+                onClick={() => setSelectedSport(sport)}
                 className="p-2"
                 title={leagues.join(", ")}
               >
@@ -148,7 +154,7 @@ const MatchupList = ({}) => {
                           animate={true}
                           className="rounded-lg overflow-hidden shadow-lg"
                         >
-                          <MatchupCard matchup={matchup} />
+                          <MatchupCard matchup={matchup} userId={userId} />
                         </BackgroundGradient>
                       )}
                       {matchup.featuredType === "SPONSORED" && (
@@ -160,7 +166,7 @@ const MatchupList = ({}) => {
                             matchup.metadata?.sponsoredData?.color || "white"
                           }
                         >
-                          <MatchupCard matchup={matchup} />
+                          <MatchupCard matchup={matchup} userId={userId} />
                         </BackgroundGradientSponsored>
                       )}
                     </BlurFade>
@@ -172,7 +178,7 @@ const MatchupList = ({}) => {
                       delay={0.25 * idx * 0.01}
                       inView
                     >
-                      <MatchupCard matchup={matchup} />
+                      <MatchupCard matchup={matchup} userId={userId} />
                     </BlurFade>
                   );
                 }

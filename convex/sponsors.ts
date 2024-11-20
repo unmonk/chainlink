@@ -44,13 +44,11 @@ export const listActiveFeatured = query({
       .collect();
 
     // Sort by order field, handling undefined values
-    return sponsors
-      .sort((a, b) => {
-        const orderA = a.order ?? 10000;
-        const orderB = b.order ?? 10000;
-        return orderA - orderB;
-      })
-      .slice(0, 6); // Take first 6
+    return sponsors.sort((a, b) => {
+      const orderA = a.order ?? 10000;
+      const orderB = b.order ?? 10000;
+      return orderA - orderB;
+    });
   },
 });
 
@@ -165,5 +163,43 @@ export const recordClick = mutation({
     });
 
     return sponsor.url;
+  },
+});
+
+export const update = mutation({
+  args: {
+    id: v.id("sponsors"),
+    name: v.string(),
+    description: v.string(),
+    active: v.boolean(),
+    featured: v.boolean(),
+    color: v.string(),
+    url: v.string(),
+    tier: v.union(v.literal("GOLD"), v.literal("SILVER"), v.literal("BRONZE")),
+    imageStorageId: v.id("_storage"),
+    bannerImageStorageId: v.optional(v.id("_storage")),
+    order: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updateData } = args;
+
+    const imageUrl = await ctx.storage.getUrl(args.imageStorageId);
+    if (!imageUrl) {
+      throw new Error("Failed to get image URL");
+    }
+
+    let bannerImageUrl = undefined;
+    if (args.bannerImageStorageId) {
+      bannerImageUrl = await ctx.storage.getUrl(args.bannerImageStorageId);
+      if (!bannerImageUrl) {
+        throw new Error("Failed to get banner image URL");
+      }
+    }
+
+    return await ctx.db.patch(id, {
+      ...updateData,
+      image: imageUrl,
+      bannerImage: bannerImageUrl,
+    });
   },
 });

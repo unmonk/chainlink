@@ -1,12 +1,5 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { BackgroundGradientSponsored } from "@/components/ui/background-gradient-sponsored";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,20 +21,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useAction, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import { toast } from "sonner";
 import { COLORS, COLORS_TEXT, TIERS } from "./sponsor-utils";
 
+// Reuse the same schema and color constants from create-sponsor-form
 const sponsorFormSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
   description: z.string().min(1, { message: "Description is required" }),
@@ -52,44 +44,48 @@ const sponsorFormSchema = z.object({
   tier: z.enum(["GOLD", "SILVER", "BRONZE"]),
   active: z.boolean(),
   featured: z.boolean(),
+  order: z.number().optional(),
 });
 
-type SponsorFormValues = z.infer<typeof sponsorFormSchema>;
+// Add the same COLORS and COLORS_TEXT constants from create-sponsor-form
 
-// Add this constant at the top of the file, outside the component
+interface EditSponsorFormProps {
+  sponsorId: Id<"sponsors">;
+  initialValues: z.infer<typeof sponsorFormSchema>;
+  onClose: () => void;
+}
 
-export default function CreateSponsorForm() {
+export function EditSponsorForm({
+  sponsorId,
+  initialValues,
+  onClose,
+}: EditSponsorFormProps) {
   const [activeColor, setActiveColor] = useState("");
   const router = useRouter();
-  const createSponsor = useMutation(api.sponsors.create);
+  const sponsor = useQuery(api.sponsors.getById, { id: sponsorId });
+  const updateSponsor = useMutation(api.sponsors.update);
 
-  const form = useForm<SponsorFormValues>({
+  const form = useForm<z.infer<typeof sponsorFormSchema>>({
     resolver: zodResolver(sponsorFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      url: "https://chainlink.st",
-      imageStorageId: "",
-      bannerImageStorageId: "",
-      color: "",
-      tier: "BRONZE",
-      active: true,
-      featured: false,
-    },
+    defaultValues: initialValues,
   });
 
-  async function onSubmit(values: SponsorFormValues) {
+  if (!sponsor) return null;
+
+  async function onSubmit(values: z.infer<typeof sponsorFormSchema>) {
     try {
-      await createSponsor({
+      await updateSponsor({
+        id: sponsorId,
         ...values,
         imageStorageId: values.imageStorageId as Id<"_storage">,
         bannerImageStorageId: values.bannerImageStorageId as Id<"_storage">,
       });
 
-      router.push("/admin/sponsors");
-      toast.success("Sponsor created successfully");
+      toast.success("Sponsor updated successfully");
+      onClose();
+      router.refresh();
     } catch (error) {
-      toast.error("Failed to create sponsor: " + error);
+      toast.error("Failed to update sponsor: " + error);
     }
   }
 
@@ -105,6 +101,7 @@ export default function CreateSponsorForm() {
           <CardContent className="p-4">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
+                {/* Form fields same as create-sponsor-form */}
                 <FormField
                   control={form.control}
                   name="name"
@@ -163,7 +160,7 @@ export default function CreateSponsorForm() {
                         <FormDescription>
                           24x24. Will be displayed on the matchups footer.
                         </FormDescription>
-                        <ImageUpload {...field} />
+                        <ImageUpload {...field} value={field.value || ""} />
                         <FormMessage />
                       </FormItem>
                     )}
@@ -236,15 +233,12 @@ export default function CreateSponsorForm() {
                     )}
                   />
                 </div>
-
                 <Button
                   type="submit"
                   disabled={form.formState.isSubmitting}
                   className="w-full mt-4"
                 >
-                  {form.formState.isSubmitting
-                    ? "Creating..."
-                    : "Create Sponsor"}
+                  {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
                 </Button>
               </form>
             </Form>

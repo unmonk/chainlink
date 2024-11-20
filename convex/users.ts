@@ -472,3 +472,23 @@ export const addAvatarBackground = mutation({
     return user.metadata.avatarBackgrounds;
   },
 });
+
+// Add this mutation to your existing users.ts file
+export const updateAvatarBackground = mutation({
+  args: {
+    background: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.runQuery(api.users.currentUser);
+    if (!user) throw new Error("User not found");
+
+    await ctx.db.patch(user._id, {
+      metadata: {
+        ...user.metadata,
+        avatarBackground: args.background,
+      },
+    });
+
+    return true;
+  },
+});

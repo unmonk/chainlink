@@ -6,30 +6,155 @@ import {
 } from "@/components/ui/accordion";
 import { DiscordLogoIcon } from "@radix-ui/react-icons";
 
+const LinksFAQ = () => {
+  return (
+    <>
+      <p className="mb-2">
+        Links are our in game currency. You earn links with every correct pick
+        that you make while playing ChainLink. These Links can be spent on
+        features and upgrades to the game (coming soon)
+      </p>
+      <p className="mb-2">
+        Some matchups will require you to wager Links in order to make a pick,
+        while others may pay out more in collaboration with our partners or
+        sponsors.
+      </p>
+      <p className="mb-2">
+        Links can also be spent in our game room to play blackjack or slots for
+        a chance to win even more Links!
+      </p>
+    </>
+  );
+};
+
+const MatchupsPickFAQ = () => {
+  return (
+    <>
+      <p className="mb-2">
+        Matchups are curated by our team of experts, and you can pick any
+        matchup that is available on the platform. The Play screen will show you
+        all matchups for the next 48 hours across several football, soccer,
+        baseball, and other leagues.
+      </p>
+    </>
+  );
+};
+
+const MatchupsUpdateFAQ = () => {
+  return (
+    <>
+      <p className="mb-2">
+        Matchups are checked every minute as long as the league is pushing
+        scores.
+      </p>
+    </>
+  );
+};
+
+const SquadsFAQ = () => {
+  return (
+    <>
+      <p className="mb-2">
+        Squads is a team game, built right into ChainLink! Start a new Squad or
+        join your friends to see who is the most knowledgeable group of sports
+        fans in the world!
+      </p>
+      <p className="mb-2">
+        Squad score is determined by a combination of wins, losses, pushes,
+        member contributions. Earn some cool achievements to display forever on
+        the Squad page and your profile!
+      </p>
+    </>
+  );
+};
+
+const NotificationsFAQ = () => {
+  return (
+    <>
+      <p className="mb-2">
+        If you missed turning on notifications during your account setup and
+        install, you can still activate them to Never Miss A Pick!
+      </p>
+      <p className="mb-2">
+        In your setting page on the side bar, click the notifications section,
+        this is hidden behind a menu on most phones.
+      </p>
+      <p className="mb-2">
+        From the Notifications page, activate your push notifications and be
+        sure to accept notifications on your phone or web browser when the pop
+        up appears. You may have to re-toggle the button after accepting
+        notifications.
+      </p>
+      <p className="mb-2">
+        Now toggle the “Pick Completion Notifications” and Never Miss A Pick
+        again!
+      </p>
+    </>
+  );
+};
+
+const ExtraGamesFAQ = () => {
+  return (
+    <>
+      <h2 className="mb-2 font-bold">Blackjack</h2>
+      <p className="mb-2">
+        The Blackjack game is played for our in-game currency, Links. You can
+        play one hand per day for free, otherwise playing requires you to stake
+        your hard earned Links.
+      </p>
+      <p className="mb-2">
+        This is a basic blackjack game, with no splits, doubles, or insurance.
+        Blackjack pays at 2.5:1
+      </p>
+      <h2 className="mb-2 font-bold">Slots</h2>
+      <p className="mb-2">
+        The slots game is played for our in-game currency, Links. You can play
+        one spin per day for free, otherwise playing requires you to stake your
+        hard earned Links.
+      </p>
+      <p className="mb-2">
+        Matching symbols only count from the left of the spinner.
+      </p>
+    </>
+  );
+};
+
 interface FAQProps {
   question: string;
-  answer: string;
+  answer: React.ReactNode;
   value: string;
 }
 
 const FAQList: FAQProps[] = [
   {
     question: "What matchups can I pick?",
-    answer:
-      "Matchups are curated by our team of experts, and you can pick any matchup that is available on the platform. The Play screen will show you all matchups for the next 48 hours across several football, soccer, baseball, and other leagues. ",
+    answer: <MatchupsPickFAQ />,
     value: "item-1",
   },
   {
     question: "When are matchups updated?",
-    answer:
-      "Matchups are checked every minute as long as the league is pushing scores.",
+    answer: <MatchupsUpdateFAQ />,
     value: "item-2",
   },
   {
     question: "What are 🔗Links?",
-    answer:
-      "🔗Links are our currency in the ChainLink game. You earn 🔗Links through winning matchups. Additonal ways to earn and use 🔗Links will be announced soon.",
+    answer: <LinksFAQ />,
     value: "item-3",
+  },
+  {
+    question: "What are Squads?",
+    answer: <SquadsFAQ />,
+    value: "item-4",
+  },
+  {
+    question: "How do I get notifications?",
+    answer: <NotificationsFAQ />,
+    value: "item-5",
+  },
+  {
+    question: "How do I play the extra game modes?",
+    answer: <ExtraGamesFAQ />,
+    value: "item-6",
   },
 ];
 

@@ -1,7 +1,8 @@
 import { Doc } from "@/convex/_generated/dataModel";
 import { matchupReward } from "@/convex/utils";
 import { cn } from "@/lib/utils";
-import { Link, DownloadIcon } from "lucide-react";
+import { LinkIcon, DownloadIcon } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 import { displayWinner } from "./matchup-card-buttons";
 import Image from "next/image";
@@ -9,6 +10,8 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { PiShootingStarLight } from "react-icons/pi";
+
 import CancelButton from "./cancel-button";
 
 export default function MatchupCardFooter({
@@ -42,9 +45,11 @@ export default function MatchupCardFooter({
           {matchup.featured && matchup.featuredType === "SPONSORED" && (
             <span
               className={cn(
-                `text-${matchup.metadata?.sponsoredData?.color || "white"}-500`
+                `text-${matchup.metadata?.sponsored?.color || "white"}-500`,
+                "flex flex-row items-center justify-center"
               )}
             >
+              <PiShootingStarLight className="w-3 h-3 mr-1" />
               Sponsored
             </span>
           )}
@@ -103,15 +108,15 @@ export default function MatchupCardFooter({
       </div>
       {matchup.featured &&
         matchup.featuredType === "SPONSORED" &&
-        matchup.metadata.sponsoredData && (
-          <Link href={matchup.metadata.sponsoredData.url}>
+        matchup.metadata.sponsored && (
+          <Link href={`/api/clickthru/${matchup.metadata.sponsored._id}`}>
             <div className="flex flex-row justify-center items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border text-sm">
               <span className="flex flex-row justify-center items-center gap-1">
-                {matchup.metadata.sponsoredData.description}
+                {matchup.metadata.sponsored.description}
               </span>
               <Image
-                src={matchup.metadata.sponsoredData.image}
-                alt={matchup.metadata.sponsoredData.name}
+                src={matchup.metadata.sponsored.image}
+                alt={matchup.metadata.sponsored.name}
                 width={24}
                 height={24}
                 className="ml-1 items-center justify-center self-center"

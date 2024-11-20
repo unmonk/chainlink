@@ -1,7 +1,7 @@
 import { MatchupWithPickCounts } from "@/convex/matchups";
 import MatchupPickButton from "./matchup-pick-button";
 import ReactionBar from "../reactions/reaction-bar";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
 import { formatDistance } from "date-fns";
@@ -10,8 +10,10 @@ import { LockIcon } from "lucide-react";
 const MatchupCardButtons = ({
   matchup,
   activePick,
+  userId,
 }: {
   matchup: MatchupWithPickCounts;
+  userId: Id<"users">;
   activePick?: Doc<"picks">;
 }) => {
   const totalPicks = matchup.homePicks + matchup.awayPicks;
@@ -261,7 +263,11 @@ const MatchupCardButtons = ({
           />
         </div>
       </div>
-      <ReactionBar matchupId={matchup._id}>
+      <ReactionBar
+        matchupId={matchup._id}
+        userId={userId}
+        matchupReactions={matchup.reactions}
+      >
         {matchup.status === "STATUS_SCHEDULED" &&
           activePick?.matchupId === matchup._id && (
             <div className="col-span-1 bg-accent/40 flex-nowrap p-0.5 rounded-sm flex items-center justify-center gap-1 text-xs">
