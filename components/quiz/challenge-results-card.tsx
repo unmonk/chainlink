@@ -3,11 +3,11 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { formatDistanceToNow } from "date-fns";
-import useStoreUserEffect from "@/hooks/use-store-user";
 import { QuizResults } from "@/convex/quiz";
+import { useConvexUser } from "@/hooks/use-convex-user";
 
 export default function ChallengeResultsCard({ quiz }: { quiz: QuizResults }) {
-  const userId = useStoreUserEffect();
+  const { userId } = useConvexUser();
   return (
     <Card>
       <CardHeader>

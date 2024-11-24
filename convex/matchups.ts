@@ -7,7 +7,7 @@ import {
 import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
 import { matchupReward } from "./utils";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 import { featured_type, matchup_type } from "./schema";
 
@@ -136,6 +136,7 @@ export const getAdminMatchups = query({
 export type MatchupWithPickCounts = Doc<"matchups"> & {
   homePicks: number;
   awayPicks: number;
+  reactions: Doc<"matchupReactions">[];
 };
 
 export const getActiveMatchups = query({
@@ -157,39 +158,44 @@ export const getActiveMatchups = query({
     // Get pick counts for each matchup
     const matchupsWithPickCounts: MatchupWithPickCounts[] = [];
     for (let matchup of matchups) {
+      //get picks
+      const picks = await ctx.db
+        .query("picks")
+        .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
+        .collect();
+
+      const homeTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.homeTeam.id
+      ).length;
+      const awayTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.awayTeam.id
+      ).length;
+
+      // Include reactions in the matchup data
+      const reactions = await ctx.db
+        .query("matchupReactions")
+        .withIndex("by_matchup", (q) => q.eq("matchupId", matchup._id))
+        .collect();
+
       if (
-        matchup.status === "STATUS_IN_PROGRESS" ||
-        matchup.status === "STATUS_FIRST_HALF" ||
-        matchup.status === "STATUS_SECOND_HALF" ||
-        matchup.status === "STATUS_END_PERIOD" ||
-        matchup.status === "STATUS_FINAL" ||
-        matchup.status === "STATUS_FULL_TIME" ||
-        matchup.status === "STATUS_FULL_PEN"
+        matchup.featured &&
+        matchup.featuredType === "SPONSORED" &&
+        matchup.metadata?.sponsored
       ) {
-        const picks = await ctx.db
-          .query("picks")
-          .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
-          .collect();
-
-        const homeTeamPicks = picks.filter(
-          (p) => p.pick.id === matchup.homeTeam.id
-        ).length;
-        const awayTeamPicks = picks.filter(
-          (p) => p.pick.id === matchup.awayTeam.id
-        ).length;
-
-        matchupsWithPickCounts.push({
-          ...matchup,
-          homePicks: homeTeamPicks,
-          awayPicks: awayTeamPicks,
+        const sponsor = await ctx.runQuery(api.sponsors.getById, {
+          id: matchup.metadata.sponsored.sponsorId,
         });
-      } else {
-        matchupsWithPickCounts.push({
-          ...matchup,
-          homePicks: 0,
-          awayPicks: 0,
-        });
+        if (sponsor) {
+          matchup.metadata.sponsored = sponsor;
+        }
       }
+
+      matchupsWithPickCounts.push({
+        ...matchup,
+        homePicks: homeTeamPicks || 0,
+        awayPicks: awayTeamPicks || 0,
+        reactions,
+      });
     }
     return matchupsWithPickCounts;
   },
@@ -203,8 +209,31 @@ export const getActiveMatchupsByLeague = query({
       .filter((q) =>
         q.and(q.eq(q.field("league"), league), q.eq(q.field("active"), true))
       )
-      .take(500);
-    return matchups;
+      .take(50);
+
+    // Get pick counts for each matchup
+    const matchupsWithPicks = [];
+    for (const matchup of matchups) {
+      const picks = await ctx.db
+        .query("picks")
+        .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
+        .collect();
+
+      const homeTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.homeTeam.id
+      ).length;
+      const awayTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.awayTeam.id
+      ).length;
+
+      matchupsWithPicks.push({
+        ...matchup,
+        homePicks: homeTeamPicks || 0,
+        awayPicks: awayTeamPicks || 0,
+      });
+    }
+
+    return matchupsWithPicks;
   },
 });
 
@@ -572,5 +601,54 @@ export const getNext3ChainBuilderMatchups = query({
       )
       .order("asc")
       .take(5);
+  },
+});
+
+export const create = mutation({
+  args: {
+    title: v.string(),
+    league: v.string(),
+    type: matchup_type,
+    typeDetails: v.optional(v.string()),
+    cost: v.number(),
+    startTime: v.number(),
+    active: v.boolean(),
+    featured: v.boolean(),
+    featuredType: v.optional(featured_type),
+    gameId: v.string(),
+    status: v.string(),
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    metadata: v.optional(v.any()),
+    homeImageStorageId: v.optional(v.id("_storage")),
+    awayImageStorageId: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    if (args.homeImageStorageId) {
+      const homeImageUrl = await ctx.storage.getUrl(args.homeImageStorageId);
+      if (homeImageUrl) {
+        args.homeTeam.image = homeImageUrl;
+      }
+    }
+    if (args.awayImageStorageId) {
+      const awayImageUrl = await ctx.storage.getUrl(args.awayImageStorageId);
+      if (awayImageUrl) {
+        args.awayTeam.image = awayImageUrl;
+      }
+    }
+
+    console.log(args);
+    //await ctx.db.insert("matchups", args);
+    return;
   },
 });

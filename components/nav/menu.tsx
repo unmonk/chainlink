@@ -18,7 +18,7 @@ import {
 import Coins from "../coins/coins";
 import { UserChain } from "../chains/user-chain";
 import { ThemeToggle } from "../ui/theme-toggle";
-import { useUser } from "@clerk/nextjs";
+import { SignOutButton, useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
@@ -122,6 +122,7 @@ export function Menu({ isOpen }: MenuProps) {
               )}
             </li>
           ))}
+
           {user?.publicMetadata?.isAdmin === true &&
             adminMenuList.map(({ groupLabel, menus }, index) => (
               <li

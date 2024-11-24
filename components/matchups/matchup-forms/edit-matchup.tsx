@@ -9,27 +9,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
+} from "../../ui/dialog";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "../ui/select";
+} from "../../ui/select";
 import { useForm, Form, FormProvider } from "react-hook-form";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import {
   FormField,
   FormItem,
   FormLabel,
   FormControl,
   FormMessage,
-} from "../ui/form";
+} from "../../ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Checkbox } from "../ui/checkbox";
-import { Input } from "../ui/input";
+import { Checkbox } from "../../ui/checkbox";
+import { Input } from "../../ui/input";
 import { Id } from "@/convex/_generated/dataModel";
 import { useState } from "react";
 import { ACTIVE_LEAGUES } from "@/convex/utils";
@@ -39,6 +39,7 @@ import { leagueLogos } from "@/convex/utils";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { EditIcon } from "lucide-react";
+import { SponsoredMatchupForm } from "../sponsored-matchup-form";
 
 const EditMatchupFormSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
@@ -606,6 +607,18 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
               )}
             />
           )}
+
+          {methods.watch("featured") &&
+            methods.watch("featuredType") === "SPONSORED" && (
+              <SponsoredMatchupForm
+                onChange={(sponsoredData) => {
+                  methods.setValue("metadata.sponsored", sponsoredData, {
+                    shouldValidate: true,
+                  });
+                }}
+                initialData={methods.getValues().metadata?.sponsored}
+              />
+            )}
 
           <hr className="my-4" />
           <div className="flex flex-col space-y-2">

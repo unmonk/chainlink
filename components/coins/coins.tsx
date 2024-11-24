@@ -9,13 +9,10 @@ const Coins = () => {
 
   return (
     <>
-      {!coins && (
-        <>
-          🔗 <Skeleton className="h-8 w-16 m-0.5" />
-        </>
-      )}
-      {coins && (
-        <span className="text-cyan-600 text-nowrap">
+      {!coins ? (
+        <Skeleton className="h-6 w-12 m-0.5" />
+      ) : (
+        <span className="text-cyan-600 text-nowrap text-sm md:text-base">
           🔗 {coins.toLocaleString("en-US")}
         </span>
       )}

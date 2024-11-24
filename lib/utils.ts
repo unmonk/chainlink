@@ -71,3 +71,40 @@ export const knownMatchupStatuses = [
   "STATUS_SCHEDULED",
   "STATUS_UNKNOWN",
 ] as const;
+
+export type MatchupTypeDetails =
+  | "GREATER_THAN"
+  | "LESS_THAN"
+  | "EQUAL"
+  | "GREATER_THAN_EQUAL_TO"
+  | "LESS_THAN_EQUAL_TO";
+
+export type COSMETIC_ANIMATION =
+  | "ripple"
+  | "spiral"
+  | "rotate-pulse"
+  | "breathe"
+  | "wobble"
+  | "bounce-subtle"
+  | "wave-pulse"
+  | "pulse"
+  | "gradient";
+
+export type COSMETIC_STYLE =
+  | "zenitho"
+  | "velustro"
+  | "venturo"
+  | "xenon"
+  | "tranquiluxe"
+  | "lumiflex"
+  | "novatrix"
+  | "opulento"
+  | "inferno"
+  | "hip"
+  | "mandala"
+  | "hexagons"
+  | "ocean"
+  | "phantomstar"
+  | "admin"
+  | "mod"
+  | "test";

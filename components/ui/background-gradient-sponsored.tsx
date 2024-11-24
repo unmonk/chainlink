@@ -63,7 +63,9 @@ export const BackgroundGradientSponsored = ({
   };
 
   return (
-    <div className={cn("relative p-[4px] group", containerClassName)}>
+    <div
+      className={cn("relative p-[4px] group h-full w-full", containerClassName)}
+    >
       <motion.div
         variants={animate ? variants : undefined}
         initial={animate ? "initial" : undefined}

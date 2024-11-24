@@ -121,7 +121,8 @@ function SquadCard({
           )}
           {type === "top" && (
             <span className="text-sm text-muted-foreground">
-              Squad Score: <span className="font-bold">{squad.score}</span>
+              Level: <span className="font-bold">{squad.rank}</span> • XP:{" "}
+              <span className="font-bold">{squad.score}</span>
             </span>
           )}
           <div className="flex justify-end">

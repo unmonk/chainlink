@@ -1,5 +1,10 @@
 import React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarFromUser,
+  AvatarImage,
+} from "../ui/avatar";
 import { User } from "@clerk/nextjs/server";
 import SparklesText from "../magicui/sparkles-text";
 import { format } from "timeago.js";
@@ -16,10 +21,7 @@ function Profile({ user }: { user: User }) {
         <AddFriendButton userId={user.id} />
       </div>
 
-      <Avatar className="w-28 h-28">
-        <AvatarFallback>{username.charAt(0)}</AvatarFallback>
-        <AvatarImage src={user.imageUrl} alt={username ?? "User Avatar"} />
-      </Avatar>
+      <AvatarFromUser userId={user.id} height="h-32" width="w-32" />
 
       <SparklesText
         text={username}

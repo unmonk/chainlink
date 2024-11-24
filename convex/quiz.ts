@@ -217,11 +217,7 @@ export const createQuiz = mutation({
 });
 
 interface ResponseWithUser extends Doc<"quizResponses"> {
-  user: {
-    name: string;
-    image: string;
-    _id: Id<"users">;
-  };
+  user: Doc<"users">;
 }
 
 export const getQuizById = query({
@@ -251,11 +247,12 @@ export const getQuizById = query({
           acc[user._id] = {
             name: user.name,
             image: user.image,
+            metadata: user.metadata,
           };
         }
         return acc;
       },
-      {} as Record<string, { name: string; image: string }>
+      {} as Record<string, { name: string; image: string; metadata: any }>
     );
 
     const responsesWithUsers = quizResponses.map((response) => ({

@@ -1,5 +1,5 @@
 "use client";
-import { EditMatchupForm } from "@/components/matchups/edit-matchup";
+import { EditMatchupForm } from "@/components/matchups/matchup-forms/edit-matchup";
 import { ContentLayout } from "@/components/nav/content-layout";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";

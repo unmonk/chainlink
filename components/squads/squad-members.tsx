@@ -4,8 +4,14 @@ import React from "react";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { User } from "@clerk/nextjs/server";
 import { Card, CardContent } from "../ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarFromConvex,
+  AvatarImage,
+} from "../ui/avatar";
 import { formatDate, formatDistanceToNow } from "date-fns";
+import { COSMETIC_STYLE } from "@/lib/utils";
 
 export default function SquadMembers({
   members,
@@ -40,11 +46,11 @@ export default function SquadMembers({
             <CardContent className="pt-4">
               <div className="flex flex-col gap-y-4">
                 <div className="flex items-center gap-x-4">
-                  <Avatar>
-                    <AvatarImage src={member.image} />
-                    <AvatarFallback>{member.name}</AvatarFallback>
-                  </Avatar>
-
+                  <AvatarFromConvex
+                    userId={member._id}
+                    height="h-14"
+                    width="w-14"
+                  />
                   <div className="space-y-1">
                     <div className="font-medium text-xl">
                       {member.squadInfo.role === "OWNER" && "⭐"}

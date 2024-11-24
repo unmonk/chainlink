@@ -4,12 +4,9 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import MatchupCard from "./matchup-card";
 import { BackgroundGradient } from "../ui/background-gradient";
-import { Doc } from "@/convex/_generated/dataModel";
-import ActivePickCard, { UserPickWithMatchup } from "./active-pick";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
 import { useMemo, useState } from "react";
-import { Button } from "../ui/button";
 import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import {
   FaBasketballBall,
@@ -24,11 +21,14 @@ import { Card } from "../ui/card";
 import BlurFade from "../ui/blur-fade";
 import { BackgroundGradientSponsored } from "../ui/background-gradient-sponsored";
 import MatchupSkeleton from "./matchup-skeleton";
+import { useConvexUser } from "@/hooks/use-convex-user";
 
 const MatchupList = ({}) => {
   const matchups = useQuery(api.matchups.getActiveMatchups, {});
-  const userPick = useQuery(api.picks.getUserActivePick, {});
-  const [selectedLeague, setSelectedLeague] = useState<string | null>(null);
+  const userPickWithMatchup = useQuery(api.picks.getUserActivePickWithMatchup);
+  const { userId } = useConvexUser();
+
+  const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "available" | "chainBuilder">(
     "all"
   );
@@ -36,28 +36,17 @@ const MatchupList = ({}) => {
   const filteredMatchups = useMemo(() => {
     if (!matchups) return [];
     return matchups.filter((m) => {
-      const leagueMatch = !selectedLeague || m.league === selectedLeague;
+      const sportMatch =
+        !selectedSport || getSportFromLeague(m.league) === selectedSport;
       const availableMatch =
         filter === "all" ||
         (filter === "available" && m.status === "STATUS_SCHEDULED");
       const chainBuilderMatch =
         filter === "all" || (filter === "chainBuilder" && m.featured === true);
-      return leagueMatch && (availableMatch || chainBuilderMatch);
+      return sportMatch && (availableMatch || chainBuilderMatch);
     });
-  }, [matchups, selectedLeague, filter]);
+  }, [matchups, selectedSport, filter]);
 
-  const userPickWithMatchup = userPick as UserPickWithMatchup;
-  //get the matchup for the user's active pick from matchups array by id
-  if (userPickWithMatchup && matchups) {
-    const matchup = matchups.find(
-      (matchup) => matchup._id === userPickWithMatchup.matchupId
-    );
-    if (!matchup) {
-      console.error("Matchup not found for user's active pick");
-    } else {
-      userPickWithMatchup.matchup = matchup;
-    }
-  }
   const currentTime = new Date().getTime();
   const minus8Hours = currentTime - 8 * 60 * 60 * 1000;
   const plus24Hours = currentTime + 24 * 60 * 60 * 1000;
@@ -73,41 +62,21 @@ const MatchupList = ({}) => {
     return groups;
   }, [matchups]);
 
+  if (!userId) return null;
+
   return (
     <div className="flex flex-col">
-      {!matchups ? (
-        <div className="flex flex-col items-center">
+      {userPickWithMatchup && (
+        <div className="flex flex-col gap-4 items-center">
           <h3 className="text-lg font-semibold my-2">My Pick</h3>
-          <Card className="w-full max-w-md">
-            <div className="bg-secondary">
-              <div className="grid grid-cols-2 p-1.5">
-                <Skeleton className="h-4 w-16" /> {/* League */}
-                <Skeleton className="h-4 w-24 ml-auto" /> {/* Time/Status */}
-              </div>
-            </div>
-            <div className="p-4 space-y-4">
-              <div className="flex justify-between items-center">
-                <Skeleton className="h-12 w-12 rounded" />
-                <div className="flex flex-col items-center gap-2">
-                  <Skeleton className="h-4 w-20" /> {/* VS text */}
-                  <Skeleton className="h-4 w-24" /> {/* Status/Time */}
-                </div>
-                <Skeleton className="h-12 w-12 rounded" />
-              </div>
-              <div className="flex justify-center">
-                <Skeleton className="h-4 w-32" /> {/* Pick details */}
-              </div>
-            </div>
-          </Card>
+          <MatchupCard
+            matchup={userPickWithMatchup.matchupWithPicks}
+            activePick={userPickWithMatchup.pick}
+            userId={userId}
+          />
           <Separator orientation="horizontal" className="my-4" />
         </div>
-      ) : userPickWithMatchup && userPickWithMatchup.matchup ? (
-        <div className="flex flex-col items-center">
-          <h3 className="text-lg font-semibold my-2">My Pick</h3>
-          <ActivePickCard pick={userPickWithMatchup} />
-          <Separator orientation="horizontal" className="my-4" />
-        </div>
-      ) : null}
+      )}
 
       {/* Status Filters - Always visible */}
       <div className="flex flex-col md:flex-row justify-center items-center gap-2 mb-4">
@@ -136,7 +105,7 @@ const MatchupList = ({}) => {
           <TabsList className="">
             <TabsTrigger
               value="all"
-              onClick={() => setSelectedLeague(null)}
+              onClick={() => setSelectedSport(null)}
               className="text-xs"
             >
               All
@@ -145,7 +114,7 @@ const MatchupList = ({}) => {
               <TabsTrigger
                 key={sport}
                 value={sport}
-                onClick={() => setSelectedLeague(leagues[0])}
+                onClick={() => setSelectedSport(sport)}
                 className="p-2"
                 title={leagues.join(", ")}
               >
@@ -163,7 +132,9 @@ const MatchupList = ({}) => {
             ))
           : filteredMatchups.length > 0 &&
             filteredMatchups
-              .filter((m) => m._id !== userPickWithMatchup?.matchupId)
+              .filter(
+                (m) => m._id !== userPickWithMatchup?.matchupWithPicks._id
+              )
               .sort((a, b) => {
                 if (a.status === "STATUS_POSTPONED") return 1;
                 if (b.status === "STATUS_POSTPONED") return -1;
@@ -183,7 +154,7 @@ const MatchupList = ({}) => {
                           animate={true}
                           className="rounded-lg overflow-hidden shadow-lg"
                         >
-                          <MatchupCard matchup={matchup} />
+                          <MatchupCard matchup={matchup} userId={userId} />
                         </BackgroundGradient>
                       )}
                       {matchup.featuredType === "SPONSORED" && (
@@ -191,9 +162,11 @@ const MatchupList = ({}) => {
                           key={matchup._id}
                           animate={true}
                           className="rounded-lg overflow-hidden shadow-lg"
-                          color={matchup.metadata.sponsoredData.color}
+                          color={
+                            matchup.metadata?.sponsoredData?.color || "white"
+                          }
                         >
-                          <MatchupCard matchup={matchup} />
+                          <MatchupCard matchup={matchup} userId={userId} />
                         </BackgroundGradientSponsored>
                       )}
                     </BlurFade>
@@ -205,7 +178,7 @@ const MatchupList = ({}) => {
                       delay={0.25 * idx * 0.01}
                       inView
                     >
-                      <MatchupCard matchup={matchup} />
+                      <MatchupCard matchup={matchup} userId={userId} />
                     </BlurFade>
                   );
                 }

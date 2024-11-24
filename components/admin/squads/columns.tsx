@@ -55,7 +55,7 @@ export const columns: ColumnDef<Doc<"squads">>[] = [
       return (
         <Link href={`/admin/squads/${row.original.name}`}>
           <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
+            <Avatar height="h-8" width="w-8">
               <AvatarImage src={row.original.image} alt={row.original.name} />
               <AvatarFallback>{row.original.name[0]}</AvatarFallback>
             </Avatar>

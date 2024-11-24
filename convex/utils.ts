@@ -4,6 +4,37 @@ import { action, mutation, query } from "./_generated/server";
 import { League } from "./types";
 import { api } from "./_generated/api";
 
+export const MATCHUP_FINAL_STATUSES = [
+  "STATUS_FINAL",
+  "STATUS_FULL_TIME",
+  "STATUS_FULL_PEN",
+  "STATUS_FINAL_AET",
+  "STATUS_FINAL_ET",
+  "STATUS_FORFEIT",
+];
+
+export const MATCHUP_IN_PROGRESS_STATUSES = [
+  "STATUS_IN_PROGRESS",
+  "STATUS_FIRST_HALF",
+  "STATUS_SECOND_HALF",
+  "STATUS_HALFTIME",
+  "STATUS_END_PERIOD",
+  "STATUS_SHOOTOUT",
+  "STATUS_END_OF_EXTRATIME",
+];
+
+export const MATCHUP_DELAYED_STATUSES = [
+  "STATUS_DELAYED",
+  "STATUS_RAIN_DELAY",
+  "STATUS_DELAY",
+  "STATUS_POSTPONED",
+  "STATUS_CANCELED",
+  "STATUS_SUSPENDED",
+  "STATUS_ABANDONDED",
+];
+export const MATCHUP_SCHEDULED_STATUSES = ["STATUS_SCHEDULED"];
+export const MATCHUP_UNKNOWN_STATUSES = ["STATUS_UNKNOWN"];
+
 export const ACTIVE_LEAGUES: League[] = [
   "NFL",
   "NBA",
@@ -121,6 +152,19 @@ export function missingEnvVariableUrl(envVarName: string, whereToGet: string) {
     `  https://dashboard.convex.dev/d/${deployment}/settings?var=${envVarName}`
   );
 }
+
+export const queryImageUrl = action({
+  args: {
+    storageId: v.id("_storage"),
+  },
+  handler: async (ctx, args) => {
+    const getImageUrl = new URL(
+      `${process.env.NEXT_PUBLIC_CONVEX_URL}/getImage`
+    );
+    getImageUrl.searchParams.set("storageId", args.storageId);
+    return getImageUrl.href;
+  },
+});
 
 export function getImageUrl(storageId: string) {
   const getImageUrl = new URL(`${process.env.NEXT_PUBLIC_CONVEX_URL}/getImage`);
@@ -324,3 +368,115 @@ export const getSquadScore = (squad: Doc<"squads">) => {
     ) * 1000
   );
 };
+
+export function initializeExpTable(): number[] {
+  const n: number[] = new Array(201).fill(0);
+
+  // Initialize base values with steady progression
+  n[1] = 30;
+  n[2] = n[1] + 38; // 68
+  n[3] = n[2] + 46; // 114
+  n[4] = n[3] + 70; // 184
+  n[5] = n[4] + 86; // 270
+  n[6] = n[5] + 474; // 744
+  n[7] = n[6] + 376; // 1120
+  n[8] = n[7] + 560; // 1680
+  n[9] = n[8] + 804; // 2484
+
+  // Calculate levels 10-14 with 1.1 multiplier
+  for (let i = 10; i <= 14; i++) {
+    n[i] = Math.round(n[i - 1] * 1.1);
+  }
+
+  // Calculate levels 15-29 with 1.2 multiplier
+  for (let i = 15; i <= 29; i++) {
+    n[i] = Math.round(n[i - 1] * 1.2);
+  }
+
+  // Calculate levels 30-34 with 1.15 multiplier
+  for (let i = 30; i <= 34; i++) {
+    n[i] = Math.round(n[i - 1] * 1.15);
+  }
+
+  // Calculate levels 35-39 with 1.2 multiplier
+  for (let i = 35; i <= 39; i++) {
+    n[i] = Math.round(n[i - 1] * 1.2);
+  }
+
+  // Calculate levels 40-69 with 1.08 multiplier
+  for (let i = 40; i <= 69; i++) {
+    n[i] = Math.round(n[i - 1] * 1.08);
+  }
+
+  // Calculate levels 70-74 with 1.06 multiplier
+  for (let i = 70; i <= 74; i++) {
+    n[i] = Math.round(n[i - 1] * 1.06);
+  }
+
+  // Calculate levels 75-119 with 1.07 multiplier
+  for (let i = 75; i <= 119; i++) {
+    n[i] = Math.round(n[i - 1] * 1.07);
+  }
+
+  // Calculate levels 120-124 with 1.05 multiplier
+  for (let i = 120; i <= 124; i++) {
+    n[i] = Math.round(n[i - 1] * 1.05);
+  }
+
+  // Calculate levels 125-159 with 1.07 multiplier
+  for (let i = 125; i <= 159; i++) {
+    n[i] = Math.round(n[i - 1] * 1.07);
+  }
+
+  // Calculate levels 160-199 with 1.06 multiplier
+  for (let i = 160; i <= 199; i++) {
+    n[i] = Math.round(n[i - 1] * 1.06);
+  }
+
+  n[200] = Math.round(n[199] * 1.1); // Final level
+  return n;
+}
+
+export function calculateSquadLevel(totalExperience: number): {
+  rank: number;
+  score: number;
+  nextRankScore: number;
+} {
+  const expTable = initializeExpTable();
+
+  // Find the current level
+  let level = 1;
+  for (let i = 1; i < expTable.length; i++) {
+    if (totalExperience >= expTable[i]) {
+      level = i;
+    } else {
+      break;
+    }
+  }
+
+  const currentLevelExp = expTable[level];
+  const nextLevelExp = expTable[level + 1];
+
+  return {
+    rank: level,
+    score: totalExperience,
+    nextRankScore: nextLevelExp,
+  };
+}
+
+// Calculate experience from squad activities
+export function calculateSquadScore(squad: {
+  stats: {
+    wins: number;
+    losses: number;
+    pushes: number;
+    coins: number;
+  };
+}): number {
+  // Base experience calculations
+  const winExp = squad.stats.wins * 100; // 100 XP per win
+  const pushExp = squad.stats.pushes * 25; // 25 XP per push
+  const coinExp = Math.floor(squad.stats.coins / 10); // 1 XP per 10 coins
+
+  return winExp + pushExp + coinExp;
+}

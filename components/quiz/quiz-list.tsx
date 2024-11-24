@@ -16,9 +16,8 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
 import { ClockIcon, Users2Icon } from "lucide-react";
-import { useUser } from "@clerk/nextjs";
-import useStoreUserEffect from "@/hooks/use-store-user";
 import UserQuizRecord from "./user-quiz-record";
+import { useConvexUser } from "@/hooks/use-convex-user";
 
 export function QuizList({
   limit = 15,
@@ -30,7 +29,7 @@ export function QuizList({
   showDrafts?: boolean;
 }) {
   const quizzes = useQuery(api.quiz.listQuizzes);
-  const userId = useStoreUserEffect();
+  const { userId } = useConvexUser();
 
   if (!quizzes) {
     return <QuizListSkeleton />;

@@ -77,6 +77,7 @@ export const transaction_type = v.union(
   v.literal("ACHIEVEMENT"),
   v.literal("BLACKJACK"),
   v.literal("PAYOUT"),
+  v.literal("SHOP"),
   v.literal("OTHER")
 );
 export const trasaction_status = v.union(
@@ -478,6 +479,86 @@ export default defineSchema({
     imageStorageId: v.optional(v.id("_storage")),
   }).index("by_active_expiresAt", ["active", "expiresAt"]),
 
+  sponsors: defineTable({
+    name: v.string(),
+    description: v.string(),
+    url: v.string(),
+    image: v.string(),
+    imageStorageId: v.optional(v.id("_storage")),
+    bannerImage: v.optional(v.string()),
+    bannerImageStorageId: v.optional(v.id("_storage")),
+    color: v.string(),
+    active: v.boolean(),
+    featured: v.boolean(),
+
+    order: v.optional(v.number()),
+    tier: v.union(v.literal("GOLD"), v.literal("SILVER"), v.literal("BRONZE")),
+    metadata: v.optional(
+      v.object({
+        clicks: v.optional(v.number()),
+      })
+    ),
+  })
+    .searchIndex("by_name", {
+      searchField: "name",
+      filterFields: ["active", "featured"],
+    })
+    .index("by_featured", ["featured"])
+    .index("by_active_featured", ["active", "featured"]),
+
+  //////////////////REACTIONS//////////////////////////////
+  reactions: defineTable({
+    code: v.string(),
+    name: v.string(),
+    imageUrl: v.optional(v.string()),
+    imageStorageId: v.optional(v.id("_storage")),
+    active: v.boolean(),
+    premium: v.boolean(),
+  }).index("by_active", ["active"]),
+
+  matchupReactions: defineTable({
+    matchupId: v.id("matchups"),
+    reactionId: v.id("reactions"),
+    team: v.union(v.literal("HOME"), v.literal("AWAY")),
+    userId: v.id("users"),
+  })
+    .index("by_matchup", ["matchupId"])
+    .index("by_user", ["userId"])
+    .index("by_matchup_team_userId", ["matchupId", "team", "userId"]),
+
+  ////////////////////SHOP//////////////////////////////
+
+  shopItems: defineTable({
+    name: v.string(),
+    description: v.string(),
+    price: v.number(),
+    type: v.union(
+      v.literal("BACKGROUND"),
+      v.literal("STICKER"),
+      v.literal("MERCH")
+    ),
+    active: v.boolean(),
+    preview: v.string(),
+    metadata: v.optional(
+      v.object({
+        avatarBackground: v.optional(v.string()),
+        imageUrl: v.optional(v.string()),
+        imageStorageId: v.optional(v.id("_storage")),
+      })
+    ),
+    featured: v.boolean(),
+    order: v.optional(v.number()),
+  })
+    .index("by_active", ["active"])
+    .index("by_type_active", ["type", "active"])
+    .index("by_featured", ["featured"]),
+
+  purchases: defineTable({
+    userId: v.id("users"),
+    itemId: v.id("shopItems"),
+    purchasedAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
   //////////////////USERS//////////////////////////////
 
   friendRequests: defineTable({
@@ -542,7 +623,12 @@ export default defineSchema({
     externalId: v.string(),
     role: user_role,
     status: v.union(v.literal("ACTIVE"), v.literal("INACTIVE")),
-    metadata: v.optional(v.object({})),
+    metadata: v.optional(
+      v.object({
+        avatarBackground: v.optional(v.string()),
+        avatarBackgrounds: v.optional(v.array(v.string())),
+      })
+    ),
     settings: v.optional(v.object({})),
     referralCode: v.optional(v.string()),
     referredBy: v.optional(v.id("users")),

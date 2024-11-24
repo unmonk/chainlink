@@ -143,7 +143,7 @@ export function SquadEditForm({ squadSlug }: { squadSlug: string }) {
       </CardHeader>
       <CardContent>
         <div className="flex justify-center mb-6">
-          <Avatar className="w-24 h-24">
+          <Avatar height="h-24" width="w-24">
             <AvatarImage
               src={imagePreview ? imagePreview : squad.image}
               alt={squad.name}

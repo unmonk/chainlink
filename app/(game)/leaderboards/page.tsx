@@ -1,6 +1,26 @@
 import { LeaderboardList } from "@/components/leaderboards/leaderboard-list";
 import { ContentLayout } from "@/components/nav/content-layout";
 import { InfoIcon } from "lucide-react";
+import { Metadata } from "next";
+
+//metadata
+export const metadata: Metadata = {
+  title: "Leaderboards - ChainLink",
+  description: "View the leaderboards to see who has the biggest chain.",
+  openGraph: {
+    title: "Leaderboards - ChainLink",
+    description: "View the leaderboards to see who has the biggest chain.",
+    type: "website",
+    siteName: "ChainLink",
+    locale: "en_US",
+    url: "https://chainlink.com/leaderboards",
+  },
+  twitter: {
+    title: "Leaderboards - ChainLink",
+    description: "View the leaderboards to see who has the biggest chain.",
+    site: "https://chainlink.com",
+  },
+};
 
 export default function Page({}) {
   return (
