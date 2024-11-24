@@ -55,9 +55,12 @@ export default function ShopAdminPage() {
             Add Item
           </Button>
         </div>
-
-        <DataTable columns={columns} data={items} />
-
+        {items.length === 0 && (
+          <div className="flex justify-center items-center h-full">
+            <p className="text-muted-foreground">No items found</p>
+          </div>
+        )}
+        {items.length > 0 && <DataTable columns={columns} data={items} />}
         <ShopItemDialog
           open={open}
           onOpenChange={handleOpenChange}

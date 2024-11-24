@@ -25,18 +25,7 @@ export const getFeaturedItems = query({
 
 export const getAllItems = query({
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthorized");
-
-    // Verify admin status
-    const user = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("tokenIdentifier"), identity.tokenIdentifier))
-      .first();
-
-    if (!user || user.role !== "ADMIN") throw new Error("Unauthorized");
-
-    return await ctx.db.query("shopItems").take(10);
+    return await ctx.db.query("shopItems").take(50);
   },
 });
 
