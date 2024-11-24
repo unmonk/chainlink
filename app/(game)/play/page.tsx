@@ -13,6 +13,13 @@ export const metadata: Metadata = {
     siteName: "ChainLink",
     locale: "en_US",
     url: "https://chainlink.com/play",
+    images: ["/images/og-image.png"],
+  },
+  twitter: {
+    title: "Play - ChainLink",
+    description: "Play the ChainLink game by making picks.",
+    site: "https://chainlink.com",
+    images: ["/images/og-image.png"],
   },
 };
 

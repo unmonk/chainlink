@@ -22,12 +22,14 @@ export const metadata: Metadata = {
     siteName: "ChainLink",
     locale: "en_US",
     url: "https://chainlink.com/dashboard",
+    images: ["/images/og-image.png"],
   },
   twitter: {
     title: "Dashboard - ChainLink",
     description:
       "View your dashboard to see your active pick, chain, stats, achievements, and more.",
     site: "https://chainlink.com",
+    images: ["/images/og-image.png"],
   },
 };
 

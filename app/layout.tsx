@@ -29,12 +29,14 @@ export const metadata: Metadata = {
     siteName: APP_NAME,
     locale: "en_US",
     url: "https://chainlink.com",
+    images: ["/images/og-image.png"],
   },
   twitter: {
     title: APP_NAME,
     description: APP_DESCRIPTION,
     creator: "@chainlink_st",
     site: "https://chainlink.com",
+    images: ["/images/og-image.png"],
   },
   manifest: "/manifest.json",
   appleWebApp: {
