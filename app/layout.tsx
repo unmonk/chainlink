@@ -22,7 +22,20 @@ export const metadata: Metadata = {
     default: APP_NAME,
     template: "%s - ChainLink",
   },
-  description: APP_DESCRIPTION,
+  openGraph: {
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    type: "website",
+    siteName: APP_NAME,
+    locale: "en_US",
+    url: "https://chainlink.com",
+  },
+  twitter: {
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    creator: "@chainlink_st",
+    site: "https://chainlink.com",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

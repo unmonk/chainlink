@@ -33,7 +33,7 @@ import {
 } from "../ui/alert-dialog";
 import { Badge } from "../ui/badge";
 import { motion } from "framer-motion";
-import { cn, COSMETIC_STYLE, COSMETIC_STYLES } from "@/lib/utils";
+import { cn, COSMETIC_STYLE } from "@/lib/utils";
 
 export function FriendsList() {
   const user = useUser();

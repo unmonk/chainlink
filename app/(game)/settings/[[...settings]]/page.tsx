@@ -1,4 +1,3 @@
-"use client";
 import PrivacyPolicyText from "@/components/landing/privacy-policy";
 import TermsServiceText from "@/components/landing/terms-service";
 import { ContentLayout } from "@/components/nav/content-layout";
@@ -6,6 +5,26 @@ import SendNotification from "@/components/profile/notifications";
 import Inventory from "@/components/shop/inventory";
 import { UserProfile } from "@clerk/nextjs";
 import { BellRingIcon, FileIcon, FileTextIcon, GemIcon } from "lucide-react";
+import { Metadata } from "next";
+
+//metadata
+export const metadata: Metadata = {
+  title: "Settings - ChainLink",
+  description: "Manage your settings and preferences.",
+  openGraph: {
+    title: "Settings - ChainLink",
+    description: "Manage your settings and preferences.",
+    type: "website",
+    siteName: "ChainLink",
+    locale: "en_US",
+    url: "https://chainlink.com/settings",
+  },
+  twitter: {
+    title: "Settings - ChainLink",
+    description: "Manage your settings and preferences.",
+    site: "https://chainlink.com",
+  },
+};
 
 export default function Page() {
   return (

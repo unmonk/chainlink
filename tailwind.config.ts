@@ -215,6 +215,9 @@ const config = {
       boxShadow: {
         glow: "0 0 35px -5px var(--tw-shadow-color)",
       },
+      scale: {
+        "115": "1.13",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

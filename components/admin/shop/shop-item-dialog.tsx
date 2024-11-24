@@ -33,6 +33,7 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { Doc, Id } from "@/convex/_generated/dataModel";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -72,6 +73,23 @@ export function ShopItemDialog({
       order: 0,
     },
   });
+
+  useEffect(() => {
+    if (open) {
+      form.reset(
+        item || {
+          name: "",
+          description: "",
+          price: 0,
+          type: "BACKGROUND",
+          preview: "",
+          active: true,
+          featured: false,
+          order: 0,
+        }
+      );
+    }
+  }, [open, item, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {

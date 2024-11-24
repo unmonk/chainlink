@@ -209,8 +209,31 @@ export const getActiveMatchupsByLeague = query({
       .filter((q) =>
         q.and(q.eq(q.field("league"), league), q.eq(q.field("active"), true))
       )
-      .take(500);
-    return matchups;
+      .take(50);
+
+    // Get pick counts for each matchup
+    const matchupsWithPicks = [];
+    for (const matchup of matchups) {
+      const picks = await ctx.db
+        .query("picks")
+        .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
+        .collect();
+
+      const homeTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.homeTeam.id
+      ).length;
+      const awayTeamPicks = picks.filter(
+        (p) => p.pick.id === matchup.awayTeam.id
+      ).length;
+
+      matchupsWithPicks.push({
+        ...matchup,
+        homePicks: homeTeamPicks || 0,
+        awayPicks: awayTeamPicks || 0,
+      });
+    }
+
+    return matchupsWithPicks;
   },
 });
 
@@ -578,5 +601,54 @@ export const getNext3ChainBuilderMatchups = query({
       )
       .order("asc")
       .take(5);
+  },
+});
+
+export const create = mutation({
+  args: {
+    title: v.string(),
+    league: v.string(),
+    type: matchup_type,
+    typeDetails: v.optional(v.string()),
+    cost: v.number(),
+    startTime: v.number(),
+    active: v.boolean(),
+    featured: v.boolean(),
+    featuredType: v.optional(featured_type),
+    gameId: v.string(),
+    status: v.string(),
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    metadata: v.optional(v.any()),
+    homeImageStorageId: v.optional(v.id("_storage")),
+    awayImageStorageId: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    if (args.homeImageStorageId) {
+      const homeImageUrl = await ctx.storage.getUrl(args.homeImageStorageId);
+      if (homeImageUrl) {
+        args.homeTeam.image = homeImageUrl;
+      }
+    }
+    if (args.awayImageStorageId) {
+      const awayImageUrl = await ctx.storage.getUrl(args.awayImageStorageId);
+      if (awayImageUrl) {
+        args.awayTeam.image = awayImageUrl;
+      }
+    }
+
+    console.log(args);
+    //await ctx.db.insert("matchups", args);
+    return;
   },
 });

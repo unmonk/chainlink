@@ -2,7 +2,7 @@ import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { cn, COSMETIC_STYLE, COSMETIC_STYLES } from "@/lib/utils";
+import { cn, COSMETIC_STYLE } from "@/lib/utils";
 
 interface LeaderCardProps {
   user: any;

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { streakColor, streakLetter } from "@/components/chains/user-chain";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { COSMETIC_STYLE, COSMETIC_STYLES } from "@/lib/utils";
+import { COSMETIC_STYLE } from "@/lib/utils";
 
 export function ChainLeaderboard({ data }: { data: any[] }) {
   const sortedData = [...data].sort((a, b) => b.chain.chain - a.chain.chain);

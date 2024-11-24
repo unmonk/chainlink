@@ -1,26 +1,11 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { HeroCards } from "./hero-cards";
-import {
-  DashboardIcon,
-  DiscordLogoIcon,
-  GitHubLogoIcon,
-} from "@radix-ui/react-icons";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import Link from "next/link";
+import { DiscordLogoIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
-import { AuthLoading, Authenticated, Unauthenticated } from "convex/react";
+import Link from "next/link";
 
 export const Hero = () => {
-  const router = useRouter();
-  const goToDashboard = () => {
-    router.push("/dashboard");
-  };
-  const goToSignIn = () => {
-    router.push("/sign-in");
-  };
-
   return (
     <section className="container grid lg:grid-cols-2 place-items-center pt-16 md:pt-24">
       <div className="text-center lg:text-start space-y-6">
@@ -34,25 +19,14 @@ export const Hero = () => {
 
         <p className="text-xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0">
           Pick the winner on matchups drawn from different sports and events
-          from around the world, including NFL, MLB, NBA, and College Football
+          from around the world, including NFL, MLB, NBA, Soccer, UFL, Lacrosse,
+          College Football, and College Basketball
         </p>
 
         <div className="space-y-4 md:space-y-0 md:space-x-4">
-          <Authenticated>
-            <Button className="w-full md:w-1/3" onClick={goToDashboard}>
-              Dashboard
-            </Button>
-          </Authenticated>
-          <Unauthenticated>
-            <Button className="w-full md:w-1/3" onClick={goToSignIn}>
-              Get Started
-            </Button>
-          </Unauthenticated>
-          <AuthLoading>
-            <Button className="w-full md:w-1/3" onClick={goToSignIn}>
-              Get Started
-            </Button>
-          </AuthLoading>
+          <Link href="/dashboard" passHref>
+            <Button className="w-full md:w-1/3">Play Now</Button>
+          </Link>
 
           <a
             href={process.env.NEXT_PUBLIC_DISCORD_URL}

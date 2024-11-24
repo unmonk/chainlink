@@ -1,5 +1,3 @@
-"use client";
-
 import DashboardCoins from "@/components/dashboard/dashboard-coins";
 import { DashboardChain } from "@/components/dashboard/dashboard-chain";
 import DashboardActivePick from "@/components/dashboard/dashboard-pick";
@@ -9,6 +7,29 @@ import { ContentLayout } from "@/components/nav/content-layout";
 import DashboardQuiz from "@/components/dashboard/dashboard-quiz";
 import DashboardAnnouncements from "@/components/dashboard/dashboard-announcements";
 import DashboardAdsSponsors from "@/components/dashboard/dashboard-ads-sponsors";
+import { Metadata } from "next";
+
+//metadata
+export const metadata: Metadata = {
+  title: "Dashboard - ChainLink",
+  description:
+    "View your dashboard to see your active pick, chain, stats, achievements, and more.",
+  openGraph: {
+    title: "Dashboard - ChainLink",
+    description:
+      "View your dashboard to see your active pick, chain, stats, achievements, and more.",
+    type: "website",
+    siteName: "ChainLink",
+    locale: "en_US",
+    url: "https://chainlink.com/dashboard",
+  },
+  twitter: {
+    title: "Dashboard - ChainLink",
+    description:
+      "View your dashboard to see your active pick, chain, stats, achievements, and more.",
+    site: "https://chainlink.com",
+  },
+};
 
 export default function Dashboard() {
   return (

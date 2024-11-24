@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { Separator } from "../ui/separator";
 
 function EditSquadButton({
   ownerId,
@@ -151,26 +152,31 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
       {/* Header Section with Three Columns */}
       <div className="relative flex flex-col md:flex-row h-[620px] w-full items-center justify-between overflow-hidden rounded-lg border bg-background p-4 md:p-20 md:shadow-xl mb-4">
         {/* Left Number */}
-        <div className="flex flex-col items-center justify-center w-1/4">
-          {squad.rank && (
-            <div className="text-4xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
-              {squad.rank}
-            </div>
-          )}
-          {!squad.rank && (
+        <div className="flex flex-row items-center justify-center w-1/4">
+          <div className="flex flex-col items-center justify-center">
+            {squad.rank && (
+              <div className="text-4xl md:text-8xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+                {squad.rank}
+              </div>
+            )}
+            {!squad.rank && (
+              <span className="text-4xl md:text-8xl text-muted-foreground mt-2">
+                0
+              </span>
+            )}
             <span className="text-xs md:text-sm text-muted-foreground mt-2">
-              Unranked
+              Level
             </span>
-          )}
-          <span className="text-xs md:text-sm text-muted-foreground mt-2">
-            RANK
-          </span>
-          <div className="md:hidden text-xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
-            {squad.score}
           </div>
-          <span className="md:hidden text-xs md:text-sm text-muted-foreground">
-            SCORE
-          </span>
+          <Separator orientation="vertical" className="h-12 mx-2 md:hidden" />
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-2xl min-h-12 md:hidden font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
+              {squad.score}
+            </div>
+            <span className="md:hidden text-xs md:text-sm text-muted-foreground">
+              XP
+            </span>
+          </div>
         </div>
 
         {/* Center Content */}
@@ -239,9 +245,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
           <div className="text-2xl md:text-4xl font-bold bg-gradient-to-b from-[#88d681] to-[#257532] bg-clip-text text-transparent">
             {squad.score || 0}
           </div>
-          <span className="text-sm text-muted-foreground mt-2">
-            SQUAD SCORE
-          </span>
+          <span className="text-sm text-muted-foreground mt-2">XP</span>
         </div>
       </div>
 

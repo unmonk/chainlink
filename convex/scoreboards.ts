@@ -2,7 +2,13 @@ import { internal } from "./_generated/api";
 import { action, internalAction } from "./_generated/server";
 import { ScoreboardResponse } from "./espn";
 import { League } from "./types";
-import { ACTIVE_LEAGUES, getHawaiiTime } from "./utils";
+import {
+  ACTIVE_LEAGUES,
+  getHawaiiTime,
+  MATCHUP_FINAL_STATUSES,
+  MATCHUP_IN_PROGRESS_STATUSES,
+  MATCHUP_SCHEDULED_STATUSES,
+} from "./utils";
 
 export const scoreboards = action({
   args: {},
@@ -185,11 +191,7 @@ export const scoreboards = action({
         }
 
         // Skip if matchup is already final
-        if (
-          matchup.status === "STATUS_FINAL" ||
-          matchup.status === "STATUS_FULL_TIME" ||
-          matchup.status === "STATUS_FULL_PEN"
-        ) {
+        if (MATCHUP_FINAL_STATUSES.includes(matchup.status)) {
           leagueResponse.games.push({
             game: event.shortName || "",
             result: `Skipped - already final`,
@@ -199,6 +201,14 @@ export const scoreboards = action({
 
         //get event status
         const eventStatus = event.competitions[0].status?.type?.name;
+        if (!eventStatus) {
+          leagueResponse.games.push({
+            game: event.shortName || "",
+            result: `Skipped - no event status`,
+          });
+          continue;
+        }
+
         const statusDetails = event.competitions[0].status?.type?.detail;
         const homeTeam = event.competitions[0].competitors.find(
           (competitor) => competitor.homeAway === "home"
@@ -221,9 +231,8 @@ export const scoreboards = action({
 
         ///////////////////MATCHUP STARTED////////////////////////
         if (
-          matchup.status === "STATUS_SCHEDULED" &&
-          (eventStatus === "STATUS_IN_PROGRESS" ||
-            eventStatus === "STATUS_FIRST_HALF")
+          MATCHUP_SCHEDULED_STATUSES.includes(matchup.status) &&
+          MATCHUP_IN_PROGRESS_STATUSES.includes(eventStatus)
         ) {
           await ctx.runMutation(internal.matchups.handleMatchupStarted, {
             matchupId: matchup._id,
@@ -254,15 +263,8 @@ export const scoreboards = action({
 
         ///////////////////MATCHUP ENDED////////////////////////
         if (
-          (matchup.status === "STATUS_IN_PROGRESS" ||
-            matchup.status === "STATUS_END_PERIOD" ||
-            matchup.status === "STATUS_SECOND_HALF" ||
-            matchup.status === "STATUS_SHOOTOUT" ||
-            matchup.status === "STATUS_END_OF_EXTRATIME" ||
-            matchup.status === "STATUS_SCHEDULED") &&
-          (eventStatus === "STATUS_FINAL" ||
-            eventStatus === "STATUS_FULL_TIME" ||
-            eventStatus === "STATUS_FULL_PEN")
+          MATCHUP_IN_PROGRESS_STATUSES.includes(matchup.status) &&
+          MATCHUP_FINAL_STATUSES.includes(eventStatus)
         ) {
           await ctx.runMutation(internal.matchups.handleMatchupFinished, {
             matchupId: matchup._id,
@@ -306,10 +308,8 @@ export const scoreboards = action({
         /////////////MATCHUP UPDATE ONLY////////////////////////
         if (
           eventStatus &&
-          eventStatus !== "STATUS_FINAL" &&
-          eventStatus !== "STATUS_FULL_TIME" &&
-          eventStatus !== "STATUS_FINAL_PEN" &&
-          eventStatus !== "STATUS_SCHEDULED"
+          !MATCHUP_FINAL_STATUSES.includes(eventStatus) &&
+          !MATCHUP_SCHEDULED_STATUSES.includes(matchup.status)
         ) {
           //#region CHECK FOR CHANGES IN MATCHUP and LOGGING
           let hasChanged = false;

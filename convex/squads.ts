@@ -1,8 +1,8 @@
 import { v } from "convex/values";
-import { internalAction, mutation, query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { pick_status } from "./schema";
-import { getSquadScore } from "./utils";
+import { calculateSquadLevel, calculateSquadScore } from "./utils";
 
 export const updateSquad = mutation({
   args: {
@@ -269,6 +269,7 @@ export const createSquad = mutation({
       featured: false,
       ownerId: user._id,
       score: 0,
+      rank: 1,
       stats: {
         coins: 0,
         wins: 0,
@@ -328,12 +329,22 @@ export const handlePickComplete = mutation({
       throw new Error("Squad not found");
     }
 
-    const squadScore = getSquadScore(squad);
-    console.log("squadScore", squadScore);
+    //Calculate new squad score and Level
+    const squadScore = calculateSquadScore({
+      stats: {
+        ...squad.stats,
+        coins: squad.stats.coins + pick.coins,
+        wins: squad.stats.wins + (pick.status === "WIN" ? 1 : 0),
+        losses: squad.stats.losses + (pick.status === "LOSS" ? 1 : 0),
+        pushes: squad.stats.pushes + (pick.status === "PUSH" ? 1 : 0),
+      },
+    });
+    const rank = calculateSquadLevel(squadScore);
 
     //update squad stats
     await ctx.db.patch(squadId, {
       score: squadScore,
+      rank: rank.rank,
       members: squad.members.map((member) => {
         if (member.userId === userId) {
           return {

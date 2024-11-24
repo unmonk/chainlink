@@ -4,15 +4,11 @@ import ReactConfetti from "react-confetti";
 import { useState, useEffect } from "react";
 import { ContentLayout } from "@/components/nav/content-layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Id } from "@/convex/_generated/dataModel";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn, COSMETIC_STYLE, COSMETIC_STYLES } from "@/lib/utils";
 import { ShopHeader } from "@/components/shop/shop-header";
 import { ShopItemCard } from "@/components/shop/shop-item-card";
 

@@ -2,15 +2,26 @@
 
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-import {
-  cn,
-  COSMETIC_STYLE,
-  COSMETIC_STYLES,
-  getColorValue,
-} from "@/lib/utils";
+import { cn, COSMETIC_STYLE } from "@/lib/utils";
 import { Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
+import {
+  Tranquiluxe,
+  Lumiflex,
+  Novatrix,
+  Opulento,
+  Velustro,
+  Venturo,
+  Xenon,
+  Zenitho,
+} from "uvcanvas";
+import { Inferno } from "./avatar-backgrounds/inferno";
+import { Hip } from "./avatar-backgrounds/hip";
+import { Mandala } from "./avatar-backgrounds/mandala";
+import { Hexagons } from "./avatar-backgrounds/hexagons";
+import { Ocean } from "./avatar-backgrounds/ocean";
+import { PhantomStar } from "./avatar-backgrounds/phantomstar";
 
 interface AvatarProps
   extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> {
@@ -26,116 +37,32 @@ const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   AvatarProps
 >(({ className, hasGlow, height, width, title, cosmetic, ...props }, ref) => {
-  const cosmeticStyle = cosmetic
-    ? COSMETIC_STYLES[cosmetic as COSMETIC_STYLE]
-    : undefined;
-
-  const glowAnimation = cosmeticStyle?.animation;
-
   return (
     <div className="relative group">
       <div className="relative flex flex-col items-center">
         <div className="relative flex justify-center items-center">
-          {hasGlow && cosmeticStyle && (
-            <div className={cn("absolute", height, width)}>
-              <div
-                className={cn(
-                  "absolute w-full h-full rounded-full",
-                  glowAnimation === "wobble"
-                    ? "animate-wobble"
-                    : glowAnimation === "breathe"
-                      ? "animate-breathe"
-                      : glowAnimation === "spiral"
-                        ? "animate-spiral"
-                        : glowAnimation === "ripple"
-                          ? "animate-ripple"
-                          : glowAnimation === "bounce-subtle"
-                            ? "animate-bounce-subtle"
-                            : glowAnimation === "rotate-pulse"
-                              ? "animate-rotate-pulse"
-                              : glowAnimation === "wave-pulse"
-                                ? "animate-wave-pulse"
-                                : "animate-pulse"
-                )}
-                style={{
-                  background: `radial-gradient(circle at bottom left, 
-                          ${getColorValue(cosmeticStyle?.first)} 0%, 
-                          transparent 90%)`,
-                  opacity: 0.8,
-                  transform:
-                    cosmeticStyle?.animation === "pulse"
-                      ? "scale(1.1)"
-                      : undefined,
-                }}
-              />
-              {glowAnimation !== "gradient" && (
-                <>
-                  <div
-                    className={cn(
-                      "absolute w-full h-full rounded-full",
-                      glowAnimation === "wobble"
-                        ? "animate-wobble"
-                        : glowAnimation === "breathe"
-                          ? "animate-breathe"
-                          : glowAnimation === "spiral"
-                            ? "animate-spiral"
-                            : glowAnimation === "ripple"
-                              ? "animate-ripple"
-                              : glowAnimation === "bounce-subtle"
-                                ? "animate-bounce-subtle"
-                                : glowAnimation === "rotate-pulse"
-                                  ? "animate-rotate-pulse"
-                                  : glowAnimation === "wave-pulse"
-                                    ? "animate-wave-pulse"
-                                    : "animate-pulse"
-                    )}
-                    style={{
-                      background: `radial-gradient(circle at top left, 
-                      ${getColorValue(cosmeticStyle?.second)} 0%, 
-                      transparent 90%
-                    )`,
-                      opacity: 0.8,
-                      transform:
-                        glowAnimation === "pulse"
-                          ? "scale(1.1) rotate(120deg)"
-                          : undefined,
-                    }}
-                  />
-                  <div
-                    className={cn(
-                      "absolute w-full h-full rounded-full",
-                      glowAnimation === "wobble"
-                        ? "animate-wobble"
-                        : glowAnimation === "breathe"
-                          ? "animate-breathe"
-                          : glowAnimation === "spiral"
-                            ? "animate-spiral"
-                            : glowAnimation === "ripple"
-                              ? "animate-ripple"
-                              : glowAnimation === "bounce-subtle"
-                                ? "animate-bounce-subtle"
-                                : glowAnimation === "rotate-pulse"
-                                  ? "animate-rotate-pulse"
-                                  : glowAnimation === "wave-pulse"
-                                    ? "animate-wave-pulse"
-                                    : "animate-pulse"
-                    )}
-                    style={{
-                      background: `radial-gradient(circle at center, 
-                      ${getColorValue(cosmeticStyle?.third)} 0%, 
-                      transparent 90%
-                    )`,
-                      opacity: 0.8,
-                      transform:
-                        glowAnimation === "pulse"
-                          ? "scale(1.1) rotate(240deg)"
-                          : undefined,
-                    }}
-                  />
-                </>
-              )}
-            </div>
-          )}
+          <div
+            className={cn(
+              height,
+              width,
+              "scale-115 rounded-full absolute overflow-hidden"
+            )}
+          >
+            {cosmetic === "zenitho" && <Zenitho />}
+            {cosmetic === "velustro" && <Velustro />}
+            {cosmetic === "venturo" && <Venturo />}
+            {cosmetic === "xenon" && <Xenon />}
+            {cosmetic === "tranquiluxe" && <Tranquiluxe />}
+            {cosmetic === "lumiflex" && <Lumiflex />}
+            {cosmetic === "novatrix" && <Novatrix />}
+            {cosmetic === "opulento" && <Opulento />}
+            {cosmetic === "inferno" && <Inferno />}
+            {cosmetic === "hip" && <Hip />}
+            {cosmetic === "mandala" && <Mandala />}
+            {cosmetic === "phantomstar" && <PhantomStar />}
+            {cosmetic === "hexagons" && <Hexagons />}
+            {cosmetic === "ocean" && <Ocean />}
+          </div>
           <div className="relative">
             <AvatarPrimitive.Root
               ref={ref}
@@ -151,14 +78,16 @@ const Avatar = React.forwardRef<
               <div className="absolute bottom-0 left-0 right-0 z-20 px-1 pb-1">
                 <p
                   className={cn(
-                    "relative z-30 text-center text-xs font-medium text-zinc-100 truncate",
+                    "relative z-30 text-center text-xs text-black",
                     "bg-gradient-to-b from-transparent to-transparent rounded-md w-1/2 mx-auto",
-                    title === "Premium" ? "from-purple-500/40" : "",
-                    title === "Admin" ? "from-primary/40" : "",
-                    title === "Mod" ? "from-red-500/40" : ""
+                    title === "PREMIUM" ? "from-purple-500/80" : "",
+                    title === "ADMIN" ? "from-primary/80" : "",
+                    title === "MOD" ? "from-red-500/80" : ""
                   )}
                 >
-                  {title}
+                  {title === "ADMIN" && "Admin"}
+                  {title === "MOD" && "Mod"}
+                  {title === "PREMIUM" && "Premium"}
                 </p>
               </div>
             )}

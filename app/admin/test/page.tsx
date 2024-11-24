@@ -93,22 +93,15 @@ export default function AdminTestPage() {
         <h1>Admin Test Page</h1>
         <div className="flex flex-col items-center">
           <div className="grid grid-cols-3 gap-4 items-center my-2">
-            <Avatar hasGlow cosmetic="gold" height="h-28" width="w-28">
+            <Avatar hasGlow cosmetic="mandala" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
-            <Avatar hasGlow cosmetic="silver" height="h-28" width="w-28">
+            <Avatar hasGlow cosmetic="hexagons" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
-            <Avatar hasGlow cosmetic="bronze" height="h-28" width="w-28">
-              <AvatarFallback>JH</AvatarFallback>
-              <AvatarImage src="/images/ad3.png" />
-            </Avatar>
-          </div>
-          <Separator orientation="horizontal" className="my-4" />
-          <div className="grid grid-cols-3 gap-4 items-center my-2">
-            <Avatar hasGlow cosmetic="celestial" height="h-28" width="w-28">
+            <Avatar hasGlow cosmetic="phantomstar" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
@@ -116,19 +109,42 @@ export default function AdminTestPage() {
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
-            <Avatar hasGlow cosmetic="forest" height="h-28" width="w-28">
+            <Avatar hasGlow cosmetic="opulento" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
+          </div>
+          <Separator orientation="horizontal" className="my-4" />
+          <div className="grid grid-cols-3 gap-4 items-center my-2">
             <Avatar hasGlow cosmetic="ocean" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
-            <Avatar hasGlow cosmetic="galaxy" height="h-28" width="w-28">
+            <Avatar hasGlow cosmetic="novatrix" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
-            <Avatar hasGlow cosmetic="usa" height="h-28" width="w-28">
+            <Avatar hasGlow cosmetic="lumiflex" height="h-28" width="w-28">
+              <AvatarFallback>JH</AvatarFallback>
+              <AvatarImage src="/images/ad3.png" />
+            </Avatar>
+            <Avatar hasGlow cosmetic="tranquiluxe" height="h-28" width="w-28">
+              <AvatarFallback>JH</AvatarFallback>
+              <AvatarImage src="/images/ad3.png" />
+            </Avatar>
+            <Avatar hasGlow cosmetic="xenon" height="h-28" width="w-28">
+              <AvatarFallback>JH</AvatarFallback>
+              <AvatarImage src="/images/ad3.png" />
+            </Avatar>
+            <Avatar hasGlow cosmetic="venturo" height="h-28" width="w-28">
+              <AvatarFallback>JH</AvatarFallback>
+              <AvatarImage src="/images/ad3.png" />
+            </Avatar>
+            <Avatar hasGlow cosmetic="velustro" height="h-28" width="w-28">
+              <AvatarFallback>JH</AvatarFallback>
+              <AvatarImage src="/images/ad3.png" />
+            </Avatar>
+            <Avatar hasGlow cosmetic="zenitho" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
@@ -137,30 +153,30 @@ export default function AdminTestPage() {
           <div className="grid grid-cols-3 gap-4 items-center my-2">
             <Avatar
               hasGlow
-              cosmetic="mod"
+              cosmetic="phantomstar"
               height="h-28"
               width="w-28"
-              title="Mod"
+              title="MOD"
             >
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
             <Avatar
               hasGlow
-              cosmetic="premium"
+              cosmetic="hip"
               height="h-28"
               width="w-28"
-              title="Premium"
+              title="PREMIUM"
             >
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
             </Avatar>
             <Avatar
               hasGlow
-              cosmetic="admin"
+              cosmetic="phantomstar"
               height="h-28"
               width="w-28"
-              title="Admin"
+              title="ADMIN"
             >
               <AvatarFallback>JH</AvatarFallback>
               <AvatarImage src="/images/ad3.png" />
