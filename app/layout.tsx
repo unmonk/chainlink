@@ -14,7 +14,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const APP_NAME = "ChainLink";
-const APP_DESCRIPTION = "Build the biggest chain.";
+const APP_DESCRIPTION = "Playing ChainLink is good for your kidneys.";
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,

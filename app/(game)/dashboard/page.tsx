@@ -12,12 +12,10 @@ import { Metadata } from "next";
 //metadata
 export const metadata: Metadata = {
   title: "Dashboard - ChainLink",
-  description:
-    "View your dashboard to see your active pick, chain, stats, achievements, and more.",
+  description: "Playing ChainLink is good for your kidneys.",
   openGraph: {
     title: "Dashboard - ChainLink",
-    description:
-      "View your dashboard to see your active pick, chain, stats, achievements, and more.",
+    description: "Playing ChainLink is good for your kidneys.",
     type: "website",
     siteName: "ChainLink",
     locale: "en_US",
@@ -26,8 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: "Dashboard - ChainLink",
-    description:
-      "View your dashboard to see your active pick, chain, stats, achievements, and more.",
+    description: "Playing ChainLink is good for your kidneys.",
     site: "https://chainlink.com",
     images: ["/images/og-image.png"],
   },
