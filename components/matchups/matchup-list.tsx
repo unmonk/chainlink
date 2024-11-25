@@ -211,7 +211,7 @@ const MatchupList = ({}) => {
 
 export default MatchupList;
 
-const getSportIcon = (sport: string) => {
+export const getSportIcon = (sport: string) => {
   switch (sport) {
     case "basketball":
       return <FaBasketballBall />;

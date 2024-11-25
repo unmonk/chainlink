@@ -1,32 +1,28 @@
 import { Doc } from "@/convex/_generated/dataModel";
+import {
+  MATCHUP_DELAYED_STATUSES,
+  MATCHUP_FINAL_STATUSES,
+  MATCHUP_IN_PROGRESS_STATUSES,
+} from "@/convex/utils";
+import { getSportFromLeague } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
+import { getSportIcon } from "@/components/matchups/matchup-list";
 
 const MatchupCardHeader = ({ matchup }: { matchup: Doc<"matchups"> }) => {
   const headerColor = (status: string) => {
-    switch (status) {
-      case "STATUS_SCHEDULED":
-        return "bg-secondary";
-      case "STATUS_IN_PROGRESS":
-      case "STATUS_HALFTIME":
-      case "STATUS_FIRST_HALF":
-      case "STATUS_SECOND_HALF":
-      case "STATUS_END_PERIOD":
-      case "STATUS_SHOOTOUT":
-        return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800";
-      case "STATUS_FINAL":
-      case "STATUS_FULL_TIME":
-      case "STATUS_FULL_PEN":
-        return "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400";
-      case "STATUS_POSTPONED":
-      case "STATUS_CANCELED":
-      case "STATUS_SUSPENDED":
-      case "STATUS_DELAYED":
-      case "STATUS_RAIN_DELAY":
-      case "STATUS_DELAY":
-        return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600";
-      default:
-        return "bg-secondary";
+    if (MATCHUP_IN_PROGRESS_STATUSES.includes(status)) {
+      return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800";
     }
+    if (MATCHUP_FINAL_STATUSES.includes(status)) {
+      return "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400";
+    }
+    if (status === "STATUS_SCHEDULED") {
+      return "bg-secondary";
+    }
+    if (MATCHUP_DELAYED_STATUSES.includes(status)) {
+      return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300  dark:from-amber-600";
+    }
+    return "bg-secondary";
   };
 
   const getNetwork = (metadata: any) => {
@@ -35,12 +31,30 @@ const MatchupCardHeader = ({ matchup }: { matchup: Doc<"matchups"> }) => {
     }
     return "";
   };
+
+  const getLeagueText = (league: string) => {
+    if (league === "COLLEGE-FOOTBALL") {
+      return "CFB";
+    }
+    if (league === "MBB") {
+      return "Mens BB";
+    }
+    if (league === "WBB") {
+      return "Womens BB";
+    }
+    return league;
+  };
+
+  const sport = getSportFromLeague(matchup.league);
+  const icon = getSportIcon(sport);
+
   return (
     <div className={headerColor(matchup.status)}>
       <div className="grid grid-cols-2 p-1.5">
         <div className="text-start flex flex-row items-center gap-1">
-          <div className="text-sm font-semibold">
-            {matchup.league === "COLLEGE-FOOTBALL" ? "CFB" : matchup.league}
+          <div className="text-sm font-semibold flex flex-row items-center gap-1">
+            {icon && <>{icon}</>}
+            {getLeagueText(matchup.league)}
           </div>
           <div className="text-xs font-extralight">
             {getNetwork(matchup.metadata)}
