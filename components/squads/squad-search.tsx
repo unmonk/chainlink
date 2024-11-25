@@ -26,7 +26,7 @@ const SquadSearch = () => {
 
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 text-center items-center">
         <CardTitle>Find Squad</CardTitle>
         <CardDescription className="text-xs text-muted-foreground">
           Searches for squads by name
