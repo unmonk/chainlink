@@ -209,18 +209,19 @@ export const scoreboards = action({
           continue;
         }
 
-        const statusDetails = event.competitions[0].status?.type?.detail;
-        const homeTeam = event.competitions[0].competitors.find(
-          (competitor) => competitor.homeAway === "home"
+        const competition = event.competitions[0];
+        const statusDetails = competition.status?.type?.detail;
+        const homeTeam = competition.competitors.find(
+          (competitor) => competitor.id === matchup.homeTeam.id
         );
-        const awayTeam = event.competitions[0].competitors.find(
-          (competitor) => competitor.homeAway === "away"
+        const awayTeam = competition.competitors.find(
+          (competitor) => competitor.id === matchup.awayTeam.id
         );
         //check if no home or away team found
         if (!homeTeam || !awayTeam) {
           leagueResponse.games.push({
             game: event.shortName || "",
-            result: `Skipped with no home or away team`,
+            result: `Skipped - team IDs from ESPN (${competition.competitors.map((c) => c.id).join(", ")}) don't match stored matchup (home: ${matchup.homeTeam.id}, away: ${matchup.awayTeam.id})`,
           });
           continue;
         }
@@ -262,9 +263,11 @@ export const scoreboards = action({
         }
 
         ///////////////////MATCHUP ENDED////////////////////////
+
         if (
           MATCHUP_IN_PROGRESS_STATUSES.includes(matchup.status) &&
-          MATCHUP_FINAL_STATUSES.includes(eventStatus)
+          (competition.status?.type?.completed === true ||
+            MATCHUP_FINAL_STATUSES.includes(eventStatus))
         ) {
           await ctx.runMutation(internal.matchups.handleMatchupFinished, {
             matchupId: matchup._id,

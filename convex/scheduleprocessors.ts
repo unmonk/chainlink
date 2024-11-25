@@ -128,25 +128,38 @@ export async function processSchedule(
   league: League,
   leagueResponse: LeagueResponse
 ): Promise<LeagueResponse> {
+  // Iterate through each day in the schedule data
   for (const day in scheduleData) {
     const games = scheduleData[day].games;
+    // Skip if no games exist for this day
     if (!games) continue;
 
+    // Process each game for the current day
     for (const game of games) {
+      // Increment total games counter
       leagueResponse.gamesOnSchedule++;
       const gameId = game.id;
+
+      // Handle existing matchups for this game
       if (existingMatchups[gameId]) {
+        // Increment existing matchups counter
         leagueResponse.existingMatchups++;
+
+        // If multiple matchups exist for same game ID, delete duplicates
         if (existingMatchups[gameId].length > 1) {
+          // Keep first matchup, delete all others
           for (let i = 1; i < existingMatchups[gameId].length; i++) {
             await ctx.runMutation(api.matchups.deleteMatchup, {
               matchupId: existingMatchups[gameId][i]._id,
             });
           }
         }
-        //remove all the deleted dupes from the record leaving only the non-deleted one
+
+        // Update record to only keep the first non-deleted matchup
         existingMatchups[gameId] = existingMatchups[gameId].slice(0, 1);
       }
+
+      // Process the game and record the result
       const result = await processGame(ctx, game, existingMatchups, league);
       leagueResponse.games.push({
         game: game.shortName,
@@ -248,12 +261,9 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
 
 function isGameValid(game: Game) {
   const competitionStatus = game.competitions[0].status?.type?.name;
-  const home = game.competitions[0].competitors.find(
-    (c) => c.homeAway === "home"
-  );
-  const away = game.competitions[0].competitors.find(
-    (c) => c.homeAway === "away"
-  );
+  const competitors = game.competitions[0].competitors;
+  const home = competitors.find((c) => c.id === game.competitions[0].venue?.id);
+  const away = competitors.find((c) => c.id !== game.competitions[0].venue?.id);
 
   if (!competitionStatus)
     return {
@@ -292,6 +302,11 @@ function isGameValid(game: Game) {
       valid: false,
       result: "No home or away team",
     };
+  if (!home.id || !away.id)
+    return {
+      valid: false,
+      result: "No home or away team ID",
+    };
 
   return {
     valid: true,
@@ -306,13 +321,10 @@ async function createNewMatchupByType(
   matchupType: MatchupType
 ) {
   if (matchupType === "SCORE") {
-    const home = game.competitions[0].competitors.find(
-      (c) => c.homeAway === "home"
-    );
-    const away = game.competitions[0].competitors.find(
-      (c) => c.homeAway === "away"
-    );
     const competition = game.competitions[0];
+    const competitors = competition.competitors;
+    const home = competitors.find((c) => c.id === competition.venue?.id);
+    const away = competitors.find((c) => c.id !== competition.venue?.id);
     if (!home || !away || !competition) return;
 
     if (matchupType === "SCORE") {
