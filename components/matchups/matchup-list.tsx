@@ -125,7 +125,7 @@ const MatchupList = ({}) => {
         </Tabs>
       </div>
 
-      <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3 flex-grow">
+      <div className="3xl:grid-cols-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
         {!matchups
           ? Array.from({ length: 12 }).map((_, i) => (
               <MatchupSkeleton key={i} />
@@ -141,47 +141,11 @@ const MatchupList = ({}) => {
                 return a.startTime - b.startTime;
               })
               .map((matchup, idx) => {
-                if (matchup.featured) {
-                  return (
-                    <BlurFade
-                      key={matchup._id}
-                      delay={0.25 * idx * 0.01}
-                      inView
-                    >
-                      {matchup.featuredType === "CHAINBUILDER" && (
-                        <BackgroundGradient
-                          key={matchup._id}
-                          animate={true}
-                          className="rounded-lg overflow-hidden shadow-lg"
-                        >
-                          <MatchupCard matchup={matchup} userId={userId} />
-                        </BackgroundGradient>
-                      )}
-                      {matchup.featuredType === "SPONSORED" && (
-                        <BackgroundGradientSponsored
-                          key={matchup._id}
-                          animate={true}
-                          className="rounded-lg overflow-hidden shadow-lg"
-                          color={
-                            matchup.metadata?.sponsoredData?.color || "white"
-                          }
-                        >
-                          <MatchupCard matchup={matchup} userId={userId} />
-                        </BackgroundGradientSponsored>
-                      )}
-                    </BlurFade>
-                  );
-                } else {
-                  return (
-                    <BlurFade
-                      key={matchup._id}
-                      delay={0.25 * idx * 0.01}
-                      inView
-                    >
-                      <MatchupCard matchup={matchup} userId={userId} />
-                    </BlurFade>
-                  );
-                }
+                return (
+                  <BlurFade key={matchup._id} delay={0.25 * idx * 0.01} inView>
+                    <MatchupCard matchup={matchup} userId={userId} />
+                  </BlurFade>
+                );
               })}
       </div>
 

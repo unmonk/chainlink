@@ -1,8 +1,30 @@
 import { v } from "convex/values";
 import { Doc, Id } from "./_generated/dataModel";
-import { action, mutation, query } from "./_generated/server";
+import { action, mutation, query, QueryCtx } from "./_generated/server";
 import { League } from "./types";
 import { api } from "./_generated/api";
+
+////////////////////MATCHUP UTILS////////////////////
+export function determineWinner(
+  type: string,
+  typeDetails: string | undefined,
+  homeTeam: any,
+  awayTeam: any
+) {
+  if (type === "SCORE" && typeDetails === "GREATER_THAN") {
+    if (homeTeam.score === awayTeam.score) return "PUSH";
+    return homeTeam.score > awayTeam.score ? homeTeam.id : awayTeam.id;
+  }
+  return null;
+}
+
+export const matchupReward = (cost: number, featured: boolean) => {
+  if (featured) {
+    return cost * 3 > 0 ? cost * 3 : 30;
+  } else {
+    return cost * 2 > 0 ? cost * 2 : 10;
+  }
+};
 
 export const MATCHUP_FINAL_STATUSES = [
   "STATUS_FINAL",
@@ -59,6 +81,8 @@ export const ACTIVE_LEAGUES: League[] = [
   "CSL",
   "RPL",
 ];
+
+////////////////////UTILS////////////////////
 
 export interface ScheduledMessage {
   _id: string;
@@ -158,6 +182,15 @@ export function missingEnvVariableUrl(envVarName: string, whereToGet: string) {
   );
 }
 
+export function deploymentName() {
+  const url = process.env.CONVEX_CLOUD_URL;
+  if (!url) return undefined;
+  const regex = new RegExp("https://(.+).convex.cloud");
+  return regex.exec(url)?.[1];
+}
+
+////////////////////STORAGE UTILS////////////////////
+
 export const queryImageUrl = action({
   args: {
     storageId: v.id("_storage"),
@@ -186,6 +219,22 @@ export const removeImageFromStorage = mutation({
   },
 });
 
+////////////////////USER UTILS////////////////////
+export async function getAuthenticatedUser(ctx: QueryCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) throw new Error("Unauthorized");
+
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_token", (q) =>
+      q.eq("tokenIdentifier", identity.tokenIdentifier)
+    )
+    .unique();
+  if (!user) throw new Error("User not found");
+
+  return { identity, user };
+}
+
 export interface UserMonthlyStats {
   [key: string]: {
     wins: number;
@@ -203,21 +252,6 @@ export interface UserMonthlyStats {
     };
   };
 }
-
-export function deploymentName() {
-  const url = process.env.CONVEX_CLOUD_URL;
-  if (!url) return undefined;
-  const regex = new RegExp("https://(.+).convex.cloud");
-  return regex.exec(url)?.[1];
-}
-
-export const matchupReward = (cost: number, featured: boolean) => {
-  if (featured) {
-    return cost * 3 > 0 ? cost * 3 : 30;
-  } else {
-    return cost * 2 > 0 ? cost * 2 : 10;
-  }
-};
 
 export const leagueLogos: {
   [key: string]: string;

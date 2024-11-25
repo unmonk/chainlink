@@ -3,10 +3,11 @@ import {
   internalQuery,
   mutation,
   query,
+  QueryCtx,
 } from "./_generated/server";
 import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
-import { matchupReward } from "./utils";
+import { determineWinner, matchupReward } from "./utils";
 import { api, internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 import { featured_type, matchup_type } from "./schema";
@@ -159,17 +160,10 @@ export const getActiveMatchups = query({
     const matchupsWithPickCounts: MatchupWithPickCounts[] = [];
     for (let matchup of matchups) {
       //get picks
-      const picks = await ctx.db
-        .query("picks")
-        .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
-        .collect();
-
-      const homeTeamPicks = picks.filter(
-        (p) => p.pick.id === matchup.homeTeam.id
-      ).length;
-      const awayTeamPicks = picks.filter(
-        (p) => p.pick.id === matchup.awayTeam.id
-      ).length;
+      const { homeTeamPicks, awayTeamPicks } = await getPickCountsForMatchup(
+        ctx,
+        matchup
+      );
 
       // Include reactions in the matchup data
       const reactions = await ctx.db
@@ -214,17 +208,10 @@ export const getActiveMatchupsByLeague = query({
     // Get pick counts for each matchup
     const matchupsWithPicks = [];
     for (const matchup of matchups) {
-      const picks = await ctx.db
-        .query("picks")
-        .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
-        .collect();
-
-      const homeTeamPicks = picks.filter(
-        (p) => p.pick.id === matchup.homeTeam.id
-      ).length;
-      const awayTeamPicks = picks.filter(
-        (p) => p.pick.id === matchup.awayTeam.id
-      ).length;
+      const { homeTeamPicks, awayTeamPicks } = await getPickCountsForMatchup(
+        ctx,
+        matchup
+      );
 
       matchupsWithPicks.push({
         ...matchup,
@@ -382,15 +369,7 @@ export const handleMatchupFinished = internalMutation({
     { matchupId, homeTeam, awayTeam, status, type, typeDetails, metadata }
   ) => {
     //#region //////////////////DETERMINE WINS ///////////////////////
-    let winnerId = undefined;
-
-    //SCORE GREATER_THAN
-    if (type === "SCORE" && typeDetails === "GREATER_THAN") {
-      winnerId = homeTeam.score > awayTeam.score ? homeTeam.id : awayTeam.id;
-      if (homeTeam.score === awayTeam.score) {
-        winnerId = "PUSH";
-      }
-    }
+    let winnerId = determineWinner(type, typeDetails, homeTeam, awayTeam);
 
     //IF NO WINNER FOUND throw error
     if (!winnerId) {
@@ -652,3 +631,22 @@ export const create = mutation({
     return;
   },
 });
+
+async function getPickCountsForMatchup(
+  ctx: QueryCtx,
+  matchup: Doc<"matchups">
+) {
+  const picks = await ctx.db
+    .query("picks")
+    .withIndex("by_matchupId", (q) => q.eq("matchupId", matchup._id))
+    .collect();
+
+  const homeTeamPicks = picks.filter(
+    (p) => p.pick.id === matchup.homeTeam.id
+  ).length;
+  const awayTeamPicks = picks.filter(
+    (p) => p.pick.id === matchup.awayTeam.id
+  ).length;
+
+  return { homeTeamPicks, awayTeamPicks };
+}
