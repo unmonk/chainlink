@@ -131,6 +131,7 @@ export async function processSchedule(
   // Iterate through each day in the schedule data
   for (const day in scheduleData) {
     const games = scheduleData[day].games;
+
     // Skip if no games exist for this day
     if (!games) continue;
 
@@ -139,7 +140,6 @@ export async function processSchedule(
       // Increment total games counter
       leagueResponse.gamesOnSchedule++;
       const gameId = game.id;
-
       // Handle existing matchups for this game
       if (existingMatchups[gameId]) {
         // Increment existing matchups counter
@@ -165,6 +165,7 @@ export async function processSchedule(
         game: game.shortName,
         result: result.result,
       });
+      leagueResponse.scoreMatchupsCreated += result.matchupsCreated || 0;
     }
   }
 
@@ -185,7 +186,6 @@ export async function processGame(
       result: validationResult.result,
     };
   }
-
   // Process existing matchup
   if (existingMatchups[game.id]?.length > 0) {
     //check if needs to update
@@ -262,8 +262,8 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
 function isGameValid(game: Game) {
   const competitionStatus = game.competitions[0].status?.type?.name;
   const competitors = game.competitions[0].competitors;
-  const home = competitors.find((c) => c.id === game.competitions[0].venue?.id);
-  const away = competitors.find((c) => c.id !== game.competitions[0].venue?.id);
+  const home = competitors.find((c) => c.homeAway === "home");
+  const away = competitors.find((c) => c.homeAway === "away");
 
   if (!competitionStatus)
     return {
@@ -280,10 +280,7 @@ function isGameValid(game: Game) {
       valid: false,
       result: "Not enough competitors",
     };
-  if (
-    game.competitions[0].competitors[0].team.name === "TBD" ||
-    game.competitions[0].competitors[1].team.name === "TBD"
-  )
+  if (home?.team.name === "TBD" || away?.team.name === "TBD")
     return {
       valid: false,
       result: "TBD team",
@@ -323,8 +320,8 @@ async function createNewMatchupByType(
   if (matchupType === "SCORE") {
     const competition = game.competitions[0];
     const competitors = competition.competitors;
-    const home = competitors.find((c) => c.id === competition.venue?.id);
-    const away = competitors.find((c) => c.id !== competition.venue?.id);
+    const home = competitors.find((c) => c.homeAway === "home");
+    const away = competitors.find((c) => c.homeAway === "away");
     if (!home || !away || !competition) return;
 
     if (matchupType === "SCORE") {
