@@ -3,9 +3,18 @@ import { Loader2Icon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { api } from "@/convex/_generated/api";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { useQuery, useAction } from "convex/react";
+import { ScrollArea } from "../ui/scroll-area";
+import { useAction } from "convex/react";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 
 export default function ScheduleRunButton() {
   const runSchedules = useAction(api.schedules.schedules);
@@ -30,12 +39,14 @@ export default function ScheduleRunButton() {
     >
   >({});
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleRunSchedules = async () => {
     try {
       setLoading(true);
       const response = await runSchedules();
       setScheduleResponse(response);
+      setIsOpen(true);
       toast.success("Schedules run successfully");
     } catch (error) {
       toast.error("Error running schedules");
@@ -45,7 +56,7 @@ export default function ScheduleRunButton() {
   };
 
   return (
-    <div className="flex gap-2">
+    <>
       <Button
         onClick={handleRunSchedules}
         disabled={loading}
@@ -60,58 +71,58 @@ export default function ScheduleRunButton() {
         )}
       </Button>
 
-      {Object.keys(scheduleResponse).length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Schedule Response</h2>
-          <ScrollArea className="h-[500px]">
-            {Object.keys(scheduleResponse).map((league) => (
-              <div key={league}>
-                <h3 className="text-lg font-semibold">{league}</h3>
-                {scheduleResponse[league].error && (
-                  <p className="text-red-500">
-                    {scheduleResponse[league].error}
-                  </p>
-                )}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-2 mb-4">
-                  <div className="p-3 bg-muted rounded-lg">
-                    <div className="text-sm text-muted-foreground">
-                      ESPN Games
-                    </div>
-                    <div className="text-lg font-medium">
-                      {scheduleResponse[league].gamesOnSchedule}
-                    </div>
-                  </div>
-                  <div className="p-3 bg-muted rounded-lg">
-                    <div className="text-sm text-muted-foreground"></div>
-                    <div className="text-lg font-medium">
-                      Existing Matchups
-                      <span className="font-bold">
-                        {scheduleResponse[league].existingMatchups}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-3 bg-muted rounded-lg">
-                    <div className="text-sm text-muted-foreground">
-                      Updated Info
-                    </div>
-                    <div className="text-lg font-medium">
-                      {scheduleResponse[league].matchupsUpdated}
-                    </div>
-                  </div>
-                  <div className="p-3 bg-muted rounded-lg">
-                    <div className="text-sm text-muted-foreground">
-                      New Matchups
-                    </div>
-                    <div className="text-lg font-medium">
-                      {scheduleResponse[league].scoreMatchupsCreated}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>Schedule Results</DialogTitle>
+          </DialogHeader>
+
+          <ScrollArea className="h-[500px] w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>League</TableHead>
+                  <TableHead className="text-right">ESPN Games</TableHead>
+                  <TableHead className="text-right">
+                    Existing Matchups
+                  </TableHead>
+                  <TableHead className="text-right">Updated</TableHead>
+                  <TableHead className="text-right">New Matchups</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Object.entries(scheduleResponse).map(([league, data]) => (
+                  <TableRow key={league}>
+                    <TableCell className="font-medium">{league}</TableCell>
+                    <TableCell className="text-right">
+                      {data.gamesOnSchedule}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {data.existingMatchups}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {data.matchupsUpdated}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {data.scoreMatchupsCreated}
+                    </TableCell>
+                    <TableCell>
+                      {data.error ? (
+                        <span className="text-red-500 text-sm">
+                          {data.error}
+                        </span>
+                      ) : (
+                        <span className="text-green-500 text-sm">Success</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </ScrollArea>
-        </div>
-      )}
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

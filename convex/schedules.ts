@@ -181,7 +181,8 @@ export function getScheduleEndpoints(league: League) {
   const tomorrowString = tomorrow.toISOString().split("T")[0].replace(/-/g, "");
   const theDayAfterTomorrowString = theDayAfterTomorrow
     .toISOString()
-    .split("T")[0];
+    .split("T")[0]
+    .replace(/-/g, "");
   const dates = [
     `${yesterdayString}`,
     `${todayString}`,
