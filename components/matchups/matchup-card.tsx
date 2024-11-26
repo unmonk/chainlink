@@ -50,69 +50,40 @@ const MatchupCard = ({
   };
 
   if (matchup.featured) {
-    if (matchup.featuredType === "CHAINBUILDER") {
-      return (
-        <BackgroundGradient
-          key={matchup._id}
-          animate={true}
-          className={`rounded-lg overflow-hidden shadow-lg w-full h-full`}
+    return (
+      <BackgroundGradientSponsored
+        key={matchup._id}
+        animate={true}
+        className={`rounded-lg overflow-hidden shadow-lg h-full w-full`}
+        color={
+          matchup.featuredType === "CHAINBUILDER"
+            ? "green"
+            : matchup.metadata?.sponsored?.color || "white"
+        }
+      >
+        <Card
+          className="rounded-t-none flex flex-col h-full w-full"
+          ref={cardRef}
         >
-          <Card
-            className="rounded-t-none flex flex-col h-full w-full"
-            ref={cardRef}
-          >
-            <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
-            <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
-              <Link href={`/matchups/${matchup._id}`}>{matchup.title}</Link>
-            </CardTitle>
-            <MatchupCardButtons
-              activePick={activePick}
+          <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
+          <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
+            <Link href={`/matchups/${matchup._id}`}>{matchup.title}</Link>
+          </CardTitle>
+          <MatchupCardButtons
+            activePick={activePick}
+            matchup={matchup}
+            userId={userId}
+          />
+          <div className="mt-auto">
+            <MatchupCardFooter
               matchup={matchup}
-              userId={userId}
+              handleShare={handleShare}
+              pick={activePick}
             />
-            <div className="mt-auto">
-              <MatchupCardFooter
-                matchup={matchup}
-                handleShare={handleShare}
-                pick={activePick}
-              />
-            </div>
-          </Card>
-        </BackgroundGradient>
-      );
-    }
-    if (matchup.featuredType === "SPONSORED") {
-      return (
-        <BackgroundGradientSponsored
-          key={matchup._id}
-          animate={true}
-          className={`rounded-lg overflow-hidden shadow-lg h-full w-full`}
-          color={matchup.metadata?.sponsored?.color || "white"}
-        >
-          <Card
-            className="rounded-t-none flex flex-col h-full w-full"
-            ref={cardRef}
-          >
-            <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
-            <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
-              <Link href={`/matchups/${matchup._id}`}>{matchup.title}</Link>
-            </CardTitle>
-            <MatchupCardButtons
-              activePick={activePick}
-              matchup={matchup}
-              userId={userId}
-            />
-            <div className="mt-auto">
-              <MatchupCardFooter
-                matchup={matchup}
-                handleShare={handleShare}
-                pick={activePick}
-              />
-            </div>
-          </Card>
-        </BackgroundGradientSponsored>
-      );
-    }
+          </div>
+        </Card>
+      </BackgroundGradientSponsored>
+    );
   }
 
   return (

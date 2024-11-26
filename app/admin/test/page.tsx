@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { ContentLayout } from "@/components/nav/content-layout";
 import { Id } from "@/convex/_generated/dataModel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import MatchupCard from "@/components/matchups/matchup-card";
 
 const exampleMatchup = {
   _id: "1" as Id<"matchups">,
@@ -34,6 +35,7 @@ const exampleMatchup = {
   typeDetails: "GREATER_THAN" as const,
   homePicks: 3,
   awayPicks: 8,
+  reactions: [],
 };
 
 const exampleMatchup2 = {
@@ -48,7 +50,7 @@ const exampleMatchup2 = {
   },
   cost: 0,
   featured: true,
-  featuredType: "CHAINBUILDER" as const,
+  featuredType: "SPONSORED" as const,
   gameId: "401715432",
   homeTeam: {
     id: "264",
@@ -57,7 +59,17 @@ const exampleMatchup2 = {
     score: 0,
   },
   league: "MBB",
-  metadata: { network: "B1G+", statusDetails: "1:33 - 1st Half" },
+  metadata: {
+    network: "B1G+",
+    statusDetails: "1:33 - 1st Half",
+    sponsored: {
+      color: "blue",
+      description: "Sponsored by Blue",
+      image: "/images/ad3.png",
+      name: "Blue",
+      url: "https://www.blue.com",
+    },
+  },
   startTime: 1731900600000,
   status: "STATUS_SCHEDULED" as const,
   title: "Who will win? River Hawks @ Huskies",
@@ -65,6 +77,7 @@ const exampleMatchup2 = {
   typeDetails: "GREATER_THAN" as const,
   homePicks: 2,
   awayPicks: 2,
+  reactions: [],
 };
 
 const userPickWithMatchup = {
@@ -91,7 +104,11 @@ export default function AdminTestPage() {
     <ContentLayout title="Admin Test Page">
       <div className="p-4">
         <h1>Admin Test Page</h1>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center gap-4">
+          <MatchupCard matchup={exampleMatchup} userId={"1" as Id<"users">} />
+
+          <MatchupCard matchup={exampleMatchup2} userId={"1" as Id<"users">} />
+
           <div className="grid grid-cols-3 gap-4 items-center my-2">
             <Avatar hasGlow cosmetic="mandala" height="h-28" width="w-28">
               <AvatarFallback>JH</AvatarFallback>

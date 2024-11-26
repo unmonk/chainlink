@@ -178,3 +178,19 @@ export const getPurchases = query({
       .take(50);
   },
 });
+
+export const unEquipAvatarBackground = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) throw new Error("User not found");
+
+    await ctx.db.patch(args.userId, {
+      ...user,
+      metadata: {
+        ...user.metadata,
+        avatarBackground: undefined,
+      },
+    });
+  },
+});

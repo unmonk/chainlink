@@ -26,7 +26,7 @@ export default function Page() {
         <div className="w-full">
           <SquadSearch />
         </div>
-        <p className="text-muted-foreground text-sm mb-2 rounded-md p-2 bg-background/20">
+        <p className="text-muted-foreground text-sm mb-2 rounded-md p-2 bg-background/20 text-center">
           Squads is a team game, built right into ChainLink! Start a new Squad
           or join your friends to see who is the most knowledgeable group of
           sports fans in the world!
@@ -49,7 +49,7 @@ export default function Page() {
         <div className="w-full">
           <SquadsList />
         </div>
-        <p className="text-muted-foreground text-sm mb-2 rounded-md p-2 bg-background/20">
+        <p className="text-muted-foreground text-sm mb-2 rounded-md p-2 bg-background/20 text-center">
           Squad score is determined by a combination of wins, losses, pushes,
           member contributions. Earn some cool achievements to display forever
           on the Squad page and your profile!

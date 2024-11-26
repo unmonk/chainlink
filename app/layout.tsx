@@ -10,6 +10,7 @@ import { ErrorBoundary } from "@sentry/nextjs";
 import { CookiesProvider } from "next-client-cookies/server";
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import GoogleAdsense from "@/lib/GoogleAdsense";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -90,6 +91,7 @@ export default function RootLayout({
             </ErrorBoundary>
           </NuqsAdapter>
         </body>
+        <GoogleAdsense pId="1737227166446709" />
       </html>
     </CookiesProvider>
   );
