@@ -17,11 +17,12 @@ const MatchupCardButtons = ({
   activePick?: Doc<"picks">;
 }) => {
   const totalPicks = matchup.homePicks + matchup.awayPicks;
+  const isHotMatchup = totalPicks >= 5;
 
   const getGradientColors = (picks: number) => {
-    if (picks < 3) {
+    if (picks < 2) {
       return "from-blue-300 via-blue-400 to-blue-500"; // Cold theme
-    } else if (picks < 7) {
+    } else if (picks < 4) {
       return "from-yellow-300 via-orange-200 to-orange-500"; // Warm theme
     } else {
       return "from-red-500 via-red-600 to-red-700"; // Hot theme
@@ -37,7 +38,7 @@ const MatchupCardButtons = ({
 
   const getBarWidth = (picks: number) => {
     if (picks === 0) return "0%";
-    const width = Math.min(10 + picks * 10, 100);
+    const width = Math.min(10 + picks * 15, 100);
     return `${width}%`;
   };
 
@@ -81,12 +82,12 @@ const MatchupCardButtons = ({
                     width: getBarWidth(matchup.awayPicks),
                     transition: "width 0.3s ease-in-out",
                     boxShadow:
-                      matchup.awayPicks >= 10
+                      matchup.awayPicks >= 3
                         ? "0 0 10px rgba(255, 0, 0, 0.5)"
                         : "none",
                   }}
                 />
-                {matchup.awayPicks > 5 && (
+                {matchup.awayPicks > 3 && (
                   <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-black drop-shadow-md overflow-hidden">
                     Hot🔥
                   </span>
@@ -103,12 +104,12 @@ const MatchupCardButtons = ({
                     transition: "width 0.3s ease-in-out",
                     marginLeft: "auto",
                     boxShadow:
-                      matchup.homePicks >= 10
+                      matchup.homePicks >= 3
                         ? "0 0 10px rgba(255, 0, 0, 0.5)"
                         : "none",
                   }}
                 />
-                {matchup.homePicks > 5 && (
+                {matchup.homePicks > 3 && (
                   <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-black drop-shadow-md overflow-hidden">
                     Hot🔥
                   </span>
@@ -154,12 +155,12 @@ const MatchupCardButtons = ({
                           width: getBarWidth(matchup.awayPicks),
                           transition: "width 0.3s ease-in-out",
                           boxShadow:
-                            matchup.awayPicks >= 10
+                            matchup.awayPicks >= 3
                               ? "0 0 10px rgba(255, 0, 0, 0.5)"
                               : "none",
                         }}
                       />
-                      {matchup.awayPicks > 5 && (
+                      {matchup.awayPicks > 3 && (
                         <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-black drop-shadow-md overflow-hidden">
                           Hot🔥
                         </span>
@@ -216,12 +217,12 @@ const MatchupCardButtons = ({
                           transition: "width 0.3s ease-in-out",
                           marginLeft: "auto",
                           boxShadow:
-                            matchup.homePicks >= 10
+                            matchup.homePicks >= 3
                               ? "0 0 10px rgba(255, 0, 0, 0.5)"
                               : "none",
                         }}
                       />
-                      {matchup.homePicks > 5 && (
+                      {matchup.homePicks > 3 && (
                         <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-black drop-shadow-md overflow-hidden">
                           Hot🔥
                         </span>
@@ -268,19 +269,25 @@ const MatchupCardButtons = ({
         userId={userId}
         matchupReactions={matchup.reactions}
       >
-        {matchup.status === "STATUS_SCHEDULED" &&
-          activePick?.matchupId === matchup._id && (
-            <div className="col-span-1 bg-accent/40 flex-nowrap p-0.5 rounded-sm flex items-center justify-center gap-1 text-xs">
-              <span className="text-primary text-xs font-bold whitespace-nowrap"></span>
-              <LockIcon size={12} className="text-muted-foreground" />
-              <span className="text-primary text-xs font-bold whitespace-nowrap">
-                {formatDistance(new Date(matchup.startTime), new Date(), {
-                  includeSeconds: true,
-                  addSuffix: true,
-                })}
-              </span>
+        <div className="col-span-1  flex-nowrap gap-2 flex items-center justify-center">
+          {matchup.status === "STATUS_SCHEDULED" &&
+            activePick?.matchupId === matchup._id && (
+              <div className=" bg-accent/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs ">
+                <LockIcon size={12} className="text-muted-foreground" />
+                <span className="text-primary text-xs font-bold whitespace-nowrap">
+                  {formatDistance(new Date(matchup.startTime), new Date(), {
+                    includeSeconds: true,
+                    addSuffix: true,
+                  })}
+                </span>
+              </div>
+            )}
+          {isHotMatchup && (
+            <div className=" bg-orange-500/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
+              🔥Hot Matchup
             </div>
           )}
+        </div>
       </ReactionBar>
     </div>
   );
