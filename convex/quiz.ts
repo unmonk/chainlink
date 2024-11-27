@@ -59,7 +59,6 @@ export const listQuizzes = query({
   args: {},
   handler: async ({ db }) => {
     const quizzes = await db.query("globalQuiz").order("desc").take(15);
-    console.log(quizzes, "quizzes");
     const quizzesWithResponses = await Promise.all(
       quizzes.map(async (quiz) => {
         const responses = await db
@@ -154,27 +153,20 @@ export const updateQuiz = mutation({
           await ctx.db.patch(response._id, { win: true });
         }
       } else {
-        // Original winning logic
-        const winningOption = quiz.options.find(
-          (option) => option.id === correctAnswerId
-        );
-        if (!winningOption) return;
-
-        const winningResponses = await ctx.db
-          .query("quizResponses")
-          .withIndex("by_quizId", (q) => q.eq("quizId", quizId))
-          .filter((q) => q.eq(q.field("selectedOptionId"), winningOption.id))
-          .collect();
-
-        for (const response of winningResponses) {
-          const payout = response.wager * 10;
-          await ctx.scheduler.runAfter(0, api.users.adjustCoins, {
-            amount: payout,
-            transactionType: "PAYOUT",
-            userId: response.userId,
-          });
+        // Set win status for all responses
+        for (const response of quizResponses) {
           const userWin = response.selectedOptionId === correctAnswerId;
           await ctx.db.patch(response._id, { win: userWin });
+
+          // Only pay out winning responses
+          if (userWin) {
+            const payout = response.wager * 10;
+            await ctx.scheduler.runAfter(0, api.users.adjustCoins, {
+              amount: payout,
+              transactionType: "PAYOUT",
+              userId: response.userId,
+            });
+          }
         }
       }
     }
