@@ -62,7 +62,7 @@ const CancelButton = ({ onConfirm }: { onConfirm: () => void }) => {
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>Cencel Pick</DrawerTitle>
+          <DrawerTitle>Cancel Pick</DrawerTitle>
           <DrawerDescription>
             Are you sure you want to cancel your pick?
           </DrawerDescription>

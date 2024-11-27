@@ -154,6 +154,7 @@ export const recordClick = mutation({
   handler: async (ctx, args) => {
     const sponsor = await ctx.db.get(args.sponsorId);
     if (!sponsor) throw new Error("Sponsor not found");
+    console.log(sponsor.name);
 
     await ctx.db.patch(args.sponsorId, {
       metadata: {
