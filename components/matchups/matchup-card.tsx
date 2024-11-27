@@ -67,7 +67,9 @@ const MatchupCard = ({
         >
           <MatchupCardHeader matchup={matchup as Doc<"matchups">} />
           <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
-            <Link href={`/matchups/${matchup._id}`}>{matchup.title}</Link>
+            <Link href={`/matchups/${matchup._id}`} prefetch={false}>
+              {matchup.title}
+            </Link>
           </CardTitle>
           <MatchupCardButtons
             activePick={activePick}
