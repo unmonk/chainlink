@@ -347,19 +347,28 @@ export const updateUserMonthlyStats = internalMutation({
       _id: v.id("users"),
       monthlyStats: v.any(),
     }),
+    dryRun: v.optional(v.boolean()),
   },
-  handler: async (ctx, { user }) => {
-    await ctx.db.patch(user._id, {
-      monthlyStats: {
-        ...user.monthlyStats,
-      },
-    });
+  handler: async (ctx, { user, dryRun }) => {
+    if (dryRun) {
+      console.log("UPDATING MONTHLY STATS");
+      console.log(user.monthlyStats);
+    }
+    if (!dryRun) {
+      await ctx.db.patch(user._id, {
+        monthlyStats: {
+          ...user.monthlyStats,
+        },
+      });
+    }
   },
 });
 
 export const monthlyStatsRecord = internalAction({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    dryRun: v.optional(v.boolean()),
+  },
+  handler: async (ctx, { dryRun }) => {
     const users = await ctx.runQuery(api.users.getAllUsers);
     for (const user of users) {
       if (!user.monthlyStats) {
@@ -376,7 +385,9 @@ export const monthlyStatsRecord = internalAction({
       currentStats.totalGames =
         user.stats.wins + user.stats.losses + user.stats.pushes;
       if (currentStats.totalGames > 0) {
-        currentStats.winRate = user.stats.wins / currentStats.totalGames;
+        currentStats.winRate = Number(
+          (user.stats.wins / currentStats.totalGames).toFixed(2)
+        );
       }
       if (currentStats.totalGames === 0) {
         currentStats.winRate = 0;
@@ -384,16 +395,24 @@ export const monthlyStatsRecord = internalAction({
       currentStats.coins = user.coins;
       currentStats.statsByLeague = user.stats.statsByLeague;
 
-      await ctx.runMutation(internal.users.updateUserMonthlyStats, {
-        user: {
-          _id: user._id,
-          monthlyStats: {
-            ...user.monthlyStats,
-            [currentMonth]: currentStats,
+      if (dryRun) {
+        console.log("CURRENT STATS", currentMonth, user.name);
+        console.log(currentStats);
+      }
+
+      if (!dryRun) {
+        await ctx.runMutation(internal.users.updateUserMonthlyStats, {
+          user: {
+            _id: user._id,
+            monthlyStats: {
+              ...user.monthlyStats,
+              [currentMonth]: currentStats,
+            },
           },
-        },
-      });
+        });
+      }
     }
+    return "Monthly stats processing completed";
   },
 });
 

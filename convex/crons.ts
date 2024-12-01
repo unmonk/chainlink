@@ -18,13 +18,15 @@ crons.daily(
 crons.monthly(
   "Monthly Campaign Finalization, Achievement Awards, and New Campaign Creation",
   { day: 1, hourUTC: 10, minuteUTC: 0 }, // 1st of the month at 10:00 UTC, Midnight HST
-  internal.campaigns.createMonthlyCampaign
+  internal.campaigns.createMonthlyCampaign,
+  { dryRun: false }
 );
 
 crons.monthly(
   "Record monthly statistics for all players",
   { day: 1, hourUTC: 9, minuteUTC: 45 }, // last day of the month at 11:45 PM HST
-  internal.users.monthlyStatsRecord
+  internal.users.monthlyStatsRecord,
+  { dryRun: false }
 );
 
 export default crons;
