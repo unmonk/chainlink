@@ -9,8 +9,19 @@ export const getChainLeaderboard = query({
       .withIndex("by_active", (q) => q.eq("active", true))
       .collect();
 
-    //sort chains by best chain
-    chains.sort((a, b) => b.chain - a.chain);
+    //sort chains by best chain, then wins, then pushes
+    chains.sort((a, b) => {
+      // First compare chains
+      if (a.chain !== b.chain) {
+        return b.chain - a.chain;
+      }
+      // If chains are equal, compare wins
+      if (a.wins !== b.wins) {
+        return b.wins - a.wins;
+      }
+      // If wins are equal, compare pushes
+      return b.pushes - a.pushes;
+    });
 
     return Promise.all(
       (chains as any[]).map(async (chain, index) => {
