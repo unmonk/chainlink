@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { LandingLeagues } from "./landing-leagues";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import GetStartedButton from "../ui/get-started-button";
+import GetStartedButton from "@/components/ui/get-started-button";
 
 export const Hero = () => {
   const [currentVideo, setCurrentVideo] = useState(1);
