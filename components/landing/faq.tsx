@@ -35,7 +35,7 @@ const MatchupsPickFAQ = () => {
       <p className="mb-2">
         Matchups are curated by our team of experts, and you can pick any
         matchup that is available on the platform. The Play screen will show you
-        all matchups for the next 48 hours across several football, soccer,
+        all matchups for the next 24 hours across several football, soccer,
         baseball, and other leagues.
       </p>
     </>

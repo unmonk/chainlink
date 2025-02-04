@@ -95,18 +95,6 @@ export const manuallyFinalizeMatchup = mutation({
   },
 });
 
-export const getHomepageMatchups = query({
-  args: {},
-  handler: async (ctx) => {
-    const currentTime = new Date().getTime();
-    const matchups = await ctx.db
-      .query("matchups")
-      .withIndex("by_startTime", (q) => q.gte("startTime", currentTime))
-      .take(3);
-    return matchups;
-  },
-});
-
 export const getAdminMatchups = query({
   args: {},
   handler: async (ctx) => {
@@ -203,7 +191,7 @@ export const getActiveMatchupsByLeague = query({
       .filter((q) =>
         q.and(q.eq(q.field("league"), league), q.eq(q.field("active"), true))
       )
-      .take(50);
+      .take(500);
 
     // Get pick counts for each matchup
     const matchupsWithPicks = [];

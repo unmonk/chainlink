@@ -156,7 +156,7 @@ export type AnnouncementType = Infer<typeof announcement_type>;
 
 export default defineSchema({
   //////////////////MATCHUPS AND PICKS//////////////////////////////
-  matchups: defineTable({
+  activeMatchups: defineTable({
     updatedAt: v.optional(v.number()),
     startTime: v.number(),
     active: v.boolean(),
@@ -184,11 +184,39 @@ export default defineSchema({
     cost: v.number(),
     metadata: v.optional(v.any()),
   })
-    .index("by_active_league", ["league", "active"])
-    .index("by_league_time", ["league", "startTime"])
-    .index("by_active_dates", ["active", "startTime"])
-    .index("by_startTime", ["startTime"])
-    .index("by_gameId", ["gameId"]),
+    .index("by_gameId", ["gameId"])
+    .index("by_league", ["league"])
+    .index("by_featured", ["featured"])
+    .index("by_startTime", ["startTime"]),
+
+  matchups: defineTable({
+    updatedAt: v.optional(v.number()),
+    startTime: v.number(),
+    active: v.boolean(),
+    featured: v.boolean(),
+    featuredType: v.optional(featured_type),
+    title: v.string(),
+    league: v.string(),
+    type: matchup_type,
+    typeDetails: v.optional(v.string()),
+    status: v.string(),
+    gameId: v.string(),
+    winnerId: v.optional(v.string()),
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    cost: v.number(),
+    metadata: v.optional(v.any()),
+  }).index("by_league", ["league"]),
 
   chains: defineTable({
     userId: v.string(),

@@ -10,6 +10,8 @@ import {
   UserRound,
   CoinsIcon,
   ScrollTextIcon,
+  MegaphoneIcon,
+  BellPlusIcon,
 } from "lucide-react";
 import { MdDatasetLinked } from "react-icons/md";
 
@@ -33,6 +35,32 @@ type Group = {
   groupLabel: string;
   menus: Menu[];
 };
+
+export function getCommsMenuList(pathname: string): Menu[] {
+  return [
+    {
+      href: "/admin/comms",
+      label: "Comms",
+      active: pathname.includes("/admin/comms"),
+      icon: LayoutGrid,
+      submenus: [],
+    },
+    {
+      href: "/admin/comms/announcements",
+      label: "Announcements",
+      active: pathname.includes("/admin/comms/announcements"),
+      icon: MegaphoneIcon,
+      submenus: [],
+    },
+    {
+      href: "/admin/comms/notifications",
+      label: "Notifications",
+      active: pathname.includes("/admin/comms/notifications"),
+      icon: BellPlusIcon,
+      submenus: [],
+    },
+  ];
+}
 
 export function getAdminMenuList(pathname: string): Group[] {
   return [
@@ -60,11 +88,10 @@ export function getAdminMenuList(pathname: string): Group[] {
               label: "Users",
               active: pathname.includes("/admin/users"),
             },
-
             {
-              href: "/admin/announcements",
-              label: "Announcements",
-              active: pathname.includes("/admin/announcements"),
+              href: "/admin/comms",
+              label: "Comms",
+              active: pathname.includes("/admin/comms"),
             },
 
             {
@@ -82,11 +109,7 @@ export function getAdminMenuList(pathname: string): Group[] {
               label: "Challenge",
               active: pathname.includes("/admin/quiz"),
             },
-            {
-              href: "/admin/notifications",
-              label: "Notifications",
-              active: pathname.includes("/admin/notifications"),
-            },
+
             {
               href: "/admin/squads",
               label: "Squads",

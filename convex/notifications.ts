@@ -329,3 +329,21 @@ export const handlePickPushNotification = action({
     });
   },
 });
+
+function createBaseNotificationPayload(title: string, message: string) {
+  return {
+    notification: {
+      title,
+      message,
+      icon: "/images/icon-512x512.png",
+      actions: [{ action: "pick", title: "Pick Now" }],
+      data: {
+        onActionClick: {
+          default: {
+            operation: "openWindow",
+          },
+        },
+      },
+    },
+  };
+}

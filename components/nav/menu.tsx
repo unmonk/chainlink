@@ -78,6 +78,7 @@ export function Menu({ isOpen }: MenuProps) {
                                   href === "/u" ? `/u/${user?.username}` : href
                                 }
                                 className="relative flex items-center w-full"
+                                prefetch={false}
                               >
                                 <span
                                   className={cn(isOpen === false ? "" : "mr-4")}
@@ -161,7 +162,7 @@ export function Menu({ isOpen }: MenuProps) {
                                 className="w-full justify-start h-10 mb-1"
                                 asChild
                               >
-                                <Link href={href}>
+                                <Link href={href} prefetch={false}>
                                   <span
                                     className={cn(
                                       isOpen === false ? "" : "mr-4"

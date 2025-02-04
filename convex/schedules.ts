@@ -57,7 +57,7 @@ export const insertStatMatchup = internalMutation({
     }
   ) => {
     //create a STATS matchup
-    const matchupId = await ctx.db.insert("matchups", {
+    const matchupId = await ctx.db.insert("activeMatchups", {
       startTime,
       active: false,
       featured: false,
@@ -121,7 +121,7 @@ export const insertScoreMatchup = internalMutation({
     }
   ) => {
     //create a score matchup
-    const matchupId = await ctx.db.insert("matchups", {
+    const matchupId = await ctx.db.insert("activeMatchups", {
       startTime,
       active,
       featured,
@@ -149,7 +149,7 @@ export const updateScheduledMatchup = internalMutation({
   },
   handler: async (ctx, { gameId, league, startTime, status }) => {
     const matchups = await ctx.db
-      .query("matchups")
+      .query("activeMatchups")
       .filter((q) =>
         q.and(
           q.eq(q.field("league"), league),
