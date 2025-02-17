@@ -148,19 +148,21 @@ export const updateScheduledMatchup = internalMutation({
     status: v.string(),
   },
   handler: async (ctx, { gameId, league, startTime, status }) => {
+    // Use index to efficiently query matchups
     const matchups = await ctx.db
       .query("matchups")
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("league"), league),
-          q.eq(q.field("active"), true),
-          q.eq(q.field("gameId"), gameId)
-        )
+      .withIndex("by_active_league", (q) =>
+        q.eq("league", league).eq("active", true)
       )
-      .take(500);
-    for (const matchup of matchups) {
-      await ctx.db.patch(matchup._id, { startTime, status });
-    }
+      .filter((q) => q.eq(q.field("gameId"), gameId))
+      .take(50);
+
+    // Batch update all matching matchups
+    await Promise.all(
+      matchups.map((matchup) =>
+        ctx.db.patch(matchup._id, { startTime, status })
+      )
+    );
   },
 });
 

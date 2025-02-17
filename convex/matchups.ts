@@ -200,10 +200,10 @@ export const getActiveMatchupsByLeague = query({
   handler: async (ctx, { league }) => {
     const matchups = await ctx.db
       .query("matchups")
-      .filter((q) =>
-        q.and(q.eq(q.field("league"), league), q.eq(q.field("active"), true))
+      .withIndex("by_active_league", (q) =>
+        q.eq("league", league).eq("active", true)
       )
-      .take(50);
+      .take(250);
 
     // Get pick counts for each matchup
     const matchupsWithPicks = [];
