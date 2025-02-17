@@ -1,3 +1,4 @@
+"use client";
 import {
   Accordion,
   AccordionContent,
@@ -5,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { DiscordLogoIcon } from "@radix-ui/react-icons";
+import { motion } from "framer-motion";
 
 const LinksFAQ = () => {
   return (
@@ -158,27 +160,57 @@ const FAQList: FAQProps[] = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      when: "beforeChildren",
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
+
 export const FAQ = () => {
   return (
     <section id="faq" className="container py-24 sm:py-32">
-      <h2 className="text-3xl md:text-4xl font-bold mb-4">
-        Frequently Asked{" "}
-        <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
-          Questions
-        </span>
-      </h2>
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={containerVariants}
+      >
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          Frequently Asked{" "}
+          <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
+            Questions
+          </span>
+        </h2>
 
-      <Accordion type="single" collapsible className="w-full AccordionRoot">
-        {FAQList.map(({ question, answer, value }: FAQProps) => (
-          <AccordionItem key={value} value={value}>
-            <AccordionTrigger className="text-left">
-              {question}
-            </AccordionTrigger>
-
-            <AccordionContent>{answer}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+        <Accordion type="single" collapsible className="w-full AccordionRoot">
+          {FAQList.map(({ question, answer, value }: FAQProps) => (
+            <motion.div key={value} variants={itemVariants}>
+              <AccordionItem value={value}>
+                <AccordionTrigger className="text-left">
+                  {question}
+                </AccordionTrigger>
+                <AccordionContent>{answer}</AccordionContent>
+              </AccordionItem>
+            </motion.div>
+          ))}
+        </Accordion>
+      </motion.div>
 
       <h3 className="font-medium mt-4">
         Still have questions?{" "}

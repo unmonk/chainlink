@@ -1,5 +1,7 @@
+"use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gift, Map, Medal, Plane } from "lucide-react";
+import { Gift, Medal } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface FeatureProps {
   icon: JSX.Element;
@@ -37,28 +39,49 @@ const features: FeatureProps[] = [
 export const HowItWorks = () => {
   return (
     <section id="howItWorks" className="container text-center py-8 sm:py-16">
-      <h2 className="text-3xl md:text-4xl font-bold ">
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        className="text-3xl md:text-4xl font-bold"
+      >
         How to{" "}
         <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
           Play{" "}
         </span>
         Step-by-Step Guide
-      </h2>
-      <p className="md:w-3/4 mx-auto mt-4 mb-8 text-xl text-muted-foreground">
+      </motion.h2>
+
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ delay: 0.2 }}
+        className="md:w-3/4 mx-auto mt-4 mb-8 text-xl text-muted-foreground"
+      >
         Correctly pick matchups to build your chain.
-      </p>
+      </motion.p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {features.map(({ icon, title, description }: FeatureProps) => (
-          <Card key={title} className="bg-muted/50">
-            <CardHeader>
-              <CardTitle className="grid gap-4 place-items-center">
-                {icon}
-                {title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>{description}</CardContent>
-          </Card>
+        {features.map(({ icon, title, description }: FeatureProps, index) => (
+          <motion.div
+            key={title}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.2 + index * 0.1 }}
+            className="hover:scale-105 transition-transform duration-300 h-full"
+          >
+            <Card className="bg-muted/50 h-full">
+              <CardHeader>
+                <CardTitle className="grid gap-4 place-items-center">
+                  {icon}
+                  {title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>{description}</CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
     </section>
