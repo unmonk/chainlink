@@ -301,9 +301,45 @@ export const getMatchupsByLeagueAndGameIds = internalQuery({
 export const getMatchupsByGameIds = internalQuery({
   args: { gameIds: v.array(v.string()) },
   handler: async (ctx, { gameIds }) => {
-    return await filter(ctx.db.query("matchups"), (m) =>
-      gameIds.includes(m.gameId)
-    ).collect();
+    console.log(`Searching for ${gameIds.length} games:`, gameIds);
+
+    // Split gameIds into chunks of 25 to avoid hitting memory limits
+    const chunkSize = 25;
+    const chunks = [];
+    for (let i = 0; i < gameIds.length; i += chunkSize) {
+      chunks.push(gameIds.slice(i, i + chunkSize));
+    }
+
+    let allMatchups: Doc<"matchups">[] = [];
+    for (const chunk of chunks) {
+      // Query each gameId individually and combine results
+      const matchupsChunk = await Promise.all(
+        chunk.map(async (gameId) => {
+          const matches = await ctx.db
+            .query("matchups")
+            .withIndex("by_gameId", (q) =>
+              q.eq("active", true).eq("gameId", gameId)
+            )
+            .collect();
+          if (matches.length === 0) {
+            console.log(`No active matchup found for gameId: ${gameId}`);
+          }
+          return matches;
+        })
+      );
+
+      const flattenedChunk = matchupsChunk.flat();
+      console.log(
+        `Found ${flattenedChunk.length} matchups in chunk of ${chunk.length} gameIds`
+      );
+
+      allMatchups = [...allMatchups, ...flattenedChunk];
+    }
+
+    console.log(
+      `Total matchups found: ${allMatchups.length} out of ${gameIds.length} gameIds`
+    );
+    return allMatchups;
   },
 });
 

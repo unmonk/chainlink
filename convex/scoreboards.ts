@@ -26,318 +26,163 @@ export const scoreboards = action({
       }
     > = {};
 
-    // Fetch scoreboard data for all leagues
-    const leagueData: Record<League, ScoreboardResponse> = {
-      NFL: {
-        events: [],
-        leagues: undefined,
-      },
-      NBA: {
-        events: [],
-        leagues: undefined,
-      },
-      MLB: {
-        events: [],
-        leagues: undefined,
-      },
-      NHL: {
-        events: [],
-        leagues: undefined,
-      },
-      "COLLEGE-FOOTBALL": {
-        events: [],
-        leagues: undefined,
-      },
-      MBB: {
-        events: [],
-        leagues: undefined,
-      },
-      WBB: {
-        events: [],
-        leagues: undefined,
-      },
-      WNBA: {
-        events: [],
-        leagues: undefined,
-      },
-      MLS: {
-        events: [],
-        leagues: undefined,
-      },
-      PLL: {
-        events: [],
-        leagues: undefined,
-      },
-      NWSL: {
-        events: [],
-        leagues: undefined,
-      },
-      EPL: {
-        events: [],
-        leagues: undefined,
-      },
-      RPL: {
-        events: [],
-        leagues: undefined,
-      },
-      ARG: {
-        events: [],
-        leagues: undefined,
-      },
-      TUR: {
-        events: [],
-        leagues: undefined,
-      },
-      CSL: {
-        events: [],
-        leagues: undefined,
-      },
-      NBAG: {
-        events: [],
-        leagues: undefined,
-      },
-      FRIENDLY: {
-        events: [],
-        leagues: undefined,
-      },
-      UFL: {
-        events: [],
-        leagues: undefined,
-      },
-    };
-    const allGameIds: string[] = [];
+    // Process leagues in chunks to avoid memory issues
+    const leagueChunks = chunk(ACTIVE_LEAGUES, 3);
 
-    for (const league of ACTIVE_LEAGUES) {
-      const urlOrUrls = getScoreboardUrl(league);
+    for (const leagueChunk of leagueChunks) {
+      const leagueData: Partial<Record<League, ScoreboardResponse>> = {};
+      const chunkGameIds: string[] = [];
 
-      if (Array.isArray(urlOrUrls)) {
-        // Handle WBB/MBB case with multiple URLs
-        const allResponses = await Promise.all(
-          urlOrUrls.map((url) =>
-            fetch(url).then((res) => res.json() as Promise<ScoreboardResponse>)
-          )
-        );
+      // Fetch scoreboard data for current chunk of leagues
+      for (const league of leagueChunk) {
+        const urlOrUrls = getScoreboardUrl(league);
 
-        // Merge all responses into one
-        leagueData[league] = allResponses.reduce(
-          (acc, curr) => ({
-            events: [...(acc.events || []), ...(curr.events || [])],
-            leagues: curr.leagues, // Take the last one or handle as needed
-          }),
-          { events: [], leagues: undefined }
-        );
-      } else {
-        // Handle single URL case for other leagues
-        const response = await fetch(urlOrUrls);
-        const data = (await response.json()) as ScoreboardResponse;
-        leagueData[league] = data;
-      }
+        try {
+          if (Array.isArray(urlOrUrls)) {
+            const allResponses = await Promise.all(
+              urlOrUrls.map((url) =>
+                fetch(url).then(
+                  (res) => res.json() as Promise<ScoreboardResponse>
+                )
+              )
+            );
 
-      if (leagueData[league].events && leagueData[league].events.length > 0) {
-        //remove duplicates from events
-        leagueData[league].events = leagueData[league].events.filter(
-          (event, index, self) =>
-            index === self.findIndex((t) => t.id === event.id)
-        );
-
-        allGameIds.push(...leagueData[league].events.map((event) => event.id));
-      }
-    }
-    // Query all matchups at once
-    const allMatchups = await ctx.runQuery(
-      internal.matchups.getMatchupsByGameIds,
-      {
-        gameIds: allGameIds,
-      }
-    );
-
-    // Process each league
-    for (const league of ACTIVE_LEAGUES) {
-      let leagueResponse = {
-        fetchedEvents: 0,
-        fetchedMatchups: 0,
-        matchupsStarted: 0,
-        matchupsFinished: 0,
-        matchupsUpdated: 0,
-        message: "",
-        games: [] as { game: string; result: string }[],
-      };
-
-      const data = leagueData[league];
-
-      //check if no events found
-      if (!data.events || data.events.length === 0) {
-        leagueResponse.message = "NO EVENTS FOUND";
-        actionResponse[league] = leagueResponse;
-        continue;
-      }
-
-      //filter matchups by league
-      const leagueMatchups = allMatchups.filter((m) => m.league === league);
-
-      leagueResponse.fetchedEvents = data.events.length;
-      leagueResponse.fetchedMatchups = leagueMatchups.length;
-
-      // Process events for the current league
-      for (const event of data.events) {
-        const matchup = leagueMatchups.find((m) => m.gameId === event.id);
-        //check if no matchup found
-        if (!matchup) {
-          leagueResponse.games.push({
-            game: event.shortName || "",
-            result: `Skipped with no matchup`,
-          });
-          continue;
-        }
-
-        // Skip if matchup is already final
-        if (MATCHUP_FINAL_STATUSES.includes(matchup.status)) {
-          leagueResponse.games.push({
-            game: event.shortName || "",
-            result: `Skipped - already final`,
-          });
-          continue;
-        }
-
-        //get event status
-        const eventStatus = event.competitions[0].status?.type?.name;
-        if (!eventStatus) {
-          leagueResponse.games.push({
-            game: event.shortName || "",
-            result: `Skipped - no event status`,
-          });
-          continue;
-        }
-
-        const competition = event.competitions[0];
-        const statusDetails = competition.status?.type?.detail;
-        const homeTeam = competition.competitors.find(
-          (competitor) => competitor.id === matchup.homeTeam.id
-        );
-        const awayTeam = competition.competitors.find(
-          (competitor) => competitor.id === matchup.awayTeam.id
-        );
-        //check if no home or away team found
-        if (!homeTeam || !awayTeam) {
-          leagueResponse.games.push({
-            game: event.shortName || "",
-            result: `Skipped - team IDs from ESPN (${competition.competitors.map((c) => c.id).join(", ")}) don't match stored matchup (home: ${matchup.homeTeam.id}, away: ${matchup.awayTeam.id})`,
-          });
-          continue;
-        }
-        const homeScore = parseInt(homeTeam.score);
-        const awayScore = parseInt(awayTeam.score);
-
-        //#region HANDLE MATCHUP STATUS AND SCORE CHANGES
-
-        ///////////////////MATCHUP STARTED////////////////////////
-        if (
-          MATCHUP_SCHEDULED_STATUSES.includes(matchup.status) &&
-          MATCHUP_IN_PROGRESS_STATUSES.includes(eventStatus)
-        ) {
-          await ctx.runMutation(internal.matchups.handleMatchupStarted, {
-            matchupId: matchup._id,
-            status: eventStatus,
-            homeTeam: {
-              id: matchup.homeTeam.id,
-              name: matchup.homeTeam.name,
-              score: homeScore,
-              image: matchup.homeTeam.image,
-            },
-            awayTeam: {
-              id: matchup.awayTeam.id,
-              name: matchup.awayTeam.name,
-              score: awayScore,
-              image: matchup.awayTeam.image,
-            },
-            metadata: {
-              ...matchup.metadata,
-              statusDetails: statusDetails,
-            },
-          });
-          leagueResponse.matchupsStarted++;
-          leagueResponse.games.push({
-            game: event.shortName || "",
-            result: `Matchup started`,
-          });
-        }
-
-        ///////////////////MATCHUP ENDED////////////////////////
-
-        if (
-          MATCHUP_IN_PROGRESS_STATUSES.includes(matchup.status) &&
-          (competition.status?.type?.completed === true ||
-            MATCHUP_FINAL_STATUSES.includes(eventStatus))
-        ) {
-          await ctx.runMutation(internal.matchups.handleMatchupFinished, {
-            matchupId: matchup._id,
-            homeTeam: {
-              id: matchup.homeTeam.id,
-              name: matchup.homeTeam.name,
-              score: homeScore,
-              image: matchup.homeTeam.image,
-            },
-            awayTeam: {
-              id: matchup.awayTeam.id,
-              name: matchup.awayTeam.name,
-              score: awayScore,
-              image: matchup.awayTeam.image,
-            },
-            status: eventStatus,
-            type: matchup.type,
-            typeDetails: matchup.typeDetails,
-            metadata: {
-              ...matchup.metadata,
-              statusDetails: statusDetails,
-            },
-          });
-          leagueResponse.matchupsFinished++;
-          leagueResponse.games.push({
-            game: event.shortName || "",
-            result: `Matchup finished`,
-          });
-        }
-
-        /////////////MATCHUP POSTPONED///////////////////////////
-        //release picks / push
-
-        /////////////MATCHUP DELAYED////////////////////////////
-        //hold
-        /////////////MATCHUP CANCELLED//////////////////////////
-        //release
-
-        //overtime
-
-        /////////////MATCHUP UPDATE ONLY////////////////////////
-        if (
-          eventStatus &&
-          !MATCHUP_FINAL_STATUSES.includes(eventStatus) &&
-          !MATCHUP_SCHEDULED_STATUSES.includes(matchup.status)
-        ) {
-          //#region CHECK FOR CHANGES IN MATCHUP and LOGGING
-          let hasChanged = false;
-          let hasChangedDetails = "";
-          if (matchup.status !== eventStatus) {
-            hasChanged = true;
-            hasChangedDetails += `status difference ours: ${matchup.status} espn: ${eventStatus} for ${event.shortName}`;
+            leagueData[league] = allResponses.reduce(
+              (acc, curr) => ({
+                events: [...(acc.events || []), ...(curr.events || [])],
+                leagues: curr.leagues,
+              }),
+              { events: [], leagues: undefined }
+            );
+          } else {
+            const response = await fetch(urlOrUrls);
+            const data = (await response.json()) as ScoreboardResponse;
+            leagueData[league] = data;
           }
-          if (matchup.homeTeam.score !== homeScore) {
-            hasChanged = true;
-            hasChangedDetails += `home score changed from ${matchup.homeTeam.score} to ${homeScore} for ${event.shortName}`;
+
+          if (leagueData[league]?.events?.length) {
+            leagueData[league]!.events = leagueData[league]!.events.filter(
+              (event, index, self) =>
+                index === self.findIndex((t) => t.id === event.id)
+            );
+            chunkGameIds.push(
+              ...leagueData[league]!.events.map((event) => event.id)
+            );
           }
-          if (matchup.awayTeam.score !== awayScore) {
-            hasChanged = true;
-            hasChangedDetails += `away score changed from ${matchup.awayTeam.score} to ${awayScore} for ${event.shortName}`;
-          }
-          //#endregion
-          if (!hasChanged) {
+        } catch (error) {
+          console.error(`Error fetching data for ${league}:`, error);
+          actionResponse[league] = {
+            fetchedEvents: 0,
+            fetchedMatchups: 0,
+            matchupsStarted: 0,
+            matchupsFinished: 0,
+            matchupsUpdated: 0,
+            message: "ERROR FETCHING DATA",
+            games: [],
+          };
+        }
+      }
+
+      // Query matchups for current chunk
+      const chunkMatchups = await ctx.runQuery(
+        internal.matchups.getMatchupsByGameIds,
+        {
+          gameIds: chunkGameIds,
+        }
+      );
+
+      // Process each league in the chunk
+      for (const league of leagueChunk) {
+        let leagueResponse = {
+          fetchedEvents: 0,
+          fetchedMatchups: 0,
+          matchupsStarted: 0,
+          matchupsFinished: 0,
+          matchupsUpdated: 0,
+          message: "",
+          games: [] as { game: string; result: string }[],
+        };
+
+        const data = leagueData[league];
+
+        // Early return if no data found
+        if (!data) {
+          leagueResponse.message = "NO DATA FOUND";
+          actionResponse[league] = leagueResponse;
+          continue;
+        }
+
+        //check if no events found
+        if (!data.events || data.events.length === 0) {
+          leagueResponse.message = "NO EVENTS FOUND";
+          actionResponse[league] = leagueResponse;
+          continue;
+        }
+
+        //filter matchups by league
+        const leagueMatchups = chunkMatchups.filter((m) => m.league === league);
+
+        leagueResponse.fetchedEvents = data.events.length;
+        leagueResponse.fetchedMatchups = leagueMatchups.length;
+
+        // Process events for the current league
+        for (const event of data.events) {
+          const matchup = leagueMatchups.find((m) => m.gameId === event.id);
+          //check if no matchup found
+          if (!matchup) {
             leagueResponse.games.push({
               game: event.shortName || "",
-              result: `No changes for ${event.shortName}, skipping update`,
+              result: `Skipped with no matchup`,
             });
             continue;
-          } else {
-            await ctx.runMutation(internal.matchups.handleMatchupUpdated, {
+          }
+
+          // Skip if matchup is already final
+          if (MATCHUP_FINAL_STATUSES.includes(matchup.status)) {
+            leagueResponse.games.push({
+              game: event.shortName || "",
+              result: `Skipped - already final`,
+            });
+            continue;
+          }
+
+          //get event status
+          const eventStatus = event.competitions[0].status?.type?.name;
+          if (!eventStatus) {
+            leagueResponse.games.push({
+              game: event.shortName || "",
+              result: `Skipped - no event status`,
+            });
+            continue;
+          }
+
+          const competition = event.competitions[0];
+          const statusDetails = competition.status?.type?.detail;
+          const homeTeam = competition.competitors.find(
+            (competitor) => competitor.id === matchup.homeTeam.id
+          );
+          const awayTeam = competition.competitors.find(
+            (competitor) => competitor.id === matchup.awayTeam.id
+          );
+          //check if no home or away team found
+          if (!homeTeam || !awayTeam) {
+            leagueResponse.games.push({
+              game: event.shortName || "",
+              result: `Skipped - team IDs from ESPN (${competition.competitors.map((c) => c.id).join(", ")}) don't match stored matchup (home: ${matchup.homeTeam.id}, away: ${matchup.awayTeam.id})`,
+            });
+            continue;
+          }
+          const homeScore = parseInt(homeTeam.score);
+          const awayScore = parseInt(awayTeam.score);
+
+          //#region HANDLE MATCHUP STATUS AND SCORE CHANGES
+
+          ///////////////////MATCHUP STARTED////////////////////////
+          if (
+            MATCHUP_SCHEDULED_STATUSES.includes(matchup.status) &&
+            MATCHUP_IN_PROGRESS_STATUSES.includes(eventStatus)
+          ) {
+            await ctx.runMutation(internal.matchups.handleMatchupStarted, {
               matchupId: matchup._id,
               status: eventStatus,
               homeTeam: {
@@ -357,19 +202,123 @@ export const scoreboards = action({
                 statusDetails: statusDetails,
               },
             });
-            leagueResponse.matchupsUpdated++;
+            leagueResponse.matchupsStarted++;
             leagueResponse.games.push({
               game: event.shortName || "",
-              result: `Matchup updated with ${hasChangedDetails}`,
+              result: `Matchup started`,
             });
           }
-        }
-        // #endregion
-      }
 
-      leagueResponse.message = "SUCCESS";
-      actionResponse[league] = leagueResponse;
+          ///////////////////MATCHUP ENDED////////////////////////
+
+          if (
+            MATCHUP_IN_PROGRESS_STATUSES.includes(matchup.status) &&
+            (competition.status?.type?.completed === true ||
+              MATCHUP_FINAL_STATUSES.includes(eventStatus))
+          ) {
+            await ctx.runMutation(internal.matchups.handleMatchupFinished, {
+              matchupId: matchup._id,
+              homeTeam: {
+                id: matchup.homeTeam.id,
+                name: matchup.homeTeam.name,
+                score: homeScore,
+                image: matchup.homeTeam.image,
+              },
+              awayTeam: {
+                id: matchup.awayTeam.id,
+                name: matchup.awayTeam.name,
+                score: awayScore,
+                image: matchup.awayTeam.image,
+              },
+              status: eventStatus,
+              type: matchup.type,
+              typeDetails: matchup.typeDetails,
+              metadata: {
+                ...matchup.metadata,
+                statusDetails: statusDetails,
+              },
+            });
+            leagueResponse.matchupsFinished++;
+            leagueResponse.games.push({
+              game: event.shortName || "",
+              result: `Matchup finished`,
+            });
+          }
+
+          /////////////MATCHUP POSTPONED///////////////////////////
+          //release picks / push
+
+          /////////////MATCHUP DELAYED////////////////////////////
+          //hold
+          /////////////MATCHUP CANCELLED//////////////////////////
+          //release
+
+          //overtime
+
+          /////////////MATCHUP UPDATE ONLY////////////////////////
+          if (
+            eventStatus &&
+            !MATCHUP_FINAL_STATUSES.includes(eventStatus) &&
+            !MATCHUP_SCHEDULED_STATUSES.includes(matchup.status)
+          ) {
+            //#region CHECK FOR CHANGES IN MATCHUP and LOGGING
+            let hasChanged = false;
+            let hasChangedDetails = "";
+            if (matchup.status !== eventStatus) {
+              hasChanged = true;
+              hasChangedDetails += `status difference ours: ${matchup.status} espn: ${eventStatus} for ${event.shortName}`;
+            }
+            if (matchup.homeTeam.score !== homeScore) {
+              hasChanged = true;
+              hasChangedDetails += `home score changed from ${matchup.homeTeam.score} to ${homeScore} for ${event.shortName}`;
+            }
+            if (matchup.awayTeam.score !== awayScore) {
+              hasChanged = true;
+              hasChangedDetails += `away score changed from ${matchup.awayTeam.score} to ${awayScore} for ${event.shortName}`;
+            }
+            //#endregion
+            if (!hasChanged) {
+              leagueResponse.games.push({
+                game: event.shortName || "",
+                result: `No changes for ${event.shortName}, skipping update`,
+              });
+              continue;
+            } else {
+              await ctx.runMutation(internal.matchups.handleMatchupUpdated, {
+                matchupId: matchup._id,
+                status: eventStatus,
+                homeTeam: {
+                  id: matchup.homeTeam.id,
+                  name: matchup.homeTeam.name,
+                  score: homeScore,
+                  image: matchup.homeTeam.image,
+                },
+                awayTeam: {
+                  id: matchup.awayTeam.id,
+                  name: matchup.awayTeam.name,
+                  score: awayScore,
+                  image: matchup.awayTeam.image,
+                },
+                metadata: {
+                  ...matchup.metadata,
+                  statusDetails: statusDetails,
+                },
+              });
+              leagueResponse.matchupsUpdated++;
+              leagueResponse.games.push({
+                game: event.shortName || "",
+                result: `Matchup updated with ${hasChangedDetails}`,
+              });
+            }
+          }
+          // #endregion
+        }
+
+        leagueResponse.message = "SUCCESS";
+        actionResponse[league] = leagueResponse;
+      }
     }
+
     if (process.env.NODE_ENV === "development") {
       console.log(actionResponse);
     }
@@ -433,4 +382,13 @@ function getScoreboardUrl(league: League) {
     default:
       throw new Error("Invalid league");
   }
+}
+
+// Helper function to chunk arrays
+function chunk<T>(array: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
 }

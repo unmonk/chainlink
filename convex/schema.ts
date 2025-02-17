@@ -188,7 +188,7 @@ export default defineSchema({
     .index("by_league_time", ["league", "startTime"])
     .index("by_active_dates", ["active", "startTime"])
     .index("by_startTime", ["startTime"])
-    .index("by_gameId", ["gameId"]),
+    .index("by_gameId", ["active", "gameId"]),
 
   chains: defineTable({
     userId: v.string(),
