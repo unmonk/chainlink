@@ -3,6 +3,12 @@ import { api, internal } from "./_generated/api";
 
 const crons = cronJobs();
 
+crons.daily(
+  "Daily Pick Reminder Notification",
+  { hourUTC: 12, minuteUTC: 0 }, // 12:00 PM UTC
+  api.notifications.sendDailyPickReminder
+);
+
 crons.interval(
   "Scoreboards for all active leagues",
   { minutes: 2 }, // every minute
