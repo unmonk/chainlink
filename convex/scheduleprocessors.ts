@@ -186,19 +186,43 @@ export async function processGame(
       result: validationResult.result,
     };
   }
+
   // Process existing matchup
   if (existingMatchups[game.id]?.length > 0) {
     //check if needs to update
     const matchup = existingMatchups[game.id][0];
     const { hasChanged, hasChangedDetails } = hasMatchupChanged(matchup, game);
     if (hasChanged) {
-      const status =
-        game.competitions[0].status?.type?.name || "STATUS_SCHEDULED";
+      const competition = game.competitions[0];
+      const competitors = competition.competitors;
+      const home = competitors.find((c) => c.homeAway === "home");
+      const away = competitors.find((c) => c.homeAway === "away");
+
+      if (!home || !away) {
+        return {
+          gameProcessed: false,
+          result: "Missing team information",
+        };
+      }
+
+      const status = game.competitions[0].status?.type?.name || "STATUS_SCHEDULED";
       await ctx.runMutation(internal.schedules.updateScheduledMatchup, {
         gameId: game.id,
         league: league,
         startTime: Date.parse(game.date),
         status: status,
+        homeTeam: {
+          id: home.id,
+          name: home.team.name || "Home Team",
+          score: 0,
+          image: home.team.logo || "https://chainlink.st/icons/icon-256x256.png",
+        },
+        awayTeam: {
+          id: away.id,
+          name: away.team.name || "Away Team",
+          score: 0,
+          image: away.team.logo || "https://chainlink.st/icons/icon-256x256.png",
+        },
       });
       return {
         gameProcessed: true,
@@ -243,6 +267,30 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
   let hasChanged = false;
   let hasChangedDetails = `${game.shortName} - `;
   const competitionStatus = game.competitions[0].status?.type?.name;
+
+  // Define in-progress statuses
+  const inProgressStatuses = [
+    "STATUS_FIRST_HALF",
+    "STATUS_HALFTIME",
+    "STATUS_SECOND_HALF",
+    "STATUS_IN_PROGRESS",
+    "STATUS_END_PERIOD",
+    "STATUS_END_QUARTER",
+    "STATUS_END_REGULATION",
+    "STATUS_END_GAME",
+    "STATUS_FINAL",
+    "STATUS_FINAL_OVERTIME",
+    "STATUS_FINAL_SHOOTOUT",
+    "STATUS_FINAL_PENALTIES",
+  ];
+
+  // Don't allow updating from in-progress to scheduled
+  if (
+    inProgressStatuses.includes(matchup.status) &&
+    competitionStatus === "STATUS_SCHEDULED"
+  ) {
+    return { hasChanged: false, hasChangedDetails: "" };
+  }
 
   if (matchup.startTime !== Date.parse(game.date)) {
     hasChanged = true;

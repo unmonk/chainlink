@@ -85,7 +85,7 @@ export const checkPickAchievements = mutation({
         });
 
         if (achievement.threshold === absoluteChain) {
-          await awardAchievementToUser(ctx, {
+          await ctx.runMutation(api.achievements.awardAchievementToUser, {
             userId: user._id,
             achievementId: achievement._id,
           });
@@ -134,7 +134,7 @@ export const checkPickAchievements = mutation({
         });
 
         if (achievement.threshold === chain.wins) {
-          await awardAchievementToUser(ctx, {
+          await ctx.runMutation(api.achievements.awardAchievementToUser, {
             userId: user._id,
             achievementId: achievement._id,
           });
@@ -184,7 +184,7 @@ export const checkPickAchievements = mutation({
           }
         });
         if (achievement.threshold === user.stats.losses) {
-          await awardAchievementToUser(ctx, {
+          await ctx.runMutation(api.achievements.awardAchievementToUser, {
             userId: user._id,
             achievementId: achievement._id,
           });
@@ -234,7 +234,7 @@ export const checkPickAchievements = mutation({
           }
         });
         if (achievement.threshold === user.stats.pushes) {
-          await awardAchievementToUser(ctx, {
+          await ctx.runMutation(api.achievements.awardAchievementToUser, {
             userId: user._id,
             achievementId: achievement._id,
           });

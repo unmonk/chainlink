@@ -146,23 +146,71 @@ export const updateScheduledMatchup = internalMutation({
     league: v.string(),
     startTime: v.number(),
     status: v.string(),
+    homeTeam: v.optional(v.object({
+      id: v.string(),
+      name: v.string(),
+      image: v.string(),
+      score: v.number(),
+    })),
+    awayTeam: v.optional(v.object({
+      id: v.string(),
+      name: v.string(),
+      image: v.string(),
+      score: v.number(),
+    })),
   },
-  handler: async (ctx, { gameId, league, startTime, status }) => {
-    // Use index to efficiently query matchups
-    const matchups = await ctx.db
-      .query("matchups")
-      .withIndex("by_active_league", (q) =>
-        q.eq("league", league).eq("active", true)
-      )
-      .filter((q) => q.eq(q.field("gameId"), gameId))
-      .take(50);
+  handler: async (ctx, { gameId, league, startTime, status, homeTeam, awayTeam }) => {
+    try {
+      // Query matchups without the active filter to ensure we catch all relevant matchups
+      const matchups = await ctx.db
+        .query("matchups")
+        .withIndex("by_league_time", (q) => q.eq("league", league))
+        .filter((q) => q.eq(q.field("gameId"), gameId))
+        .take(50);
 
-    // Batch update all matching matchups
-    await Promise.all(
-      matchups.map((matchup) =>
-        ctx.db.patch(matchup._id, { startTime, status })
-      )
-    );
+      if (matchups.length === 0) {
+        console.log(`No matchups found for gameId: ${gameId} and league: ${league}`);
+        return;
+      }
+
+      // Batch update all matching matchups
+      const updatePromises = matchups.map((matchup) => {
+        const updateData: any = {
+          startTime,
+          status,
+          updatedAt: Date.now(),
+        };
+
+        // Only update team data if provided
+        if (homeTeam) {
+          updateData.homeTeam = {
+            ...matchup.homeTeam,
+            ...homeTeam,
+          };
+        }
+        if (awayTeam) {
+          updateData.awayTeam = {
+            ...matchup.awayTeam,
+            ...awayTeam,
+          };
+        }
+
+        // Update title if team names changed
+        if (homeTeam?.name || awayTeam?.name) {
+          const homeName = homeTeam?.name || matchup.homeTeam.name;
+          const awayName = awayTeam?.name || matchup.awayTeam.name;
+          updateData.title = `Who will win? ${awayName} @ ${homeName}`;
+        }
+
+        return ctx.db.patch(matchup._id, updateData);
+      });
+
+      await Promise.all(updatePromises);
+      console.log(`Successfully updated ${matchups.length} matchups for gameId: ${gameId}`);
+    } catch (error) {
+      console.error(`Error updating matchups for gameId: ${gameId}:`, error);
+      throw error;
+    }
   },
 });
 

@@ -51,16 +51,15 @@ export function getAdminMenuList(pathname: string): Group[] {
               active: pathname.includes("/admin/matchups"),
             },
             {
+              href: "/admin/picks",
+              label: "Picks",
+              active: pathname.includes("/admin/picks"),
+            },
+            {
               href: "/admin/matchups/find",
               label: "Find Matchup",
               active: pathname.includes("/admin/matchups/find"),
             },
-            {
-              href: "/admin/users",
-              label: "Users",
-              active: pathname.includes("/admin/users"),
-            },
-
             {
               href: "/admin/announcements",
               label: "Announcements",
@@ -101,6 +100,11 @@ export function getAdminMenuList(pathname: string): Group[] {
               href: "/admin/shop",
               label: "Shop",
               active: pathname.includes("/admin/shop"),
+            },
+            {
+              href: "/admin/users",
+              label: "Users",
+              active: pathname.includes("/admin/users"),
             },
           ],
         },
