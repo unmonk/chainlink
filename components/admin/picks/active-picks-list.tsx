@@ -21,8 +21,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trophy, X, Minus, TicketXIcon } from "lucide-react";
+import { MoreHorizontal, Trophy, X, Minus, TicketXIcon, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface PickWithDetails extends Doc<"picks"> {
   user: Doc<"users"> | null;
@@ -97,7 +98,13 @@ export function ActivePicksList() {
                 </div>
               </TableCell>
               <TableCell>
-                {pick.matchup?.homeTeam.name} vs {pick.matchup?.awayTeam.name}
+                <Link
+                  href={`/admin/matchups/${pick.matchup?._id}`}
+                  className="flex items-center gap-2 hover:underline"
+                >
+                  {pick.matchup?.homeTeam.name} vs {pick.matchup?.awayTeam.name}
+                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                </Link>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
