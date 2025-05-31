@@ -110,15 +110,15 @@ export default function MatchupCardFooter({
         matchup.featuredType === "SPONSORED" &&
         matchup.metadata.sponsored && (
           <Link href={`/api/clickthru/${matchup.metadata.sponsored._id}`}>
-            <div className="flex flex-row justify-center items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border text-sm">
+            <div className="flex flex-col justify-center items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border text-sm">
               <span className="flex flex-row justify-center items-center gap-1">
                 {matchup.metadata.sponsored.description}
               </span>
               <Image
                 src={matchup.metadata.sponsored.image}
                 alt={matchup.metadata.sponsored.name}
-                width={24}
-                height={24}
+                width={64}
+                height={64}
                 className="ml-1 items-center justify-center self-center"
               />
             </div>
