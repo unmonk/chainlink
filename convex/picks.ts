@@ -642,3 +642,65 @@ export const setPickActive = internalMutation({
     await ctx.db.patch(pickId, { active: true });
   },
 });
+
+export const getAllActivePicks = query({
+  args: {},
+  handler: async (ctx) => {
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_active_userId", (q) => q.eq("active", true))
+      .collect();
+
+    const picksWithDetails = await Promise.all(
+      picks.map(async (pick) => {
+        const user = await ctx.db.get(pick.userId);
+        const matchup = await ctx.db.get(pick.matchupId);
+        return {
+          ...pick,
+          user,
+          matchup,
+        };
+      })
+    );
+
+    return picksWithDetails;
+  },
+});
+
+export const adminDeletePick = mutation({
+  args: { pickId: v.id("picks") },
+  handler: async (ctx, { pickId }) => {
+    const pick = await ctx.db.get(pickId);
+    if (!pick) {
+      throw new ConvexError("PICK_NOT_FOUND");
+    }
+    await ctx.db.delete(pickId);
+  },
+});
+
+export const adminAwardWin = mutation({
+  args: { pickId: v.id("picks") },
+  handler: async (ctx, { pickId }) => {
+    await ctx.scheduler.runAfter(0, internal.picks.handlePickWin, {
+      pickId,
+    });
+  },
+});
+
+export const adminAwardLoss = mutation({
+  args: { pickId: v.id("picks") },
+  handler: async (ctx, { pickId }) => {
+    await ctx.scheduler.runAfter(0, internal.picks.handlePickLoss, {
+      pickId,
+    });
+  },
+});
+
+export const adminAwardPush = mutation({
+  args: { pickId: v.id("picks") },
+  handler: async (ctx, { pickId }) => {
+    await ctx.scheduler.runAfter(0, internal.picks.handlePickPush, {
+      pickId,
+    });
+  },
+});
