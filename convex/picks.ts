@@ -82,16 +82,15 @@ export const handlePickWin = internalMutation({
       throw new ConvexError("USER_NOT_FOUND");
     }
 
-    //get user active chain
-    const chain = await ctx.db
-      .query("chains")
-      .withIndex("by_active_userId", (q) =>
-        q.eq("active", true).eq("userId", user.externalId)
-      )
-      .unique();
+    //get or create user active chain
+    const chainId = await ctx.runMutation(internal.chains.getOrCreateActiveChain, {
+      userId: user.externalId,
+    });
+    const chain = await ctx.db.get(chainId);
     if (!chain) {
       throw new ConvexError("CHAIN_NOT_FOUND");
     }
+
     //get matchup
     const matchup = await ctx.db.get(pick.matchupId);
     if (!matchup) {
@@ -194,17 +193,15 @@ export const handlePickLoss = internalMutation({
       throw new ConvexError("USER_NOT_FOUND");
     }
 
-    //get user active chain
-    const chain = await ctx.db
-      .query("chains")
-      .withIndex("by_active_userId", (q) =>
-        q.eq("active", true).eq("userId", user.externalId)
-      )
-      .unique();
-
+    //get or create user active chain
+    const chainId = await ctx.runMutation(internal.chains.getOrCreateActiveChain, {
+      userId: user.externalId,
+    });
+    const chain = await ctx.db.get(chainId);
     if (!chain) {
       throw new ConvexError("CHAIN_NOT_FOUND");
     }
+
     //get matchup
     const matchup = await ctx.db.get(pick.matchupId);
     if (!matchup) {
@@ -289,7 +286,6 @@ export const handlePickLoss = internalMutation({
 });
 
 //HANDLE PICK PUSH
-
 export const handlePickPush = internalMutation({
   args: { pickId: v.id("picks") },
   handler: async (ctx, { pickId }) => {
@@ -304,16 +300,15 @@ export const handlePickPush = internalMutation({
       throw new ConvexError("USER_NOT_FOUND");
     }
 
-    //get user active chain
-    const chain = await ctx.db
-      .query("chains")
-      .withIndex("by_active_userId", (q) =>
-        q.eq("active", true).eq("userId", user.externalId)
-      )
-      .unique();
+    //get or create user active chain
+    const chainId = await ctx.runMutation(internal.chains.getOrCreateActiveChain, {
+      userId: user.externalId,
+    });
+    const chain = await ctx.db.get(chainId);
     if (!chain) {
       throw new ConvexError("CHAIN_NOT_FOUND");
     }
+
     //get matchup
     const matchup = await ctx.db.get(pick.matchupId);
     if (!matchup) {
