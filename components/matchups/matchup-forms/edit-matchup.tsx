@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { EditIcon } from "lucide-react";
 import { SponsoredMatchupForm } from "../sponsored-matchup-form";
+import { MatchupPicksList } from "./matchup-picks-list";
 
 const EditMatchupFormSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
@@ -741,6 +742,8 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
           </div>
         </form>
       </FormProvider>
+      <hr className="my-8" />
+      <MatchupPicksList matchupId={row._id as Id<"matchups">} />
     </div>
   );
 }

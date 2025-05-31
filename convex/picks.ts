@@ -382,14 +382,29 @@ export const handlePickPush = internalMutation({
   },
 });
 
-export const getPicksByMatchupId = internalQuery({
+export const getPicksByMatchupId = query({
   args: { matchupId: v.id("matchups") },
   handler: async (ctx, { matchupId }) => {
     const picks = await ctx.db
       .query("picks")
       .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
       .collect();
-    return picks;
+
+    // Get user data for each pick
+    const picksWithUsers = await Promise.all(
+      picks.map(async (pick) => {
+        const user = await ctx.db.get(pick.userId);
+        return {
+          ...pick,
+          user: user ? {
+            name: user.name,
+            image: user.image,
+          } : undefined,
+        };
+      })
+    );
+
+    return picksWithUsers;
   },
 });
 

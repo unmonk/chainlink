@@ -152,3 +152,42 @@ export const createChain = internalMutation({
     });
   },
 });
+
+export const getOrCreateActiveChain = internalMutation({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    // Try to get an active chain for this user
+    const activeChain = await ctx.db
+      .query("chains")
+      .withIndex("by_active_userId", (q) =>
+        q.eq("active", true).eq("userId", userId)
+      )
+      .unique();
+    if (activeChain) {
+      return activeChain._id;
+    }
+    // Get the current active campaign
+    const campaign = await ctx.db
+      .query("campaigns")
+      .filter((q) =>
+        q.and(q.eq(q.field("active"), true), q.eq(q.field("type"), "GLOBAL"))
+      )
+      .unique();
+    if (!campaign) {
+      throw new ConvexError("NO_ACTIVE_CAMPAIGN_FOUND");
+    }
+    // Create a new chain for the user in the current campaign
+    const chainId = await ctx.db.insert("chains", {
+      campaignId: campaign._id,
+      userId,
+      active: true,
+      wins: 0,
+      losses: 0,
+      best: 0,
+      chain: 0,
+      cost: 0,
+      pushes: 0,
+    });
+    return chainId;
+  },
+});

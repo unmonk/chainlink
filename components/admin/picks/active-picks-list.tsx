@@ -101,6 +101,7 @@ export function ActivePicksList() {
                 <Link
                   href={`/admin/matchups/${pick.matchup?._id}`}
                   className="flex items-center gap-2 hover:underline"
+                  prefetch={false}
                 >
                   {pick.matchup?.homeTeam.name} vs {pick.matchup?.awayTeam.name}
                   <ExternalLink className="h-4 w-4 text-muted-foreground" />
