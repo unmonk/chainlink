@@ -77,12 +77,10 @@ export const createActiveChain = mutation({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      console.log("USER_NOT_FOUND");
-      //throw new Error("USER_NOT_FOUND");
-      return null;
+      throw new ConvexError("USER_NOT_FOUND");
     }
 
-    //check if user has an active chain
+    // First try to get an active chain
     const activeChain = await ctx.db
       .query("chains")
       .withIndex("by_active_userId", (q) =>
@@ -90,34 +88,51 @@ export const createActiveChain = mutation({
       )
       .unique();
 
-    if (activeChain !== null) {
+    if (activeChain) {
       return activeChain._id;
     }
 
-    //else create a new chain
-
+    // Get the current active campaign
     const campaign = await ctx.db
       .query("campaigns")
       .filter((q) =>
         q.and(q.eq(q.field("active"), true), q.eq(q.field("type"), "GLOBAL"))
       )
       .unique();
+
     if (!campaign) {
-      throw new Error("No active campaign found");
+      throw new ConvexError("NO_ACTIVE_CAMPAIGN_FOUND");
     }
 
-    const chain = await ctx.db.insert("chains", {
-      campaignId: campaign._id,
-      userId: identity.subject,
-      active: true,
-      wins: 0,
-      losses: 0,
-      best: 0,
-      chain: 0,
-      cost: 0,
-      pushes: 0,
-    });
-    return chain;
+    try {
+      // Create a new chain for the user in the current campaign
+      const chain = await ctx.db.insert("chains", {
+        campaignId: campaign._id,
+        userId: identity.subject,
+        active: true,
+        wins: 0,
+        losses: 0,
+        best: 0,
+        chain: 0,
+        cost: 0,
+        pushes: 0,
+      });
+      return chain;
+    } catch (error) {
+      // If we get a write conflict, try to get the chain again
+      // This handles the case where another request created the chain
+      const existingChain = await ctx.db
+        .query("chains")
+        .withIndex("by_active_userId", (q) =>
+          q.eq("active", true).eq("userId", identity.subject)
+        )
+        .unique();
+      
+      if (existingChain) {
+        return existingChain._id;
+      }
+      throw error;
+    }
   },
 });
 
@@ -135,50 +150,5 @@ export const createChain = internalMutation({
       cost: 0,
       pushes: 0,
     });
-  },
-});
-
-export const getOrCreateActiveChain = internalMutation({
-  args: { userId: v.string() },
-  handler: async (ctx, { userId }) => {
-    // First try to get an active chain
-    const activeChain = await ctx.db
-      .query("chains")
-      .withIndex("by_active_userId", (q) =>
-        q.eq("active", true).eq("userId", userId)
-      )
-      .unique();
-
-    if (activeChain) {
-      return activeChain._id;
-    }
-
-    // If no active chain exists, get the current active campaign
-    console.log("NO_ACTIVE_CHAIN_FOUND");
-    const campaign = await ctx.db
-      .query("campaigns")
-      .filter((q) =>
-        q.and(q.eq(q.field("active"), true), q.eq(q.field("type"), "GLOBAL"))
-      )
-      .unique();
-
-    if (!campaign) {
-      throw new ConvexError("NO_ACTIVE_CAMPAIGN_FOUND");
-    }
-
-    // Create a new chain for the user in the current campaign
-    const chain = await ctx.db.insert("chains", {
-      campaignId: campaign._id,
-      userId,
-      active: true,
-      wins: 0,
-      losses: 0,
-      best: 0,
-      chain: 0,
-      cost: 0,
-      pushes: 0,
-    });
-
-    return chain;
   },
 });
