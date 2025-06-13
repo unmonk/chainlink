@@ -18,6 +18,7 @@ export const DashboardChain = () => {
   const { isAuthenticated } = useConvexAuth();
   const chain = useQuery(api.chains.getUserActiveChain, {});
 
+  if (!isAuthenticated) return null;
   if (chain === null) {
     return <Skeleton className="h-8 w-16 m-0.5" />;
   }

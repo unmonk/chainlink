@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Ellipsis, LogOut } from "lucide-react";
+import { Ellipsis, LogInIcon, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
@@ -18,7 +18,13 @@ import {
 import Coins from "../coins/coins";
 import { UserChain } from "../chains/user-chain";
 import { ThemeToggle } from "../ui/theme-toggle";
-import { SignOutButton, useUser } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignOutButton,
+  useUser,
+} from "@clerk/nextjs";
 import { useState } from "react";
 import { Card } from "../ui/card";
 import { Separator } from "../ui/separator";
@@ -62,7 +68,10 @@ export function Menu({ isOpen }: MenuProps) {
                 <p className="pb-2"></p>
               )}
               {menus.map(
-                ({ href, label, icon: Icon, active, submenus }, index) =>
+                (
+                  { href, label, icon: Icon, active, submenus, signedIn },
+                  index
+                ) =>
                   submenus.length === 0 ? (
                     <div className="w-full" key={index}>
                       <TooltipProvider disableHoverableContent>
@@ -71,33 +80,62 @@ export function Menu({ isOpen }: MenuProps) {
                             <Button
                               variant={active ? "secondary" : "ghost"}
                               className="w-full justify-start h-10 mb-1"
-                              asChild
+                              asChild={!signedIn || !!user}
+                              disabled={signedIn && !user}
                             >
-                              <Link
-                                href={
-                                  href === "/u" ? `/u/${user?.username}` : href
-                                }
-                                className="relative flex items-center w-full"
-                              >
-                                <span
-                                  className={cn(isOpen === false ? "" : "mr-4")}
+                              {!signedIn || !!user ? (
+                                <Link
+                                  href={
+                                    href === "/u"
+                                      ? `/u/${user?.username}`
+                                      : href
+                                  }
+                                  className="relative flex items-center w-full"
                                 >
-                                  <Icon size={18} />
-                                </span>
-                                <p
-                                  className={cn(
-                                    "max-w-[200px] truncate",
-                                    isOpen === false
-                                      ? "-translate-x-96 opacity-0"
-                                      : "translate-x-0 opacity-100"
+                                  <span
+                                    className={cn(
+                                      isOpen === false ? "" : "mr-4"
+                                    )}
+                                  >
+                                    <Icon size={18} />
+                                  </span>
+                                  <p
+                                    className={cn(
+                                      "max-w-[200px] truncate",
+                                      isOpen === false
+                                        ? "-translate-x-96 opacity-0"
+                                        : "translate-x-0 opacity-100"
+                                    )}
+                                  >
+                                    {label}
+                                  </p>
+                                  {label === "Spin" && spinFree && (
+                                    <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
                                   )}
-                                >
-                                  {label}
-                                </p>
-                                {label === "Spin" && spinFree && (
-                                  <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
-                                )}
-                              </Link>
+                                </Link>
+                              ) : (
+                                <SignInButton mode="modal">
+                                  <div className="relative flex items-center w-full">
+                                    <span
+                                      className={cn(
+                                        isOpen === false ? "" : "mr-4"
+                                      )}
+                                    >
+                                      <Icon size={18} />
+                                    </span>
+                                    <p
+                                      className={cn(
+                                        "max-w-[200px] truncate",
+                                        isOpen === false
+                                          ? "-translate-x-96 opacity-0"
+                                          : "translate-x-0 opacity-100"
+                                      )}
+                                    >
+                                      {label}
+                                    </p>
+                                  </div>
+                                </SignInButton>
+                              )}
                             </Button>
                           </TooltipTrigger>
                           {isOpen === false && (
@@ -116,6 +154,7 @@ export function Menu({ isOpen }: MenuProps) {
                         active={active}
                         submenus={submenus}
                         isOpen={isOpen}
+                        signedIn={signedIn}
                       />
                     </div>
                   )
@@ -150,7 +189,10 @@ export function Menu({ isOpen }: MenuProps) {
                   <p className="pb-2"></p>
                 )}
                 {menus.map(
-                  ({ href, label, icon: Icon, active, submenus }, index) =>
+                  (
+                    { href, label, icon: Icon, active, submenus, signedIn },
+                    index
+                  ) =>
                     submenus.length === 0 ? (
                       <div className="w-full" key={index}>
                         <TooltipProvider disableHoverableContent>
@@ -159,27 +201,55 @@ export function Menu({ isOpen }: MenuProps) {
                               <Button
                                 variant={active ? "secondary" : "ghost"}
                                 className="w-full justify-start h-10 mb-1"
-                                asChild
+                                asChild={!signedIn || !!user}
+                                disabled={signedIn && !user}
                               >
-                                <Link href={href}>
-                                  <span
-                                    className={cn(
-                                      isOpen === false ? "" : "mr-4"
-                                    )}
+                                {!signedIn || !!user ? (
+                                  <Link
+                                    href={href}
+                                    className="relative flex items-center w-full"
                                   >
-                                    <Icon size={18} />
-                                  </span>
-                                  <p
-                                    className={cn(
-                                      "max-w-[200px] truncate",
-                                      isOpen === false
-                                        ? "-translate-x-96 opacity-0"
-                                        : "translate-x-0 opacity-100"
-                                    )}
-                                  >
-                                    {label}
-                                  </p>
-                                </Link>
+                                    <span
+                                      className={cn(
+                                        isOpen === false ? "" : "mr-4"
+                                      )}
+                                    >
+                                      <Icon size={18} />
+                                    </span>
+                                    <p
+                                      className={cn(
+                                        "max-w-[200px] truncate",
+                                        isOpen === false
+                                          ? "-translate-x-96 opacity-0"
+                                          : "translate-x-0 opacity-100"
+                                      )}
+                                    >
+                                      {label}
+                                    </p>
+                                  </Link>
+                                ) : (
+                                  <SignInButton mode="modal">
+                                    <div className="relative flex items-center w-full">
+                                      <span
+                                        className={cn(
+                                          isOpen === false ? "" : "mr-4"
+                                        )}
+                                      >
+                                        <Icon size={18} />
+                                      </span>
+                                      <p
+                                        className={cn(
+                                          "max-w-[200px] truncate",
+                                          isOpen === false
+                                            ? "-translate-x-96 opacity-0"
+                                            : "translate-x-0 opacity-100"
+                                        )}
+                                      >
+                                        {label}
+                                      </p>
+                                    </div>
+                                  </SignInButton>
+                                )}
                               </Button>
                             </TooltipTrigger>
                             {isOpen === false && (
@@ -198,6 +268,7 @@ export function Menu({ isOpen }: MenuProps) {
                           active={active}
                           submenus={submenus}
                           isOpen={isOpen}
+                          signedIn={signedIn}
                         />
                       </div>
                     )
@@ -211,14 +282,23 @@ export function Menu({ isOpen }: MenuProps) {
                 isOpen === false ? "opacity-0 hidden" : "opacity-100"
               )}
             >
-              <Card className="w-full p-2 flex flex-col gap-1 items-center bg-background/30">
-                <UserChain />
-                <Separator className="my-2" />
-                <div className="flex flex-row gap-2 justify-center items-center">
-                  <ThemeToggle />
-                  <Coins />
-                </div>
-              </Card>
+              <SignedIn>
+                <Card className="w-full p-2 flex flex-col gap-1 items-center bg-background/30">
+                  <UserChain />
+                  <Separator className="my-2" />
+                  <div className="flex flex-row gap-2 justify-center items-center">
+                    <ThemeToggle />
+                    <Coins />
+                  </div>
+                </Card>
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button variant="outline" className="w-full">
+                    <LogInIcon className="w-4 h-4 mr-2" /> Sign In
+                  </Button>
+                </SignInButton>
+              </SignedOut>
             </div>
           </li>
         </ul>

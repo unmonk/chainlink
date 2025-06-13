@@ -36,7 +36,6 @@ export const UserPickList = () => {
   const { results, status, loadMore } = result;
 
   if (status === "LoadingFirstPage") return <Loading />;
-  if (!results) return null;
 
   return (
     <>

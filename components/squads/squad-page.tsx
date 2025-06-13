@@ -250,7 +250,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
       </div>
 
       <div className="flex items-center justify-center mt-4">
-        {squad.open && !isUserInSquad && (
+        {squad.open && !isUserInSquad && currentUser.isSignedIn && (
           <Button
             onClick={handleJoinSquad}
             disabled={loading}
@@ -284,7 +284,7 @@ export default function SquadPageContent({ squad }: { squad: Doc<"squads"> }) {
 
         <SquadMembers members={mergedUsers} />
         <div className="flex items-center justify-center gap-2 mt-4">
-          {isUserInSquad && (
+          {isUserInSquad && currentUser.isSignedIn && (
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="destructive" size="sm">

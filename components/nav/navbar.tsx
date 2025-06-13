@@ -41,7 +41,7 @@ export function Navbar({ title }: NavbarProps) {
             <NavAvatar />
           </SignedIn>
           <SignedOut>
-            <RedirectToSignIn />
+            <SignInButton />
           </SignedOut>
         </div>
       </div>

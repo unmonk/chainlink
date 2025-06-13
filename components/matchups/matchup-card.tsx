@@ -17,7 +17,7 @@ const MatchupCard = ({
   userId,
 }: {
   matchup: MatchupWithPickCounts;
-  userId: Id<"users">;
+  userId: Id<"users"> | null | undefined;
   activePick?: Doc<"picks">;
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);

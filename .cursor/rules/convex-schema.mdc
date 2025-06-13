@@ -1,0 +1,16 @@
+---
+description: 
+globs: **/convex/schema.ts
+alwaysApply: false
+---
+---
+description: Instructs developers to follow the patterns demonstrated in the example schema provided, paying attention to index creation and field validation using `v`.
+globs: **/convex/schema.ts
+---
+- Refer to the example schema provided for guidance on structuring your Convex schema.
+- Pay attention to index creation using `.index()` and field validation using `v`.
+- Understand that Convex automatically generates system fields `_id` and `_creationTime` for every document.
+- Do not manually add indices for `_id` and `_creationTime` as they are added automatically.
+- When designing the schema, refer to the built-in System fields and data types available at https://docs.convex.dev/database/types.
+
+- Pay special attention to the correct usage of the `v` validator builder (https://docs.convex.dev/api/modules/values#v) for defining schema types.

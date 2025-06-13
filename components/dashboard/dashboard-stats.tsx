@@ -11,6 +11,7 @@ import { api } from "@/convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LeagueRadarChart } from "@/components/stats/league-radar-chart";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 const DashboardStats = () => {
   const user = useQuery(api.users.currentUser, {});
@@ -111,30 +112,37 @@ const DashboardStats = () => {
         <CardDescription>All-Time Statistics</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center px-2 py-2 flex-wrap gap-1">
-        {!user && (
-          <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
-        )}
-        {user && (
+        <SignedOut>
           <Badge className="bg-green-500 text-white text-nowrap">
-            {totalWins} Wins
+            Join today to see your stats!
           </Badge>
-        )}
-        {!user && (
-          <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
-        )}
-        {user && (
-          <Badge className="bg-red-500 text-white text-nowrap">
-            {totalLosses} Losses
-          </Badge>
-        )}
-        {!user && (
-          <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
-        )}
-        {user && (
-          <Badge className="bg-gray-500 text-white text-nowrap">
-            {totalPushes} Pushes
-          </Badge>
-        )}
+        </SignedOut>
+        <SignedIn>
+          {!user && (
+            <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
+          )}
+          {user && (
+            <Badge className="bg-green-500 text-white text-nowrap">
+              {totalWins} Wins
+            </Badge>
+          )}
+          {!user && (
+            <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
+          )}
+          {user && (
+            <Badge className="bg-red-500 text-white text-nowrap">
+              {totalLosses} Losses
+            </Badge>
+          )}
+          {!user && (
+            <Skeleton className="h-8 w-16 inline-flex items-center rounded-full border px-2.5 py-0.5" />
+          )}
+          {user && (
+            <Badge className="bg-gray-500 text-white text-nowrap">
+              {totalPushes} Pushes
+            </Badge>
+          )}
+        </SignedIn>
       </CardContent>
       <CardContent className="grid gap-2 grid-cols-1">
         <LeagueRadarChart leagueData={leagueChartData} />
