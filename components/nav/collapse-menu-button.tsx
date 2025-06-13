@@ -39,6 +39,8 @@ interface CollapseMenuButtonProps {
   active: boolean;
   submenus: Submenu[];
   isOpen: boolean | undefined;
+  disabled?: boolean;
+  signedIn?: boolean;
 }
 
 export function CollapseMenuButton({
@@ -47,6 +49,8 @@ export function CollapseMenuButton({
   active,
   submenus,
   isOpen,
+  disabled,
+  signedIn,
 }: CollapseMenuButtonProps) {
   const isSubmenuActive = submenus.some((submenu) => submenu.active);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(isSubmenuActive);
@@ -64,6 +68,7 @@ export function CollapseMenuButton({
         <Button
           variant={active ? "secondary" : "ghost"}
           className="w-full justify-start h-10"
+          disabled={signedIn}
         >
           <div className="w-full items-center flex justify-between">
             <div className="flex items-center">

@@ -19,7 +19,7 @@ export default function DashboardWrapper2({
   if (!sidebar) return null;
 
   return (
-    <SignedIn>
+    <>
       <Sidebar />
       <main
         className={cn(
@@ -38,6 +38,6 @@ export default function DashboardWrapper2({
       >
         <p className="text-xs text-muted text-center">Chainlink 2024</p>
       </footer>
-    </SignedIn>
+    </>
   );
 }

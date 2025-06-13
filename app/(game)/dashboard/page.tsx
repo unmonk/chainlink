@@ -8,6 +8,7 @@ import DashboardQuiz from "@/components/dashboard/dashboard-quiz";
 import DashboardAnnouncements from "@/components/dashboard/dashboard-announcements";
 import DashboardAdsSponsors from "@/components/dashboard/dashboard-ads-sponsors";
 import { Metadata } from "next";
+import { SignedIn } from "@clerk/nextjs";
 
 //metadata
 export const metadata: Metadata = {
@@ -36,7 +37,9 @@ export default function Dashboard() {
       <main className="grid w-full grid-cols-1 gap-4 lg:grid-cols-4">
         <div className="lg:col-span-3 lg:row-span-1 flex flex-col gap-4 h-full">
           <DashboardActivePick />
-          <DashboardAchievements />
+          <SignedIn>
+            <DashboardAchievements />
+          </SignedIn>
         </div>
         <div className="lg:col-span-1 lg:row-span-1 flex flex-col gap-4 h-full">
           <DashboardChain />
@@ -48,9 +51,11 @@ export default function Dashboard() {
         <div className="lg:col-span-4 lg:row-span-2 h-full">
           <DashboardStats />
         </div>
-        <div className="lg:col-span-2 lg:row-span-1 flex flex-col gap-4 h-full">
-          <DashboardQuiz />
-        </div>
+        <SignedIn>
+          <div className="lg:col-span-2 lg:row-span-1 flex flex-col gap-4 h-full">
+            <DashboardQuiz />
+          </div>
+        </SignedIn>
         {/* <div className="lg:col-span-1 lg:row-span-1 flex flex-col gap-4 h-full"></div> */}
         <div className="lg:col-span-2 lg:row-span-1">
           <DashboardAdsSponsors />

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { PiShootingStarLight } from "react-icons/pi";
 
 import CancelButton from "./cancel-button";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 export default function MatchupCardFooter({
   matchup,
@@ -88,29 +89,36 @@ export default function MatchupCardFooter({
                 : "text-red-500 animate-pulse"
           )}
         >
-          {pick &&
-            pick.status === "PENDING" &&
-            (matchup.status === "STATUS_SCHEDULED" ||
-              matchup.status === "STATUS_POSTPONED") && (
-              <div className="flex flex-row w-full justify-center items-center">
-                <CancelButton onConfirm={handleCancelPick} />
-              </div>
-            )}
-          {matchup.status === "STATUS_SCHEDULED" ||
-          matchup.status === "STATUS_POSTPONED"
-            ? ""
-            : matchup.status === "STATUS_FINAL" ||
-                matchup.status === "STATUS_FULL_TIME" ||
-                matchup.status === "STATUS_FULL_PEN"
-              ? displayWinner(matchup)
-              : "Locked"}
+          <SignedOut>
+            <span className="text-muted-foreground">
+              <Link href="/sign-up">Sign Up / Sign In</Link>
+            </span>
+          </SignedOut>
+          <SignedIn>
+            {pick &&
+              pick.status === "PENDING" &&
+              (matchup.status === "STATUS_SCHEDULED" ||
+                matchup.status === "STATUS_POSTPONED") && (
+                <div className="flex flex-row w-full justify-center items-center">
+                  <CancelButton onConfirm={handleCancelPick} />
+                </div>
+              )}
+            {matchup.status === "STATUS_SCHEDULED" ||
+            matchup.status === "STATUS_POSTPONED"
+              ? ""
+              : matchup.status === "STATUS_FINAL" ||
+                  matchup.status === "STATUS_FULL_TIME" ||
+                  matchup.status === "STATUS_FULL_PEN"
+                ? displayWinner(matchup)
+                : "Locked"}
+          </SignedIn>
         </div>
       </div>
       {matchup.featured &&
         matchup.featuredType === "SPONSORED" &&
         matchup.metadata.sponsored && (
           <Link href={`/api/clickthru/${matchup.metadata.sponsored._id}`}>
-            <div className="flex flex-col justify-center items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border text-sm">
+            <div className="flex flex-row justify-center items-center text-center p-1 min-h-12 mt-auto bg-background/20 border-t border-border text-sm gap-2">
               <span className="flex flex-row justify-center items-center gap-1">
                 {matchup.metadata.sponsored.description}
               </span>
@@ -119,7 +127,7 @@ export default function MatchupCardFooter({
                 alt={matchup.metadata.sponsored.name}
                 width={64}
                 height={64}
-                className="ml-1 items-center justify-center self-center"
+                className="ml-1 items-center justify-center self-center w-16 h-16 rounded-sm"
               />
             </div>
           </Link>

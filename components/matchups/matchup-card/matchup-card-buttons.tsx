@@ -13,7 +13,7 @@ const MatchupCardButtons = ({
   userId,
 }: {
   matchup: MatchupWithPickCounts;
-  userId: Id<"users">;
+  userId: Id<"users"> | null | undefined;
   activePick?: Doc<"picks">;
 }) => {
   const totalPicks = matchup.homePicks + matchup.awayPicks;
@@ -63,7 +63,8 @@ const MatchupCardButtons = ({
             disabled={
               (matchup.status !== "STATUS_SCHEDULED" &&
                 matchup.status !== "STATUS_POSTPONED") ||
-              !!activePick
+              !!activePick ||
+              !userId
             }
             winnerId={matchup.winnerId}
             matchupId={matchup._id}
@@ -255,7 +256,8 @@ const MatchupCardButtons = ({
             disabled={
               (matchup.status !== "STATUS_SCHEDULED" &&
                 matchup.status !== "STATUS_POSTPONED") ||
-              !!activePick
+              !!activePick ||
+              !userId
             }
             winnerId={matchup.winnerId}
             matchupId={matchup._id}
@@ -264,31 +266,26 @@ const MatchupCardButtons = ({
           />
         </div>
       </div>
-      <ReactionBar
-        matchupId={matchup._id}
-        userId={userId}
-        matchupReactions={matchup.reactions}
-      >
-        <div className="col-span-1  flex-nowrap gap-2 flex items-center justify-center">
-          {matchup.status === "STATUS_SCHEDULED" &&
-            activePick?.matchupId === matchup._id && (
-              <div className=" bg-accent/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs ">
-                <LockIcon size={12} className="text-muted-foreground" />
-                <span className="text-primary text-xs font-bold whitespace-nowrap">
-                  {formatDistance(new Date(matchup.startTime), new Date(), {
-                    includeSeconds: true,
-                    addSuffix: true,
-                  })}
-                </span>
-              </div>
-            )}
-          {isHotMatchup && (
-            <div className=" bg-orange-500/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
-              🔥Hot Matchup
+
+      <div className="col-span-1  flex-nowrap gap-2 flex items-center justify-center">
+        {matchup.status === "STATUS_SCHEDULED" &&
+          activePick?.matchupId === matchup._id && (
+            <div className=" bg-accent/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs ">
+              <LockIcon size={12} className="text-muted-foreground" />
+              <span className="text-primary text-xs font-bold whitespace-nowrap">
+                {formatDistance(new Date(matchup.startTime), new Date(), {
+                  includeSeconds: true,
+                  addSuffix: true,
+                })}
+              </span>
             </div>
           )}
-        </div>
-      </ReactionBar>
+        {isHotMatchup && (
+          <div className=" bg-orange-500/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
+            🔥Hot Matchup
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -62,11 +62,9 @@ const MatchupList = ({}) => {
     return groups;
   }, [matchups]);
 
-  if (!userId) return null;
-
   return (
     <div className="flex flex-col">
-      {userPickWithMatchup && (
+      {userPickWithMatchup && userId && (
         <div className="flex flex-col gap-4 items-center">
           <h3 className="text-lg font-semibold my-2">My Pick</h3>
           <MatchupCard

@@ -146,20 +146,27 @@ export const updateScheduledMatchup = internalMutation({
     league: v.string(),
     startTime: v.number(),
     status: v.string(),
-    homeTeam: v.optional(v.object({
-      id: v.string(),
-      name: v.string(),
-      image: v.string(),
-      score: v.number(),
-    })),
-    awayTeam: v.optional(v.object({
-      id: v.string(),
-      name: v.string(),
-      image: v.string(),
-      score: v.number(),
-    })),
+    homeTeam: v.optional(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        image: v.string(),
+        score: v.number(),
+      })
+    ),
+    awayTeam: v.optional(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        image: v.string(),
+        score: v.number(),
+      })
+    ),
   },
-  handler: async (ctx, { gameId, league, startTime, status, homeTeam, awayTeam }) => {
+  handler: async (
+    ctx,
+    { gameId, league, startTime, status, homeTeam, awayTeam }
+  ) => {
     try {
       // Query matchups without the active filter to ensure we catch all relevant matchups
       const matchups = await ctx.db
@@ -169,7 +176,9 @@ export const updateScheduledMatchup = internalMutation({
         .take(50);
 
       if (matchups.length === 0) {
-        console.log(`No matchups found for gameId: ${gameId} and league: ${league}`);
+        console.log(
+          `No matchups found for gameId: ${gameId} and league: ${league}`
+        );
         return;
       }
 
@@ -206,7 +215,9 @@ export const updateScheduledMatchup = internalMutation({
       });
 
       await Promise.all(updatePromises);
-      console.log(`Successfully updated ${matchups.length} matchups for gameId: ${gameId}`);
+      console.log(
+        `Successfully updated ${matchups.length} matchups for gameId: ${gameId}`
+      );
     } catch (error) {
       console.error(`Error updating matchups for gameId: ${gameId}:`, error);
       throw error;
@@ -243,13 +254,13 @@ export function getScheduleEndpoints(league: League) {
   if (league === "MBB") {
     return dates.map(
       (date) =>
-        `https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&dates=${date}`
+        `https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/scoreboard?groups=50&dates=${date}&limit=500`
     );
   }
   if (league === "WBB") {
     return dates.map(
       (date) =>
-        `https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?groups=50&dates=${date}`
+        `https://site.api.espn.com/apis/site/v2/sports/basketball/womens-college-basketball/scoreboard?groups=50&dates=${date}&limit=500`
     );
   }
 

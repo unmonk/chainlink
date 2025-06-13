@@ -33,7 +33,7 @@ export default function Page() {
         </p>
 
         <div className="flex mt-2 mb-2 justify-center w-full">
-          {!squad && <NewSquadForm />}
+          {!squad && user.isSignedIn && <NewSquadForm />}
           {squad && (
             <Link
               href={`/squads/${squad.slug}`}

@@ -20,6 +20,8 @@ export default function DashboardQuiz() {
   const quizData = useQuery(api.quiz.getActiveQuiz);
   const user = useQuery(api.users.currentUser);
 
+  if (!user) return null;
+
   const userHasResponded = quizData?.participants.find(
     (participant) => participant.userId === user?._id
   );

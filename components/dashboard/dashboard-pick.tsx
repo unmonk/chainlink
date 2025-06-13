@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { CircleArrowOutUpRightIcon } from "lucide-react";
 import { RainbowButton } from "../ui/rainbow-button";
 import MatchupCard from "../matchups/matchup-card";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 const DashboardActivePick = () => {
   const pick = useQuery(api.picks.getUserActivePickWithMatchup, {});
@@ -33,7 +34,11 @@ const DashboardActivePick = () => {
               size={16}
               className="mr-1 size-3 transition-transform duration-300 ease-in-out group-hover:-translate-x-0.5"
             />
-            <span>Make Pick</span>{" "}
+
+            <SignedIn>
+              <span>Make Pick</span>{" "}
+            </SignedIn>
+            <SignedOut>View Picks</SignedOut>
           </RainbowButton>
         </CardContent>
       </Card>

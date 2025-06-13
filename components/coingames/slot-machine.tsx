@@ -28,9 +28,9 @@ import { toast } from "sonner";
 import ResultBox from "./result-box";
 
 const SYMBOLS = {
-  CHERRY: "🍒",
-  BAR: "🍫",
-  SEVEN: "🪙",
+  CHERRY: "🏈",
+  BAR: "⚾",
+  SEVEN: "🏀",
   STAR: "⭐",
   DIAMOND: "💎",
   COIN: "🔗",

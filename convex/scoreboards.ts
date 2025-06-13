@@ -268,6 +268,10 @@ export const scoreboards = action({
               hasChanged = true;
               hasChangedDetails += `status difference ours: ${matchup.status} espn: ${eventStatus} for ${event.shortName}`;
             }
+            if (matchup.metadata?.statusDetails !== statusDetails) {
+              hasChanged = true;
+              hasChangedDetails += `status details difference ours: ${matchup.metadata?.statusDetails} espn: ${statusDetails} for ${event.shortName}`;
+            }
             if (matchup.homeTeam.score !== homeScore) {
               hasChanged = true;
               hasChangedDetails += `home score changed from ${matchup.homeTeam.score} to ${homeScore} for ${event.shortName}`;

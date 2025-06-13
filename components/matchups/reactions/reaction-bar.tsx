@@ -9,10 +9,11 @@ export default function ReactionBar({
   children,
 }: {
   matchupId: Id<"matchups">;
-  userId: Id<"users">;
+  userId: Id<"users"> | null | undefined;
   matchupReactions: Doc<"matchupReactions">[];
   children?: React.ReactNode;
 }) {
+  if (!userId) return null;
   return (
     <div className="grid grid-cols-3 items-center text-center px-2 -mt-1 w-full mb-1 min-h-6">
       <div className="col-span-1 justify-self-start">

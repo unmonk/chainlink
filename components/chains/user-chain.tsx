@@ -11,6 +11,9 @@ export const UserChain = () => {
   if (chain === null && isAuthenticated) {
     createChain();
   }
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <>

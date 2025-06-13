@@ -6,25 +6,22 @@ import { Card, CardTitle, CardHeader } from "../ui/card";
 export default function DashboardAchievements() {
   const { user } = useUser();
 
+  if (!user) return null;
+
   return (
     <div>
-      {user && (
-        <Card className="h-full">
-          <CardHeader>
-            <CardTitle>Achievements</CardTitle>
-          </CardHeader>
-          <div className="flex justify-center m-2">
-            <div className="flex flex-col items-center justify-center">
-              <div className="w-full max-w-2xl">
-                <AchievementCircles
-                  userId={user?.id}
-                  username={user?.username}
-                />
-              </div>
+      <Card className="h-full">
+        <CardHeader>
+          <CardTitle>Achievements</CardTitle>
+        </CardHeader>
+        <div className="flex justify-center m-2">
+          <div className="flex flex-col items-center justify-center">
+            <div className="w-full max-w-2xl">
+              <AchievementCircles userId={user?.id} username={user?.username} />
             </div>
           </div>
-        </Card>
-      )}
+        </div>
+      </Card>
     </div>
   );
 }

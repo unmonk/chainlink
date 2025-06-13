@@ -10,6 +10,7 @@ import {
   UserRound,
   CoinsIcon,
   ScrollTextIcon,
+  UserPlusIcon,
 } from "lucide-react";
 import { MdDatasetLinked } from "react-icons/md";
 
@@ -19,6 +20,7 @@ type Submenu = {
   href: string;
   label: string;
   active: boolean;
+  signedIn?: boolean;
 };
 
 type Menu = {
@@ -27,6 +29,7 @@ type Menu = {
   active: boolean;
   icon: LucideIcon;
   submenus: Submenu[];
+  signedIn?: boolean;
 };
 
 type Group = {
@@ -124,6 +127,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/dashboard"),
           icon: LayoutGrid,
           submenus: [],
+          signedIn: false,
         },
         {
           href: "/u",
@@ -131,6 +135,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/u/"),
           icon: UserRound,
           submenus: [],
+          signedIn: true,
         },
       ],
     },
@@ -143,6 +148,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/play"),
           icon: Link,
           submenus: [],
+          signedIn: false,
         },
         {
           href: "/picks",
@@ -150,6 +156,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/picks"),
           icon: UserCheckIcon,
           submenus: [],
+          signedIn: true,
         },
         {
           href: "/squads",
@@ -157,6 +164,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/squads"),
           icon: RiTeamLine as LucideIcon,
           submenus: [],
+          signedIn: false,
         },
         {
           href: "/leaderboards",
@@ -164,6 +172,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/leaderboards"),
           icon: TrophyIcon,
           submenus: [],
+          signedIn: false,
         },
         {
           href: "/challenge",
@@ -171,6 +180,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/challenge"),
           icon: ScrollTextIcon,
           submenus: [],
+          signedIn: false,
         },
         {
           href: "/shop",
@@ -178,22 +188,26 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/shop"),
           icon: MdDatasetLinked as LucideIcon,
           submenus: [],
+          signedIn: true,
         },
         {
           href: "/games",
           label: "Games",
           active: pathname.includes("/games"),
           icon: CoinsIcon,
+          signedIn: false,
           submenus: [
             {
               href: "/games/blackjack",
               label: "Blackjack",
               active: pathname.includes("/games/blackjack"),
+              signedIn: true,
             },
             {
               href: "/games/spin",
               label: "Spin",
               active: pathname.includes("/games/spin"),
+              signedIn: true,
             },
           ],
         },
@@ -207,6 +221,7 @@ export function getMenuList(pathname: string): Group[] {
           label: "Friends",
           active: pathname.includes("/friends"),
           icon: Users,
+          signedIn: true,
           submenus: [],
         },
         {
@@ -215,6 +230,7 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname.includes("/settings"),
           icon: Settings,
           submenus: [],
+          signedIn: true,
         },
       ],
     },
