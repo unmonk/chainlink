@@ -195,7 +195,7 @@ export function getMenuList(pathname: string): Group[] {
           label: "Games",
           active: pathname.includes("/games"),
           icon: CoinsIcon,
-          signedIn: true,
+          signedIn: false,
           submenus: [
             {
               href: "/games/blackjack",
