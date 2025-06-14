@@ -208,7 +208,14 @@ export async function processGame(
       const status =
         game.competitions[0].status?.type?.name || "STATUS_SCHEDULED";
 
-      const overUnder = competition.odds?.overUnder || undefined;
+      const overUnder = competition.odds?.[0]?.overUnder || undefined;
+      const spread = competition.odds?.[0]?.spread || undefined;
+      const pointSpread = {
+        home:
+          competition.odds?.[0]?.pointSpread?.home?.close?.line || undefined,
+        away:
+          competition.odds?.[0]?.pointSpread?.away?.close?.line || undefined,
+      };
 
       await ctx.runMutation(internal.schedules.updateScheduledMatchup, {
         gameId: game.id,
@@ -232,6 +239,10 @@ export async function processGame(
         metadata: {
           ...matchup.metadata,
           overUnder: overUnder,
+          spread: spread,
+          statusDetails: competition.status?.type?.detail,
+          network: competition.geoBroadcasts?.[0]?.media?.shortName || "N/A",
+          pointSpread: pointSpread,
         },
       });
       return {
@@ -281,6 +292,7 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
   // Define in-progress statuses
   const inProgressStatuses = [
     "STATUS_DELAYED",
+    "STATUS_RAIN_DELAY",
     "STATUS_FIRST_HALF",
     "STATUS_HALFTIME",
     "STATUS_SECOND_HALF",
@@ -315,9 +327,30 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
     hasChangedDetails += `status: ${matchup.status} -> ${competitionStatus} `;
   }
 
-  if (matchup.metadata?.overUnder !== game.competitions[0].odds?.overUnder) {
+  if (
+    matchup.metadata?.overUnder !== game.competitions[0].odds?.[0]?.overUnder
+  ) {
     hasChanged = true;
-    hasChangedDetails += `overUnder: ${matchup.metadata?.overUnder} -> ${game.competitions[0].odds?.overUnder} `;
+    hasChangedDetails += `overUnder: ${matchup.metadata?.overUnder} -> ${game.competitions[0].odds?.[0]?.overUnder} `;
+  }
+
+  if (matchup.metadata?.spread !== game.competitions[0].odds?.[0]?.spread) {
+    hasChanged = true;
+    hasChangedDetails += `spread: ${matchup.metadata?.spread} -> ${game.competitions[0].odds?.[0]?.spread} `;
+  }
+  if (
+    matchup.metadata?.pointSpread?.home !==
+    game.competitions[0].odds?.[0]?.pointSpread?.home?.close?.line
+  ) {
+    hasChanged = true;
+    hasChangedDetails += `pointSpread: ${matchup.metadata?.pointSpread?.home} -> ${game.competitions[0].odds?.[0]?.pointSpread?.home?.close?.line} `;
+  }
+  if (
+    matchup.metadata?.pointSpread?.away !==
+    game.competitions[0].odds?.[0]?.pointSpread?.away?.close?.line
+  ) {
+    hasChanged = true;
+    hasChangedDetails += `pointSpread: ${matchup.metadata?.pointSpread?.away} -> ${game.competitions[0].odds?.[0]?.pointSpread?.away?.close?.line} `;
   }
 
   return { hasChanged, hasChangedDetails: hasChanged ? hasChangedDetails : "" };
@@ -388,7 +421,12 @@ async function createNewMatchupByType(
     const away = competitors.find((c) => c.homeAway === "away");
     if (!home || !away || !competition) return;
 
-    const overUnder = competition.odds?.overUnder || undefined;
+    const overUnder = competition.odds?.[0]?.overUnder || undefined;
+    const spread = competition.odds?.[0]?.spread || undefined;
+    const pointSpread = {
+      home: competition.odds?.[0]?.pointSpread?.home?.close?.line || undefined,
+      away: competition.odds?.[0]?.pointSpread?.away?.close?.line || undefined,
+    };
 
     if (matchupType === "SCORE") {
       return await ctx.runMutation(internal.schedules.insertScoreMatchup, {
@@ -417,6 +455,8 @@ async function createNewMatchupByType(
         metadata: {
           network: competition.geoBroadcasts?.[0]?.media?.shortName || "N/A",
           overUnder: overUnder,
+          spread: spread,
+          pointSpread: pointSpread,
         },
       });
     }
@@ -452,6 +492,7 @@ async function createNewMatchupByType(
                 competition.geoBroadcasts?.[0]?.media?.shortName || "N/A",
               statType: stat,
               overUnder: overUnder,
+              spread: spread,
             },
           });
         }

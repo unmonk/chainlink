@@ -77,7 +77,20 @@ export type Competition = {
   onWatchEspn?: boolean;
   odds?: {
     overUnder?: number;
-  };
+    spread?: number;
+    pointSpread?: {
+      away?: {
+        close?: {
+          line?: string;
+        };
+      };
+      home?: {
+        close?: {
+          line?: string;
+        };
+      };
+    };
+  }[];
   wasSuspended?: boolean;
   competitors: Competitor[];
   venue?: Venue;

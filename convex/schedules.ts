@@ -40,6 +40,13 @@ export const insertStatMatchup = internalMutation({
         network: v.optional(v.string()),
         statType: v.optional(v.string()),
         overUnder: v.optional(v.number()),
+        spread: v.optional(v.number()),
+        pointSpread: v.optional(
+          v.object({
+            home: v.optional(v.number()),
+            away: v.optional(v.number()),
+          })
+        ),
       })
     ),
   },
@@ -103,6 +110,13 @@ export const insertScoreMatchup = internalMutation({
       v.object({
         network: v.optional(v.string()),
         overUnder: v.optional(v.number()),
+        spread: v.optional(v.number()),
+        pointSpread: v.optional(
+          v.object({
+            home: v.optional(v.string()),
+            away: v.optional(v.string()),
+          })
+        ),
       })
     ),
   },
@@ -167,14 +181,28 @@ export const updateScheduledMatchup = internalMutation({
     metadata: v.optional(
       v.object({
         overUnder: v.optional(v.number()),
+        spread: v.optional(v.number()),
         network: v.optional(v.string()),
         statusDetails: v.optional(v.string()),
+        sponsored: v.optional(
+          v.object({
+            sponsorId: v.optional(v.id("sponsors")),
+            sponsorName: v.optional(v.string()),
+            sponsorImage: v.optional(v.string()),
+          })
+        ),
+        pointSpread: v.optional(
+          v.object({
+            home: v.optional(v.string()),
+            away: v.optional(v.string()),
+          })
+        ),
       })
     ),
   },
   handler: async (
     ctx,
-    { gameId, league, startTime, status, homeTeam, awayTeam }
+    { gameId, league, startTime, status, homeTeam, awayTeam, metadata }
   ) => {
     try {
       // Query matchups without the active filter to ensure we catch all relevant matchups
@@ -197,6 +225,10 @@ export const updateScheduledMatchup = internalMutation({
           startTime,
           status,
           updatedAt: Date.now(),
+          metadata: {
+            ...matchup.metadata,
+            ...metadata,
+          },
         };
 
         // Only update team data if provided
