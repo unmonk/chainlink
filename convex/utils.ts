@@ -18,6 +18,110 @@ export function determineWinner(
   return null;
 }
 
+export function determineSpreadWinner(
+  type: string,
+  typeDetails: string | undefined,
+  homeTeam: any,
+  awayTeam: any,
+  metadata: {
+    overUnder?: number;
+    pointSpread?: {
+      home?: string;
+      away?: string;
+    };
+  }
+) {
+  if (type === "SPREAD") {
+    if (!metadata.pointSpread) return null;
+    const homeSpread = parseFloat(metadata.pointSpread?.home || "0");
+    const awaySpread = parseFloat(metadata.pointSpread?.away || "0");
+
+    // Calculate adjusted scores
+    const homeAdjustedScore = homeTeam.score + homeSpread;
+    const awayAdjustedScore = awayTeam.score + awaySpread;
+
+    if (homeAdjustedScore === awayAdjustedScore) return "PUSH";
+    return homeAdjustedScore > awayAdjustedScore ? homeTeam.id : awayTeam.id;
+  }
+  return null;
+}
+
+export function determineCustomScoreWinner(
+  type: string,
+  typeDetails: string | undefined,
+  homeTeam: any,
+  awayTeam: any,
+  metadata: {
+    homeWinCondition?: string;
+    awayWinCondition?: string;
+    homeWinBy?: number;
+    awayWinBy?: number;
+  }
+) {
+  if (type === "CUSTOM_SCORE") {
+    if (!metadata.homeWinCondition || !metadata.awayWinCondition) return null;
+    const homeWinCondition = metadata.homeWinCondition;
+    const awayWinCondition = metadata.awayWinCondition;
+    const homeWinBy = metadata.homeWinBy;
+    const awayWinBy = metadata.awayWinBy;
+
+    if (homeWinCondition === "WINBYXPLUS") {
+      if (!homeWinBy) return null;
+      if (homeTeam.score - awayTeam.score >= homeWinBy) {
+        return homeTeam.id;
+      }
+      if (homeTeam.score - awayTeam.score < homeWinBy) {
+        return awayTeam.id;
+      }
+      return "PUSH";
+    }
+    if (awayWinCondition === "WINBYXPLUS") {
+      if (!awayWinBy) return null;
+      if (awayTeam.score - homeTeam.score >= awayWinBy) {
+        return awayTeam.id;
+      }
+      if (awayTeam.score - homeTeam.score < awayWinBy) {
+        return homeTeam.id;
+      }
+      return "PUSH";
+    }
+    if (homeWinCondition === "WINDRAWLOSEBYXPLUS") {
+      if (!homeWinBy) return null;
+      //win by x
+      if (homeTeam.score - awayTeam.score === homeWinBy) {
+        return homeTeam.id;
+      }
+      //draw
+      if (homeTeam.score === awayTeam.score) {
+        return homeTeam.id;
+      }
+      //lose by x
+      if (awayTeam.score - homeTeam.score === homeWinBy) {
+        return homeTeam.id;
+      }
+
+      return awayTeam.id;
+    }
+    if (awayWinCondition === "WINDRAWLOSEBYXPLUS") {
+      if (!awayWinBy) return null;
+      //win by x
+      if (awayTeam.score - homeTeam.score === awayWinBy) {
+        return awayTeam.id;
+      }
+      //draw
+      if (awayTeam.score === homeTeam.score) {
+        return awayTeam.id;
+      }
+      //lose by x
+      if (homeTeam.score - awayTeam.score === awayWinBy) {
+        return awayTeam.id;
+      }
+      return homeTeam.id;
+    }
+    return "PUSH";
+  }
+}
+
 export const matchupReward = (cost: number, featured: boolean) => {
   if (featured) {
     return cost * 3 > 0 ? cost * 3 : 30;

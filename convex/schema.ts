@@ -13,9 +13,16 @@ export const matchup_type = v.union(
   v.literal("LEADERS"),
   v.literal("BOOLEAN"),
   v.literal("CUSTOM"),
-  v.literal("SPREAD")
+  v.literal("SPREAD"),
+  v.literal("CUSTOM_SCORE")
 );
 export type MatchupType = Infer<typeof matchup_type>;
+
+export const custom_score_types = v.union(
+  v.literal("WINBYXPLUS"),
+  v.literal("WINDRAWLOSEBYXPLUS")
+);
+export type CustomScoreType = Infer<typeof custom_score_types>;
 
 export const pick_status = v.union(
   v.literal("PENDING"),

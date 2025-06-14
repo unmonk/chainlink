@@ -71,6 +71,28 @@ const MatchupCardButtons = ({
             currentlyWinning={currentlyWinning}
             activePickId={activePick?.pick.id}
           />
+          <div className="flex items-center justify-center font-bold text-xl">
+            {matchup.type === "SPREAD" &&
+              matchup.metadata?.pointSpread?.away && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
+                  Win By {matchup.metadata.pointSpread.away}
+                </div>
+              )}
+            {matchup.type === "CUSTOM_SCORE" &&
+              matchup.metadata?.awayCustomScoreType === "WINBYXPLUS" &&
+              matchup.metadata?.awayWinBy && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
+                  Win By {matchup.metadata.awayWinBy}
+                </div>
+              )}
+            {matchup.type === "CUSTOM_SCORE" &&
+              matchup.metadata?.awayCustomScoreType === "WINDRAWLOSEBYXPLUS" &&
+              matchup.metadata?.awayWinBy && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
+                  Win/Lose by {matchup.metadata.awayWinBy} or Draw
+                </div>
+              )}
+          </div>
         </div>
         {(matchup.status === "STATUS_SCHEDULED" ||
           matchup.status === "STATUS_POSTPONED") && (
@@ -264,10 +286,32 @@ const MatchupCardButtons = ({
             currentlyWinning={currentlyWinning}
             activePickId={activePick?.pick.id}
           />
+          <div className="flex items-center justify-center font-bold text-xl">
+            {matchup.type === "SPREAD" &&
+              matchup.metadata?.pointSpread?.home && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
+                  Win By {matchup.metadata.pointSpread.home}
+                </div>
+              )}
+            {matchup.type === "CUSTOM_SCORE" &&
+              matchup.metadata?.homeCustomScoreType === "WINBYXPLUS" &&
+              matchup.metadata?.homeWinBy && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
+                  Win By {matchup.metadata.homeWinBy}
+                </div>
+              )}
+            {matchup.type === "CUSTOM_SCORE" &&
+              matchup.metadata?.homeCustomScoreType === "WINDRAWLOSEBYXPLUS" &&
+              matchup.metadata?.homeWinBy && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
+                  Win/Lose by {matchup.metadata.homeWinBy} or Draw
+                </div>
+              )}
+          </div>
         </div>
       </div>
 
-      <div className="col-span-1  flex-nowrap gap-2 flex items-center justify-center">
+      <div className="col-span-3  flex-nowrap gap-2 flex items-center justify-center">
         {matchup.status === "STATUS_SCHEDULED" &&
           activePick?.matchupId === matchup._id && (
             <div className=" bg-accent/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs ">
@@ -280,11 +324,13 @@ const MatchupCardButtons = ({
               </span>
             </div>
           )}
-        {isHotMatchup && (
-          <div className=" bg-orange-500/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
-            🔥Hot Matchup
-          </div>
-        )}
+        <div className="flex items-center gap-2 col-span-1">
+          {isHotMatchup && (
+            <div className="bg-orange-500/40 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
+              🔥Hot Matchup
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

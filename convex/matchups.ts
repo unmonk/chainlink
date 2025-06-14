@@ -7,7 +7,12 @@ import {
 } from "./_generated/server";
 import { filter } from "convex-helpers/server/filter";
 import { v } from "convex/values";
-import { determineWinner, matchupReward } from "./utils";
+import {
+  determineCustomScoreWinner,
+  determineSpreadWinner,
+  determineWinner,
+  matchupReward,
+} from "./utils";
 import { api, internal } from "./_generated/api";
 import { Doc } from "./_generated/dataModel";
 import { featured_type, matchup_type } from "./schema";
@@ -405,7 +410,31 @@ export const handleMatchupFinished = internalMutation({
     { matchupId, homeTeam, awayTeam, status, type, typeDetails, metadata }
   ) => {
     //#region //////////////////DETERMINE WINS ///////////////////////
-    let winnerId = determineWinner(type, typeDetails, homeTeam, awayTeam);
+
+    let winnerId = undefined;
+    if (type === "SCORE") {
+      winnerId = determineWinner(type, typeDetails, homeTeam, awayTeam);
+    }
+
+    if (type === "SPREAD") {
+      winnerId = determineSpreadWinner(
+        type,
+        typeDetails,
+        homeTeam,
+        awayTeam,
+        metadata
+      );
+    }
+
+    if (type === "CUSTOM_SCORE") {
+      winnerId = determineCustomScoreWinner(
+        type,
+        typeDetails,
+        homeTeam,
+        awayTeam,
+        metadata
+      );
+    }
 
     //IF NO WINNER FOUND throw error
     if (!winnerId) {

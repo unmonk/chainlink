@@ -45,7 +45,15 @@ import { MatchupPicksList } from "./matchup-picks-list";
 const EditMatchupFormSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
   league: z.string().min(1, { message: "League is required." }),
-  type: z.enum(["SCORE", "STATS", "LEADERS", "BOOLEAN", "CUSTOM"]),
+  type: z.enum([
+    "SCORE",
+    "STATS",
+    "LEADERS",
+    "BOOLEAN",
+    "CUSTOM",
+    "SPREAD",
+    "CUSTOM_SCORE",
+  ]),
   typeDetails: z.string().optional(),
   cost: z.number().min(0, { message: "Cost must be a non-negative number." }),
   homeTeam: z.object({
@@ -471,13 +479,19 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
                       <SelectValue placeholder="Select a type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {["SCORE", "STATS", "LEADERS", "BOOLEAN", "CUSTOM"].map(
-                        (type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        )
-                      )}
+                      {[
+                        "SCORE",
+                        "STATS",
+                        "LEADERS",
+                        "BOOLEAN",
+                        "CUSTOM",
+                        "SPREAD",
+                        "CUSTOM_SCORE",
+                      ].map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -485,19 +499,167 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
               </FormItem>
             )}
           />
-          <FormField
-            control={methods.control}
-            name="typeDetails"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Type Details</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+
+          {methods.watch("type") === "SPREAD" && (
+            <div className="space-y-4">
+              <FormField
+                control={methods.control}
+                name="metadata.homeSpread"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Home Team Spread</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value || 0} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={methods.control}
+                name="metadata.awaySpread"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Away Team Spread</FormLabel>
+                    <FormControl>
+                      <Input {...field} value={field.value || 0} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+          {methods.watch("type") === "CUSTOM_SCORE" && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <FormField
+                  control={methods.control}
+                  name="metadata.homeCustomScoreType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Home Team Score Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select score type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {[
+                            { value: "WINBYXPLUS", label: "Win By x+" },
+                            {
+                              value: "WINDRAWLOSEBYXPLUS",
+                              label: "Win, Lose, by x, or Draw",
+                            },
+                          ].map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={methods.control}
+                  name="metadata.homeWinBy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Home Win By Points</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <FormField
+                  control={methods.control}
+                  name="metadata.awayCustomScoreType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Away Team Score Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select score type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {[
+                            { value: "WINBYXPLUS", label: "Win By x+" },
+                            {
+                              value: "WINDRAWLOSEBYXPLUS",
+                              label: "Win, Lose, by x, or Draw",
+                            },
+                          ].map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={methods.control}
+                  name="metadata.awayWinBy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Away Win By Points</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          )}
+
+          {methods.watch("type") !== "SPREAD" &&
+            methods.watch("type") !== "CUSTOM_SCORE" && (
+              <FormField
+                control={methods.control}
+                name="typeDetails"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type Details</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             )}
-          />
           <FormField
             control={methods.control}
             name="cost"

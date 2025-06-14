@@ -144,6 +144,7 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
       return <p className="text-balance">{row.original.title}</p>;
     },
   },
+
   {
     accessorKey: "active",
     header: ({ column }) => {
@@ -349,6 +350,31 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
     },
   },
   {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => {
+      return <p className="text-balance">{row.original.type}</p>;
+    },
+  },
+
+  {
+    accessorKey: "startTime",
+    header: "Start | Details",
+    cell: ({ row }) => {
+      return (
+        <p className="text-nowrap">
+          {row.original.status !== "STATUS_SCHEDULED" &&
+            row.original.metadata?.statusDetails}
+          {row.original.status === "STATUS_SCHEDULED" &&
+            new Date(row.original.startTime).toLocaleString("en-US", {
+              dateStyle: "short",
+              timeStyle: "short",
+            })}
+        </p>
+      );
+    },
+  },
+  {
     accessorKey: "winnerId",
     header: "Winner",
     cell: ({ row }) => {
@@ -384,23 +410,6 @@ export const AdminColumns: ColumnDef<MatchupWithPicks>[] = [
           )
         );
       }
-    },
-  },
-  {
-    accessorKey: "startTime",
-    header: "Start | Details",
-    cell: ({ row }) => {
-      return (
-        <p className="text-nowrap">
-          {row.original.status !== "STATUS_SCHEDULED" &&
-            row.original.metadata?.statusDetails}
-          {row.original.status === "STATUS_SCHEDULED" &&
-            new Date(row.original.startTime).toLocaleString("en-US", {
-              dateStyle: "short",
-              timeStyle: "short",
-            })}
-        </p>
-      );
     },
   },
 ];
