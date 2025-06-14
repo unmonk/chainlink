@@ -191,6 +191,10 @@ export const updateScheduledMatchup = internalMutation({
             sponsorImage: v.optional(v.string()),
           })
         ),
+        homeCustomScoreType: v.optional(v.string()),
+        awayCustomScoreType: v.optional(v.string()),
+        homeWinBy: v.optional(v.number()),
+        awayWinBy: v.optional(v.number()),
         pointSpread: v.optional(
           v.object({
             home: v.optional(v.string()),
