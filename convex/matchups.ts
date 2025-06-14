@@ -457,6 +457,26 @@ export const handleMatchupFinished = internalMutation({
   },
 });
 
+export const handleMatchupPostponed = internalMutation({
+  args: {
+    matchupId: v.id("matchups"),
+    status: v.string(),
+  },
+  handler: async (ctx, { matchupId, status }) => {
+    await ctx.db.patch(matchupId, { status, active: false });
+    //release picks
+    const picks = await ctx.db
+      .query("picks")
+      .withIndex("by_matchupId", (q) => q.eq("matchupId", matchupId))
+      .collect();
+    for (const pick of picks) {
+      await ctx.scheduler.runAfter(0, internal.picks.handlePickPush, {
+        pickId: pick._id,
+      });
+    }
+  },
+});
+
 //handle matchup finished, everyone wins
 export const handleMatchupAllWinners = internalMutation({
   args: {

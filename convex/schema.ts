@@ -12,7 +12,8 @@ export const matchup_type = v.union(
   v.literal("STATS"),
   v.literal("LEADERS"),
   v.literal("BOOLEAN"),
-  v.literal("CUSTOM")
+  v.literal("CUSTOM"),
+  v.literal("SPREAD")
 );
 export type MatchupType = Infer<typeof matchup_type>;
 
@@ -34,7 +35,8 @@ export const campaign_type = v.union(
   v.literal("SQUAD"),
   v.literal("TOURNAMENT"),
   v.literal("BRACKET"),
-  v.literal("ACHIEVEMENT")
+  v.literal("ACHIEVEMENT"),
+  v.literal("PICKEM")
 );
 export type CampaignType = Infer<typeof campaign_type>;
 

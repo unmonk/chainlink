@@ -5,8 +5,10 @@ import { League } from "./types";
 import {
   ACTIVE_LEAGUES,
   getHawaiiTime,
+  MATCHUP_DELAYED_STATUSES,
   MATCHUP_FINAL_STATUSES,
   MATCHUP_IN_PROGRESS_STATUSES,
+  MATCHUP_POSTPONED_STATUSES,
   MATCHUP_SCHEDULED_STATUSES,
 } from "./utils";
 
@@ -180,7 +182,8 @@ export const scoreboards = action({
           ///////////////////MATCHUP STARTED////////////////////////
           if (
             MATCHUP_SCHEDULED_STATUSES.includes(matchup.status) &&
-            MATCHUP_IN_PROGRESS_STATUSES.includes(eventStatus)
+            (MATCHUP_IN_PROGRESS_STATUSES.includes(eventStatus) ||
+              MATCHUP_DELAYED_STATUSES.includes(eventStatus))
           ) {
             await ctx.runMutation(internal.matchups.handleMatchupStarted, {
               matchupId: matchup._id,
@@ -246,14 +249,19 @@ export const scoreboards = action({
           }
 
           /////////////MATCHUP POSTPONED///////////////////////////
-          //release picks / push
-
-          /////////////MATCHUP DELAYED////////////////////////////
-          //hold
-          /////////////MATCHUP CANCELLED//////////////////////////
-          //release
-
-          //overtime
+          if (
+            MATCHUP_IN_PROGRESS_STATUSES.includes(matchup.status) &&
+            MATCHUP_POSTPONED_STATUSES.includes(eventStatus)
+          ) {
+            await ctx.runMutation(internal.matchups.handleMatchupPostponed, {
+              matchupId: matchup._id,
+              status: eventStatus,
+            });
+            leagueResponse.games.push({
+              game: event.shortName || "",
+              result: `Matchup postponed`,
+            });
+          }
 
           /////////////MATCHUP UPDATE ONLY////////////////////////
           if (

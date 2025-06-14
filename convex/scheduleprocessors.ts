@@ -205,7 +205,11 @@ export async function processGame(
         };
       }
 
-      const status = game.competitions[0].status?.type?.name || "STATUS_SCHEDULED";
+      const status =
+        game.competitions[0].status?.type?.name || "STATUS_SCHEDULED";
+
+      const overUnder = competition.odds?.overUnder || undefined;
+
       await ctx.runMutation(internal.schedules.updateScheduledMatchup, {
         gameId: game.id,
         league: league,
@@ -215,13 +219,19 @@ export async function processGame(
           id: home.id,
           name: home.team.name || "Home Team",
           score: 0,
-          image: home.team.logo || "https://chainlink.st/icons/icon-256x256.png",
+          image:
+            home.team.logo || "https://chainlink.st/icons/icon-256x256.png",
         },
         awayTeam: {
           id: away.id,
           name: away.team.name || "Away Team",
           score: 0,
-          image: away.team.logo || "https://chainlink.st/icons/icon-256x256.png",
+          image:
+            away.team.logo || "https://chainlink.st/icons/icon-256x256.png",
+        },
+        metadata: {
+          ...matchup.metadata,
+          overUnder: overUnder,
         },
       });
       return {
@@ -270,6 +280,7 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
 
   // Define in-progress statuses
   const inProgressStatuses = [
+    "STATUS_DELAYED",
     "STATUS_FIRST_HALF",
     "STATUS_HALFTIME",
     "STATUS_SECOND_HALF",
@@ -302,6 +313,11 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
   if (matchup.status !== competitionStatus) {
     hasChanged = true;
     hasChangedDetails += `status: ${matchup.status} -> ${competitionStatus} `;
+  }
+
+  if (matchup.metadata?.overUnder !== game.competitions[0].odds?.overUnder) {
+    hasChanged = true;
+    hasChangedDetails += `overUnder: ${matchup.metadata?.overUnder} -> ${game.competitions[0].odds?.overUnder} `;
   }
 
   return { hasChanged, hasChangedDetails: hasChanged ? hasChangedDetails : "" };
@@ -340,7 +356,7 @@ function isGameValid(game: Game) {
   )
     return {
       valid: false,
-      result: "Game has alreadystarted",
+      result: "Game has already started",
     };
   if (!home || !away)
     return {
@@ -372,6 +388,8 @@ async function createNewMatchupByType(
     const away = competitors.find((c) => c.homeAway === "away");
     if (!home || !away || !competition) return;
 
+    const overUnder = competition.odds?.overUnder || undefined;
+
     if (matchupType === "SCORE") {
       return await ctx.runMutation(internal.schedules.insertScoreMatchup, {
         startTime: Date.parse(game.date),
@@ -398,6 +416,7 @@ async function createNewMatchupByType(
         cost: 0,
         metadata: {
           network: competition.geoBroadcasts?.[0]?.media?.shortName || "N/A",
+          overUnder: overUnder,
         },
       });
     }
@@ -432,6 +451,7 @@ async function createNewMatchupByType(
               network:
                 competition.geoBroadcasts?.[0]?.media?.shortName || "N/A",
               statType: stat,
+              overUnder: overUnder,
             },
           });
         }

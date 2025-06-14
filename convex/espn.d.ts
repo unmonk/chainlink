@@ -75,7 +75,9 @@ export type Competition = {
   boxscoreAvailable?: boolean;
   recent?: boolean;
   onWatchEspn?: boolean;
-
+  odds?: {
+    overUnder?: number;
+  };
   wasSuspended?: boolean;
   competitors: Competitor[];
   venue?: Venue;

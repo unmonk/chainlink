@@ -39,6 +39,7 @@ export const insertStatMatchup = internalMutation({
       v.object({
         network: v.optional(v.string()),
         statType: v.optional(v.string()),
+        overUnder: v.optional(v.number()),
       })
     ),
   },
@@ -101,6 +102,7 @@ export const insertScoreMatchup = internalMutation({
     metadata: v.optional(
       v.object({
         network: v.optional(v.string()),
+        overUnder: v.optional(v.number()),
       })
     ),
   },
@@ -160,6 +162,13 @@ export const updateScheduledMatchup = internalMutation({
         name: v.string(),
         image: v.string(),
         score: v.number(),
+      })
+    ),
+    metadata: v.optional(
+      v.object({
+        overUnder: v.optional(v.number()),
+        network: v.optional(v.string()),
+        statusDetails: v.optional(v.string()),
       })
     ),
   },
