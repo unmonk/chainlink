@@ -379,21 +379,64 @@ export const monthlyStatsRecord = internalAction({
       date.setMonth(date.getMonth() - 1);
       const currentMonth = formatDate(date, "yyyyMM");
       const currentStats = user.monthlyStats[currentMonth] || {};
-      currentStats.wins = user.stats.wins;
-      currentStats.losses = user.stats.losses;
-      currentStats.pushes = user.stats.pushes;
+
+      // Get the previous month's stats
+      const previousMonth = formatDate(
+        new Date(date.getFullYear(), date.getMonth() - 1, 1),
+        "yyyyMM"
+      );
+      const previousStats = user.monthlyStats[previousMonth] || {
+        statsByLeague: {},
+        wins: 0,
+        losses: 0,
+        pushes: 0,
+      };
+
+      // Calculate monthly stats for each league
+      const monthlyLeagueStats: Record<
+        string,
+        { wins: number; losses: number; pushes: number }
+      > = {};
+
+      Object.entries(user.stats.statsByLeague).forEach(
+        ([league, currentLeagueStats]) => {
+          const previousLeagueStats = previousStats.statsByLeague?.[league] || {
+            wins: 0,
+            losses: 0,
+            pushes: 0,
+          };
+
+          monthlyLeagueStats[league] = {
+            wins:
+              (currentLeagueStats as { wins: number }).wins -
+              previousLeagueStats.wins,
+            losses:
+              (currentLeagueStats as { losses: number }).losses -
+              previousLeagueStats.losses,
+            pushes:
+              (currentLeagueStats as { pushes: number }).pushes -
+              previousLeagueStats.pushes,
+          };
+        }
+      );
+
+      // Calculate monthly differences for total stats
+      currentStats.wins = user.stats.wins - previousStats.wins;
+      currentStats.losses = user.stats.losses - previousStats.losses;
+      currentStats.pushes = user.stats.pushes - previousStats.pushes;
       currentStats.totalGames =
-        user.stats.wins + user.stats.losses + user.stats.pushes;
+        currentStats.wins + currentStats.losses + currentStats.pushes;
+
       if (currentStats.totalGames > 0) {
         currentStats.winRate = Number(
-          (user.stats.wins / currentStats.totalGames).toFixed(2)
+          (currentStats.wins / currentStats.totalGames).toFixed(2)
         );
       }
       if (currentStats.totalGames === 0) {
         currentStats.winRate = 0;
       }
       currentStats.coins = user.coins;
-      currentStats.statsByLeague = user.stats.statsByLeague;
+      currentStats.statsByLeague = monthlyLeagueStats;
 
       if (dryRun) {
         console.log("CURRENT STATS", currentMonth, user.name);
