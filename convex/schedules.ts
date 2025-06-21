@@ -41,12 +41,6 @@ export const insertStatMatchup = internalMutation({
         statType: v.optional(v.string()),
         overUnder: v.optional(v.number()),
         spread: v.optional(v.number()),
-        pointSpread: v.optional(
-          v.object({
-            home: v.optional(v.number()),
-            away: v.optional(v.number()),
-          })
-        ),
       })
     ),
   },
@@ -111,12 +105,6 @@ export const insertScoreMatchup = internalMutation({
         network: v.optional(v.string()),
         overUnder: v.optional(v.number()),
         spread: v.optional(v.number()),
-        pointSpread: v.optional(
-          v.object({
-            home: v.optional(v.string()),
-            away: v.optional(v.string()),
-          })
-        ),
       })
     ),
   },
@@ -195,12 +183,7 @@ export const updateScheduledMatchup = internalMutation({
         awayCustomScoreType: v.optional(v.string()),
         homeWinBy: v.optional(v.number()),
         awayWinBy: v.optional(v.number()),
-        pointSpread: v.optional(
-          v.object({
-            home: v.optional(v.string()),
-            away: v.optional(v.string()),
-          })
-        ),
+        pointSpread: v.optional(v.any()),
       })
     ),
   },

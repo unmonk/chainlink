@@ -208,7 +208,7 @@ export const getActiveMatchupsByLeague = query({
       .withIndex("by_active_league", (q) =>
         q.eq("league", league).eq("active", true)
       )
-      .take(250);
+      .take(500);
 
     // Get pick counts for each matchup
     const matchupsWithPicks = [];
@@ -226,6 +226,20 @@ export const getActiveMatchupsByLeague = query({
     }
 
     return matchupsWithPicks;
+  },
+});
+
+export const getMatchupsByLeague = query({
+  args: { league: v.string() },
+  handler: async (ctx, { league }) => {
+    const matchups = await ctx.db
+      .query("matchups")
+      .withIndex("by_active_league", (q) =>
+        q.eq("league", league).eq("active", true)
+      )
+      .take(500);
+
+    return matchups;
   },
 });
 

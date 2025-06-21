@@ -72,24 +72,29 @@ const MatchupCardButtons = ({
             activePickId={activePick?.pick.id}
           />
           <div className="flex items-center justify-center font-bold text-xl">
-            {matchup.type === "SPREAD" &&
-              matchup.metadata?.pointSpread?.away && (
-                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
-                  Win By {matchup.metadata.pointSpread.away}
-                </div>
-              )}
+            {matchup.type === "SPREAD" && matchup.metadata?.spread && (
+              <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
+                {-matchup.metadata.spread}
+              </div>
+            )}
             {matchup.type === "CUSTOM_SCORE" &&
               matchup.metadata?.awayCustomScoreType === "WINBYXPLUS" &&
               matchup.metadata?.awayWinBy && (
                 <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
-                  Win By {matchup.metadata.awayWinBy}
+                  Win By {matchup.metadata.awayWinBy}+
                 </div>
               )}
             {matchup.type === "CUSTOM_SCORE" &&
-              matchup.metadata?.awayCustomScoreType === "WINDRAWLOSEBYXPLUS" &&
+              matchup.metadata?.awayCustomScoreType === "WINDRAWLOSEBYX" &&
               matchup.metadata?.awayWinBy && (
                 <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
-                  Win/Lose by {matchup.metadata.awayWinBy} or Draw
+                  Win, Draw, or Lose by {matchup.metadata.awayWinBy}
+                </div>
+              )}
+            {matchup.type === "CUSTOM_SCORE" &&
+              matchup.metadata?.awayCustomScoreType === "WIN" && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
+                  Win
                 </div>
               )}
           </div>
@@ -287,24 +292,29 @@ const MatchupCardButtons = ({
             activePickId={activePick?.pick.id}
           />
           <div className="flex items-center justify-center font-bold text-xl">
-            {matchup.type === "SPREAD" &&
-              matchup.metadata?.pointSpread?.home && (
-                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
-                  Win By {matchup.metadata.pointSpread.home}
-                </div>
-              )}
+            {matchup.type === "SPREAD" && matchup.metadata?.spread && (
+              <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
+                {matchup.metadata.spread}
+              </div>
+            )}
             {matchup.type === "CUSTOM_SCORE" &&
               matchup.metadata?.homeCustomScoreType === "WINBYXPLUS" &&
               matchup.metadata?.homeWinBy && (
                 <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-sm whitespace-nowrap">
-                  Win By {matchup.metadata.homeWinBy}
+                  Win By {matchup.metadata.homeWinBy}+
                 </div>
               )}
             {matchup.type === "CUSTOM_SCORE" &&
-              matchup.metadata?.homeCustomScoreType === "WINDRAWLOSEBYXPLUS" &&
+              matchup.metadata?.homeCustomScoreType === "WINDRAWLOSEBYX" &&
               matchup.metadata?.homeWinBy && (
                 <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
-                  Win/Lose by {matchup.metadata.homeWinBy} or Draw
+                  Win, Draw, or Lose by {matchup.metadata.homeWinBy}
+                </div>
+              )}
+            {matchup.type === "CUSTOM_SCORE" &&
+              matchup.metadata?.homeCustomScoreType === "WIN" && (
+                <div className="bg-accent/90 p-1 rounded-sm justify-center gap-1 flex items-center text-xs whitespace-nowrap">
+                  Win
                 </div>
               )}
           </div>

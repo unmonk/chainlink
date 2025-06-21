@@ -43,23 +43,25 @@ export async function processLeague(
     return leagueResponse;
   }
 
+  // Get existing matchups ONCE for the entire league
+  const existingMatchups = await getExistingMatchups(ctx, league);
+  leagueResponse.matchupsFromDatabase = existingMatchups.length;
+
+  const existingMatchupsRecord: Record<string, Doc<"matchups">[]> = {};
+  for (const matchup of existingMatchups) {
+    const existingMatchupsForGame =
+      existingMatchupsRecord[matchup.gameId] || [];
+
+    existingMatchupsForGame.push(matchup);
+    existingMatchupsRecord[matchup.gameId] = existingMatchupsForGame;
+  }
+
+  // Process each endpoint
   for (const endpoint of endpoints) {
     const scheduleData = await fetchScheduleData(endpoint, league);
     if (!scheduleData) {
       leagueResponse.error = `No schedule found for ${league}`;
       continue;
-    }
-
-    const existingMatchups = await getExistingMatchups(ctx, league);
-    leagueResponse.matchupsFromDatabase = existingMatchups.length;
-
-    const existingMatchupsRecord: Record<string, Doc<"matchups">[]> = {};
-    for (const matchup of existingMatchups) {
-      const existingMatchupsForGame =
-        existingMatchupsRecord[matchup.gameId] || [];
-
-      existingMatchupsForGame.push(matchup);
-      existingMatchupsRecord[matchup.gameId] = existingMatchupsForGame;
     }
 
     const results = await processSchedule(
@@ -78,10 +80,9 @@ export async function processLeague(
 
 export async function getExistingMatchups(ctx: ActionCtx, league: League) {
   const matchupsFromDatabase = await ctx.runQuery(
-    api.matchups.getMatchupsByLeagueAndTime,
+    api.matchups.getMatchupsByLeague,
     {
       league: league,
-      startTime: new Date().getTime(),
     }
   );
   return matchupsFromDatabase;
@@ -116,9 +117,35 @@ export async function fetchScheduleData(endpoint: string, league: League) {
     return scheduleData;
   }
 
+  // Handle old API format with deduplication
   const scheduleResponse = data as ScheduleResponse;
+  const rawSchedule = scheduleResponse.content.schedule;
 
-  return scheduleResponse.content.schedule;
+  // Deduplicate games by gameId across all days
+  const seenGameIds = new Set<string>();
+  const deduplicatedSchedule: Schedule = {};
+
+  for (const day in rawSchedule) {
+    const games = rawSchedule[day].games;
+    if (!games) continue;
+
+    const uniqueGames = games.filter((game) => {
+      if (seenGameIds.has(game.id)) {
+        return false; // Skip duplicate
+      }
+      seenGameIds.add(game.id);
+      return true; // Keep unique game
+    });
+
+    if (uniqueGames.length > 0) {
+      deduplicatedSchedule[day] = {
+        ...rawSchedule[day],
+        games: uniqueGames,
+      };
+    }
+  }
+
+  return deduplicatedSchedule;
 }
 
 export async function processSchedule(
@@ -210,12 +237,6 @@ export async function processGame(
 
       const overUnder = competition.odds?.[0]?.overUnder || undefined;
       const spread = competition.odds?.[0]?.spread || undefined;
-      const pointSpread = {
-        home:
-          competition.odds?.[0]?.pointSpread?.home?.close?.line || undefined,
-        away:
-          competition.odds?.[0]?.pointSpread?.away?.close?.line || undefined,
-      };
 
       await ctx.runMutation(internal.schedules.updateScheduledMatchup, {
         gameId: game.id,
@@ -242,7 +263,6 @@ export async function processGame(
           spread: spread,
           statusDetails: competition.status?.type?.detail,
           network: competition.geoBroadcasts?.[0]?.media?.shortName || "N/A",
-          pointSpread: pointSpread,
         },
       });
       return {
@@ -338,20 +358,6 @@ function hasMatchupChanged(matchup: Doc<"matchups">, game: Game) {
     hasChanged = true;
     hasChangedDetails += `spread: ${matchup.metadata?.spread} -> ${game.competitions[0].odds?.[0]?.spread} `;
   }
-  if (
-    matchup.metadata?.pointSpread?.home !==
-    game.competitions[0].odds?.[0]?.pointSpread?.home?.close?.line
-  ) {
-    hasChanged = true;
-    hasChangedDetails += `pointSpread: ${matchup.metadata?.pointSpread?.home} -> ${game.competitions[0].odds?.[0]?.pointSpread?.home?.close?.line} `;
-  }
-  if (
-    matchup.metadata?.pointSpread?.away !==
-    game.competitions[0].odds?.[0]?.pointSpread?.away?.close?.line
-  ) {
-    hasChanged = true;
-    hasChangedDetails += `pointSpread: ${matchup.metadata?.pointSpread?.away} -> ${game.competitions[0].odds?.[0]?.pointSpread?.away?.close?.line} `;
-  }
 
   return { hasChanged, hasChangedDetails: hasChanged ? hasChangedDetails : "" };
 }
@@ -423,10 +429,6 @@ async function createNewMatchupByType(
 
     const overUnder = competition.odds?.[0]?.overUnder || undefined;
     const spread = competition.odds?.[0]?.spread || undefined;
-    const pointSpread = {
-      home: competition.odds?.[0]?.pointSpread?.home?.close?.line || undefined,
-      away: competition.odds?.[0]?.pointSpread?.away?.close?.line || undefined,
-    };
 
     if (matchupType === "SCORE") {
       return await ctx.runMutation(internal.schedules.insertScoreMatchup, {
@@ -456,7 +458,6 @@ async function createNewMatchupByType(
           network: competition.geoBroadcasts?.[0]?.media?.shortName || "N/A",
           overUnder: overUnder,
           spread: spread,
-          pointSpread: pointSpread,
         },
       });
     }

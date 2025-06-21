@@ -504,23 +504,10 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
             <div className="space-y-4">
               <FormField
                 control={methods.control}
-                name="metadata.homeSpread"
+                name="metadata.spread"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Home Team Spread</FormLabel>
-                    <FormControl>
-                      <Input {...field} value={field.value || 0} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={methods.control}
-                name="metadata.awaySpread"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Away Team Spread</FormLabel>
+                    <FormLabel>Spread</FormLabel>
                     <FormControl>
                       <Input {...field} value={field.value || 0} />
                     </FormControl>
@@ -532,61 +519,6 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
           )}
           {methods.watch("type") === "CUSTOM_SCORE" && (
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <FormField
-                  control={methods.control}
-                  name="metadata.homeCustomScoreType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Home Team Score Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select score type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {[
-                            { value: "WINBYXPLUS", label: "Win By x+" },
-                            {
-                              value: "WINDRAWLOSEBYXPLUS",
-                              label: "Win, Lose, by x, or Draw",
-                            },
-                          ].map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={methods.control}
-                  name="metadata.homeWinBy"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Home Win By Points</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
               <div className="space-y-4">
                 <FormField
                   control={methods.control}
@@ -607,9 +539,10 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
                           {[
                             { value: "WINBYXPLUS", label: "Win By x+" },
                             {
-                              value: "WINDRAWLOSEBYXPLUS",
-                              label: "Win, Lose, by x, or Draw",
+                              value: "WINDRAWLOSEBYX",
+                              label: "Win, Draw, or Lose by x",
                             },
+                            { value: "WIN", label: "Win" },
                           ].map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
@@ -621,25 +554,103 @@ export function EditMatchupForm({ row }: EditMatchupFormProps) {
                     </FormItem>
                   )}
                 />
+                {(methods.watch("metadata.awayCustomScoreType") ===
+                  "WINBYXPLUS" ||
+                  methods.watch("metadata.awayCustomScoreType") ===
+                    "WINDRAWLOSEBYX") && (
+                  <FormField
+                    control={methods.control}
+                    name="metadata.awayWinBy"
+                    rules={{ required: "Away win by points is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {methods.watch("metadata.awayCustomScoreType") ===
+                          "WINBYXPLUS"
+                            ? "Away Win By At Least Points"
+                            : "Away Lose By Points"}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+
+              <div className="space-y-4">
                 <FormField
                   control={methods.control}
-                  name="metadata.awayWinBy"
+                  name="metadata.homeCustomScoreType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Away Win By Points</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value))
-                          }
-                        />
-                      </FormControl>
+                      <FormLabel>Home Team Score Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select score type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {[
+                            { value: "WINBYXPLUS", label: "Win By x+" },
+                            {
+                              value: "WINDRAWLOSEBYX",
+                              label: "Win, Draw, or Lose by x",
+                            },
+                            { value: "WIN", label: "Win" },
+                          ].map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+                {(methods.watch("metadata.homeCustomScoreType") ===
+                  "WINBYXPLUS" ||
+                  methods.watch("metadata.homeCustomScoreType") ===
+                    "WINDRAWLOSEBYX") && (
+                  <FormField
+                    control={methods.control}
+                    name="metadata.homeWinBy"
+                    rules={{ required: "Away win by points is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {methods.watch("metadata.homeCustomScoreType") ===
+                          "WINBYXPLUS"
+                            ? "Home Win By At Least Points"
+                            : "Home Lose By Points"}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
             </div>
           )}

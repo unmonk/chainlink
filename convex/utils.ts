@@ -25,23 +25,18 @@ export function determineSpreadWinner(
   awayTeam: any,
   metadata: {
     overUnder?: number;
-    pointSpread?: {
-      home?: string;
-      away?: string;
-    };
+    spread?: number;
   }
 ) {
   if (type === "SPREAD") {
-    if (!metadata.pointSpread) return null;
-    const homeSpread = parseFloat(metadata.pointSpread?.home || "0");
-    const awaySpread = parseFloat(metadata.pointSpread?.away || "0");
-
-    // Calculate adjusted scores
-    const homeAdjustedScore = homeTeam.score + homeSpread;
-    const awayAdjustedScore = awayTeam.score + awaySpread;
-
-    if (homeAdjustedScore === awayAdjustedScore) return "PUSH";
-    return homeAdjustedScore > awayAdjustedScore ? homeTeam.id : awayTeam.id;
+    if (!metadata.spread) return null;
+    if (homeTeam.score + metadata.spread > awayTeam.score) {
+      return homeTeam.id;
+    }
+    if (homeTeam.score + metadata.spread < awayTeam.score) {
+      return awayTeam.id;
+    }
+    return "PUSH";
   }
   return null;
 }
@@ -52,74 +47,89 @@ export function determineCustomScoreWinner(
   homeTeam: any,
   awayTeam: any,
   metadata: {
-    homeWinCondition?: string;
-    awayWinCondition?: string;
+    homeCustomScoreType?: string;
+    awayCustomScoreType?: string;
     homeWinBy?: number;
     awayWinBy?: number;
   }
 ) {
   if (type === "CUSTOM_SCORE") {
-    if (!metadata.homeWinCondition || !metadata.awayWinCondition) return null;
-    const homeWinCondition = metadata.homeWinCondition;
-    const awayWinCondition = metadata.awayWinCondition;
+    if (!metadata.homeCustomScoreType || !metadata.awayCustomScoreType)
+      return null;
+    const homeWinCondition = metadata.homeCustomScoreType;
+    const awayWinCondition = metadata.awayCustomScoreType;
     const homeWinBy = metadata.homeWinBy;
     const awayWinBy = metadata.awayWinBy;
 
-    if (homeWinCondition === "WINBYXPLUS") {
+    //HOME WIN BY X - AWAY WIN/DRAW LOSE BY X
+
+    if (
+      homeWinCondition === "WINBYXPLUS" &&
+      awayWinCondition === "WINDRAWLOSEBYX"
+    ) {
+      if (!homeWinBy || !awayWinBy) return null;
+      if (homeTeam.score - awayTeam.score >= homeWinBy) {
+        return homeTeam.id;
+      }
+      if (awayTeam.score > homeTeam.score) {
+        return awayTeam.id;
+      }
+      if (awayTeam.score - homeTeam.score === awayWinBy) {
+        return awayTeam.id;
+      }
+      if (awayTeam.score === homeTeam.score) {
+        return awayTeam.id;
+      }
+      return "PUSH";
+    }
+
+    //AWAY WIN BY X - HOME WIN/DRAW LOSE BY X
+    if (
+      homeWinCondition === "WINDRAWLOSEBYX" &&
+      awayWinCondition === "WINBYXPLUS"
+    ) {
+      if (!homeWinBy || !awayWinBy) return null;
+      if (awayTeam.score - homeTeam.score >= awayWinBy) {
+        return awayTeam.id;
+      }
+      if (homeTeam.score > awayTeam.score) {
+        return homeTeam.id;
+      }
+      if (homeTeam.score - awayTeam.score === homeWinBy) {
+        return homeTeam.id;
+      }
+      if (awayTeam.score === homeTeam.score) {
+        return homeTeam.id;
+      }
+      return "PUSH";
+    }
+
+    //HOME WIN BY X - AWAY WIN
+
+    if (homeWinCondition === "WINBYXPLUS" && awayWinCondition === "WIN") {
       if (!homeWinBy) return null;
       if (homeTeam.score - awayTeam.score >= homeWinBy) {
         return homeTeam.id;
       }
-      if (homeTeam.score - awayTeam.score < homeWinBy) {
+      if (awayTeam.score > homeTeam.score) {
         return awayTeam.id;
       }
       return "PUSH";
     }
-    if (awayWinCondition === "WINBYXPLUS") {
+
+    //HOME WIN - AWAY WIN BY X
+    if (homeWinCondition === "WIN" && awayWinCondition === "WINBYXPLUS") {
       if (!awayWinBy) return null;
       if (awayTeam.score - homeTeam.score >= awayWinBy) {
         return awayTeam.id;
       }
-      if (awayTeam.score - homeTeam.score < awayWinBy) {
+      if (homeTeam.score > awayTeam.score) {
         return homeTeam.id;
       }
       return "PUSH";
     }
-    if (homeWinCondition === "WINDRAWLOSEBYXPLUS") {
-      if (!homeWinBy) return null;
-      //win by x
-      if (homeTeam.score - awayTeam.score === homeWinBy) {
-        return homeTeam.id;
-      }
-      //draw
-      if (homeTeam.score === awayTeam.score) {
-        return homeTeam.id;
-      }
-      //lose by x
-      if (awayTeam.score - homeTeam.score === homeWinBy) {
-        return homeTeam.id;
-      }
-
-      return awayTeam.id;
-    }
-    if (awayWinCondition === "WINDRAWLOSEBYXPLUS") {
-      if (!awayWinBy) return null;
-      //win by x
-      if (awayTeam.score - homeTeam.score === awayWinBy) {
-        return awayTeam.id;
-      }
-      //draw
-      if (awayTeam.score === homeTeam.score) {
-        return awayTeam.id;
-      }
-      //lose by x
-      if (homeTeam.score - awayTeam.score === awayWinBy) {
-        return awayTeam.id;
-      }
-      return homeTeam.id;
-    }
-    return "PUSH";
   }
+  return null;
 }
 
 export const matchupReward = (cost: number, featured: boolean) => {
@@ -201,6 +211,55 @@ export interface ScheduledMessage {
   };
   args: any[];
 }
+
+export const deduplicateMatchups = mutation({
+  args: {
+    league: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Get all matchups for league
+    const matchups = await ctx.db
+      .query("matchups")
+      .withIndex("by_active_league", (q) => q.eq("league", args.league))
+      .collect();
+
+    // Group matchups by gameId
+    const matchupsByGameId = new Map<string, Doc<"matchups">[]>();
+
+    for (const matchup of matchups) {
+      if (!matchupsByGameId.has(matchup.gameId)) {
+        matchupsByGameId.set(matchup.gameId, []);
+      }
+      matchupsByGameId.get(matchup.gameId)!.push(matchup);
+    }
+
+    // Find gameIds with more than one matchup
+    const duplicatesToDelete: Id<"matchups">[] = [];
+
+    for (const [gameId, matchupList] of matchupsByGameId.entries()) {
+      if (matchupList.length > 1) {
+        // Sort by creation time to keep the newest one (last created)
+        matchupList.sort((a, b) => b._creationTime - a._creationTime);
+
+        // Keep the first one (oldest), delete the rest
+        const toDelete = matchupList.slice(1);
+        duplicatesToDelete.push(...toDelete.map((matchup) => matchup._id));
+      }
+    }
+
+    // Delete the duplicate matchups
+    for (const matchupId of duplicatesToDelete) {
+      await ctx.db.delete(matchupId);
+    }
+
+    return {
+      totalMatchups: matchups.length,
+      duplicatesFound: duplicatesToDelete.length,
+      deletedMatchups: duplicatesToDelete.length,
+      remainingMatchups: matchups.length - duplicatesToDelete.length,
+    };
+  },
+});
 
 export const fixPreviousQuizResponses = mutation({
   args: {},

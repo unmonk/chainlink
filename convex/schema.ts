@@ -20,7 +20,9 @@ export type MatchupType = Infer<typeof matchup_type>;
 
 export const custom_score_types = v.union(
   v.literal("WINBYXPLUS"),
-  v.literal("WINDRAWLOSEBYXPLUS")
+  v.literal("WINDRAWLOSEBYX"),
+  v.literal("WIN"),
+  v.literal("LOSE")
 );
 export type CustomScoreType = Infer<typeof custom_score_types>;
 
