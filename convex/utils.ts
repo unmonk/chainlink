@@ -236,14 +236,21 @@ export const deduplicateMatchups = mutation({
     // Find gameIds with more than one matchup
     const duplicatesToDelete: Id<"matchups">[] = [];
 
-    for (const [gameId, matchupList] of matchupsByGameId.entries()) {
+    for (const [gameId, matchupList] of Array.from(
+      matchupsByGameId.entries()
+    )) {
       if (matchupList.length > 1) {
         // Sort by creation time to keep the newest one (last created)
-        matchupList.sort((a, b) => b._creationTime - a._creationTime);
+        matchupList.sort(
+          (a: Doc<"matchups">, b: Doc<"matchups">) =>
+            b._creationTime - a._creationTime
+        );
 
         // Keep the first one (oldest), delete the rest
         const toDelete = matchupList.slice(1);
-        duplicatesToDelete.push(...toDelete.map((matchup) => matchup._id));
+        duplicatesToDelete.push(
+          ...toDelete.map((matchup: Doc<"matchups">) => matchup._id)
+        );
       }
     }
 

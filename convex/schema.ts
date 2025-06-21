@@ -228,6 +228,17 @@ export default defineSchema({
     squadWinnerId: v.optional(v.id("squads")),
     startDate: v.number(),
     endDate: v.number(),
+    prizes: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          description: v.string(),
+          image: v.optional(v.string()),
+          imageStorageId: v.optional(v.id("_storage")),
+          coins: v.number(),
+        })
+      )
+    ),
   }),
 
   picks: defineTable({

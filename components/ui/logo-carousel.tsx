@@ -149,6 +149,9 @@ const LogoColumn: React.FC<LogoColumnProps> = React.memo(
   }
 );
 
+// Add display name for the memoized component
+LogoColumn.displayName = "LogoColumn";
+
 // Main LogoCarousel component
 function LogoCarousel({ columnCount = 2 }: { columnCount?: number }) {
   const [logoSets, setLogoSets] = useState<Logo[][]>([]);

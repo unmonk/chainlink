@@ -49,12 +49,12 @@ const SpreadPickFAQ = () => {
   return (
     <>
       <p className="mb-2">
-        Picking a game "against the spread" means you are picking a team not
-        just to win, but to win by more than a predetermined number of points,
-        or to lose by less than that number if they are the underdog. You are
-        either picking the favored team to "cover" the spread by winning by a
-        certain margin, or the underdog to "cover" by keeping the game within
-        that margin.
+        Picking a game `&quot;against the spread`&quot;` means you are picking a
+        team not just to win, but to win by more than a predetermined number of
+        points, or to lose by less than that number if they are the underdog.
+        You are either picking the favored team to `&quot;`cover`&quot;` the
+        spread by winning by a certain margin, or the underdog to
+        `&quot;`cover`&quot;` by keeping the game within that margin.
       </p>
     </>
   );
