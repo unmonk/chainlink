@@ -1,7 +1,9 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gift, Medal } from "lucide-react";
+import { Gift, Medal, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { Button } from "../ui/button";
 
 interface FeatureProps {
   icon: JSX.Element;
@@ -14,7 +16,7 @@ const features: FeatureProps[] = [
     icon: <Medal />,
     title: "Make Picks",
     description:
-      "Pick winners from all your favorite sports leagues throughout the month",
+      "Pick winners from all your favorite sports leagues throughout the month. You can also pick against the spread or our custom scoring options.",
   },
   {
     icon: <Medal />,
@@ -32,7 +34,7 @@ const features: FeatureProps[] = [
     icon: <Gift />,
     title: "Dominate",
     description:
-      "Show off your wins and accomplishments every month and earn the title of ChainMaster",
+      "Show off your wins and accomplishments every month and earn achievements and the title of ChainMaster",
   },
 ];
 

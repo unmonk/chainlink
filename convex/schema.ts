@@ -12,9 +12,19 @@ export const matchup_type = v.union(
   v.literal("STATS"),
   v.literal("LEADERS"),
   v.literal("BOOLEAN"),
-  v.literal("CUSTOM")
+  v.literal("CUSTOM"),
+  v.literal("SPREAD"),
+  v.literal("CUSTOM_SCORE")
 );
 export type MatchupType = Infer<typeof matchup_type>;
+
+export const custom_score_types = v.union(
+  v.literal("WINBYXPLUS"),
+  v.literal("WINDRAWLOSEBYX"),
+  v.literal("WIN"),
+  v.literal("LOSE")
+);
+export type CustomScoreType = Infer<typeof custom_score_types>;
 
 export const pick_status = v.union(
   v.literal("PENDING"),
@@ -34,7 +44,8 @@ export const campaign_type = v.union(
   v.literal("SQUAD"),
   v.literal("TOURNAMENT"),
   v.literal("BRACKET"),
-  v.literal("ACHIEVEMENT")
+  v.literal("ACHIEVEMENT"),
+  v.literal("PICKEM")
 );
 export type CampaignType = Infer<typeof campaign_type>;
 
@@ -217,6 +228,17 @@ export default defineSchema({
     squadWinnerId: v.optional(v.id("squads")),
     startDate: v.number(),
     endDate: v.number(),
+    prizes: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          description: v.string(),
+          image: v.optional(v.string()),
+          imageStorageId: v.optional(v.id("_storage")),
+          coins: v.number(),
+        })
+      )
+    ),
   }),
 
   picks: defineTable({

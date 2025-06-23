@@ -7,6 +7,9 @@ import {
 } from "@/components/ui/accordion";
 import { DiscordLogoIcon } from "@radix-ui/react-icons";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { Star } from "lucide-react";
 
 const LinksFAQ = () => {
   return (
@@ -35,8 +38,23 @@ const MatchupsPickFAQ = () => {
       <p className="mb-2">
         Matchups are curated by our team of experts, and you can pick any
         matchup that is available on the platform. The Play screen will show you
-        all matchups for the next 48 hours across several football, soccer,
+        all matchups for the next 24 hours across several football, soccer,
         baseball, and other leagues.
+      </p>
+    </>
+  );
+};
+
+const SpreadPickFAQ = () => {
+  return (
+    <>
+      <p className="mb-2">
+        Picking a game `&quot;against the spread`&quot;` means you are picking a
+        team not just to win, but to win by more than a predetermined number of
+        points, or to lose by less than that number if they are the underdog.
+        You are either picking the favored team to `&quot;`cover`&quot;` the
+        spread by winning by a certain margin, or the underdog to
+        `&quot;`cover`&quot;` by keeping the game within that margin.
       </p>
     </>
   );
@@ -134,29 +152,34 @@ const FAQList: FAQProps[] = [
     value: "item-1",
   },
   {
+    question: "What is picking against the spread?",
+    answer: <SpreadPickFAQ />,
+    value: "item-2",
+  },
+  {
     question: "When are matchups updated?",
     answer: <MatchupsUpdateFAQ />,
-    value: "item-2",
+    value: "item-3",
   },
   {
     question: "What are 🔗Links?",
     answer: <LinksFAQ />,
-    value: "item-3",
+    value: "item-4",
   },
   {
     question: "What are Squads?",
     answer: <SquadsFAQ />,
-    value: "item-4",
+    value: "item-5",
   },
   {
     question: "How do I get notifications?",
     answer: <NotificationsFAQ />,
-    value: "item-5",
+    value: "item-6",
   },
   {
     question: "How do I play the extra game modes?",
     answer: <ExtraGamesFAQ />,
-    value: "item-6",
+    value: "item-7",
   },
 ];
 
@@ -221,6 +244,16 @@ export const FAQ = () => {
           Join our Discord <DiscordLogoIcon className="w-5 h-5 inline" />
         </a>
       </h3>
+      <Link href="/sponsor" prefetch={false}>
+        <Button
+          variant="outline"
+          size="lg"
+          className="mx-auto mt-8 flex items-center gap-2 hover:bg-primary hover:text-primary-foreground transition-colors"
+        >
+          <Star className="w-4 h-4" />
+          Advertise with us
+        </Button>
+      </Link>
     </section>
   );
 };

@@ -155,6 +155,20 @@ export const createMonthlyCampaign = internalAction({
           startDate: startDate.getTime(),
           endDate: endDate.getTime(),
           ownedBy: "SYSTEM",
+          prizes: [
+            {
+              name: "Longest Chain",
+              description:
+                "The user with the longest chain at the end of the month wins this prize.",
+              coins: 1000,
+            },
+            {
+              name: "Most Wins",
+              description:
+                "The user with the most wins at the end of the month wins this prize.",
+              coins: 1000,
+            },
+          ],
         });
         return `Created ${campaignName}`;
       }
@@ -175,10 +189,31 @@ export const createGlobalCampaign = internalMutation({
     startDate: v.number(),
     endDate: v.number(),
     ownedBy: v.string(),
+    prizes: v.optional(
+      v.array(
+        v.object({
+          name: v.string(),
+          description: v.string(),
+          coins: v.number(),
+          image: v.optional(v.string()),
+          imageStorageId: v.optional(v.id("_storage")),
+        })
+      )
+    ),
   },
   handler: async (
     ctx,
-    { name, description, active, featured, type, startDate, endDate, ownedBy }
+    {
+      name,
+      description,
+      active,
+      featured,
+      type,
+      startDate,
+      endDate,
+      ownedBy,
+      prizes,
+    }
   ) => {
     const campaign = await ctx.db.insert("campaigns", {
       name,
@@ -189,6 +224,7 @@ export const createGlobalCampaign = internalMutation({
       startDate,
       endDate,
       ownedBy,
+      prizes,
     });
     return campaign;
   },

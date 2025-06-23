@@ -39,6 +39,8 @@ export const insertStatMatchup = internalMutation({
       v.object({
         network: v.optional(v.string()),
         statType: v.optional(v.string()),
+        overUnder: v.optional(v.number()),
+        spread: v.optional(v.number()),
       })
     ),
   },
@@ -101,6 +103,8 @@ export const insertScoreMatchup = internalMutation({
     metadata: v.optional(
       v.object({
         network: v.optional(v.string()),
+        overUnder: v.optional(v.number()),
+        spread: v.optional(v.number()),
       })
     ),
   },
@@ -162,10 +166,30 @@ export const updateScheduledMatchup = internalMutation({
         score: v.number(),
       })
     ),
+    metadata: v.optional(
+      v.object({
+        overUnder: v.optional(v.number()),
+        spread: v.optional(v.number()),
+        network: v.optional(v.string()),
+        statusDetails: v.optional(v.string()),
+        sponsored: v.optional(
+          v.object({
+            sponsorId: v.optional(v.id("sponsors")),
+            sponsorName: v.optional(v.string()),
+            sponsorImage: v.optional(v.string()),
+          })
+        ),
+        homeCustomScoreType: v.optional(v.string()),
+        awayCustomScoreType: v.optional(v.string()),
+        homeWinBy: v.optional(v.number()),
+        awayWinBy: v.optional(v.number()),
+        pointSpread: v.optional(v.any()),
+      })
+    ),
   },
   handler: async (
     ctx,
-    { gameId, league, startTime, status, homeTeam, awayTeam }
+    { gameId, league, startTime, status, homeTeam, awayTeam, metadata }
   ) => {
     try {
       // Query matchups without the active filter to ensure we catch all relevant matchups
@@ -188,6 +212,10 @@ export const updateScheduledMatchup = internalMutation({
           startTime,
           status,
           updatedAt: Date.now(),
+          metadata: {
+            ...matchup.metadata,
+            ...metadata,
+          },
         };
 
         // Only update team data if provided
