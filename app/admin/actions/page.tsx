@@ -7,12 +7,10 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 
 export default function AdminActionsPage() {
-  const activeCampaign = useQuery(api.campaigns.getActiveGlobalCampaign);
+  //const activeCampaign = useQuery(api.campaigns.getActiveGlobalCampaign);
   return (
     <ContentLayout title="Actions">
       <AdminActions />
-
-      {activeCampaign && <AdminCampaigns row={activeCampaign} />}
     </ContentLayout>
   );
 }
