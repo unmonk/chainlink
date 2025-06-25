@@ -113,9 +113,21 @@ export const slot_symbol_type = v.union(
   v.literal("STAR"),
   v.literal("SEVEN"),
   v.literal("BAR"),
-  v.literal("CHERRY")
+  v.literal("CHERRY"),
+  v.literal("WILD"),
+  v.literal("SCATTER")
 );
 export type SlotSymbolType = Infer<typeof slot_symbol_type>;
+
+export const payline_type = v.union(
+  v.literal("HORIZONTAL_1"),
+  v.literal("HORIZONTAL_2"),
+  v.literal("HORIZONTAL_3"),
+  v.literal("V_SHAPE_UPSIDE_DOWN"),
+  v.literal("V_SHAPE"),
+  v.literal("SCATTER")
+);
+export type PaylineType = Infer<typeof payline_type>;
 
 export const blackjack_game_status = v.union(
   v.literal("PLAYING"),
@@ -439,27 +451,28 @@ export default defineSchema({
       winnerId: v.optional(v.string()),
     }),
   }).index("by_tournamentId", ["tournamentId"]),
-
+  //////////////////SLOT MACHINE//////////////////////////////
   slotMachineSpins: defineTable({
     userId: v.id("users"),
     spunAt: v.number(),
-    result: v.array(slot_symbol_type),
+    result: v.union(
+      v.array(slot_symbol_type),
+      v.array(v.array(slot_symbol_type))
+    ),
     payout: v.number(),
     freeSpin: v.boolean(),
-  }).index("by_userId", ["userId"]),
-
-  slotMachineConfig: defineTable({
-    active: v.boolean(),
-    symbolWeights: v.record(v.string(), v.number()),
-    payouts: v.array(
-      v.object({
-        line: v.number(),
-        payout: v.number(),
-      })
+    betAmount: v.optional(v.number()),
+    paylines: v.optional(
+      v.array(
+        v.object({
+          type: payline_type,
+          symbols: v.array(slot_symbol_type),
+          matches: v.number(),
+          payout: v.number(),
+        })
+      )
     ),
-    spinCost: v.number(),
-    freeSpinInterval: v.number(),
-  }),
+  }).index("by_userId", ["userId"]),
 
   blackjackGames: defineTable({
     userId: v.id("users"),
