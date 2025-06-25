@@ -11,6 +11,9 @@ import {
   CoinsIcon,
   ScrollTextIcon,
   UserPlusIcon,
+  GemIcon,
+  GalleryVerticalEnd,
+  BellRingIcon,
 } from "lucide-react";
 import { MdDatasetLinked } from "react-icons/md";
 
@@ -40,76 +43,142 @@ type Group = {
 export function getAdminMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "",
+      groupLabel: "Admin",
       menus: [
         {
-          href: "/admin",
-          label: "Admin",
-          active: pathname.includes("/admin"),
-          icon: ShieldAlertIcon,
+          href: "/admin/matchups",
+          label: "Matchups",
+          active: pathname.includes("/admin/matchups"),
+          icon: GalleryVerticalEnd,
           submenus: [
             {
               href: "/admin/matchups",
-              label: "Matchups",
-              active: pathname.includes("/admin/matchups"),
+              label: "All Matchups",
+              active: pathname === "/admin/matchups",
             },
             {
               href: "/admin/picks",
               label: "Picks",
-              active: pathname.includes("/admin/picks"),
+              active: pathname === "/admin/picks",
+            },
+            {
+              href: "/admin/matchups/create",
+              label: "Create Matchup",
+              active: pathname.includes("/admin/matchups/create"),
             },
             {
               href: "/admin/matchups/find",
               label: "Find Matchup",
               active: pathname.includes("/admin/matchups/find"),
             },
+          ],
+        },
+        {
+          href: "/admin/announcements",
+          label: "Announcements",
+          active: pathname.includes("/admin/announcements"),
+          icon: ScrollTextIcon,
+          submenus: [
             {
               href: "/admin/announcements",
-              label: "Announcements",
-              active: pathname.includes("/admin/announcements"),
-            },
-
-            {
-              href: "/admin/achievements",
-              label: "Achievements",
-              active: pathname.includes("/admin/achievements"),
+              label: "All Announcements",
+              active: pathname === "/admin/announcements",
             },
             {
-              href: "/admin/actions",
-              label: "Actions",
-              active: pathname.includes("/admin/actions"),
-            },
-            {
-              href: "/admin/quiz",
-              label: "Challenge",
-              active: pathname.includes("/admin/quiz"),
-            },
-            {
-              href: "/admin/notifications",
-              label: "Notifications",
-              active: pathname.includes("/admin/notifications"),
-            },
-            {
-              href: "/admin/squads",
-              label: "Squads",
-              active: pathname.includes("/admin/squads"),
-            },
-            {
-              href: "/admin/sponsors",
-              label: "Sponsors",
-              active: pathname.includes("/admin/sponsors"),
-            },
-            {
-              href: "/admin/shop",
-              label: "Shop",
-              active: pathname.includes("/admin/shop"),
-            },
-            {
-              href: "/admin/users",
-              label: "Users",
-              active: pathname.includes("/admin/users"),
+              href: "/admin/announcements/create",
+              label: "Create Announcement",
+              active: pathname.includes("/admin/announcements/create"),
             },
           ],
+        },
+        {
+          href: "/admin/sponsors",
+          label: "Sponsors",
+          active: pathname.includes("/admin/sponsors"),
+          icon: GemIcon,
+          submenus: [
+            {
+              href: "/admin/sponsors",
+              label: "All Sponsors",
+              active: pathname === "/admin/sponsors",
+            },
+            {
+              href: "/admin/sponsors/create",
+              label: "Create Sponsor",
+              active: pathname.includes("/admin/sponsors/create"),
+            },
+            {
+              href: "/admin/sponsors/featured",
+              label: "Featured Sponsors",
+              active: pathname.includes("/admin/sponsors/featured"),
+            },
+          ],
+        },
+        {
+          href: "/admin/achievements",
+          label: "Achievements",
+          active: pathname.includes("/admin/achievements"),
+          icon: TrophyIcon,
+          submenus: [
+            {
+              href: "/admin/achievements",
+              label: "All Achievements",
+              active: pathname === "/admin/achievements",
+            },
+            {
+              href: "/admin/achievements/create",
+              label: "Create Achievement",
+              active: pathname.includes("/admin/achievements/create"),
+            },
+            {
+              href: "/admin/achievements/award",
+              label: "Award Achievement",
+              active: pathname.includes("/admin/achievements/award"),
+            },
+          ],
+        },
+        {
+          href: "/admin/quiz",
+          label: "Challenges",
+          active: pathname.includes("/admin/quiz"),
+          icon: ScrollTextIcon,
+          submenus: [],
+        },
+        {
+          href: "/admin/users",
+          label: "Users",
+          active: pathname.includes("/admin/users"),
+          icon: Users,
+          submenus: [],
+        },
+        {
+          href: "/admin/squads",
+          label: "Squads",
+          active: pathname.includes("/admin/squads"),
+          icon: RiTeamLine as LucideIcon,
+          submenus: [],
+        },
+
+        {
+          href: "/admin/notifications",
+          label: "Notifications",
+          active: pathname.includes("/admin/notifications"),
+          icon: BellRingIcon,
+          submenus: [],
+        },
+        {
+          href: "/admin/actions",
+          label: "Actions",
+          active: pathname.includes("/admin/actions"),
+          icon: ShieldAlertIcon,
+          submenus: [],
+        },
+        {
+          href: "/admin/shop",
+          label: "Shop",
+          active: pathname.includes("/admin/shop"),
+          icon: CoinsIcon,
+          submenus: [],
         },
       ],
     },
