@@ -105,8 +105,27 @@ export type SquadRole = Infer<typeof squad_role>;
 export const user_role = v.union(v.literal("USER"), v.literal("ADMIN"));
 export type UserRole = Infer<typeof user_role>;
 
-//////////////////SLOT MACHINE//////////////////////////////
+//////////////////PICKEM//////////////////////////////
+export const pickem_type = v.union(
+  v.literal("TRADITIONAL"), // Traditional Pick'em - pick all games each week
+  v.literal("WEEKLY"), // Weekly Pick'em - separate weekly contests
+  v.literal("SURVIVOR") // Survivor - pick one team per week, can't repeat
+);
 
+export const pickem_scoring_type = v.union(
+  v.literal("STANDARD"), // Each win = 1 point
+  v.literal("SPREAD"), // Pick against point spread
+  v.literal("CONFIDENCE") // Rank picks by confidence level
+);
+
+export const pickem_matchup_status = v.union(
+  v.literal("PENDING"),
+  v.literal("ACTIVE"),
+  v.literal("LOCKED"),
+  v.literal("COMPLETE")
+);
+
+//////////////////SLOT MACHINE//////////////////////////////
 export const slot_symbol_type = v.union(
   v.literal("COIN"),
   v.literal("DIAMOND"),
@@ -348,27 +367,6 @@ export default defineSchema({
   }),
 
   //////////////////OTHER GAMES//////////////////////////////
-  pickemGames: defineTable({
-    title: v.string(),
-    description: v.string(),
-    image: v.string(),
-    active: v.boolean(),
-    startDate: v.number(),
-    endDate: v.number(),
-    cost: v.number(),
-    reward: v.number(),
-    league: v.string(),
-
-    type: v.optional(v.string()),
-    pickSchedule: v.any(),
-  }),
-
-  pickemPicks: defineTable({
-    userId: v.id("users"),
-    gameId: v.id("pickemGames"),
-    picks: v.any(),
-  }),
-
   globalQuiz: defineTable({
     title: v.string(),
     description: v.string(),
@@ -593,6 +591,144 @@ export default defineSchema({
     itemId: v.id("shopItems"),
     purchasedAt: v.number(),
   }).index("by_userId", ["userId"]),
+
+  //////////////////PICKEM//////////////////////////////
+  pickemMatchups: defineTable({
+    campaignId: v.id("pickemCampaigns"),
+    title: v.string(),
+    gameId: v.string(),
+    league: v.string(),
+    startTime: v.number(),
+    status: pickem_matchup_status,
+    seasonType: v.optional(
+      v.union(
+        v.literal("PRESEASON"),
+        v.literal("REGULAR_SEASON"),
+        v.literal("POSTSEASON")
+      )
+    ),
+    winnerId: v.optional(v.string()),
+    week: v.optional(v.number()),
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    metadata: v.optional(v.any()),
+  })
+    .index("by_campaignId", ["campaignId"])
+    .index("by_week", ["week"]),
+
+  pickemCampaigns: defineTable({
+    name: v.string(),
+    description: v.string(),
+    league: v.string(),
+    type: pickem_type,
+    scoringType: pickem_scoring_type,
+    active: v.boolean(),
+    featured: v.boolean(),
+    startDate: v.number(),
+    endDate: v.number(),
+    weekStartDate: v.optional(v.number()), // For weekly pickem
+    weekEndDate: v.optional(v.number()),
+    maxParticipants: v.optional(v.number()),
+    entryFee: v.number(), // Coins required to join
+    prizes: v.optional(
+      v.array(
+        v.object({
+          place: v.number(),
+          coins: v.number(),
+          merch: v.optional(v.string()),
+          merchStorageId: v.optional(v.id("_storage")),
+          description: v.string(),
+        })
+      )
+    ),
+    settings: v.object({
+      allowTies: v.boolean(),
+      dropLowestWeeks: v.optional(v.number()), // Drop X lowest scoring weeks
+      excludeGames: v.optional(v.array(v.string())), // Game IDs to exclude
+      confidencePoints: v.optional(v.boolean()), // Enable confidence points
+      pointSpreads: v.optional(v.boolean()), // Enable point spreads
+      includePreseason: v.optional(v.boolean()), // Include preseason games
+      includePlayoffs: v.optional(v.boolean()), // Include playoff games
+    }),
+    metadata: v.optional(v.any()),
+  })
+    .index("by_league_active", ["league", "active"])
+    .index("by_type_active", ["type", "active"])
+    .index("by_startDate", ["startDate"]),
+
+  pickemParticipants: defineTable({
+    campaignId: v.id("pickemCampaigns"),
+    userId: v.id("users"),
+    joinedAt: v.number(),
+    active: v.boolean(),
+    eliminated: v.boolean(), // For survivor pickem
+    eliminatedWeek: v.optional(v.number()),
+    totalPoints: v.number(),
+    weeklyPoints: v.any(), // { week1: points, week2: points, ... }
+    picksMade: v.number(),
+    correctPicks: v.number(),
+    incorrectPicks: v.number(),
+    pushedPicks: v.number(),
+    usedTeams: v.array(v.string()), // For survivor - teams already picked
+    metadata: v.optional(v.any()),
+  })
+    .index("by_campaignId", ["campaignId"])
+    .index("by_userId", ["userId"])
+    .index("by_campaign_user", ["campaignId", "userId"])
+    .index("by_totalPoints", ["totalPoints"]),
+
+  pickemPicks: defineTable({
+    campaignId: v.id("pickemCampaigns"),
+    participantId: v.id("pickemParticipants"),
+    matchupId: v.id("pickemMatchups"), // Updated to reference pickemMatchups
+    week: v.number(),
+    pick: v.object({
+      teamId: v.string(),
+      teamName: v.string(),
+      teamImage: v.string(),
+    }),
+    confidencePoints: v.optional(v.number()), // 1-16 for confidence points
+    pointSpread: v.optional(v.number()), // For spread betting
+    status: pick_status,
+    pointsEarned: v.number(),
+    submittedAt: v.number(),
+    metadata: v.optional(v.any()),
+  })
+    .index("by_campaignId", ["campaignId"])
+    .index("by_participantId", ["participantId"])
+    .index("by_matchupId", ["matchupId"])
+    .index("by_week", ["week"])
+    .index("by_campaign_week", ["campaignId", "week"]),
+
+  pickemWeeks: defineTable({
+    campaignId: v.id("pickemCampaigns"),
+    weekNumber: v.number(),
+    startDate: v.number(),
+    endDate: v.number(),
+    matchups: v.array(v.id("pickemMatchups")), // Updated to reference pickemMatchups
+    status: v.union(
+      v.literal("PENDING"),
+      v.literal("ACTIVE"),
+      v.literal("LOCKED"),
+      v.literal("COMPLETE")
+    ),
+    totalParticipants: v.number(),
+    participantsWithPicks: v.number(),
+    metadata: v.optional(v.any()),
+  })
+    .index("by_campaignId", ["campaignId"])
+    .index("by_week", ["weekNumber"])
+    .index("by_campaign_week", ["campaignId", "weekNumber"]),
 
   //////////////////USERS//////////////////////////////
 

@@ -74,6 +74,13 @@ export function getAdminMenuList(pathname: string): Group[] {
           ],
         },
         {
+          href: "/admin/pickem",
+          label: "Pick'em",
+          active: pathname.includes("/admin/pickem"),
+          icon: ScrollTextIcon,
+          submenus: [],
+        },
+        {
           href: "/admin/announcements",
           label: "Announcements",
           active: pathname.includes("/admin/announcements"),
@@ -216,6 +223,15 @@ export function getMenuList(pathname: string): Group[] {
           label: "Play ChainLink",
           active: pathname.includes("/play"),
           icon: Link,
+          submenus: [],
+          signedIn: false,
+        },
+        {
+          href: "/pickem",
+          label: "Pick'em",
+          active:
+            pathname.includes("/pickem") && !pathname.includes("/admin/pickem"),
+          icon: ScrollTextIcon,
           submenus: [],
           signedIn: false,
         },
