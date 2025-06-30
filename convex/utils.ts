@@ -74,7 +74,7 @@ export function determineCustomScoreWinner(
       if (awayTeam.score > homeTeam.score) {
         return awayTeam.id;
       }
-      if (awayTeam.score - homeTeam.score === awayWinBy) {
+      if (Math.abs(awayTeam.score - homeTeam.score) === awayWinBy) {
         return awayTeam.id;
       }
       if (awayTeam.score === homeTeam.score) {
@@ -95,7 +95,7 @@ export function determineCustomScoreWinner(
       if (homeTeam.score > awayTeam.score) {
         return homeTeam.id;
       }
-      if (homeTeam.score - awayTeam.score === homeWinBy) {
+      if (Math.abs(homeTeam.score - awayTeam.score) === homeWinBy) {
         return homeTeam.id;
       }
       if (awayTeam.score === homeTeam.score) {
