@@ -84,7 +84,6 @@ export function PickemWeeksList({ campaignId }: PickemWeeksListProps) {
     }
   };
 
-  // Sort season types in the desired order: preseason, regular season, postseason
   const getSeasonTypeOrder = (seasonType: string) => {
     switch (seasonType) {
       case "PRESEASON":
@@ -98,13 +97,35 @@ export function PickemWeeksList({ campaignId }: PickemWeeksListProps) {
     }
   };
 
-  // Sort pickem weeks by season type and week number
+  const getStatusOrder = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return 0;
+      case "PENDING":
+        return 1;
+      case "LOCKED":
+        return 2;
+      case "COMPLETE":
+        return 3;
+      default:
+        return 4;
+    }
+  };
+
+  // Sort pickem weeks by season type, status, and week number
   const sortedPickemWeeks = pickemWeeks.sort((a, b) => {
     const seasonOrderA = getSeasonTypeOrder(a.seasonType || "REGULAR_SEASON");
     const seasonOrderB = getSeasonTypeOrder(b.seasonType || "REGULAR_SEASON");
 
     if (seasonOrderA !== seasonOrderB) {
       return seasonOrderA - seasonOrderB;
+    }
+
+    const statusOrderA = getStatusOrder(a.status);
+    const statusOrderB = getStatusOrder(b.status);
+
+    if (statusOrderA !== statusOrderB) {
+      return statusOrderA - statusOrderB;
     }
 
     return a.weekNumber - b.weekNumber;
@@ -139,7 +160,7 @@ export function PickemWeeksList({ campaignId }: PickemWeeksListProps) {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-xl font-semibold">Pickem Weeks</h3>
+      <h3 className="text-xl font-semibold mt-4">Pickem Weeks</h3>
 
       <Accordion type="multiple" className="space-y-4">
         {Object.entries(weeksBySeason).map(([seasonType, weeks]) => (
@@ -169,7 +190,7 @@ export function PickemWeeksList({ campaignId }: PickemWeeksListProps) {
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4 sm:px-6 pb-4 bg-accent/30">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-3 sm:mt-0">
                 {weeks.map((week) => (
                   <Card
                     key={week._id}
@@ -289,7 +310,7 @@ export function PickemWeeksList({ campaignId }: PickemWeeksListProps) {
                       {/* Make Picks Button */}
                       <div className="pt-3 border-t">
                         <Link
-                          href={`/pickem/${campaignId}/week/${week.weekNumber}`}
+                          href={`/pickem/${campaignId}/season/${seasonType.toLowerCase()}/week/${week.weekNumber}`}
                         >
                           <Button
                             className="w-full h-10 text-sm"

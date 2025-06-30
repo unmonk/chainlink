@@ -63,63 +63,85 @@ export default function PickemCampaignPage() {
           </div>
 
           {/* Campaign Info Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  League
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold">{campaign.league}</span>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="space-y-4 md:space-y-0">
+            {/* Mobile: Single Participants Card */}
+            <div className="md:hidden">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Participants
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-5 w-5 text-blue-500" />
+                    <span className="text-xl font-bold">
+                      {participants?.length || 0}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  Type
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold">{campaign.type}</span>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Desktop: All 4 Cards */}
+            <div className="hidden md:grid md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    League
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl font-bold">{campaign.league}</span>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  Scoring
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold">
-                    {campaign.scoringType}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Type
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl font-bold">{campaign.type}</span>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">
-                  Participants
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2">
-                  <Users className="h-5 w-5 text-blue-500" />
-                  <span className="text-xl font-bold">
-                    {participants?.length || 0}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Scoring
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xl font-bold">
+                      {campaign.scoringType}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Participants
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-5 w-5 text-blue-500" />
+                    <span className="text-xl font-bold">
+                      {participants?.length || 0}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
 
