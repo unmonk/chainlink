@@ -327,7 +327,7 @@ export const CreatePickemCampaign = () => {
                       <br />
                       Weekly: Separate weekly contests
                       <br />
-                      Survivor: Pick one team per week, can't repeat
+                      Survivor: Pick one team per week, can&apros;t repeat
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
