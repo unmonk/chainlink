@@ -6,7 +6,15 @@ import { ContentLayout } from "@/components/nav/content-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Users, Trophy, Settings } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  Users,
+  Trophy,
+  Settings,
+  Link2Icon,
+  CoinsIcon,
+} from "lucide-react";
 import Link from "next/link";
 
 // Helper to format dates
@@ -140,7 +148,7 @@ export default function AdminPickemCampaignPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center space-x-2">
-                <Trophy className="h-5 w-5 text-yellow-500" />
+                <CoinsIcon className="h-5 w-5 text-yellow-500" />
                 <span className="text-2xl font-bold">{campaign.entryFee}</span>
                 <span className="text-sm text-gray-500">🔗Links</span>
               </div>
@@ -182,7 +190,10 @@ export default function AdminPickemCampaignPage() {
                   <label className="text-sm font-medium text-gray-600">
                     Featured
                   </label>
-                  <Badge variant={campaign.featured ? "default" : "secondary"}>
+                  <Badge
+                    variant={campaign.featured ? "default" : "secondary"}
+                    className="ml-2"
+                  >
                     {campaign.featured ? "Yes" : "No"}
                   </Badge>
                 </div>

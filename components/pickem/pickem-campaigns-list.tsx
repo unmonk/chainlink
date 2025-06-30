@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Id } from "@/convex/_generated/dataModel";
+import Link from "next/link";
 
 export const PickemCampaignsList = () => {
   const campaigns = useQuery(api.pickem.getActivePickemCampaigns, {
@@ -74,6 +75,11 @@ export const PickemCampaignsList = () => {
                   >
                     Join Campaign
                   </Button>
+                )}
+                {isJoined && (
+                  <Link href={`/pickem/${campaign._id}`}>
+                    <Button className="w-full mt-4">Play Pick&apos;em</Button>
+                  </Link>
                 )}
               </CardContent>
             </Card>

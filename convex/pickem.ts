@@ -53,6 +53,16 @@ export const createPickemMatchup = mutation({
       ...args,
     });
 
+    // Update the corresponding pickemWeek
+    await ctx.scheduler.runAfter(
+      0,
+      internal.pickem.updatePickemWeekFromMatchups,
+      {
+        campaignId: args.campaignId,
+        week: args.week,
+      }
+    );
+
     return matchupId;
   },
 });
@@ -111,7 +121,23 @@ export const updatePickemMatchup = mutation({
       throw new ConvexError("Admin access required");
     }
 
+    // Get the matchup to find its campaign and week
+    const matchup = await ctx.db.get(matchupId);
+    if (!matchup) throw new ConvexError("Matchup not found");
+
     await ctx.db.patch(matchupId, updates);
+
+    // Update the corresponding pickemWeek
+    if (matchup.week) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.pickem.updatePickemWeekFromMatchups,
+        {
+          campaignId: matchup.campaignId,
+          week: matchup.week,
+        }
+      );
+    }
 
     // If matchup is completed, process results
     if (updates.status === "COMPLETE" && updates.winnerId) {
@@ -656,5 +682,304 @@ export const getPickemMatchupsBySeasonAndWeek = query({
     });
 
     return organizedMatchups;
+  },
+});
+
+// Generate pickemWeeks from existing pickemMatchups
+export const generatePickemWeeksFromMatchups = mutation({
+  args: { campaignId: v.id("pickemCampaigns") },
+  handler: async (ctx, { campaignId }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) throw new ConvexError("Not authenticated");
+
+    // Check if user is admin
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+
+    if (!userProfile || userProfile.role !== "ADMIN") {
+      throw new ConvexError("Admin access required");
+    }
+
+    // Get all matchups for the campaign
+    const matchups = await ctx.db
+      .query("pickemMatchups")
+      .withIndex("by_campaignId", (q) => q.eq("campaignId", campaignId))
+      .collect();
+
+    // Group matchups by week and season type
+    const matchupsByWeekAndSeason: Record<number, Record<string, any[]>> = {};
+
+    matchups.forEach((matchup) => {
+      const week = matchup.week;
+      const seasonType = matchup.seasonType || "REGULAR_SEASON";
+      if (!week) return;
+
+      if (!matchupsByWeekAndSeason[week]) {
+        matchupsByWeekAndSeason[week] = {};
+      }
+
+      if (!matchupsByWeekAndSeason[week][seasonType]) {
+        matchupsByWeekAndSeason[week][seasonType] = [];
+      }
+
+      matchupsByWeekAndSeason[week][seasonType].push(matchup);
+    });
+
+    // Get campaign details for date calculations
+    const campaign = await ctx.db.get(campaignId);
+    if (!campaign) throw new ConvexError("Campaign not found");
+
+    // Create pickemWeeks for each week and season type combination
+    const weekIds = await Promise.all(
+      Object.entries(matchupsByWeekAndSeason).flatMap(
+        ([weekNumber, seasonTypes]) => {
+          const week = parseInt(weekNumber);
+
+          return Object.entries(seasonTypes).map(
+            async ([seasonType, weekMatchups]) => {
+              // Calculate week dates (you might want to adjust this logic based on your needs)
+              let weekStartDate =
+                campaign.startDate + (week - 1) * 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+              let weekEndDate = weekStartDate + 6 * 24 * 60 * 60 * 1000; // 6 days later
+
+              if (campaign.league === "NFL") {
+                // Find earliest matchup start time for this week
+                const earliestMatchup = weekMatchups.reduce(
+                  (earliest, matchup) => {
+                    return matchup.startTime < earliest.startTime
+                      ? matchup
+                      : earliest;
+                  },
+                  weekMatchups[0]
+                );
+
+                // Get date of earliest matchup
+                const matchupDate = new Date(earliestMatchup.startTime);
+
+                // Find Tuesday before the matchup (go back until we hit Tuesday)
+                const tuesday = new Date(matchupDate);
+                while (tuesday.getDay() !== 2) {
+                  // 2 = Tuesday
+                  tuesday.setDate(tuesday.getDate() - 1);
+                }
+                tuesday.setHours(0, 0, 0, 0);
+
+                // Find next Monday (go forward until we hit Monday)
+                const monday = new Date(matchupDate);
+                while (monday.getDay() !== 1) {
+                  // 1 = Monday
+                  monday.setDate(monday.getDate() + 1);
+                }
+                monday.setHours(23, 59, 59, 999);
+
+                weekStartDate = tuesday.getTime();
+                weekEndDate = monday.getTime();
+              }
+
+              // Determine week status based on matchup statuses
+              let weekStatus: "PENDING" | "ACTIVE" | "LOCKED" | "COMPLETE" =
+                "PENDING";
+
+              const hasActiveMatchups = weekMatchups.some(
+                (m) => m.status === "ACTIVE"
+              );
+              const hasLockedMatchups = weekMatchups.some(
+                (m) => m.status === "LOCKED"
+              );
+              const allComplete = weekMatchups.every(
+                (m) => m.status === "COMPLETE"
+              );
+
+              if (allComplete) {
+                weekStatus = "COMPLETE";
+              } else if (hasLockedMatchups) {
+                weekStatus = "LOCKED";
+              } else if (hasActiveMatchups) {
+                weekStatus = "ACTIVE";
+              }
+
+              // Get participant count for this week
+              const participants = await ctx.db
+                .query("pickemParticipants")
+                .withIndex("by_campaignId", (q) =>
+                  q.eq("campaignId", campaignId)
+                )
+                .collect();
+
+              // Count participants who have made picks for this week
+              const participantsWithPicks = await ctx.db
+                .query("pickemPicks")
+                .withIndex("by_campaign_week", (q) =>
+                  q.eq("campaignId", campaignId).eq("week", week)
+                )
+                .collect();
+
+              const uniqueParticipantsWithPicks = new Set(
+                participantsWithPicks.map((pick) => pick.participantId)
+              ).size;
+
+              return await ctx.db.insert("pickemWeeks", {
+                campaignId,
+                weekNumber: week,
+                seasonType: seasonType as
+                  | "PRESEASON"
+                  | "REGULAR_SEASON"
+                  | "POSTSEASON",
+                startDate: weekStartDate,
+                endDate: weekEndDate,
+                matchups: weekMatchups.map((m) => m._id),
+                status: weekStatus,
+                totalParticipants: participants.length,
+                participantsWithPicks: uniqueParticipantsWithPicks,
+                metadata: {},
+              });
+            }
+          );
+        }
+      )
+    );
+
+    return weekIds.flat();
+  },
+});
+
+// Update pickemWeeks when matchups are updated
+export const updatePickemWeekFromMatchups = internalMutation({
+  args: { campaignId: v.id("pickemCampaigns"), week: v.number() },
+  handler: async (ctx, { campaignId, week }) => {
+    // Get all matchups for this week
+    const matchups = await ctx.db
+      .query("pickemMatchups")
+      .withIndex("by_campaignId", (q) => q.eq("campaignId", campaignId))
+      .filter((q) => q.eq(q.field("week"), week))
+      .collect();
+
+    // Group matchups by season type
+    const matchupsBySeason: Record<string, any[]> = {};
+    matchups.forEach((matchup) => {
+      const seasonType = matchup.seasonType || "REGULAR_SEASON";
+      if (!matchupsBySeason[seasonType]) {
+        matchupsBySeason[seasonType] = [];
+      }
+      matchupsBySeason[seasonType].push(matchup);
+    });
+
+    // Process each season type separately
+    for (const [seasonType, seasonMatchups] of Object.entries(
+      matchupsBySeason
+    )) {
+      // Find existing week record for this season type
+      const existingWeek = await ctx.db
+        .query("pickemWeeks")
+        .withIndex("by_campaign_week", (q) =>
+          q.eq("campaignId", campaignId).eq("weekNumber", week)
+        )
+        .filter((q) => q.eq(q.field("seasonType"), seasonType))
+        .unique();
+
+      if (!existingWeek) {
+        // Create new week if it doesn't exist
+        const campaign = await ctx.db.get(campaignId);
+        if (!campaign) continue;
+
+        const weekStartDate =
+          campaign.startDate + (week - 1) * 7 * 24 * 60 * 60 * 1000;
+        const weekEndDate = weekStartDate + 6 * 24 * 60 * 60 * 1000;
+
+        let weekStatus: "PENDING" | "ACTIVE" | "LOCKED" | "COMPLETE" =
+          "PENDING";
+
+        const hasActiveMatchups = seasonMatchups.some(
+          (m) => m.status === "ACTIVE"
+        );
+        const hasLockedMatchups = seasonMatchups.some(
+          (m) => m.status === "LOCKED"
+        );
+        const allComplete = seasonMatchups.every(
+          (m) => m.status === "COMPLETE"
+        );
+
+        if (allComplete) {
+          weekStatus = "COMPLETE";
+        } else if (hasLockedMatchups) {
+          weekStatus = "LOCKED";
+        } else if (hasActiveMatchups) {
+          weekStatus = "ACTIVE";
+        }
+
+        const participants = await ctx.db
+          .query("pickemParticipants")
+          .withIndex("by_campaignId", (q) => q.eq("campaignId", campaignId))
+          .collect();
+
+        const participantsWithPicks = await ctx.db
+          .query("pickemPicks")
+          .withIndex("by_campaign_week", (q) =>
+            q.eq("campaignId", campaignId).eq("week", week)
+          )
+          .collect();
+
+        const uniqueParticipantsWithPicks = new Set(
+          participantsWithPicks.map((pick) => pick.participantId)
+        ).size;
+
+        await ctx.db.insert("pickemWeeks", {
+          campaignId,
+          weekNumber: week,
+          seasonType: seasonType as
+            | "PRESEASON"
+            | "REGULAR_SEASON"
+            | "POSTSEASON",
+          startDate: weekStartDate,
+          endDate: weekEndDate,
+          matchups: seasonMatchups.map((m) => m._id),
+          status: weekStatus,
+          totalParticipants: participants.length,
+          participantsWithPicks: uniqueParticipantsWithPicks,
+          metadata: {},
+        });
+      } else {
+        // Update existing week
+        let weekStatus: "PENDING" | "ACTIVE" | "LOCKED" | "COMPLETE" =
+          "PENDING";
+
+        const hasActiveMatchups = seasonMatchups.some(
+          (m) => m.status === "ACTIVE"
+        );
+        const hasLockedMatchups = seasonMatchups.some(
+          (m) => m.status === "LOCKED"
+        );
+        const allComplete = seasonMatchups.every(
+          (m) => m.status === "COMPLETE"
+        );
+
+        if (allComplete) {
+          weekStatus = "COMPLETE";
+        } else if (hasLockedMatchups) {
+          weekStatus = "LOCKED";
+        } else if (hasActiveMatchups) {
+          weekStatus = "ACTIVE";
+        }
+
+        const participantsWithPicks = await ctx.db
+          .query("pickemPicks")
+          .withIndex("by_campaign_week", (q) =>
+            q.eq("campaignId", campaignId).eq("week", week)
+          )
+          .collect();
+
+        const uniqueParticipantsWithPicks = new Set(
+          participantsWithPicks.map((pick) => pick.participantId)
+        ).size;
+
+        await ctx.db.patch(existingWeek._id, {
+          matchups: seasonMatchups.map((m) => m._id),
+          status: weekStatus,
+          participantsWithPicks: uniqueParticipantsWithPicks,
+        });
+      }
+    }
   },
 });

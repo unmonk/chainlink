@@ -26,10 +26,14 @@ export default function Page({ params }: { params: { id: string } }) {
     matchup?.gameId as string
   );
 
-  console.log(summaryUrl);
+  const boxScoreUrl = getBoxScoreUrlByLeagueAndGameId(
+    matchup?.league as string,
+    matchup?.gameId as string
+  );
 
   //fetch summary data
   const [summary, setSummary] = useState(null);
+  const [boxScore, setBoxScore] = useState(null);
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -41,8 +45,18 @@ export default function Page({ params }: { params: { id: string } }) {
       setSummary(summaryJson);
     };
 
+    const fetchBoxScore = async () => {
+      if (!boxScoreUrl) {
+        return;
+      }
+      const boxScoreData = await fetch(boxScoreUrl);
+      const boxScoreJson = await boxScoreData.json();
+      setBoxScore(boxScoreJson);
+    };
+
     fetchSummary();
-  }, [summaryUrl]);
+    fetchBoxScore();
+  }, [summaryUrl, boxScoreUrl]);
 
   if (!summary) {
     return (
@@ -76,12 +90,25 @@ export default function Page({ params }: { params: { id: string } }) {
             </Link>
           </div>
         ) : (
-          <MatchupView data={summary} league={matchup?.league as string} />
+          <MatchupView
+            data={summary}
+            league={matchup?.league as string}
+            boxScoreData={boxScore}
+          />
         )}
       </Suspense>
     </ContentLayout>
   );
 }
+
+const getBoxScoreUrlByLeagueAndGameId = (league: string, gameId: string) => {
+  switch (league) {
+    case "MLB":
+      return `http://cdn.espn.com/core/mlb/boxscore?gameId=${gameId}&xhr=1&render=false&device=desktop&userab=18`;
+    default:
+      return null;
+  }
+};
 
 const getSummaryUrlByLeagueAndGameId = (league: string, gameId: string) => {
   switch (league) {

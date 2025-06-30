@@ -713,6 +713,13 @@ export default defineSchema({
   pickemWeeks: defineTable({
     campaignId: v.id("pickemCampaigns"),
     weekNumber: v.number(),
+    seasonType: v.optional(
+      v.union(
+        v.literal("PRESEASON"),
+        v.literal("REGULAR_SEASON"),
+        v.literal("POSTSEASON")
+      )
+    ),
     startDate: v.number(),
     endDate: v.number(),
     matchups: v.array(v.id("pickemMatchups")), // Updated to reference pickemMatchups
