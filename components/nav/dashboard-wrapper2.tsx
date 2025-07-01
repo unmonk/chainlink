@@ -36,7 +36,19 @@ export default function DashboardWrapper2({
           sidebar?.isOpen === false ? "lg:ml-[90px]" : "lg:ml-72"
         )}
       >
-        <p className="text-xs text-muted text-center">Chainlink 2024</p>
+        <p className="text-xs text-muted text-center flex flex-col items-center justify-center">
+          <span>
+            © {new Date().getFullYear()} Chainlink. All rights reserved.
+          </span>
+          <span className="text-xs">
+            DISCLAIMER: This site is not affiliated, associated, authorized,
+            endorsed by, or in any way officially connected with any network,
+            team, league or its subsidiaries or its affiliates. All logos,
+            brands, and other trademarks or images featured or referred to
+            within this website are the property of their respective trademark
+            holders.
+          </span>
+        </p>
       </footer>
     </>
   );

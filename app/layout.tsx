@@ -58,10 +58,6 @@ export const metadata: Metadata = {
   },
   keywords:
     "chainlink, sports betting, sports, sports picks, sports predictions, online game",
-  other: {
-    "ads.txt": "google.com, pub-1737227166446709, DIRECT, f08c47fec0942fa0",
-    "google-adsense-account": "ca-pub-1737227166446709",
-  },
 };
 
 export const viewport: Viewport = {
