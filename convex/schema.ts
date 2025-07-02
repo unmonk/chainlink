@@ -640,6 +640,19 @@ export default defineSchema({
     weekEndDate: v.optional(v.number()),
     maxParticipants: v.optional(v.number()),
     entryFee: v.number(), // Coins required to join
+    entryFeeDollars: v.optional(v.number()),
+    isPrivate: v.optional(v.boolean()),
+    privateCode: v.optional(v.string()),
+    sponsorInfo: v.optional(
+      v.object({
+        name: v.string(),
+        logo: v.optional(v.string()),
+        logoStorageId: v.optional(v.id("_storage")),
+        website: v.optional(v.string()),
+        description: v.optional(v.string()),
+      })
+    ),
+    leaderboardPublic: v.optional(v.boolean()),
     prizes: v.optional(
       v.array(
         v.object({
