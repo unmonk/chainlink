@@ -42,6 +42,15 @@ const prizeSchema = z.object({
   merchStorageId: z.custom<Id<"_storage">>().optional(),
 });
 
+// Sponsor schema
+const sponsorSchema = z.object({
+  name: z.string().min(1, "Sponsor name is required"),
+  logo: z.string().optional(),
+  logoStorageId: z.custom<Id<"_storage">>().optional(),
+  website: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  description: z.string().optional(),
+});
+
 const pickemCampaignSchema = z
   .object({
     name: z.string().min(3, "Campaign name must be at least 3 characters"),
@@ -62,6 +71,8 @@ const pickemCampaignSchema = z
     dropLowestWeeks: z.number().min(0).max(16).optional(),
     includePlayoffs: z.boolean().default(false),
     includePreseason: z.boolean().default(false),
+    hasSponsor: z.boolean().default(false),
+    sponsorInfo: sponsorSchema.optional(),
   })
   .refine(
     (data) => {
@@ -73,10 +84,23 @@ const pickemCampaignSchema = z
       message: "End date must be after start date",
       path: ["endDate"],
     }
+  )
+  .refine(
+    (data) => {
+      if (data.hasSponsor) {
+        return data.sponsorInfo && data.sponsorInfo.name;
+      }
+      return true;
+    },
+    {
+      message: "Sponsor information is required when sponsor is enabled",
+      path: ["sponsorInfo"],
+    }
   );
 
 type PickemCampaignFormValues = z.infer<typeof pickemCampaignSchema>;
 type PrizeFormValues = z.infer<typeof prizeSchema>;
+type SponsorFormValues = z.infer<typeof sponsorSchema>;
 
 export const CreatePickemCampaign = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +114,10 @@ export const CreatePickemCampaign = () => {
   });
   const [newPrizeImage, setNewPrizeImage] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [sponsorLogo, setSponsorLogo] = useState<File | null>(null);
+  const [isUploadingSponsorLogo, setIsUploadingSponsorLogo] = useState(false);
   const newPrizeFileInputRef = useRef<HTMLInputElement>(null);
+  const sponsorLogoFileInputRef = useRef<HTMLInputElement>(null);
 
   const createCampaign = useMutation(api.pickem.createPickemCampaign);
   const generateUploadUrl = useMutation(api.achievements.generateUploadUrl);
@@ -110,6 +137,14 @@ export const CreatePickemCampaign = () => {
       dropLowestWeeks: 0,
       includePlayoffs: false,
       includePreseason: false,
+      hasSponsor: false,
+      sponsorInfo: {
+        name: "",
+        logo: "",
+        logoStorageId: undefined,
+        website: "",
+        description: "",
+      },
     },
   });
 
@@ -176,15 +211,32 @@ export const CreatePickemCampaign = () => {
     }
   };
 
+  const handleSponsorLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSponsorLogo(e.target.files[0]);
+    }
+  };
+
   const onSubmit = async (values: PickemCampaignFormValues) => {
     try {
       setIsLoading(true);
+
+      // Handle sponsor logo upload
+      let sponsorLogoStorageId: Id<"_storage"> | undefined = undefined;
+      let sponsorLogoUrl = "";
+
+      if (sponsorLogo && values.hasSponsor) {
+        setIsUploadingSponsorLogo(true);
+        const storageId = await handleImageUpload(sponsorLogo);
+        sponsorLogoStorageId = storageId as Id<"_storage">;
+        sponsorLogoUrl = `/api/files/${sponsorLogoStorageId}`;
+      }
 
       // Determine confidence points and point spreads based on scoring type
       const confidencePoints = values.scoringType === "CONFIDENCE";
       const pointSpreads = values.scoringType === "SPREAD";
 
-      const campaignId = await createCampaign({
+      const campaignData: any = {
         name: values.name,
         description: values.description,
         league: values.league,
@@ -202,7 +254,20 @@ export const CreatePickemCampaign = () => {
           includePreseason: values.includePreseason,
         },
         prizes: prizes.length > 0 ? prizes : undefined,
-      });
+      };
+
+      // Add sponsor info if enabled
+      if (values.hasSponsor && values.sponsorInfo) {
+        campaignData.sponsorInfo = {
+          name: values.sponsorInfo.name,
+          logo: sponsorLogoUrl || values.sponsorInfo.logo,
+          logoStorageId: sponsorLogoStorageId,
+          website: values.sponsorInfo.website || undefined,
+          description: values.sponsorInfo.description || undefined,
+        };
+      }
+
+      const campaignId = await createCampaign(campaignData);
 
       toast.success("Pickem campaign created successfully!");
       form.reset();
@@ -214,6 +279,10 @@ export const CreatePickemCampaign = () => {
         merch: "",
         merchStorageId: undefined,
       });
+      setSponsorLogo(null);
+      if (sponsorLogoFileInputRef.current) {
+        sponsorLogoFileInputRef.current.value = "";
+      }
       router.push(`/admin/pickem/campaigns/${campaignId}`);
     } catch (error) {
       console.error("Error creating campaign:", error);
@@ -222,6 +291,7 @@ export const CreatePickemCampaign = () => {
       });
     } finally {
       setIsLoading(false);
+      setIsUploadingSponsorLogo(false);
     }
   };
 
@@ -425,106 +495,123 @@ export const CreatePickemCampaign = () => {
               />
             </div>
 
+            {/* Add Sponsor Section before the Prizes Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Campaign Settings</h3>
+              <h3 className="text-lg font-semibold">Sponsor Information</h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="allowTies"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Allow Ties</FormLabel>
-                        <FormDescription>
-                          Award points for tied games
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="includePlayoffs"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                          Include Playoffs
-                        </FormLabel>
-                        <FormDescription>
-                          Include playoff games in the campaign
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="includePreseason"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">
-                          Include Preseason
-                        </FormLabel>
-                        <FormDescription>
-                          Include preseason games in the campaign
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="dropLowestWeeks"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Drop Lowest Weeks</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="16"
-                          placeholder="0"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value) || 0)
-                          }
-                        />
-                      </FormControl>
+              <FormField
+                control={form.control}
+                name="hasSponsor"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Has Sponsor</FormLabel>
                       <FormDescription>
-                        Number of lowest scoring weeks to drop from final
-                        standings (0-16)
+                        Enable if this campaign is sponsored by a company or
+                        organization
                       </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {form.watch("hasSponsor") && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Sponsor Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="sponsorInfo.name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sponsor Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Sponsor Company Name"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="sponsorInfo.website"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Website URL</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="https://example.com"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="mt-4">
+                      <FormField
+                        control={form.control}
+                        name="sponsorInfo.description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sponsor Description</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Brief description of the sponsor..."
+                                className="min-h-[80px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="text-sm font-medium">
+                        Sponsor Logo
+                      </label>
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleSponsorLogoChange}
+                          ref={sponsorLogoFileInputRef}
+                          className="flex-1"
+                        />
+                        {sponsorLogo && (
+                          <Image
+                            src={URL.createObjectURL(sponsorLogo)}
+                            alt="Sponsor logo preview"
+                            width={40}
+                            height={40}
+                            className="rounded"
+                          />
+                        )}
+                      </div>
+                      <FormDescription>
+                        Upload a logo for the sponsor (optional)
+                      </FormDescription>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Prizes Section */}

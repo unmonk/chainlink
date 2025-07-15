@@ -273,6 +273,15 @@ export const createPickemCampaign = mutation({
         })
       )
     ),
+    sponsorInfo: v.optional(
+      v.object({
+        name: v.string(),
+        logo: v.optional(v.string()),
+        logoStorageId: v.optional(v.id("_storage")),
+        website: v.optional(v.string()),
+        description: v.optional(v.string()),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const user = await ctx.auth.getUserIdentity();
@@ -456,7 +465,7 @@ export const submitPickemPicks = mutation({
       );
     }
 
-    // Check if picks are already submitted for this week
+    // Get existing picks for this week
     const existingPicks = await ctx.db
       .query("pickemPicks")
       .withIndex("by_campaign_week", (q) =>
@@ -465,37 +474,62 @@ export const submitPickemPicks = mutation({
       .filter((q) => q.eq(q.field("participantId"), participant._id))
       .collect();
 
-    if (existingPicks.length > 0) {
-      throw new ConvexError("Picks already submitted for this week");
-    }
+    // Create a map of existing picks by matchupId for easy lookup
+    const existingPicksMap = new Map(
+      existingPicks.map((pick) => [pick.matchupId, pick])
+    );
 
-    // Create picks
+    // Process each pick - either update existing or create new
     const pickIds = await Promise.all(
       picks.map(async (pick) => {
-        return await ctx.db.insert("pickemPicks", {
-          campaignId,
-          participantId: participant._id,
-          matchupId: pick.matchupId,
-          week,
-          pick: {
-            teamId: pick.teamId,
-            teamName: pick.teamName,
-            teamImage: pick.teamImage,
-          },
-          confidencePoints: pick.confidencePoints,
-          pointSpread: pick.pointSpread,
-          status: "PENDING",
-          pointsEarned: 0,
-          submittedAt: new Date().getTime(),
-          metadata: {},
-        });
+        const existingPick = existingPicksMap.get(pick.matchupId);
+
+        if (existingPick) {
+          // Update existing pick
+          await ctx.db.patch(existingPick._id, {
+            pick: {
+              teamId: pick.teamId,
+              teamName: pick.teamName,
+              teamImage: pick.teamImage,
+            },
+            confidencePoints: pick.confidencePoints,
+            pointSpread: pick.pointSpread,
+            status: "PENDING",
+            submittedAt: new Date().getTime(),
+          });
+          return existingPick._id;
+        } else {
+          // Create new pick
+          return await ctx.db.insert("pickemPicks", {
+            campaignId,
+            participantId: participant._id,
+            matchupId: pick.matchupId,
+            week,
+            pick: {
+              teamId: pick.teamId,
+              teamName: pick.teamName,
+              teamImage: pick.teamImage,
+            },
+            confidencePoints: pick.confidencePoints,
+            pointSpread: pick.pointSpread,
+            status: "PENDING",
+            pointsEarned: 0,
+            submittedAt: new Date().getTime(),
+            metadata: {},
+          });
+        }
       })
     );
 
-    // Update participant stats
-    await ctx.db.patch(participant._id, {
-      picksMade: participant.picksMade + picks.length,
-    });
+    // Update participant stats - only count new picks
+    const newPicksCount = picks.filter(
+      (pick) => !existingPicksMap.has(pick.matchupId)
+    ).length;
+    if (newPicksCount > 0) {
+      await ctx.db.patch(participant._id, {
+        picksMade: participant.picksMade + newPicksCount,
+      });
+    }
 
     return pickIds;
   },
@@ -562,7 +596,13 @@ export const getPickemWeeksByCampaign = query({
       .order("asc")
       .collect();
 
-    // Get the actual matchup data for each week
+    // Get all participants for this campaign
+    const allParticipants = await ctx.db
+      .query("pickemParticipants")
+      .withIndex("by_campaignId", (q) => q.eq("campaignId", campaignId))
+      .collect();
+    const totalParticipants = allParticipants.length;
+
     const weeksWithMatchups = await Promise.all(
       weeks.map(async (week) => {
         const matchups = await Promise.all(
@@ -571,14 +611,66 @@ export const getPickemWeeksByCampaign = query({
           })
         );
 
+        // Get all picks for this week
+        const picks = await ctx.db
+          .query("pickemPicks")
+          .withIndex("by_campaign_week", (q) =>
+            q.eq("campaignId", campaignId).eq("week", week.weekNumber)
+          )
+          .collect();
+
+        // Unique participant IDs who made at least one pick this week
+        const participantsWithPicks = new Set(
+          picks.map((pick) => pick.participantId)
+        ).size;
+
         return {
           ...week,
-          matchups: matchups.filter(Boolean), // Remove any null matchups
+          matchups: matchups.filter(Boolean),
+          totalParticipants,
+          participantsWithPicks,
         };
       })
     );
 
     return weeksWithMatchups;
+  },
+});
+
+// Get a single pickem week by campaign, season type, and week number
+export const getPickemWeekByCampaignSeasonAndNumber = query({
+  args: {
+    campaignId: v.id("pickemCampaigns"),
+    seasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+    weekNumber: v.number(),
+  },
+  handler: async (ctx, { campaignId, seasonType, weekNumber }) => {
+    // Find the week
+    const week = await ctx.db
+      .query("pickemWeeks")
+      .withIndex("by_campaign_week", (q) =>
+        q.eq("campaignId", campaignId).eq("weekNumber", weekNumber)
+      )
+      .filter((q) => q.eq(q.field("seasonType"), seasonType))
+      .unique();
+
+    if (!week) return null;
+
+    // Fetch full matchup objects
+    const matchups = await Promise.all(
+      week.matchups.map(async (matchupId) => {
+        return await ctx.db.get(matchupId);
+      })
+    );
+
+    return {
+      ...week,
+      matchups: matchups.filter(Boolean), // Remove any nulls
+    };
   },
 });
 
@@ -622,6 +714,15 @@ export const updatePickemCampaign = mutation({
           description: v.string(),
         })
       )
+    ),
+    sponsorInfo: v.optional(
+      v.object({
+        name: v.string(),
+        logo: v.optional(v.string()),
+        logoStorageId: v.optional(v.id("_storage")),
+        website: v.optional(v.string()),
+        description: v.optional(v.string()),
+      })
     ),
   },
   handler: async (ctx, { campaignId, ...updates }) => {
@@ -981,5 +1082,143 @@ export const updatePickemWeekFromMatchups = internalMutation({
         });
       }
     }
+  },
+});
+
+// Get the current user's picks for a given campaign, seasonType, and weekNumber
+export const getUserPickemPicksForWeek = query({
+  args: {
+    campaignId: v.id("pickemCampaigns"),
+    seasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+    weekNumber: v.number(),
+  },
+  handler: async (ctx, { campaignId, seasonType, weekNumber }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) return [];
+
+    // Get user profile
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+    if (!userProfile) return [];
+
+    // Get participant
+    const participant = await ctx.db
+      .query("pickemParticipants")
+      .withIndex("by_campaign_user", (q) =>
+        q.eq("campaignId", campaignId).eq("userId", userProfile._id)
+      )
+      .unique();
+    if (!participant) return [];
+
+    // Get picks for this participant and week
+    const picks = await ctx.db
+      .query("pickemPicks")
+      .withIndex("by_participantId", (q) =>
+        q.eq("participantId", participant._id)
+      )
+      .filter((q) => q.eq(q.field("week"), weekNumber))
+      .collect();
+
+    return picks;
+  },
+});
+
+// Cancel a pickem pick
+export const cancelPickemPick = mutation({
+  args: { pickId: v.id("pickemPicks") },
+  handler: async (ctx, { pickId }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) throw new ConvexError("Not authenticated");
+
+    const pick = await ctx.db.get(pickId);
+    if (!pick) {
+      throw new ConvexError("PICK_NOT_FOUND");
+    }
+
+    // Get the matchup to check if it's still pending
+    const matchup = await ctx.db.get(pick.matchupId);
+    if (!matchup) {
+      throw new ConvexError("MATCHUP_NOT_FOUND");
+    }
+
+    // Only allow cancellation if matchup is still pending
+    if (matchup.status !== "PENDING") {
+      throw new ConvexError("MATCHUP_ALREADY_LOCKED");
+    }
+
+    // Verify the user owns this pick
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+
+    if (!userProfile) throw new ConvexError("User not found");
+
+    const participant = await ctx.db
+      .query("pickemParticipants")
+      .withIndex("by_campaign_user", (q) =>
+        q.eq("campaignId", pick.campaignId).eq("userId", userProfile._id)
+      )
+      .unique();
+
+    if (!participant || participant._id !== pick.participantId) {
+      throw new ConvexError("Not authorized to cancel this pick");
+    }
+
+    // Delete the pick
+    await ctx.db.delete(pickId);
+
+    // Update participant stats
+    await ctx.db.patch(participant._id, {
+      picksMade: Math.max(0, participant.picksMade - 1),
+    });
+  },
+});
+
+// Get active pickem campaigns with participant counts
+export const getActivePickemCampaignsWithCounts = query({
+  args: { league: v.optional(v.string()) },
+  handler: async (ctx, { league }) => {
+    if (!league) {
+      throw new ConvexError("League is required");
+    }
+    const campaigns = await ctx.db
+      .query("pickemCampaigns")
+      .withIndex("by_league_active", (q) =>
+        q.eq("league", league).eq("active", true)
+      )
+      .collect();
+
+    // Get participant counts for each campaign
+    const campaignsWithCounts = await Promise.all(
+      campaigns.map(async (campaign) => {
+        // Get all participants for this campaign
+        const allParticipants = await ctx.db
+          .query("pickemParticipants")
+          .withIndex("by_campaignId", (q) => q.eq("campaignId", campaign._id))
+          .collect();
+
+        // Get participants who have made at least one pick
+        const participantsWithPicks = allParticipants.filter(
+          (participant) => participant.picksMade > 0
+        );
+
+        return {
+          ...campaign,
+          participantCounts: {
+            total: allParticipants.length,
+            withPicks: participantsWithPicks.length,
+          },
+        };
+      })
+    );
+
+    return campaignsWithCounts;
   },
 });

@@ -93,7 +93,7 @@ export function PickemWeeksList({ campaignId }: PickemWeeksListProps) {
       case "POSTSEASON":
         return 2;
       default:
-        return 3;
+        return 1;
     }
   };
 
