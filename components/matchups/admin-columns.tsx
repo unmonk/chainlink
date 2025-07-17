@@ -41,6 +41,7 @@ const LEAGUE_OPTIONS = [
   { value: "MBB", label: "MBB 🏀" },
   { value: "WBB", label: "WBB 🏀" },
   { value: "WNBA", label: "WNBA 🏀" },
+  { value: "NBAS", label: "NBAS 🏀" },
   { value: "MLS", label: "MLS ⚽" },
   { value: "NWSL", label: "NWSL ⚽" },
   { value: "EPL", label: "EPL ⚽" },
