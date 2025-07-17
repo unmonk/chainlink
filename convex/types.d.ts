@@ -12,6 +12,7 @@ export type League =
   | "MLS"
   | "PLL"
   | "NWSL"
+  | "NBAS"
   | "EPL"
   | "RPL"
   | "ARG"
