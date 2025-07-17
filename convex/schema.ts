@@ -108,13 +108,11 @@ export type UserRole = Infer<typeof user_role>;
 //////////////////PICKEM//////////////////////////////
 export const pickem_type = v.union(
   v.literal("TRADITIONAL"), // Traditional Pick'em - pick all games each week
-  v.literal("WEEKLY"), // Weekly Pick'em - separate weekly contests
   v.literal("SURVIVOR") // Survivor - pick one team per week, can't repeat
 );
 
 export const pickem_scoring_type = v.union(
   v.literal("STANDARD"), // Each win = 1 point
-  v.literal("SPREAD"), // Pick against point spread
   v.literal("CONFIDENCE") // Rank picks by confidence level
 );
 
@@ -621,7 +619,7 @@ export default defineSchema({
       image: v.string(),
     }),
     metadata: v.optional(v.any()),
-  }).index("by_campaign_week", ["campaignId", "week"]),
+  }).index("by_campaign", ["campaignId"]),
 
   pickemCampaigns: defineTable({
     name: v.string(),
@@ -632,6 +630,7 @@ export default defineSchema({
     startDate: v.number(),
     endDate: v.number(),
     maxParticipants: v.optional(v.number()),
+    currentWeek: v.optional(v.number()),
     entryFee: v.number(),
     isPrivate: v.optional(v.boolean()),
     privateCode: v.optional(v.string()),
@@ -647,14 +646,18 @@ export default defineSchema({
     userId: v.id("users"),
     joinedAt: v.number(),
     weeklyStats: v.optional(v.any()),
+    picksMade: v.number(),
     survivor: v.optional(
       v.object({
         eliminated: v.boolean(),
         eliminatedWeek: v.optional(v.number()),
-        usedTeams: v.array(v.string()),
+        usedTeams: v.optional(v.array(v.string())),
       })
     ),
-  }).index("by_campaign_user", ["campaignId", "userId"]),
+  })
+    .index("by_campaign", ["campaignId"])
+    .index("by_campaign_user", ["campaignId", "userId"])
+    .index("by_user", ["userId"]),
 
   pickemPicks: defineTable({
     campaignId: v.id("pickemCampaigns"),

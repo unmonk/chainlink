@@ -1,0 +1,31 @@
+{
+  "enabled": true,
+  "name": "Documentation Sync",
+  "description": "Listens to all TypeScript source files, React components, Convex backend functions, configuration files, and other relevant project files. When changes are detected, automatically updates the README.md and any documentation in the /docs folder to keep documentation in sync with code changes.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.jsx",
+      "app/**/*.ts",
+      "app/**/*.tsx",
+      "components/**/*.ts",
+      "components/**/*.tsx",
+      "convex/**/*.ts",
+      "hooks/**/*.ts",
+      "hooks/**/*.tsx",
+      "lib/**/*.ts",
+      "*.json",
+      "*.config.*",
+      "schema.ts",
+      "middleware.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source code files have been modified in this TypeScript/Next.js project. Please review the changes and update the README.md file and any documentation in the /docs folder (if it exists) to reflect these changes. Focus on updating API documentation, component usage examples, configuration changes, and any new features or modifications that users and developers should know about. Ensure the documentation accurately represents the current state of the codebase."
+  }
+}

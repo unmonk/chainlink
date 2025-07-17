@@ -14,16 +14,8 @@ function formatDate(ts: number) {
 export const AdminPickemList = () => {
   // Fetch all pickem campaigns (admin view: show all, not just active)
   const campaigns = useQuery(api.pickem.getAllPickemCampaigns, {});
-  const participants = useQuery(api.pickem.getAllPickemParticipants, {});
 
-  if (!campaigns || !participants) return <div>Loading...</div>;
-
-  // Map campaignId to participant count
-  const participantCounts: Record<string, number> = {};
-  for (const p of participants) {
-    const cid = p.campaignId;
-    participantCounts[cid] = (participantCounts[cid] || 0) + 1;
-  }
+  if (!campaigns) return <div>Loading...</div>;
 
   return (
     <div className="space-y-4">
@@ -38,9 +30,6 @@ export const AdminPickemList = () => {
               <CardHeader>
                 <CardTitle className="flex justify-between items-start">
                   <span>{campaign.name}</span>
-                  <Badge variant={campaign.active ? "default" : "secondary"}>
-                    {campaign.active ? "Active" : "Inactive"}
-                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -58,16 +47,11 @@ export const AdminPickemList = () => {
                     <span>{campaign.scoringType}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Start:</span>
-                    <span>{formatDate(campaign.startDate)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>End:</span>
-                    <span>{formatDate(campaign.endDate)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Participants:</span>
-                    <span>{participantCounts[campaign._id] || 0}</span>
+                    <span>Active:</span>
+                    <span>
+                      {formatDate(campaign.startDate)} &ndash;{" "}
+                      {formatDate(campaign.endDate)}
+                    </span>
                   </div>
                 </div>
                 <p className="text-xs text-gray-500">Click for admin details</p>

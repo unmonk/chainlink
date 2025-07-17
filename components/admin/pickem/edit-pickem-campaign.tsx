@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ColorPicker } from "@/components/ui/color-picker";
 import {
   Select,
   SelectContent,
@@ -32,48 +33,61 @@ import Image from "next/image";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
+import { Badge } from "@/components/ui/badge";
 
 // Prize schema for individual prizes
 const prizeSchema = z.object({
   place: z.number().min(1, "Place must be at least 1"),
-  coins: z.number().min(0, "Coins must be 0 or greater"),
-  description: z.string().min(1, "Description is required"),
+  coins: z.number().min(0, "Links must be 0 or greater"),
+  description: z.string().optional(),
   merch: z.string().optional(),
   merchStorageId: z.custom<Id<"_storage">>().optional(),
+  prizeType: z.enum(["WEEKLY", "SEASON"], {
+    required_error: "Please select a prize type",
+  }),
 });
 
 // Sponsor schema
 const sponsorSchema = z.object({
-  name: z.string().min(1, "Sponsor name is required"),
+  name: z.string().optional(),
   logo: z.string().optional(),
   logoStorageId: z.custom<Id<"_storage">>().optional(),
   website: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   description: z.string().optional(),
+  borderColor: z.string().optional(),
 });
 
 const editPickemCampaignSchema = z
   .object({
     name: z.string().min(3, "Campaign name must be at least 3 characters"),
-    description: z
-      .string()
-      .min(10, "Description must be at least 10 characters"),
+    description: z.string().optional(),
     league: z.string().min(1, "Please select a league"),
-    type: z.enum(["TRADITIONAL", "WEEKLY", "SURVIVOR"], {
+    type: z.enum(["TRADITIONAL", "SURVIVOR"], {
       required_error: "Please select a campaign type",
     }),
-    scoringType: z.enum(["STANDARD", "SPREAD", "CONFIDENCE"], {
+    scoringType: z.enum(["STANDARD", "CONFIDENCE"], {
       required_error: "Please select a scoring type",
     }),
     startDate: z.string().min(1, "Start date is required"),
     endDate: z.string().min(1, "End date is required"),
-    entryFee: z.number().min(0, "Entry fee must be 0 or greater"),
-    allowTies: z.boolean().default(true),
-    dropLowestWeeks: z.number().min(0).max(16).optional(),
-    includePlayoffs: z.boolean().default(false),
-    includePreseason: z.boolean().default(false),
-    featured: z.boolean().default(false),
+    entryFee: z.number().optional(),
     hasSponsor: z.boolean().default(false),
-    sponsorInfo: sponsorSchema.optional(),
+    sponsorInfo: z.optional(
+      z.object({
+        name: z.string().optional(),
+        logo: z.string().optional(),
+        logoStorageId: z.custom<Id<"_storage">>().optional(),
+        website: z
+          .string()
+          .url("Must be a valid URL")
+          .optional()
+          .or(z.literal("")),
+        description: z.string().optional(),
+        borderColor: z.string().optional(),
+      })
+    ),
+    isPrivate: z.boolean().default(false),
+    privateCode: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -88,8 +102,13 @@ const editPickemCampaignSchema = z
   )
   .refine(
     (data) => {
+      // Only validate sponsor info if hasSponsor is true
       if (data.hasSponsor) {
-        return data.sponsorInfo && data.sponsorInfo.name;
+        return (
+          data.sponsorInfo &&
+          data.sponsorInfo.name &&
+          data.sponsorInfo.name.trim().length > 0
+        );
       }
       return true;
     },
@@ -117,6 +136,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
     description: "",
     merch: "",
     merchStorageId: undefined,
+    prizeType: "WEEKLY",
   });
   const [newPrizeImage, setNewPrizeImage] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -125,7 +145,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
   const newPrizeFileInputRef = useRef<HTMLInputElement>(null);
   const sponsorLogoFileInputRef = useRef<HTMLInputElement>(null);
 
-  const campaign = useQuery(api.pickem.getPickemCampaignById, { campaignId });
+  const campaign = useQuery(api.pickem.getPickemCampaign, { campaignId });
   const updateCampaign = useMutation(api.pickem.updatePickemCampaign);
   const generateUploadUrl = useMutation(api.achievements.generateUploadUrl);
 
@@ -140,21 +160,16 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
       startDate: "",
       endDate: "",
       entryFee: 0,
-      allowTies: true,
-      dropLowestWeeks: 0,
-      includePlayoffs: false,
-      includePreseason: false,
-      featured: false,
       hasSponsor: false,
-      sponsorInfo: {
-        name: "",
-        logo: "",
-        logoStorageId: undefined,
-        website: "",
-        description: "",
-      },
+      isPrivate: false,
+      privateCode: "",
     },
   });
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    form.handleSubmit(onSubmit)();
+  };
 
   // Update form when campaign data loads
   useEffect(() => {
@@ -168,11 +183,8 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
         startDate: new Date(campaign.startDate).toISOString().split("T")[0],
         endDate: new Date(campaign.endDate).toISOString().split("T")[0],
         entryFee: campaign.entryFee,
-        allowTies: campaign.settings.allowTies,
-        dropLowestWeeks: campaign.settings.dropLowestWeeks || 0,
-        includePlayoffs: campaign.settings.includePlayoffs || false,
-        includePreseason: campaign.settings.includePreseason || false,
-        featured: campaign.featured,
+        isPrivate: campaign.isPrivate ?? false,
+        privateCode: campaign.privateCode ?? "",
         hasSponsor: !!campaign.sponsorInfo,
         sponsorInfo: campaign.sponsorInfo
           ? {
@@ -181,6 +193,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
               logoStorageId: campaign.sponsorInfo.logoStorageId,
               website: campaign.sponsorInfo.website || "",
               description: campaign.sponsorInfo.description || "",
+              borderColor: campaign.sponsorInfo.borderColor || "#3B82F6",
             }
           : {
               name: "",
@@ -188,6 +201,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
               logoStorageId: undefined,
               website: "",
               description: "",
+              borderColor: "#3B82F6",
             },
       });
 
@@ -200,6 +214,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
           description: "",
           merch: "",
           merchStorageId: undefined,
+          prizeType: "WEEKLY",
         });
       }
     }
@@ -241,6 +256,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
         description: "",
         merch: "",
         merchStorageId: undefined,
+        prizeType: "WEEKLY",
       });
       setNewPrizeImage(null);
       if (newPrizeFileInputRef.current) {
@@ -275,23 +291,21 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
   };
 
   const onSubmit = async (values: EditPickemCampaignFormValues) => {
+    console.log("onSubmit called with values:", values);
+    console.log("Form errors:", form.formState.errors);
+
     try {
       setIsLoading(true);
+      console.log("Loading state set to true");
 
       // Handle sponsor logo upload
       let sponsorLogoStorageId: Id<"_storage"> | undefined = undefined;
-      let sponsorLogoUrl = "";
 
       if (sponsorLogo && values.hasSponsor) {
         setIsUploadingSponsorLogo(true);
         const storageId = await handleImageUpload(sponsorLogo);
         sponsorLogoStorageId = storageId as Id<"_storage">;
-        sponsorLogoUrl = `/api/files/${sponsorLogoStorageId}`;
       }
-
-      // Determine confidence points and point spreads based on scoring type
-      const confidencePoints = values.scoringType === "CONFIDENCE";
-      const pointSpreads = values.scoringType === "SPREAD";
 
       const campaignData: any = {
         campaignId,
@@ -303,15 +317,9 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
         startDate: new Date(values.startDate).getTime(),
         endDate: new Date(values.endDate).getTime(),
         entryFee: values.entryFee,
-        featured: values.featured,
-        settings: {
-          allowTies: values.allowTies,
-          dropLowestWeeks: values.dropLowestWeeks || undefined,
-          confidencePoints,
-          pointSpreads,
-          includePlayoffs: values.includePlayoffs,
-          includePreseason: values.includePreseason,
-        },
+        isPrivate: values.isPrivate ?? false,
+        privateCode: values.privateCode ?? undefined,
+        settings: {},
         prizes: prizes.length > 0 ? prizes : undefined,
       };
 
@@ -319,10 +327,11 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
       if (values.hasSponsor && values.sponsorInfo) {
         campaignData.sponsorInfo = {
           name: values.sponsorInfo.name,
-          logo: sponsorLogoUrl || values.sponsorInfo.logo,
+          logo: undefined, // Let Convex query generate the URL
           logoStorageId: sponsorLogoStorageId,
           website: values.sponsorInfo.website || undefined,
           description: values.sponsorInfo.description || undefined,
+          borderColor: values.sponsorInfo.borderColor || "#3B82F6",
         };
       }
 
@@ -361,7 +370,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleFormSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -385,7 +394,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                       <FormLabel>League</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        value={field.value}
+                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -394,15 +403,6 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="NFL">NFL</SelectItem>
-                          <SelectItem value="NBA" disabled>
-                            NBA
-                          </SelectItem>
-                          <SelectItem value="MLB" disabled>
-                            MLB
-                          </SelectItem>
-                          <SelectItem value="NHL" disabled>
-                            NHL
-                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -438,7 +438,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                       <FormLabel>Campaign Type</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        value={field.value}
+                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -449,16 +449,13 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                           <SelectItem value="TRADITIONAL">
                             Traditional
                           </SelectItem>
-                          <SelectItem value="WEEKLY">Weekly</SelectItem>
                           <SelectItem value="SURVIVOR">Survivor</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormDescription>
                         Traditional: Pick all games each week
                         <br />
-                        Weekly: Separate weekly contests
-                        <br />
-                        Survivor: Pick one team per week, can&apros;t repeat
+                        Survivor: Pick one team per week, can&apos;t repeat
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -473,7 +470,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                       <FormLabel>Scoring Type</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        value={field.value}
+                        defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -482,7 +479,6 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="STANDARD">Standard</SelectItem>
-                          <SelectItem value="SPREAD">Point Spread</SelectItem>
                           <SelectItem value="CONFIDENCE">
                             Confidence Points
                           </SelectItem>
@@ -490,8 +486,6 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                       </Select>
                       <FormDescription>
                         Standard: Each win = 1 point
-                        <br />
-                        Spread: Pick against point spread
                         <br />
                         Confidence: Rank picks by confidence level
                       </FormDescription>
@@ -505,7 +499,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                   name="entryFee"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Entry Fee (��Links)</FormLabel>
+                      <FormLabel>Entry Fee (Links)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -518,7 +512,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                         />
                       </FormControl>
                       <FormDescription>
-                        Coins required to join the campaign
+                        Links required to join the campaign
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -556,7 +550,44 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                 />
               </div>
 
-              {/* Add Sponsor Section before the Prizes Section */}
+              <div className="space-y-2">
+                <FormField
+                  control={form.control}
+                  name="isPrivate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center space-x-2">
+                        Private Campaign
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {form.watch("isPrivate") && (
+                  <FormField
+                    control={form.control}
+                    name="privateCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Private Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter private code" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+
+              {/* Sponsor Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Sponsor Information</h3>
 
@@ -674,6 +705,26 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                           Upload a logo for the sponsor (optional)
                         </FormDescription>
                       </div>
+
+                      <div className="mt-4">
+                        <FormField
+                          control={form.control}
+                          name="sponsorInfo.borderColor"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Sponsor Border Color</FormLabel>
+                              <FormControl>
+                                <ColorPicker
+                                  value={field.value || "#3B82F6"}
+                                  onChange={field.onChange}
+                                  description="This color will be used as the border for the campaign card"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -693,7 +744,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                         variant="outline"
                         size="sm"
                         onClick={addPrize}
-                        disabled={!newPrize.description || isUploading}
+                        disabled={isUploading}
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         {isUploading ? "Uploading..." : "Add Prize"}
@@ -701,9 +752,11 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="text-sm font-medium">Place</label>
+                        <label className="text-sm font-medium">
+                          Winning Place
+                        </label>
                         <Input
                           type="number"
                           min="1"
@@ -731,6 +784,28 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                           }
                           placeholder="0"
                         />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">
+                          Prize Type
+                        </label>
+                        <Select
+                          value={newPrize.prizeType}
+                          onValueChange={(value: "WEEKLY" | "SEASON") =>
+                            setNewPrize({
+                              ...newPrize,
+                              prizeType: value,
+                            })
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="WEEKLY">Weekly</SelectItem>
+                            <SelectItem value="SEASON">Season</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
                         <label className="text-sm font-medium">
@@ -786,29 +861,22 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                             key={index}
                             className="flex items-center justify-between p-3 border rounded-lg"
                           >
-                            <div className="flex items-center space-x-4">
-                              <div className="flex items-center space-x-2">
-                                <span className="font-semibold">
-                                  #{prize.place}
-                                </span>
-                                {prize.merch && (
-                                  <Image
-                                    src={prize.merch}
-                                    alt="Prize"
-                                    width={40}
-                                    height={40}
-                                    className="rounded"
-                                  />
-                                )}
-                              </div>
-                              <div>
-                                <p className="font-medium">
-                                  {prize.description}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  {prize.coins} 🔗Links
-                                </p>
-                              </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="font-semibold">
+                                #{prize.place}
+                              </span>
+                              <span>🔗{prize.coins}</span>
+                              <span>{prize.description}</span>
+                              <Badge variant="outline">{prize.prizeType}</Badge>
+                              {prize.merch && (
+                                <Image
+                                  src={prize.merch}
+                                  alt="Prize"
+                                  width={40}
+                                  height={40}
+                                  className="rounded"
+                                />
+                              )}
                             </div>
                             <Button
                               type="button"

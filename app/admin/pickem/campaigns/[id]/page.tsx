@@ -14,8 +14,11 @@ import {
   Settings,
   Link2Icon,
   CoinsIcon,
+  ExternalLink,
+  Building2,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 // Helper to format dates
 function formatDate(ts: number) {
@@ -43,12 +46,7 @@ export default function AdminPickemCampaignPage() {
   const params = useParams();
   const campaignId = params.id as string;
 
-  const campaign = useQuery(api.pickem.getPickemCampaignById, {
-    campaignId: campaignId as any,
-  });
-
-  const participants = useQuery(api.pickem.getAllPickemParticipants, {});
-  const leaderboard = useQuery(api.pickem.getPickemLeaderboard, {
+  const campaign = useQuery(api.pickem.getPickemCampaign, {
     campaignId: campaignId as any,
   });
 
@@ -64,19 +62,11 @@ export default function AdminPickemCampaignPage() {
     );
   }
 
-  // Count participants for this campaign
-  const participantCount =
-    participants?.filter((p) => p.campaignId === campaignId).length || 0;
-
-  // Calculate campaign statistics
-  const activeParticipants =
-    participants?.filter(
-      (p) => p.campaignId === campaignId && p.active && !p.eliminated
-    ).length || 0;
-
-  const eliminatedParticipants =
-    participants?.filter((p) => p.campaignId === campaignId && p.eliminated)
-      .length || 0;
+  // Separate prizes by type
+  const weeklyPrizes =
+    campaign.prizes?.filter((prize) => prize.prizeType === "WEEKLY") || [];
+  const seasonPrizes =
+    campaign.prizes?.filter((prize) => prize.prizeType === "SEASON") || [];
 
   return (
     <ContentLayout title={`Campaign: ${campaign.name}`}>
@@ -89,9 +79,6 @@ export default function AdminPickemCampaignPage() {
               <p className="text-gray-600">{campaign.description}</p>
             </div>
           </div>
-          <Badge variant={campaign.active ? "default" : "secondary"}>
-            {campaign.active ? "Active" : "Inactive"}
-          </Badge>
         </div>
 
         {/* Campaign Overview Cards */}
@@ -105,7 +92,7 @@ export default function AdminPickemCampaignPage() {
             <CardContent>
               <div className="flex items-center space-x-2">
                 <Users className="h-5 w-5 text-blue-500" />
-                <span className="text-2xl font-bold">{participantCount}</span>
+                <span className="text-2xl font-bold"></span>
               </div>
             </CardContent>
           </Card>
@@ -119,7 +106,7 @@ export default function AdminPickemCampaignPage() {
             <CardContent>
               <div className="flex items-center space-x-2">
                 <Users className="h-5 w-5 text-green-500" />
-                <span className="text-2xl font-bold">{activeParticipants}</span>
+                <span className="text-2xl font-bold"></span>
               </div>
             </CardContent>
           </Card>
@@ -133,9 +120,7 @@ export default function AdminPickemCampaignPage() {
             <CardContent>
               <div className="flex items-center space-x-2">
                 <Users className="h-5 w-5 text-red-500" />
-                <span className="text-2xl font-bold">
-                  {eliminatedParticipants}
-                </span>
+                <span className="text-2xl font-bold"></span>
               </div>
             </CardContent>
           </Card>
@@ -155,6 +140,58 @@ export default function AdminPickemCampaignPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Sponsor Information */}
+        {campaign.sponsorInfo && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Building2 className="h-5 w-5" />
+                <span>Sponsor Information</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-start space-x-4">
+                {campaign.sponsorInfo.logo && (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={campaign.sponsorInfo.logo}
+                      alt={campaign.sponsorInfo.name || "Sponsor Logo"}
+                      width={80}
+                      height={80}
+                      className="rounded-lg border"
+                    />
+                  </div>
+                )}
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {campaign.sponsorInfo.name}
+                    </h3>
+                    {campaign.sponsorInfo.description && (
+                      <p className="text-gray-600 mt-1">
+                        {campaign.sponsorInfo.description}
+                      </p>
+                    )}
+                  </div>
+                  {campaign.sponsorInfo.website && (
+                    <div className="flex items-center space-x-2">
+                      <ExternalLink className="h-4 w-4 text-gray-500" />
+                      <a
+                        href={campaign.sponsorInfo.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Visit Website
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Campaign Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -188,15 +225,20 @@ export default function AdminPickemCampaignPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">
-                    Featured
+                    Private
                   </label>
-                  <Badge
-                    variant={campaign.featured ? "default" : "secondary"}
-                    className="ml-2"
-                  >
-                    {campaign.featured ? "Yes" : "No"}
-                  </Badge>
+                  <p className="text-lg">{campaign.isPrivate ? "Yes" : "No"}</p>
                 </div>
+                {campaign.isPrivate && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Private Code
+                    </label>
+                    <p className="text-lg bg-accent p-2 rounded-md text-center">
+                      {campaign.privateCode}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -211,21 +253,6 @@ export default function AdminPickemCampaignPage() {
                   </span>
                 </div>
               </div>
-
-              {campaign.weekStartDate && campaign.weekEndDate && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-600">
-                    Current Week
-                  </label>
-                  <div className="flex items-center space-x-2 text-sm">
-                    <Calendar className="h-4 w-4" />
-                    <span>
-                      {formatDate(campaign.weekStartDate)} -{" "}
-                      {formatDate(campaign.weekEndDate)}
-                    </span>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
@@ -235,54 +262,12 @@ export default function AdminPickemCampaignPage() {
               <CardTitle>Campaign Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Allow Ties
-                  </label>
-                  <p className="text-sm">
-                    {campaign.settings.allowTies ? "Yes" : "No"}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Include Playoffs
-                  </label>
-                  <p className="text-sm">
-                    {campaign.settings.includePlayoffs ? "Yes" : "No"}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Include Preseason
-                  </label>
-                  <p className="text-sm">
-                    {campaign.settings.includePreseason ? "Yes" : "No"}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Drop Lowest Weeks
-                  </label>
-                  <p className="text-sm">
-                    {campaign.settings.dropLowestWeeks || "None"}
-                  </p>
-                </div>
-              </div>
+              <div className="grid grid-cols-2 gap-4"></div>
 
-              {campaign.settings.confidencePoints && (
+              {campaign.settings?.confidencePoints && (
                 <div>
                   <label className="text-sm font-medium text-gray-600">
                     Confidence Points
-                  </label>
-                  <p className="text-sm">Enabled</p>
-                </div>
-              )}
-
-              {campaign.settings.pointSpreads && (
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Point Spreads
                   </label>
                   <p className="text-sm">Enabled</p>
                 </div>
@@ -300,35 +285,93 @@ export default function AdminPickemCampaignPage() {
           </Card>
         </div>
 
-        {/* Prizes */}
+        {/* Prizes - Weekly and Season */}
         {campaign.prizes && campaign.prizes.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Trophy className="h-5 w-5" />
-                <span>Prizes</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {campaign.prizes.map((prize, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Badge variant="outline">{prize.place}</Badge>
-                      <span className="font-semibold">
-                        {prize.coins} 🔗Links
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">{prize.description}</p>
+          <div className="space-y-6">
+            {/* Weekly Prizes */}
+            {weeklyPrizes.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Trophy className="h-5 w-5" />
+                    <span>Weekly Prizes</span>
+                    <Badge variant="secondary">Weekly</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {weeklyPrizes.map((prize, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="outline">{prize.place}</Badge>
+                          <span className="font-semibold">
+                            {prize.coins} 🔗Links
+                          </span>
+                        </div>
+                        {prize.description && (
+                          <p className="text-sm text-gray-600">
+                            {prize.description}
+                          </p>
+                        )}
+                        {prize.merch && (
+                          <div className="mt-2">
+                            <p className="text-xs text-gray-500">
+                              Merchandise:
+                            </p>
+                            <p className="text-sm font-medium">{prize.merch}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Season Prizes */}
+            {seasonPrizes.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Trophy className="h-5 w-5" />
+                    <span>Season Prizes</span>
+                    <Badge variant="secondary">Season</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {seasonPrizes.map((prize, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant="outline">{prize.place}</Badge>
+                          <span className="font-semibold">
+                            {prize.coins} 🔗Links
+                          </span>
+                        </div>
+                        {prize.description && (
+                          <p className="text-sm text-gray-600">
+                            {prize.description}
+                          </p>
+                        )}
+                        {prize.merch && (
+                          <div className="mt-2">
+                            <p className="text-xs text-gray-500">
+                              Merchandise:
+                            </p>
+                            <p className="text-sm font-medium">{prize.merch}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         )}
 
         {/* Leaderboard Preview */}
-        {leaderboard && leaderboard.length > 0 && (
+        {/* {leaderboard && leaderboard.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Top Participants</CardTitle>
@@ -367,18 +410,16 @@ export default function AdminPickemCampaignPage() {
               </div>
             </CardContent>
           </Card>
-        )}
+        )} */}
 
         {/* Action Buttons */}
         <div className="flex space-x-4">
           <Link href={`/admin/pickem/campaigns/${campaignId}/edit`}>
             <Button variant="outline">Edit Campaign</Button>
           </Link>
-          <Button variant="outline">View All Participants</Button>
           <Link href={`/admin/pickem/campaigns/${campaignId}/matchups`}>
             <Button variant="outline">Manage Matchups</Button>
           </Link>
-          <Button variant="outline">Export Data</Button>
         </div>
       </div>
     </ContentLayout>

@@ -11,7 +11,7 @@ export const insertNFLPickemMatchups = action({
     seasonYear: v.number(),
   },
   handler: async (ctx, args) => {
-    const campaign = await ctx.runQuery(api.pickem.getPickemCampaignById, {
+    const campaign = await ctx.runQuery(api.pickem.getPickemCampaign, {
       campaignId: args.campaignId,
     });
     if (!campaign) {
@@ -108,7 +108,6 @@ export const insertNFLPickemMatchups = action({
             },
             startTime: Date.parse(gameDate),
             title: gameName,
-            league: "NFL",
             campaignId: campaign._id,
             week: week,
             seasonType: seasonType,
