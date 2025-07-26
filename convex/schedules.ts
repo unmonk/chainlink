@@ -341,6 +341,10 @@ export function getScheduleEndpoints(league: League) {
       return [
         `http://cdn.espn.com/core/nba-g-league/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`,
       ];
+    case "NBAS":
+      return [
+        `http://cdn.espn.com/core/nba-summer-league/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`,
+      ];
     case "EPL":
       return [
         `http://cdn.espn.com/core/soccer/schedule/_/league/eng.1??dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`,

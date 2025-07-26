@@ -189,6 +189,7 @@ export const ACTIVE_LEAGUES: League[] = [
   "WNBA",
   "MLS",
   "NWSL",
+  "NBAS",
   "EPL",
   "UFL",
   "ARG",
@@ -446,7 +447,7 @@ export const leagueLogos: {
   FRIENDLY:
     "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/53.png&transparent=true&w=100&h=100",
   TUR: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/18.png&transparent=true&w=100&h=100",
-
+  NBAS: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/nba.png?w=100&h=100&transparent=true",
   RPL: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/106.png&transparent=true&w=100&h=100",
   PLL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pll.png?w=100&h=100&transparent=true",
   EPL: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/23.png&transparent=true&w=100&h=100",
@@ -473,6 +474,7 @@ export const leagueNames: {
   ARG: "Argentine Liga Profesional",
   CSL: "Chinese Super League",
   NBAG: "G League",
+  NBAS: "NBA Summer League",
   FRIENDLY: "Intertional Friendly",
   TUR: "Turkish Super Lig",
 };
@@ -505,6 +507,7 @@ export const STATS_BY_LEAGUE = {
   UFL: false,
   ARG: false,
   NBAG: false,
+  NBAS: false,
   FRIENDLY: false,
   TUR: false,
   CSL: false,
@@ -518,6 +521,8 @@ export const getLeagueColor = (league: string): string => {
     case "COLLEGE-FOOTBALL":
       return "hsla(0, 78%, 50%, 1)"; // Red
     case "NBA":
+      return "hsla(15, 78%, 50%, 1)"; // Orange
+    case "NBAS":
       return "hsla(15, 78%, 50%, 1)"; // Orange
     case "MBB":
       return "hsla(15, 78%, 70%, 1)"; //Light Orange

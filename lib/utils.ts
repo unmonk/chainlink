@@ -20,7 +20,8 @@ export async function getReadyServiceWorker() {
   return navigator.serviceWorker.ready;
 }
 export const getSportFromLeague = (league: string): string => {
-  if (["NBA", "WNBA", "MBB", "WBB"].includes(league)) return "basketball";
+  if (["NBA", "WNBA", "MBB", "WBB", "NBAS"].includes(league))
+    return "basketball";
   if (["NFL", "COLLEGE-FOOTBALL", "UFL"].includes(league)) return "football";
   if (["MLB"].includes(league)) return "baseball";
   if (["NHL"].includes(league)) return "hockey";

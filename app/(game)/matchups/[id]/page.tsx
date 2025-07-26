@@ -148,6 +148,8 @@ const getSummaryUrlByLeagueAndGameId = (league: string, gameId: string) => {
       return `https://site.api.espn.com/apis/site/v2/sports/soccer/friendly/summary?event=${gameId}`;
     case "PLL":
       return `https://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/summary?event=${gameId}`;
+    case "NBAS":
+      return `https://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer-las-vegas/summary?event=${gameId}`;
 
     default:
       return null;

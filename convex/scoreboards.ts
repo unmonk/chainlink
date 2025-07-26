@@ -391,6 +391,8 @@ function getScoreboardUrl(league: League) {
       return `http://site.api.espn.com/apis/site/v2/sports/lacrosse/pll/scoreboard?dates=${date}&limit=${limit}`;
     case "NBAG":
       return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba-g-league/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
+    case "NBAS":
+      return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     default:
       throw new Error("Invalid league");
   }
