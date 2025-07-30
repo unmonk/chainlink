@@ -1,7 +1,13 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query, internalMutation } from "./_generated/server";
+import {
+  mutation,
+  query,
+  internalMutation,
+  internalQuery,
+} from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { pickem_matchup_status } from "./schema";
+import { Doc } from "./_generated/dataModel";
 
 ///CAMPAIGNS/////
 
@@ -286,8 +292,18 @@ export const processPickemMatchupResults = internalMutation({
       if (participant) {
         // weeklyStats is an object, or undefined
         const prevStats = participant.weeklyStats ?? {};
-        const weekKey = `week${pick.week}`;
-        const prevWeekStats = prevStats[weekKey] ?? {
+
+        // Get seasonType from the matchup, fallback to pick's seasonType, then default to REGULAR_SEASON
+        const seasonType =
+          matchup.seasonType || pick.seasonType || "REGULAR_SEASON";
+        const week = pick.week;
+
+        // Create nested structure: seasonType -> week -> stats
+        const seasonKey = seasonType.toLowerCase();
+        const weekKey = `week${week}`;
+
+        const prevSeasonStats = prevStats[seasonKey] ?? {};
+        const prevWeekStats = prevSeasonStats[weekKey] ?? {
           points: 0,
           correct: 0,
           incorrect: 0,
@@ -302,9 +318,14 @@ export const processPickemMatchupResults = internalMutation({
           pushed: (prevWeekStats.pushed || 0) + (status === "PUSH" ? 1 : 0),
         };
 
+        const newSeasonStats = {
+          ...prevSeasonStats,
+          [weekKey]: newWeekStats,
+        };
+
         const newWeeklyStats = {
           ...prevStats,
-          [weekKey]: newWeekStats,
+          [seasonKey]: newSeasonStats,
         };
 
         await ctx.db.patch(participant._id, {
@@ -605,13 +626,18 @@ export const getUserPickemPicksForWeek = query({
       .unique();
     if (!participant) return [];
 
-    // Get picks for this participant and week
+    // Get picks for this participant, week, and seasonType
     const picks = await ctx.db
       .query("pickemPicks")
       .withIndex("by_participant", (q) =>
         q.eq("participantId", participant._id)
       )
-      .filter((q) => q.eq(q.field("week"), weekNumber))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("week"), weekNumber),
+          q.eq(q.field("seasonType"), seasonType)
+        )
+      )
       .collect();
 
     return picks;
@@ -623,6 +649,13 @@ export const submitPickemPicks = mutation({
   args: {
     campaignId: v.id("pickemCampaigns"),
     week: v.number(),
+    seasonType: v.optional(
+      v.union(
+        v.literal("PRESEASON"),
+        v.literal("REGULAR_SEASON"),
+        v.literal("POSTSEASON")
+      )
+    ),
     picks: v.array(
       v.object({
         matchupId: v.id("pickemMatchups"),
@@ -633,7 +666,7 @@ export const submitPickemPicks = mutation({
       })
     ),
   },
-  handler: async (ctx, { campaignId, week, picks }) => {
+  handler: async (ctx, { campaignId, week, seasonType, picks }) => {
     const user = await ctx.auth.getUserIdentity();
     if (!user) throw new ConvexError("Not authenticated");
 
@@ -663,13 +696,18 @@ export const submitPickemPicks = mutation({
       );
     }
 
-    // Get existing picks for this week
+    // Get existing picks for this week and seasonType
     const existingPicks = await ctx.db
       .query("pickemPicks")
       .withIndex("by_participant", (q) =>
         q.eq("participantId", participant._id)
       )
-      .filter((q) => q.eq(q.field("week"), week))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("week"), week),
+          q.eq(q.field("seasonType"), seasonType || "REGULAR_SEASON")
+        )
+      )
       .collect();
 
     // Create a map of existing picks by matchupId for easy lookup
@@ -702,6 +740,7 @@ export const submitPickemPicks = mutation({
             participantId: participant._id,
             matchupId: pick.matchupId,
             week,
+            seasonType: seasonType || "REGULAR_SEASON",
             pick: {
               teamId: pick.teamId,
               teamName: pick.teamName,
@@ -845,5 +884,902 @@ export const getActivePickemCampaignsWithCounts = query({
     );
 
     return campaignsWithCounts;
+  },
+});
+
+// Get pickem matchups by gameIds
+export const getPickemMatchupsByGameIds = internalQuery({
+  args: { gameIds: v.array(v.string()) },
+  handler: async (ctx, { gameIds }) => {
+    console.log(`Searching for ${gameIds.length} pickem games:`, gameIds);
+
+    // Split gameIds into chunks of 25 to avoid hitting memory limits
+    const chunkSize = 25;
+    const chunks = [];
+    for (let i = 0; i < gameIds.length; i += chunkSize) {
+      chunks.push(gameIds.slice(i, i + chunkSize));
+    }
+
+    let allMatchups: Doc<"pickemMatchups">[] = [];
+    for (const chunk of chunks) {
+      // Query each gameId individually and combine results
+      const matchupsChunk = await Promise.all(
+        chunk.map(async (gameId) => {
+          const matches = await ctx.db
+            .query("pickemMatchups")
+            .withIndex("by_gameId", (q) => q.eq("gameId", gameId))
+            .collect();
+          if (matches.length === 0) {
+            console.log(`No pickem matchup found for gameId: ${gameId}`);
+          }
+          return matches;
+        })
+      );
+
+      const flattenedChunk = matchupsChunk.flat();
+      console.log(
+        `Found ${flattenedChunk.length} pickem matchups in chunk of ${chunk.length} gameIds`
+      );
+
+      allMatchups = [...allMatchups, ...flattenedChunk];
+    }
+
+    console.log(
+      `Total pickem matchups found: ${allMatchups.length} out of ${gameIds.length} gameIds`
+    );
+    return allMatchups;
+  },
+});
+
+// Handle pickem matchup started
+export const handlePickemMatchupStarted = internalMutation({
+  args: {
+    matchupId: v.id("pickemMatchups"),
+    status: pickem_matchup_status,
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    metadata: v.optional(v.any()),
+  },
+  handler: async (ctx, { matchupId, homeTeam, awayTeam, status, metadata }) => {
+    // Update pickem matchup to locked
+    await ctx.db.patch(matchupId, {
+      status: "LOCKED",
+      homeTeam,
+      awayTeam,
+      metadata,
+    });
+  },
+});
+
+// Handle pickem matchup updated
+export const handlePickemMatchupUpdated = internalMutation({
+  args: {
+    matchupId: v.id("pickemMatchups"),
+    status: pickem_matchup_status,
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    metadata: v.optional(v.any()),
+  },
+  handler: async (ctx, { matchupId, homeTeam, awayTeam, status, metadata }) => {
+    // Update pickem matchup
+    await ctx.db.patch(matchupId, {
+      status,
+      homeTeam,
+      awayTeam,
+      metadata,
+    });
+  },
+});
+
+// Handle pickem matchup finished
+export const handlePickemMatchupFinished = internalMutation({
+  args: {
+    matchupId: v.id("pickemMatchups"),
+    homeTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    awayTeam: v.object({
+      id: v.string(),
+      name: v.string(),
+      score: v.number(),
+      image: v.string(),
+    }),
+    status: pickem_matchup_status,
+    metadata: v.optional(v.any()),
+  },
+  handler: async (ctx, { matchupId, homeTeam, awayTeam, status, metadata }) => {
+    // Determine winner based on scores
+    let winnerId: string | undefined;
+
+    if (homeTeam.score > awayTeam.score) {
+      winnerId = homeTeam.id;
+    } else if (awayTeam.score > homeTeam.score) {
+      winnerId = awayTeam.id;
+    } else {
+      winnerId = "PUSH"; // Tie
+    }
+
+    // Update pickem matchup to complete
+    await ctx.db.patch(matchupId, {
+      status: "COMPLETE",
+      homeTeam,
+      awayTeam,
+      winnerId,
+      metadata,
+    });
+
+    // Process results if there's a winner
+    if (winnerId) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.pickem.processPickemMatchupResults,
+        {
+          matchupId,
+        }
+      );
+    }
+  },
+});
+
+// Distribute weekly prizes for a specific campaign and week
+export const distributeWeeklyPrizes = mutation({
+  args: {
+    campaignId: v.id("pickemCampaigns"),
+    seasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+    weekNumber: v.number(),
+  },
+  returns: v.object({
+    message: v.string(),
+    results: v.array(
+      v.object({
+        position: v.number(),
+        winner: v.string(),
+        prize: v.string(),
+        coins: v.number(),
+        points: v.number(),
+      })
+    ),
+  }),
+  handler: async (ctx, { campaignId, seasonType, weekNumber }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) throw new ConvexError("Not authenticated");
+
+    // Check if user is admin
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+
+    if (!userProfile || userProfile.role !== "ADMIN") {
+      throw new ConvexError("Admin access required");
+    }
+
+    const campaign = await ctx.db.get(campaignId);
+    if (!campaign) throw new ConvexError("Campaign not found");
+
+    // Get weekly prizes
+    const weeklyPrizes =
+      campaign.prizes?.filter((prize) => prize.prizeType === "WEEKLY") || [];
+
+    if (weeklyPrizes.length === 0) {
+      throw new ConvexError("No weekly prizes configured for this campaign");
+    }
+
+    // Get all participants for this campaign
+    const participants = await ctx.db
+      .query("pickemParticipants")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", campaignId))
+      .collect();
+
+    // Calculate weekly stats for each participant
+    const participantStats = await Promise.all(
+      participants.map(async (participant) => {
+        const user = await ctx.db.get(participant.userId);
+        if (!user) return null;
+
+        // Get weekly stats from participant
+        const weeklyStats = participant.weeklyStats || {};
+        const seasonKey = seasonType.toLowerCase();
+        const weekKey = `week${weekNumber}`;
+        const weekStats = weeklyStats[seasonKey]?.[weekKey] || {
+          points: 0,
+          correct: 0,
+          incorrect: 0,
+          pushed: 0,
+        };
+
+        return {
+          participant,
+          user,
+          weekStats,
+          totalPoints: weekStats.points || 0,
+          correctPicks: weekStats.correct || 0,
+        };
+      })
+    );
+
+    // Filter out null entries and sort by points (descending)
+    const validStats = participantStats
+      .filter((stat): stat is NonNullable<typeof stat> => stat !== null)
+      .sort((a, b) => b.totalPoints - a.totalPoints);
+
+    // Distribute prizes
+    const prizeResults = [];
+    for (let i = 0; i < Math.min(weeklyPrizes.length, validStats.length); i++) {
+      const prize = weeklyPrizes[i];
+      const winner = validStats[i];
+
+      if (prize.coins && prize.coins > 0) {
+        // Add coins to winner
+        await ctx.db.patch(winner.user._id, {
+          coins: winner.user.coins + prize.coins,
+        });
+
+        // Record transaction
+        await ctx.db.insert("coinTransactions", {
+          userId: winner.user._id,
+          amount: prize.coins,
+          type: "PRIZE",
+          status: "COMPLETE",
+          from: "PICKEM_WEEKLY_PRIZE",
+          metadata: {
+            campaignId,
+            campaignName: campaign.name,
+            seasonType,
+            weekNumber,
+            prizeType: "WEEKLY",
+            prizeName: prize.name,
+            prizeDescription: prize.description,
+            position: i + 1,
+            points: winner.totalPoints,
+            correctPicks: winner.correctPicks,
+          },
+        });
+
+        prizeResults.push({
+          position: i + 1,
+          winner: winner.user.name,
+          prize: prize.name,
+          coins: prize.coins,
+          points: winner.totalPoints,
+        });
+      }
+    }
+
+    return {
+      message: `Distributed ${prizeResults.length} weekly prizes`,
+      results: prizeResults,
+    };
+  },
+});
+
+// Distribute season prizes for a specific campaign
+export const distributeSeasonPrizes = mutation({
+  args: {
+    campaignId: v.id("pickemCampaigns"),
+    seasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+  },
+  returns: v.object({
+    message: v.string(),
+    results: v.array(
+      v.object({
+        position: v.number(),
+        winner: v.string(),
+        prize: v.string(),
+        coins: v.number(),
+        totalPoints: v.number(),
+        totalCorrect: v.number(),
+      })
+    ),
+  }),
+  handler: async (ctx, { campaignId, seasonType }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) throw new ConvexError("Not authenticated");
+
+    // Check if user is admin
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+
+    if (!userProfile || userProfile.role !== "ADMIN") {
+      throw new ConvexError("Admin access required");
+    }
+
+    const campaign = await ctx.db.get(campaignId);
+    if (!campaign) throw new ConvexError("Campaign not found");
+
+    // Get season prizes
+    const seasonPrizes =
+      campaign.prizes?.filter((prize) => prize.prizeType === "SEASON") || [];
+
+    if (seasonPrizes.length === 0) {
+      throw new ConvexError("No season prizes configured for this campaign");
+    }
+
+    // Get all participants for this campaign
+    const participants = await ctx.db
+      .query("pickemParticipants")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", campaignId))
+      .collect();
+
+    // Calculate season stats for each participant
+    const participantStats = await Promise.all(
+      participants.map(async (participant) => {
+        const user = await ctx.db.get(participant.userId);
+        if (!user) return null;
+
+        // Get season stats from participant
+        const weeklyStats = participant.weeklyStats || {};
+        const seasonKey = seasonType.toLowerCase();
+        const seasonStats = weeklyStats[seasonKey] || {};
+
+        // Sum up all weeks for this season
+        let totalPoints = 0;
+        let totalCorrect = 0;
+        let totalIncorrect = 0;
+        let totalPushed = 0;
+
+        Object.values(seasonStats).forEach((weekStats: any) => {
+          totalPoints += weekStats.points || 0;
+          totalCorrect += weekStats.correct || 0;
+          totalIncorrect += weekStats.incorrect || 0;
+          totalPushed += weekStats.pushed || 0;
+        });
+
+        return {
+          participant,
+          user,
+          seasonStats: {
+            totalPoints,
+            totalCorrect,
+            totalIncorrect,
+            totalPushed,
+          },
+        };
+      })
+    );
+
+    // Filter out null entries and sort by total points (descending)
+    const validStats = participantStats
+      .filter((stat): stat is NonNullable<typeof stat> => stat !== null)
+      .sort((a, b) => b.seasonStats.totalPoints - a.seasonStats.totalPoints);
+
+    // Distribute prizes
+    const prizeResults = [];
+    for (let i = 0; i < Math.min(seasonPrizes.length, validStats.length); i++) {
+      const prize = seasonPrizes[i];
+      const winner = validStats[i];
+
+      if (prize.coins && prize.coins > 0) {
+        // Add coins to winner
+        await ctx.db.patch(winner.user._id, {
+          coins: winner.user.coins + prize.coins,
+        });
+
+        // Record transaction
+        await ctx.db.insert("coinTransactions", {
+          userId: winner.user._id,
+          amount: prize.coins,
+          type: "PRIZE",
+          status: "COMPLETE",
+          from: "PICKEM_SEASON_PRIZE",
+          metadata: {
+            campaignId,
+            campaignName: campaign.name,
+            seasonType,
+            prizeType: "SEASON",
+            prizeName: prize.name,
+            prizeDescription: prize.description,
+            position: i + 1,
+            totalPoints: winner.seasonStats.totalPoints,
+            totalCorrect: winner.seasonStats.totalCorrect,
+            totalIncorrect: winner.seasonStats.totalIncorrect,
+            totalPushed: winner.seasonStats.totalPushed,
+          },
+        });
+
+        prizeResults.push({
+          position: i + 1,
+          winner: winner.user.name,
+          prize: prize.name,
+          coins: prize.coins,
+          totalPoints: winner.seasonStats.totalPoints,
+          totalCorrect: winner.seasonStats.totalCorrect,
+        });
+      }
+    }
+
+    return {
+      message: `Distributed ${prizeResults.length} season prizes`,
+      results: prizeResults,
+    };
+  },
+});
+
+// Get prize distribution history for a campaign
+export const getPrizeDistributionHistory = query({
+  args: { campaignId: v.id("pickemCampaigns") },
+  returns: v.array(
+    v.object({
+      _id: v.id("coinTransactions"),
+      _creationTime: v.number(),
+      userId: v.string(),
+      amount: v.number(),
+      type: v.string(),
+      status: v.string(),
+      from: v.optional(v.string()),
+      metadata: v.optional(v.any()),
+    })
+  ),
+  handler: async (ctx, { campaignId }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) throw new ConvexError("Not authenticated");
+
+    // Check if user is admin
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+
+    if (!userProfile || userProfile.role !== "ADMIN") {
+      throw new ConvexError("Admin access required");
+    }
+
+    // Get all prize transactions for this campaign
+    const transactions = await ctx.db
+      .query("coinTransactions")
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("type"), "PRIZE"),
+          q.or(
+            q.eq(q.field("from"), "PICKEM_WEEKLY_PRIZE"),
+            q.eq(q.field("from"), "PICKEM_SEASON_PRIZE")
+          )
+        )
+      )
+      .order("desc")
+      .collect();
+
+    return transactions.filter((transaction) => {
+      const metadata = transaction.metadata as
+        | { campaignId?: string }
+        | undefined;
+      return metadata?.campaignId === campaignId;
+    });
+  },
+});
+
+// Get participant standings for a specific week
+export const getWeeklyStandings = query({
+  args: {
+    campaignId: v.id("pickemCampaigns"),
+    seasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+    weekNumber: v.number(),
+  },
+  returns: v.array(
+    v.object({
+      userId: v.id("users"),
+      name: v.string(),
+      image: v.optional(v.string()),
+      points: v.number(),
+      correct: v.number(),
+      incorrect: v.number(),
+      pushed: v.number(),
+    })
+  ),
+  handler: async (ctx, { campaignId, seasonType, weekNumber }) => {
+    const participants = await ctx.db
+      .query("pickemParticipants")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", campaignId))
+      .collect();
+
+    const standings = await Promise.all(
+      participants.map(async (participant) => {
+        const user = await ctx.db.get(participant.userId);
+        if (!user) return null;
+
+        const weeklyStats = participant.weeklyStats || {};
+        const seasonKey = seasonType.toLowerCase();
+        const weekKey = `week${weekNumber}`;
+        const weekStats = weeklyStats[seasonKey]?.[weekKey] || {
+          points: 0,
+          correct: 0,
+          incorrect: 0,
+          pushed: 0,
+        };
+
+        return {
+          userId: user._id,
+          name: user.name,
+          image: user.image,
+          points: weekStats.points || 0,
+          correct: weekStats.correct || 0,
+          incorrect: weekStats.incorrect || 0,
+          pushed: weekStats.pushed || 0,
+        };
+      })
+    );
+
+    return standings
+      .filter(
+        (standing): standing is NonNullable<typeof standing> =>
+          standing !== null
+      )
+      .sort((a, b) => b.points - a.points);
+  },
+});
+
+// Get participant standings for the entire season
+export const getSeasonStandings = query({
+  args: {
+    campaignId: v.id("pickemCampaigns"),
+    seasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+  },
+  returns: v.array(
+    v.object({
+      userId: v.id("users"),
+      name: v.string(),
+      image: v.optional(v.string()),
+      totalPoints: v.number(),
+      totalCorrect: v.number(),
+      totalIncorrect: v.number(),
+      totalPushed: v.number(),
+    })
+  ),
+  handler: async (ctx, { campaignId, seasonType }) => {
+    const participants = await ctx.db
+      .query("pickemParticipants")
+      .withIndex("by_campaign", (q) => q.eq("campaignId", campaignId))
+      .collect();
+
+    const standings = await Promise.all(
+      participants.map(async (participant) => {
+        const user = await ctx.db.get(participant.userId);
+        if (!user) return null;
+
+        const weeklyStats = participant.weeklyStats || {};
+        const seasonKey = seasonType.toLowerCase();
+        const seasonStats = weeklyStats[seasonKey] || {};
+
+        // Sum up all weeks for this season
+        let totalPoints = 0;
+        let totalCorrect = 0;
+        let totalIncorrect = 0;
+        let totalPushed = 0;
+
+        Object.values(seasonStats).forEach((weekStats: any) => {
+          totalPoints += weekStats.points || 0;
+          totalCorrect += weekStats.correct || 0;
+          totalIncorrect += weekStats.incorrect || 0;
+          totalPushed += weekStats.pushed || 0;
+        });
+
+        return {
+          userId: user._id,
+          name: user.name,
+          image: user.image,
+          totalPoints,
+          totalCorrect,
+          totalIncorrect,
+          totalPushed,
+        };
+      })
+    );
+
+    return standings
+      .filter(
+        (standing): standing is NonNullable<typeof standing> =>
+          standing !== null
+      )
+      .sort((a, b) => b.totalPoints - a.totalPoints);
+  },
+});
+
+// Advance week for all active pickem campaigns
+export const advancePickemWeek = internalMutation({
+  args: {},
+  returns: v.object({
+    message: v.string(),
+    campaignsUpdated: v.number(),
+    matchupsActivated: v.number(),
+    seasonTransitions: v.number(),
+  }),
+  handler: async (ctx) => {
+    const currentTime = new Date().getTime();
+
+    // Get all active pickem campaigns
+    const activeCampaigns = await ctx.db
+      .query("pickemCampaigns")
+      .filter((q) =>
+        q.and(
+          q.lte(q.field("startDate"), currentTime),
+          q.gte(q.field("endDate"), currentTime)
+        )
+      )
+      .collect();
+
+    let campaignsUpdated = 0;
+    let matchupsActivated = 0;
+    let seasonTransitions = 0;
+
+    for (const campaign of activeCampaigns) {
+      // Get current state
+      const currentWeek = campaign.currentWeek || 0;
+      const currentSeasonType = campaign.currentSeasonType || "PRESEASON";
+
+      // Determine next week and season type
+      let nextWeek: number;
+      let nextSeasonType: "PRESEASON" | "REGULAR_SEASON" | "POSTSEASON";
+
+      if (currentSeasonType === "PRESEASON") {
+        if (currentWeek >= 4) {
+          // Transition from preseason to regular season
+          nextSeasonType = "REGULAR_SEASON";
+          nextWeek = 1; // Reset to week 1
+          seasonTransitions++;
+        } else {
+          // Stay in preseason
+          nextSeasonType = "PRESEASON";
+          nextWeek = currentWeek + 1;
+        }
+      } else if (currentSeasonType === "REGULAR_SEASON") {
+        if (currentWeek >= 18) {
+          // Transition from regular season to postseason
+          nextSeasonType = "POSTSEASON";
+          nextWeek = 1; // Reset to week 1
+          seasonTransitions++;
+        } else {
+          // Stay in regular season
+          nextSeasonType = "REGULAR_SEASON";
+          nextWeek = currentWeek + 1;
+        }
+      } else {
+        // Already in postseason, just increment week
+        nextSeasonType = "POSTSEASON";
+        nextWeek = currentWeek + 1;
+      }
+
+      // Update campaign with new week and season type
+      await ctx.db.patch(campaign._id, {
+        currentWeek: nextWeek,
+        currentSeasonType: nextSeasonType,
+      });
+      campaignsUpdated++;
+
+      // Find all pending matchups for this campaign, season type, and week
+      const matchups = await ctx.db
+        .query("pickemMatchups")
+        .withIndex("by_campaign", (q) => q.eq("campaignId", campaign._id))
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("week"), nextWeek),
+            q.eq(q.field("seasonType"), nextSeasonType),
+            q.eq(q.field("status"), "PENDING")
+          )
+        )
+        .collect();
+
+      // Activate all pending matchups for this week
+      for (const matchup of matchups) {
+        await ctx.db.patch(matchup._id, {
+          status: "ACTIVE",
+        });
+        matchupsActivated++;
+      }
+    }
+
+    return {
+      message: `Advanced week for ${campaignsUpdated} campaigns, activated ${matchupsActivated} matchups, and completed ${seasonTransitions} season transitions`,
+      campaignsUpdated,
+      matchupsActivated,
+      seasonTransitions,
+    };
+  },
+});
+
+// Get current week and season type for a pickem campaign
+export const getPickemCampaignCurrentState = query({
+  args: { campaignId: v.id("pickemCampaigns") },
+  returns: v.object({
+    currentWeek: v.number(),
+    currentSeasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+    nextWeek: v.number(),
+    nextSeasonType: v.union(
+      v.literal("PRESEASON"),
+      v.literal("REGULAR_SEASON"),
+      v.literal("POSTSEASON")
+    ),
+  }),
+  handler: async (ctx, { campaignId }) => {
+    const campaign = await ctx.db.get(campaignId);
+    if (!campaign) {
+      throw new ConvexError("Campaign not found");
+    }
+
+    const currentWeek = campaign.currentWeek || 0;
+    const currentSeasonType = campaign.currentSeasonType || "PRESEASON";
+
+    // Calculate next state
+    let nextWeek: number;
+    let nextSeasonType: "PRESEASON" | "REGULAR_SEASON" | "POSTSEASON";
+
+    if (currentSeasonType === "PRESEASON") {
+      if (currentWeek >= 4) {
+        nextSeasonType = "REGULAR_SEASON";
+        nextWeek = 1;
+      } else {
+        nextSeasonType = "PRESEASON";
+        nextWeek = currentWeek + 1;
+      }
+    } else if (currentSeasonType === "REGULAR_SEASON") {
+      if (currentWeek >= 18) {
+        nextSeasonType = "POSTSEASON";
+        nextWeek = 1;
+      } else {
+        nextSeasonType = "REGULAR_SEASON";
+        nextWeek = currentWeek + 1;
+      }
+    } else {
+      nextSeasonType = "POSTSEASON";
+      nextWeek = currentWeek + 1;
+    }
+
+    return {
+      currentWeek,
+      currentSeasonType,
+      nextWeek,
+      nextSeasonType,
+    };
+  },
+});
+
+// Manual function to advance week for testing (admin only)
+export const manualAdvancePickemWeek = mutation({
+  args: { campaignId: v.optional(v.id("pickemCampaigns")) },
+  returns: v.object({
+    message: v.string(),
+    campaignsUpdated: v.number(),
+    matchupsActivated: v.number(),
+    seasonTransitions: v.number(),
+  }),
+  handler: async (
+    ctx,
+    { campaignId }
+  ): Promise<{
+    message: string;
+    campaignsUpdated: number;
+    matchupsActivated: number;
+    seasonTransitions: number;
+  }> => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) throw new ConvexError("Not authenticated");
+
+    // Check if user is admin
+    const userProfile = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("externalId", user.subject))
+      .unique();
+
+    if (!userProfile || userProfile.role !== "ADMIN") {
+      throw new ConvexError("Admin access required");
+    }
+
+    // If campaignId is provided, advance only that campaign
+    if (campaignId) {
+      const campaign = await ctx.db.get(campaignId);
+      if (!campaign) throw new ConvexError("Campaign not found");
+
+      const currentWeek = campaign.currentWeek || 0;
+      const currentSeasonType = campaign.currentSeasonType || "PRESEASON";
+
+      // Determine next state
+      let nextWeek: number;
+      let nextSeasonType: "PRESEASON" | "REGULAR_SEASON" | "POSTSEASON";
+      let seasonTransitions = 0;
+
+      if (currentSeasonType === "PRESEASON") {
+        if (currentWeek >= 4) {
+          nextSeasonType = "REGULAR_SEASON";
+          nextWeek = 1;
+          seasonTransitions = 1;
+        } else {
+          nextSeasonType = "PRESEASON";
+          nextWeek = currentWeek + 1;
+        }
+      } else if (currentSeasonType === "REGULAR_SEASON") {
+        if (currentWeek >= 18) {
+          nextSeasonType = "POSTSEASON";
+          nextWeek = 1;
+          seasonTransitions = 1;
+        } else {
+          nextSeasonType = "REGULAR_SEASON";
+          nextWeek = currentWeek + 1;
+        }
+      } else {
+        nextSeasonType = "POSTSEASON";
+        nextWeek = currentWeek + 1;
+      }
+
+      await ctx.db.patch(campaign._id, {
+        currentWeek: nextWeek,
+        currentSeasonType: nextSeasonType,
+      });
+
+      // Find and activate matchups for this campaign, season type, and week
+      const matchups = await ctx.db
+        .query("pickemMatchups")
+        .withIndex("by_campaign", (q) => q.eq("campaignId", campaign._id))
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("week"), nextWeek),
+            q.eq(q.field("seasonType"), nextSeasonType),
+            q.eq(q.field("status"), "PENDING")
+          )
+        )
+        .collect();
+
+      let matchupsActivated = 0;
+      for (const matchup of matchups) {
+        await ctx.db.patch(matchup._id, {
+          status: "ACTIVE",
+        });
+        matchupsActivated++;
+      }
+
+      return {
+        message: `Advanced campaign '${campaign.name}' to ${nextSeasonType} Week ${nextWeek} and activated ${matchupsActivated} matchups`,
+        campaignsUpdated: 1,
+        matchupsActivated,
+        seasonTransitions,
+      };
+    }
+
+    // Otherwise, advance all active campaigns
+    const result = await ctx.runMutation(internal.pickem.advancePickemWeek, {});
+    return result;
   },
 });

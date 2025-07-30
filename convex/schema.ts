@@ -88,6 +88,7 @@ export const transaction_type = v.union(
   v.literal("ACHIEVEMENT"),
   v.literal("BLACKJACK"),
   v.literal("PAYOUT"),
+  v.literal("PRIZE"),
   v.literal("SHOP"),
   v.literal("OTHER")
 );
@@ -619,7 +620,9 @@ export default defineSchema({
       image: v.string(),
     }),
     metadata: v.optional(v.any()),
-  }).index("by_campaign", ["campaignId"]),
+  })
+    .index("by_campaign", ["campaignId"])
+    .index("by_gameId", ["gameId"]),
 
   pickemCampaigns: defineTable({
     name: v.string(),
@@ -631,6 +634,13 @@ export default defineSchema({
     endDate: v.number(),
     maxParticipants: v.optional(v.number()),
     currentWeek: v.optional(v.number()),
+    currentSeasonType: v.optional(
+      v.union(
+        v.literal("PRESEASON"),
+        v.literal("REGULAR_SEASON"),
+        v.literal("POSTSEASON")
+      )
+    ),
     entryFee: v.number(),
     isPrivate: v.optional(v.boolean()),
     privateCode: v.optional(v.string()),
@@ -662,14 +672,21 @@ export default defineSchema({
   pickemPicks: defineTable({
     campaignId: v.id("pickemCampaigns"),
     participantId: v.id("pickemParticipants"),
-    matchupId: v.id("pickemMatchups"), // Updated to reference pickemMatchups
+    matchupId: v.id("pickemMatchups"),
     week: v.number(),
+    seasonType: v.optional(
+      v.union(
+        v.literal("PRESEASON"),
+        v.literal("REGULAR_SEASON"),
+        v.literal("POSTSEASON")
+      )
+    ),
     pick: v.object({
       teamId: v.string(),
       teamName: v.string(),
       teamImage: v.string(),
     }),
-    confidencePoints: v.optional(v.number()), // 1-16 for confidence points
+    confidencePoints: v.optional(v.number()),
     status: pick_status,
     pointsEarned: v.number(),
     submittedAt: v.number(),

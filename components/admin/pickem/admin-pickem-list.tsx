@@ -54,7 +54,9 @@ export const AdminPickemList = () => {
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500">Click for admin details</p>
+                <p className="text-xs text-muted-foreground">
+                  Click for admin details
+                </p>
               </CardContent>
             </Card>
           </Link>
