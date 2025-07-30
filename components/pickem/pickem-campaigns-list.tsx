@@ -127,12 +127,12 @@ export const PickemCampaignsList = () => {
                     >
                       <div className="flex items-center gap-2 mb-2">
                         {campaign.sponsorInfo.logo && (
-                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white border">
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden border bg-white">
                             <Image
                               src={campaign.sponsorInfo.logo}
                               alt={campaign.sponsorInfo.name}
                               fill
-                              className="object-contain p-1"
+                              className="object-contain"
                               onError={(e) => {
                                 // Hide broken image
                                 const target = e.target as HTMLImageElement;
