@@ -253,11 +253,12 @@ const PickemMatchupCardButtons = ({
 
         <div className="col-span-2 flex items-center justify-center">
           <div className="text-center">
-            {matchup.status !== "PENDING" && (
-              <div className="text-2xl font-bold">
-                {matchup.awayTeam.score} - {matchup.homeTeam.score}
-              </div>
-            )}
+            {matchup.status === "LOCKED" ||
+              (matchup.status === "COMPLETE" && (
+                <div className="text-2xl font-bold">
+                  {matchup.awayTeam.score} - {matchup.homeTeam.score}
+                </div>
+              ))}
           </div>
         </div>
 
@@ -499,6 +500,10 @@ export default function PickemWeekPage() {
       await submitPickemPicks({
         campaignId: id as Id<"pickemCampaigns">,
         week: Number(weekNumber),
+        seasonType: (seasonType as string).toUpperCase() as
+          | "PRESEASON"
+          | "REGULAR_SEASON"
+          | "POSTSEASON",
         picks: picksArray,
       });
 
@@ -508,7 +513,7 @@ export default function PickemWeekPage() {
     } catch (error: any) {
       toast.error(error.message || "Failed to save picks");
     }
-  }, [selectedPicks, matchups, submitPickemPicks, id, weekNumber]);
+  }, [selectedPicks, matchups, submitPickemPicks, id, weekNumber, seasonType]);
 
   // Handler: cancel all selected picks and return to original picks
   const handleCancelPicks = useCallback(() => {
@@ -543,15 +548,15 @@ export default function PickemWeekPage() {
 
         {/* Save/Cancel Buttons - only show if there are unsaved changes and week is pending */}
         {hasUnsavedChanges && isWeekActive && (
-          <div className="mb-4 flex justify-center gap-4">
-            <Button onClick={handleCancelPicks} variant="outline" size="lg">
+          <div className="mb-4 flex justify-center gap-2">
+            <Button onClick={handleCancelPicks} variant="outline" size="sm">
               <X className="h-4 w-4 mr-2" />
               Cancel Changes
             </Button>
             <Button
               onClick={handleSavePicks}
               className="bg-primary hover:bg-primary/90"
-              size="lg"
+              size="sm"
             >
               <Save className="h-4 w-4 mr-2" />
               Save {Object.keys(selectedPicks).length} Pick

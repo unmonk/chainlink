@@ -7,9 +7,11 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { useParams } from "next/navigation";
-import { Users } from "lucide-react";
+import { Users, Trophy, Calendar } from "lucide-react";
 import { PickemWeeksList } from "@/components/pickem/pickem-weeks-list";
+import { PickemLeaderboard } from "@/components/pickem/pickem-leaderboard";
 import { Suspense } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function PickemCampaignPage() {
   const { id } = useParams();
@@ -61,23 +63,14 @@ export default function PickemCampaignPage() {
 
           {/* Campaign Info Cards */}
           <div className="space-y-4 md:space-y-0">
-            {/* Mobile: Single Participants Card */}
-            <div className="md:hidden">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
-                    Participants
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-5 w-5 text-blue-500" />
-                    <span className="text-xl font-bold">
-                      {participants?.length || 0}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Mobile: Simple Participants Display */}
+            <div className="md:hidden flex items-center justify-center py-2">
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <Users className="h-4 w-4 text-blue-500" />
+                <span className="font-medium">
+                  {participants?.length || 0} participants
+                </span>
+              </div>
             </div>
 
             {/* Desktop: All 4 Cards */}
@@ -142,9 +135,36 @@ export default function PickemCampaignPage() {
           </div>
         </div>
 
-        <Suspense fallback={<Loading />}>
-          <PickemWeeksList campaignId={id as Id<"pickemCampaigns">} />
-        </Suspense>
+        {/* Tabs for Weeks and Leaderboard */}
+        <div className="mt-8">
+          <Tabs defaultValue="weeks" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="weeks" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Weeks
+              </TabsTrigger>
+              <TabsTrigger
+                value="leaderboard"
+                className="flex items-center gap-2"
+              >
+                <Trophy className="h-4 w-4" />
+                Leaderboard
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="weeks" className="mt-6">
+              <Suspense fallback={<Loading />}>
+                <PickemWeeksList campaignId={id as Id<"pickemCampaigns">} />
+              </Suspense>
+            </TabsContent>
+
+            <TabsContent value="leaderboard" className="mt-6">
+              <Suspense fallback={<Loading />}>
+                <PickemLeaderboard campaignId={id as Id<"pickemCampaigns">} />
+              </Suspense>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </ContentLayout>
   );
