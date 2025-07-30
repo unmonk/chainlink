@@ -29,6 +29,7 @@ import {
   Pause,
   RotateCcw,
 } from "lucide-react";
+import Link from "next/link";
 
 interface PickemCampaignAdminProps {
   campaignId: Id<"pickemCampaigns">;
@@ -215,6 +216,11 @@ export function PickemCampaignAdmin({ campaignId }: PickemCampaignAdminProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
+            <Button variant="default" className="flex items-center space-x-2">
+              <Link href={`/admin/pickem/campaigns/${campaignId}/edit`}>
+                Edit Campaign
+              </Link>
+            </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button

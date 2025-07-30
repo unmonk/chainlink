@@ -17,7 +17,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ColorPicker } from "@/components/ui/color-picker";
 
 export const PickemCampaignsList = () => {
   const campaigns = useQuery(api.pickem.getActivePickemCampaignsWithCounts);
@@ -86,10 +85,13 @@ export const PickemCampaignsList = () => {
           return (
             <Card
               key={campaign._id}
-              className="flex flex-col h-full"
+              className="flex flex-col h-full transition-all duration-200 hover:shadow-lg"
               style={{
                 borderColor: campaign.sponsorInfo?.borderColor || undefined,
                 borderWidth: campaign.sponsorInfo?.borderColor ? "2px" : "1px",
+                boxShadow: campaign.sponsorInfo?.borderColor
+                  ? `0 4px 6px -1px ${campaign.sponsorInfo.borderColor}20, 0 2px 4px -1px ${campaign.sponsorInfo.borderColor}10`
+                  : undefined,
               }}
             >
               <CardHeader>
@@ -103,47 +105,65 @@ export const PickemCampaignsList = () => {
                           ? `🔗 ${campaign.entryFee} Links`
                           : "Free"}
                     </Badge>
-                    {campaign.entryFee > 0 && (
-                      <span className="text-xs text-gray-500">Entry Fee</span>
-                    )}
                   </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col flex-1">
-                <div className="mt-auto pt-4">
-                  {campaign.sponsorInfo && (
-                    <Link
-                      href={
-                        campaign.sponsorInfo.website || "https://chainlink.st"
-                      }
-                      target="_blank"
+                {/* Sponsor Section - Move to top for consistent positioning */}
+                {campaign.sponsorInfo && (
+                  <Link
+                    href={
+                      campaign.sponsorInfo.website || "https://chainlink.st"
+                    }
+                    target="_blank"
+                    className="block mb-4"
+                  >
+                    <div
+                      className="p-3 rounded-lg transition-colors hover:bg-gray-50"
+                      style={{
+                        border: `1px solid ${campaign.sponsorInfo.borderColor}30`,
+                        backgroundColor: `${campaign.sponsorInfo.borderColor}05`,
+                      }}
                     >
-                      <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          {campaign.sponsorInfo.logo && (
+                      <div className="flex items-center gap-2 mb-2">
+                        {campaign.sponsorInfo.logo && (
+                          <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white border">
                             <Image
                               src={campaign.sponsorInfo.logo}
                               alt={campaign.sponsorInfo.name}
-                              width={64}
-                              height={64}
-                              className="rounded-sm"
+                              fill
+                              className="object-contain p-1"
+                              onError={(e) => {
+                                // Hide broken image
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = "none";
+                              }}
                             />
-                          )}
-                          <span className="font-medium">
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <span
+                            className="font-medium text-sm"
+                            style={{
+                              color: campaign.sponsorInfo.borderColor,
+                            }}
+                          >
                             Sponsored by {campaign.sponsorInfo.name}
                           </span>
                         </div>
-                        {campaign.sponsorInfo.description && (
-                          <p className="text-sm text-gray-600">
-                            {campaign.sponsorInfo.description}
-                          </p>
-                        )}
                       </div>
-                    </Link>
-                  )}
-                </div>
+                      {campaign.sponsorInfo.description && (
+                        <p className="text-xs text-gray-600 line-clamp-2">
+                          {campaign.sponsorInfo.description}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                )}
+
+                {/* Campaign Description */}
                 <p className="text-sm text-gray-600 mb-4 min-h-[2.5em] line-clamp-2">
-                  {campaign.description || "\u00A0"}
+                  {campaign.description}
                 </p>
 
                 {/* Participant Count */}
@@ -156,7 +176,8 @@ export const PickemCampaignsList = () => {
                   </div>
                 </div>
 
-                <div className="space-y-2 text-sm flex-1">
+                {/* Campaign Details - Consistent spacing */}
+                <div className="space-y-2 text-sm mb-4">
                   <div className="flex justify-between">
                     <span>League:</span>
                     <span>{campaign.league}</span>
@@ -169,96 +190,113 @@ export const PickemCampaignsList = () => {
                     <span>Scoring:</span>
                     <span>{campaign.scoringType}</span>
                   </div>
-                  {campaign.prizes && campaign.prizes.length > 0 ? (
-                    <div className="flex gap-4">
-                      {/* Weekly Prizes List */}
-                      <div className="flex-1">
-                        <div className="font-semibold mb-1">Weekly Prizes</div>
-                        <div className="flex flex-col gap-1">
-                          {campaign.prizes
-                            .filter((prize) => prize.prizeType === "WEEKLY")
-                            .slice(0, 3)
-                            .map((prize, index) => (
-                              <Badge
-                                key={index}
-                                variant="outline"
-                                className="flex items-center justify-between w-32"
-                              >
-                                <span>#{index + 1}</span>
-                                <span title={prize.description}>
-                                  {prize.merch ? (
-                                    <span className="flex items-center gap-1">
-                                      <Image
-                                        src={prize.merch}
-                                        alt={prize.description}
-                                        width={16}
-                                        height={16}
-                                        className="rounded-sm"
-                                      />
-                                      {prize.coins}🔗
-                                    </span>
-                                  ) : (
-                                    `${prize.coins}🔗`
-                                  )}
-                                </span>
-                              </Badge>
-                            ))}
-                          {campaign.prizes.filter(
-                            (prize) => prize.prizeType === "WEEKLY"
-                          ).length === 0 && (
-                            <span className="text-gray-500 text-sm">None</span>
-                          )}
-                        </div>
-                      </div>
-                      {/* Season Prizes List */}
-                      <div className="flex-1">
-                        <div className="font-semibold mb-1">Season Prizes</div>
-                        <div className="flex flex-col gap-1">
-                          {campaign.prizes
-                            .filter((prize) => prize.prizeType === "SEASON")
-                            .slice(0, 3)
-                            .map((prize, index) => (
-                              <Badge
-                                key={index}
-                                variant="outline"
-                                className="flex items-center justify-between w-32"
-                              >
-                                <span>#{index + 1}</span>
-                                <span title={prize.description}>
-                                  {prize.merch ? (
-                                    <span className="flex items-center gap-1">
-                                      <Image
-                                        src={prize.merch}
-                                        alt={prize.description}
-                                        width={16}
-                                        height={16}
-                                        className="rounded-sm"
-                                      />
-                                      {prize.coins}🔗
-                                    </span>
-                                  ) : (
-                                    `${prize.coins}🔗`
-                                  )}
-                                </span>
-                              </Badge>
-                            ))}
-                          {campaign.prizes.filter(
-                            (prize) => prize.prizeType === "SEASON"
-                          ).length === 0 && (
-                            <span className="text-gray-500 text-sm">None</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex justify-between">
-                      <span>Prizes:</span>
-                      <span className="text-gray-500">None</span>
-                    </div>
-                  )}
                 </div>
 
-                <div className="mt-auto pt-4">
+                {/* Prizes Section - Consistent layout */}
+                {campaign.prizes && campaign.prizes.length > 0 ? (
+                  <div className="flex gap-4 mb-4">
+                    {/* Weekly Prizes List */}
+                    <div className="flex-1">
+                      <div className="font-semibold mb-1">Weekly Prizes</div>
+                      <div className="flex flex-col gap-1">
+                        {campaign.prizes
+                          .filter((prize) => prize.prizeType === "WEEKLY")
+                          .slice(0, 3)
+                          .map((prize, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="flex items-center justify-between w-32"
+                            >
+                              <span>#{index + 1}</span>
+                              <span title={prize.description}>
+                                {prize.merch ? (
+                                  <span className="flex items-center gap-1">
+                                    <div className="relative w-4 h-4">
+                                      <Image
+                                        src={prize.merch}
+                                        alt={prize.description}
+                                        fill
+                                        className="object-contain rounded-sm"
+                                        onError={(e) => {
+                                          // Hide broken image
+                                          const target =
+                                            e.target as HTMLImageElement;
+                                          target.style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                    {prize.coins}🔗
+                                  </span>
+                                ) : (
+                                  `${prize.coins}🔗`
+                                )}
+                              </span>
+                            </Badge>
+                          ))}
+                        {campaign.prizes.filter(
+                          (prize) => prize.prizeType === "WEEKLY"
+                        ).length === 0 && (
+                          <span className="text-gray-500 text-sm">None</span>
+                        )}
+                      </div>
+                    </div>
+                    {/* Season Prizes List */}
+                    <div className="flex-1">
+                      <div className="font-semibold mb-1">Season Prizes</div>
+                      <div className="flex flex-col gap-1">
+                        {campaign.prizes
+                          .filter((prize) => prize.prizeType === "SEASON")
+                          .slice(0, 3)
+                          .map((prize, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className="flex items-center justify-between w-32"
+                            >
+                              <span>#{index + 1}</span>
+                              <span title={prize.description}>
+                                {prize.merch ? (
+                                  <span className="flex items-center gap-1">
+                                    <div className="relative w-4 h-4">
+                                      <Image
+                                        src={prize.merch}
+                                        alt={prize.description}
+                                        fill
+                                        className="object-contain rounded-sm"
+                                        onError={(e) => {
+                                          // Hide broken image
+                                          const target =
+                                            e.target as HTMLImageElement;
+                                          target.style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                    {prize.coins}🔗
+                                  </span>
+                                ) : (
+                                  `${prize.coins}🔗`
+                                )}
+                              </span>
+                            </Badge>
+                          ))}
+                        {campaign.prizes.filter(
+                          (prize) => prize.prizeType === "SEASON"
+                        ).length === 0 && (
+                          <span className="text-gray-500 text-sm">None</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-between mb-4">
+                    <span>Prizes:</span>
+                    <span className="text-gray-500">None</span>
+                  </div>
+                )}
+
+                {/* Action Button - Consistent positioning */}
+                <div className="mt-auto">
                   {!isJoined && (
                     <Button
                       onClick={() => {
@@ -270,13 +308,25 @@ export const PickemCampaignsList = () => {
                         }
                       }}
                       className="w-full"
+                      style={{
+                        backgroundColor: campaign.sponsorInfo?.borderColor,
+                        borderColor: campaign.sponsorInfo?.borderColor,
+                      }}
                     >
                       Join Campaign
                     </Button>
                   )}
                   {isJoined && (
                     <Link href={`/pickem/${campaign._id}`}>
-                      <Button className="w-full">Play Pick&apos;em</Button>
+                      <Button
+                        className="w-full"
+                        style={{
+                          backgroundColor: campaign.sponsorInfo?.borderColor,
+                          borderColor: campaign.sponsorInfo?.borderColor,
+                        }}
+                      >
+                        Play Pick&apos;em
+                      </Button>
                     </Link>
                   )}
                 </div>

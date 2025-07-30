@@ -284,9 +284,28 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
     }
   };
 
-  const handleSponsorLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSponsorLogoChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files && e.target.files[0]) {
-      setSponsorLogo(e.target.files[0]);
+      const file = e.target.files[0];
+      setSponsorLogo(file);
+
+      try {
+        setIsUploadingSponsorLogo(true);
+        const storageId = await handleImageUpload(file);
+        // Set the storage ID in the form
+        form.setValue("sponsorInfo.logoStorageId", storageId as Id<"_storage">);
+      } catch (error) {
+        console.error("Failed to upload sponsor logo:", error);
+        toast.error("Failed to upload sponsor logo");
+        setSponsorLogo(null);
+        if (sponsorLogoFileInputRef.current) {
+          sponsorLogoFileInputRef.current.value = "";
+        }
+      } finally {
+        setIsUploadingSponsorLogo(false);
+      }
     }
   };
 
@@ -297,15 +316,6 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
     try {
       setIsLoading(true);
       console.log("Loading state set to true");
-
-      // Handle sponsor logo upload
-      let sponsorLogoStorageId: Id<"_storage"> | undefined = undefined;
-
-      if (sponsorLogo && values.hasSponsor) {
-        setIsUploadingSponsorLogo(true);
-        const storageId = await handleImageUpload(sponsorLogo);
-        sponsorLogoStorageId = storageId as Id<"_storage">;
-      }
 
       const campaignData: any = {
         campaignId,
@@ -328,7 +338,7 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
         campaignData.sponsorInfo = {
           name: values.sponsorInfo.name,
           logo: undefined, // Let Convex query generate the URL
-          logoStorageId: sponsorLogoStorageId,
+          logoStorageId: values.sponsorInfo.logoStorageId,
           website: values.sponsorInfo.website || undefined,
           description: values.sponsorInfo.description || undefined,
           borderColor: values.sponsorInfo.borderColor || "#3B82F6",
@@ -346,7 +356,6 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
       });
     } finally {
       setIsLoading(false);
-      setIsUploadingSponsorLogo(false);
     }
   };
 
@@ -686,20 +695,27 @@ export const EditPickemCampaign = ({ campaignId }: EditPickemCampaignProps) => {
                             onChange={handleSponsorLogoChange}
                             ref={sponsorLogoFileInputRef}
                             className="flex-1"
+                            disabled={isUploadingSponsorLogo}
                           />
-                          {(sponsorLogo || form.watch("sponsorInfo.logo")) && (
-                            <Image
-                              src={
-                                sponsorLogo
-                                  ? URL.createObjectURL(sponsorLogo)
-                                  : form.watch("sponsorInfo.logo") || ""
-                              }
-                              alt="Sponsor logo preview"
-                              width={40}
-                              height={40}
-                              className="rounded"
-                            />
+                          {isUploadingSponsorLogo && (
+                            <div className="text-sm text-muted-foreground">
+                              Uploading...
+                            </div>
                           )}
+                          {(sponsorLogo || form.watch("sponsorInfo.logo")) &&
+                            !isUploadingSponsorLogo && (
+                              <Image
+                                src={
+                                  sponsorLogo
+                                    ? URL.createObjectURL(sponsorLogo)
+                                    : form.watch("sponsorInfo.logo") || ""
+                                }
+                                alt="Sponsor logo preview"
+                                width={40}
+                                height={40}
+                                className="rounded"
+                              />
+                            )}
                         </div>
                         <FormDescription>
                           Upload a logo for the sponsor (optional)
