@@ -16,16 +16,19 @@ import {
   CalendarPlusIcon,
   Users,
   Trophy,
+  Edit,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { LoadMatchupsDialog } from "./load-matchups-dialog";
+import { EditMatchupDialog } from "./edit-matchup-dialog";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { toast } from "sonner";
 
 interface CampaignMatchupsListProps {
   campaignId: Id<"pickemCampaigns">;
@@ -35,6 +38,8 @@ export function CampaignMatchupsList({
   campaignId,
 }: CampaignMatchupsListProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedMatchup, setSelectedMatchup] = useState<any>(null);
 
   // Get campaign details
   const campaign = useQuery(api.pickem.getPickemCampaign, { campaignId });
@@ -98,6 +103,43 @@ export function CampaignMatchupsList({
 
   const handleLoadMatchupsFromSchedule = () => {
     setIsDialogOpen(true);
+  };
+
+  const handleEditMatchup = (matchup: any) => {
+    setSelectedMatchup(matchup);
+    setIsEditDialogOpen(true);
+  };
+
+  const updateMatchup = useMutation(api.pickem.updatePickemMatchup);
+  const [bulkUpdating, setBulkUpdating] = useState<string | null>(null);
+
+  const handleBulkStatusUpdate = async (
+    weekMatchups: any[],
+    status: string,
+    weekKey: string
+  ) => {
+    setBulkUpdating(weekKey);
+    try {
+      await Promise.all(
+        weekMatchups.map((matchup) =>
+          updateMatchup({
+            matchupId: matchup._id,
+            status: status as any,
+            title: matchup.title,
+            gameId: matchup.gameId,
+            startTime: matchup.startTime,
+            homeTeam: matchup.homeTeam,
+            awayTeam: matchup.awayTeam,
+            winnerId: matchup.winnerId,
+          })
+        )
+      );
+      toast.success(`Week ${weekMatchups[0]?.week} set to ${status}`);
+    } catch (error) {
+      toast.error("Failed to update week status");
+    } finally {
+      setBulkUpdating(null);
+    }
   };
 
   if (!campaign) {
@@ -229,14 +271,52 @@ export function CampaignMatchupsList({
                           <Accordion key={week} type="single" collapsible>
                             <AccordionItem value={`${seasonType}-week-${week}`}>
                               <AccordionTrigger className="hover:no-underline py-2">
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-sm">
-                                    Week {week}
-                                  </Badge>
-                                  <span className="text-sm font-medium">
-                                    {weekMatchups.length} game
-                                    {weekMatchups.length !== 1 ? "s" : ""}
-                                  </span>
+                                <div className="flex items-center justify-between w-full pr-4">
+                                  <div className="flex items-center gap-2">
+                                    <Badge
+                                      variant="outline"
+                                      className="text-sm"
+                                    >
+                                      Week {week}
+                                    </Badge>
+                                    <span className="text-sm font-medium">
+                                      {weekMatchups.length} game
+                                      {weekMatchups.length !== 1 ? "s" : ""}
+                                    </span>
+                                  </div>
+                                  <div
+                                    className="flex items-center gap-1"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {["PENDING", "ACTIVE", "LOCKED"].map(
+                                      (status) => (
+                                        <Button
+                                          key={status}
+                                          variant="outline"
+                                          size="sm"
+                                          className="text-xs h-6 px-2"
+                                          onClick={() =>
+                                            handleBulkStatusUpdate(
+                                              weekMatchups,
+                                              status,
+                                              `${seasonType}-${week}`
+                                            )
+                                          }
+                                          disabled={
+                                            bulkUpdating ===
+                                            `${seasonType}-${week}`
+                                          }
+                                        >
+                                          {bulkUpdating ===
+                                          `${seasonType}-${week}` ? (
+                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                          ) : (
+                                            status
+                                          )}
+                                        </Button>
+                                      )
+                                    )}
+                                  </div>
                                 </div>
                               </AccordionTrigger>
                               <AccordionContent>
@@ -273,34 +353,53 @@ export function CampaignMatchupsList({
                                             </Badge>
                                           </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                          <div className="flex items-center gap-1">
-                                            <Image
-                                              src={matchup.awayTeam.image}
-                                              alt={matchup.awayTeam.name}
-                                              width={24}
-                                              height={24}
-                                              className="rounded-full"
-                                            />
-                                            <span className="text-sm font-medium">
-                                              {matchup.awayTeam.name}
+                                        <div className="flex items-center gap-3">
+                                          <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1">
+                                              <Image
+                                                src={matchup.awayTeam.image}
+                                                alt={matchup.awayTeam.name}
+                                                width={24}
+                                                height={24}
+                                                className="rounded-full"
+                                              />
+                                              <span className="text-sm font-medium">
+                                                {matchup.awayTeam.name}
+                                              </span>
+                                              <span className="text-sm font-bold min-w-[20px] text-center">
+                                                {matchup.awayTeam.score}
+                                              </span>
+                                            </div>
+                                            <span className="text-sm text-muted-foreground">
+                                              @
                                             </span>
+                                            <div className="flex items-center gap-1">
+                                              <Image
+                                                src={matchup.homeTeam.image}
+                                                alt={matchup.homeTeam.name}
+                                                width={24}
+                                                height={24}
+                                                className="rounded-full"
+                                              />
+                                              <span className="text-sm font-medium">
+                                                {matchup.homeTeam.name}
+                                              </span>
+                                              <span className="text-sm font-bold min-w-[20px] text-center">
+                                                {matchup.homeTeam.score}
+                                              </span>
+                                            </div>
                                           </div>
-                                          <span className="text-sm text-muted-foreground">
-                                            @
-                                          </span>
-                                          <div className="flex items-center gap-1">
-                                            <Image
-                                              src={matchup.homeTeam.image}
-                                              alt={matchup.homeTeam.name}
-                                              width={24}
-                                              height={24}
-                                              className="rounded-full"
-                                            />
-                                            <span className="text-sm font-medium">
-                                              {matchup.homeTeam.name}
-                                            </span>
-                                          </div>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                              handleEditMatchup(matchup)
+                                            }
+                                            className="flex items-center gap-1"
+                                          >
+                                            <Edit className="h-3 w-3" />
+                                            Edit
+                                          </Button>
                                         </div>
                                       </div>
                                     </Card>
@@ -324,6 +423,13 @@ export function CampaignMatchupsList({
         onOpenChange={setIsDialogOpen}
         campaignId={campaignId}
         campaignLeague={campaign.league as any}
+      />
+
+      {/* Edit Matchup Dialog */}
+      <EditMatchupDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        matchup={selectedMatchup}
       />
     </div>
   );

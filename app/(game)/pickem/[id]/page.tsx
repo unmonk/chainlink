@@ -1,6 +1,5 @@
 "use client";
 import { ContentLayout } from "@/components/nav/content-layout";
-import { PickemCampaignsList } from "@/components/pickem/pickem-campaigns-list";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
@@ -10,11 +9,12 @@ import { useQuery } from "convex/react";
 import { useParams } from "next/navigation";
 import { Users } from "lucide-react";
 import { PickemWeeksList } from "@/components/pickem/pickem-weeks-list";
+import { Suspense } from "react";
 
 export default function PickemCampaignPage() {
   const { id } = useParams();
 
-  const campaign = useQuery(api.pickem.getPickemCampaignById, {
+  const campaign = useQuery(api.pickem.getPickemCampaign, {
     campaignId: id as Id<"pickemCampaigns">,
   });
 
@@ -25,7 +25,7 @@ export default function PickemCampaignPage() {
   );
 
   // Get participants for this campaign
-  const participants = useQuery(api.pickem.getPickemLeaderboard, {
+  const participants = useQuery(api.pickem.getPickemParticipantsByCampaign, {
     campaignId: id as Id<"pickemCampaigns">,
   });
 
@@ -57,9 +57,6 @@ export default function PickemCampaignPage() {
                 <p className="text-gray-600">{campaign.description}</p>
               </div>
             </div>
-            <Badge variant={campaign.active ? "default" : "secondary"}>
-              {campaign.active ? "Active" : "Inactive"}
-            </Badge>
           </div>
 
           {/* Campaign Info Cards */}
@@ -145,7 +142,9 @@ export default function PickemCampaignPage() {
           </div>
         </div>
 
-        <PickemWeeksList campaignId={id as Id<"pickemCampaigns">} />
+        <Suspense fallback={<Loading />}>
+          <PickemWeeksList campaignId={id as Id<"pickemCampaigns">} />
+        </Suspense>
       </div>
     </ContentLayout>
   );

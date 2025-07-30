@@ -12,7 +12,7 @@ import { useRef, useState, useCallback } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { DownloadIcon, X, Save, ArrowLeft } from "lucide-react";
+import { DownloadIcon, Save, ArrowLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import { getSportFromLeague } from "@/lib/utils";
@@ -20,103 +20,27 @@ import { getSportIcon } from "@/components/matchups/matchup-list";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { LinkIcon } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DrawerTrigger,
-  DrawerContent,
-  Drawer,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerClose,
-} from "@/components/ui/drawer";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import React from "react";
 
-// Pickem Cancel Button Component
-const PickemCancelButton = ({ onConfirm }: { onConfirm: () => void }) => {
-  const [open, setOpen] = React.useState(false);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+const getTuesdayBeforeGame = (gameDate: Date): Date => {
+  const givenDate = new Date(gameDate); // copy to avoid mutation
+  const dayOfWeek = givenDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
-  if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant={"destructive"}
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <X className="h-4 w-4 mr-1" />
-            Cancel Pick
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Cancel Pick</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to cancel your pick? This action cannot be
-              undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Keep Pick
-            </Button>
-            <Button variant="destructive" onClick={onConfirm}>
-              Cancel Pick
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant={"destructive"} size="sm" onClick={() => setOpen(true)}>
-          <X className="h-4 w-4 mr-1" />
-          Cancel Pick
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Cancel Pick</DrawerTitle>
-          <DrawerDescription>
-            Are you sure you want to cancel your pick? This action cannot be
-            undone.
-          </DrawerDescription>
-        </DrawerHeader>
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Keep Pick
-            </Button>
-          </DrawerClose>
-          <Button variant="destructive" onClick={onConfirm}>
-            Cancel Pick
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+  // Calculate how many days to subtract to get the previous Tuesday
+  // If today is Tuesday (day 2), we want the Tuesday *before* today → subtract 7 days
+  const daysSinceTuesday = dayOfWeek >= 2 ? dayOfWeek - 2 : 7 - (2 - dayOfWeek);
+  const result = new Date(givenDate);
+  result.setDate(
+    givenDate.getDate() - (daysSinceTuesday === 0 ? 7 : daysSinceTuesday)
   );
+  return result;
 };
 
 // Pickem Matchup Card Header Component
 const PickemMatchupCardHeader = ({ matchup }: { matchup: any }) => {
   const headerColor = (status: string) => {
     if (status === "ACTIVE") {
-      return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800";
+      return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-emerald-300 dark:from-emerald-800";
     }
     if (status === "COMPLETE") {
       return "to-bg-tertiary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-gray-200 dark:from-gray-400";
@@ -125,7 +49,7 @@ const PickemMatchupCardHeader = ({ matchup }: { matchup: any }) => {
       return "bg-secondary";
     }
     if (status === "LOCKED") {
-      return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-300 dark:from-amber-600";
+      return "to-bg-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-300 dark:from-sky-800";
     }
     return "bg-secondary";
   };
@@ -166,7 +90,7 @@ const PickemMatchupCardHeader = ({ matchup }: { matchup: any }) => {
           </div>
         </div>
         <div className="text-right text-xs font-semibold text-nowrap overflow-hidden">
-          {matchup.status === "PENDING" ? (
+          {matchup.status === "ACTIVE" || matchup.status === "PENDING" ? (
             <p className="text-xs text-gray-800 dark:text-gray-300 font-light">
               Locks:{" "}
               {new Date(matchup.startTime).getTime() - Date.now() <
@@ -236,16 +160,17 @@ const PickemPickButton = ({
     onPick(id, name, image);
   };
 
+  // Prioritize selectedPickId over activePickId for highlighting
+  const isSelected =
+    selectedPickId === id || (activePickId === id && !selectedPickId);
+
   return (
     <Button
       variant={"outline"}
       className={cn(
         "relative aspect-square h-24 w-24 sm:h-28 sm:w-28 md:h-24 md:w-24 lg:h-28 lg:w-28 p-1 overflow-hidden",
         winnerId === id && "border-primary border",
-        (activePickId && activePickId === id) ||
-          (selectedPickId && selectedPickId === id)
-          ? "border-primary border-2"
-          : ""
+        isSelected ? "border-primary border-2" : ""
       )}
       disabled={disabled}
       onClick={handleClick}
@@ -264,8 +189,7 @@ const PickemPickButton = ({
           objectFit: "contain",
         }}
       />
-      {(activePickId && activePickId === id) ||
-      (selectedPickId && selectedPickId === id) ? (
+      {isSelected ? (
         <Badge className="absolute right-1 top-1 z-10">
           <LinkIcon size={12} />
         </Badge>
@@ -311,7 +235,7 @@ const PickemMatchupCardButtons = ({
             name={matchup.awayTeam.name}
             image={matchup.awayTeam.image}
             id={matchup.awayTeam.id}
-            disabled={matchup.status !== "PENDING"}
+            disabled={matchup.status !== "ACTIVE"}
             winnerId={matchup.winnerId}
             matchupId={matchup._id}
             activePickId={activePick?.pick.teamId}
@@ -342,7 +266,7 @@ const PickemMatchupCardButtons = ({
             name={matchup.homeTeam.name}
             image={matchup.homeTeam.image}
             id={matchup.homeTeam.id}
-            disabled={matchup.status !== "PENDING"}
+            disabled={matchup.status !== "ACTIVE"}
             winnerId={matchup.winnerId}
             matchupId={matchup._id}
             activePickId={activePick?.pick.teamId}
@@ -367,36 +291,68 @@ const PickemMatchupCardFooter = ({
   matchup,
   pick,
   selectedPick,
-  onCancelPick,
 }: {
   matchup: any;
   pick?: any;
   selectedPick?: any;
-  onCancelPick?: () => void;
 }) => {
+  // Determine which team is currently picked
+  const getCurrentPickTeamId = () => {
+    if (selectedPick) return selectedPick.teamId;
+    if (pick) return pick.pick.teamId;
+    return null;
+  };
+
+  const currentPickTeamId = getCurrentPickTeamId();
+  const isAwayTeamPicked = currentPickTeamId === matchup.awayTeam.id;
+  const isHomeTeamPicked = currentPickTeamId === matchup.homeTeam.id;
+
+  // Calculate timing information
+  const gameDate = new Date(matchup.startTime);
+  const opensAt = getTuesdayBeforeGame(gameDate);
+
   return (
     <div className="grid grid-cols-3 items-center text-center p-2 min-h-12 mt-auto bg-background/20 border-t border-border">
       <div className="text-sm">
-        {onCancelPick && <PickemCancelButton onConfirm={onCancelPick} />}
+        {matchup.status === "ACTIVE" && isAwayTeamPicked && (
+          <span className="text-muted-foreground text-xs">
+            {pick ? "Current Pick" : "Selected"}
+          </span>
+        )}
       </div>
-      <div className="flex flex-col items-center justify-center"></div>
-      <div className="text-sm">
-        {matchup.status === "PENDING" && (pick || selectedPick) ? (
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-muted-foreground text-xs">
-              {pick ? "Pending" : "Selected"}
+      <div className="flex flex-col items-center justify-center">
+        {matchup.status === "PENDING" && (
+          <div className="text-center">
+            <span className="text-muted-foreground text-xs block">Opens:</span>
+            <span className="text-xs font-medium">
+              {opensAt.getTime() - Date.now() < 24 * 60 * 60 * 1000
+                ? formatDistanceToNow(opensAt, { addSuffix: true })
+                : opensAt.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })}
             </span>
           </div>
-        ) : matchup.status === "PENDING" ? (
-          <span className="text-muted-foreground">Open for Picks</span>
-        ) : matchup.status === "COMPLETE" ? (
-          <span className="font-bold">
+        )}
+        {matchup.status === "ACTIVE" && !currentPickTeamId && (
+          <span className="text-muted-foreground text-xs">Open for Picks</span>
+        )}
+        {matchup.status === "COMPLETE" && (
+          <span className="font-bold text-xs">
             {matchup.winnerId === "PUSH"
               ? "Tie"
               : `Winner: ${matchup.winnerId === matchup.homeTeam.id ? matchup.homeTeam.name : matchup.awayTeam.name}`}
           </span>
-        ) : (
-          <span className="text-red-500">Locked</span>
+        )}
+        {matchup.status === "LOCKED" && (
+          <span className="text-red-500 text-xs">Locked</span>
+        )}
+      </div>
+      <div className="text-sm">
+        {matchup.status === "ACTIVE" && isHomeTeamPicked && (
+          <span className="text-muted-foreground text-xs">
+            {pick ? "Current Pick" : "Selected"}
+          </span>
         )}
       </div>
     </div>
@@ -409,18 +365,16 @@ const PickemMatchupCard = ({
   activePick,
   selectedPick,
   onPick,
-  onCancelPick,
 }: {
   matchup: any;
   activePick?: any;
   selectedPick?: any;
   onPick: (teamId: string, teamName: string, teamImage: string) => void;
-  onCancelPick?: () => void;
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const borderClass =
-    activePick || selectedPick ? "border-2 border-muted-foreground/50" : "";
+    activePick || selectedPick ? "border-2 border-muted/75" : "";
 
   return (
     <Card
@@ -429,9 +383,7 @@ const PickemMatchupCard = ({
     >
       <PickemMatchupCardHeader matchup={matchup} />
       <CardTitle className="text-lg px-1 font-bold flex-1 flex items-start pt-2 min-h-12">
-        <Link href={`/pickem/${matchup.campaignId}/matchup/${matchup._id}`}>
-          {matchup.title}
-        </Link>
+        {matchup.title}
       </CardTitle>
       <PickemMatchupCardButtons
         activePick={activePick}
@@ -444,7 +396,6 @@ const PickemMatchupCard = ({
           matchup={matchup}
           pick={activePick}
           selectedPick={selectedPick}
-          onCancelPick={onCancelPick}
         />
       </div>
     </Card>
@@ -466,8 +417,8 @@ export default function PickemWeekPage() {
     >
   >({});
 
-  // Fetch week data
-  const week = useQuery(api.pickem.getPickemWeekByCampaignSeasonAndNumber, {
+  // Fetch matchups for this week
+  const matchups = useQuery(api.pickem.getPickemMatchupsForWeek, {
     campaignId: id as Id<"pickemCampaigns">,
     seasonType: (seasonType as string).toUpperCase() as
       | "PRESEASON"
@@ -487,7 +438,6 @@ export default function PickemWeekPage() {
   });
 
   const submitPickemPicks = useMutation(api.pickem.submitPickemPicks);
-  const cancelPickemPick = useMutation(api.pickem.cancelPickemPick);
 
   // Helper: check if user has picked for a matchup
   const userPickForMatchup = useCallback(
@@ -509,19 +459,16 @@ export default function PickemWeekPage() {
   // Handler: select a team (local state, not saved yet)
   const handlePick = useCallback(
     (teamId: string, teamName: string, teamImage: string) => {
-      if (!week?.matchups) return;
+      if (!matchups) return;
 
       // Find the matchup that was picked
-      const matchup = week.matchups.find(
+      const matchup = matchups.find(
         (m: any) => m.homeTeam.id === teamId || m.awayTeam.id === teamId
       );
 
       if (!matchup) return;
 
-      // If user already has a saved pick for this matchup, don't allow selection
-      const existingPick = userPickForMatchup(matchup._id);
-      if (existingPick) return;
-
+      // Allow changing picks - remove the existing pick check
       // Update selected picks
       setSelectedPicks((prev) => ({
         ...prev,
@@ -532,12 +479,12 @@ export default function PickemWeekPage() {
         },
       }));
     },
-    [week, userPickForMatchup]
+    [matchups]
   );
 
   // Handler: save all selected picks
   const handleSavePicks = useCallback(async () => {
-    if (Object.keys(selectedPicks).length === 0 || !week) return;
+    if (Object.keys(selectedPicks).length === 0 || !matchups) return;
 
     try {
       const picksArray = Object.entries(selectedPicks).map(
@@ -551,7 +498,7 @@ export default function PickemWeekPage() {
 
       await submitPickemPicks({
         campaignId: id as Id<"pickemCampaigns">,
-        week: week.weekNumber,
+        week: Number(weekNumber),
         picks: picksArray,
       });
 
@@ -561,33 +508,21 @@ export default function PickemWeekPage() {
     } catch (error: any) {
       toast.error(error.message || "Failed to save picks");
     }
-  }, [selectedPicks, week, submitPickemPicks, id]);
+  }, [selectedPicks, matchups, submitPickemPicks, id, weekNumber]);
 
-  // Handler: cancel a pick
-  const handleCancelPick = useCallback(
-    async (matchupId: string) => {
-      if (!userPicks) return;
-
-      const pick = userPicks.find((p) => p.matchupId === matchupId);
-      if (!pick) return;
-
-      try {
-        await cancelPickemPick({ pickId: pick._id });
-        toast.success("Pick cancelled successfully");
-      } catch (error: any) {
-        toast.error(error.message || "Failed to cancel pick");
-      }
-    },
-    [userPicks, cancelPickemPick]
-  );
+  // Handler: cancel all selected picks and return to original picks
+  const handleCancelPicks = useCallback(() => {
+    setSelectedPicks({});
+    toast.success("Changes cancelled");
+  }, []);
 
   // Check if there are unsaved changes
   const hasUnsavedChanges = Object.keys(selectedPicks).length > 0;
 
-  // Check if week is pending (allows editing)
-  const isWeekPending = week?.status === "PENDING";
+  // Check if week is active (allows editing) - check if any matchups are still active
+  const isWeekActive = matchups?.some((m) => m.status === "ACTIVE");
 
-  if (!week || !userPicks) {
+  if (!matchups || !userPicks) {
     return <Loading />;
   }
 
@@ -602,13 +537,17 @@ export default function PickemWeekPage() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Campaign
+            Back to Season
           </Button>
         </div>
 
-        {/* Save Button - only show if there are unsaved changes and week is pending */}
-        {hasUnsavedChanges && isWeekPending && (
-          <div className="mb-4 flex justify-center">
+        {/* Save/Cancel Buttons - only show if there are unsaved changes and week is pending */}
+        {hasUnsavedChanges && isWeekActive && (
+          <div className="mb-4 flex justify-center gap-4">
+            <Button onClick={handleCancelPicks} variant="outline" size="lg">
+              <X className="h-4 w-4 mr-2" />
+              Cancel Changes
+            </Button>
             <Button
               onClick={handleSavePicks}
               className="bg-primary hover:bg-primary/90"
@@ -624,12 +563,15 @@ export default function PickemWeekPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {week.seasonType} - Week {week.weekNumber}
+              {Array.isArray(seasonType)
+                ? seasonType.join(", ").replace(/_/g, " ")
+                : seasonType?.replace(/_/g, " ").toUpperCase()}{" "}
+              - Week {weekNumber}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 sm:px-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {week.matchups.map((matchup: any) => {
+              {matchups.map((matchup: any) => {
                 const userPick = userPickForMatchup(matchup._id);
                 const selectedPick = selectedPickForMatchup(matchup._id);
 
@@ -640,11 +582,6 @@ export default function PickemWeekPage() {
                     activePick={userPick}
                     selectedPick={selectedPick}
                     onPick={handlePick}
-                    onCancelPick={
-                      matchup.status === "PENDING" && userPick
-                        ? () => handleCancelPick(matchup._id)
-                        : undefined
-                    }
                   />
                 );
               })}
