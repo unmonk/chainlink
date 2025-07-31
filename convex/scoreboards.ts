@@ -23,6 +23,7 @@ export const scoreboards = action({
         matchupsStarted: number;
         matchupsFinished: number;
         matchupsUpdated: number;
+        pickemMatchupsUpdated: number;
         message: string;
         games: { game: string; result: string }[];
       }
@@ -79,6 +80,7 @@ export const scoreboards = action({
             matchupsStarted: 0,
             matchupsFinished: 0,
             matchupsUpdated: 0,
+            pickemMatchupsUpdated: 0,
             message: "ERROR FETCHING DATA",
             games: [],
           };
@@ -93,6 +95,29 @@ export const scoreboards = action({
         }
       );
 
+      // Query pickem matchups for current chunk (only for NFL)
+      const nflGameIds = chunkGameIds.filter((_, index) => {
+        // Find which league this gameId belongs to
+        for (const league of leagueChunk) {
+          const leagueEvents = leagueData[league]?.events || [];
+          const gameIds = leagueEvents.map((event) => event.id);
+          if (gameIds.includes(chunkGameIds[index])) {
+            return league === "NFL";
+          }
+        }
+        return false;
+      });
+
+      let chunkPickemMatchups: any[] = [];
+      if (nflGameIds.length > 0) {
+        chunkPickemMatchups = await ctx.runQuery(
+          internal.pickem.getPickemMatchupsByGameIds,
+          {
+            gameIds: nflGameIds,
+          }
+        );
+      }
+
       // Process each league in the chunk
       for (const league of leagueChunk) {
         let leagueResponse = {
@@ -101,6 +126,7 @@ export const scoreboards = action({
           matchupsStarted: 0,
           matchupsFinished: 0,
           matchupsUpdated: 0,
+          pickemMatchupsUpdated: 0,
           message: "",
           games: [] as { game: string; result: string }[],
         };
@@ -124,14 +150,27 @@ export const scoreboards = action({
         //filter matchups by league
         const leagueMatchups = chunkMatchups.filter((m) => m.league === league);
 
+        // Filter pickem matchups for NFL only
+        const leaguePickemMatchups =
+          league === "NFL"
+            ? chunkPickemMatchups.filter((m) => {
+                // Get the campaign to check if it's an NFL campaign
+                return m.campaignId; // We'll filter by campaign league later if needed
+              })
+            : [];
+
         leagueResponse.fetchedEvents = data.events.length;
         leagueResponse.fetchedMatchups = leagueMatchups.length;
 
         // Process events for the current league
         for (const event of data.events) {
           const matchup = leagueMatchups.find((m) => m.gameId === event.id);
+          const pickemMatchups = leaguePickemMatchups.filter(
+            (m) => m.gameId === event.id
+          );
+
           //check if no matchup found
-          if (!matchup) {
+          if (!matchup && pickemMatchups.length === 0) {
             leagueResponse.games.push({
               game: event.shortName || "",
               result: `Skipped with no matchup`,
@@ -139,8 +178,8 @@ export const scoreboards = action({
             continue;
           }
 
-          // Skip if matchup is already final
-          if (MATCHUP_FINAL_STATUSES.includes(matchup.status)) {
+          // Skip if matchup is already final (for regular matchups)
+          if (matchup && MATCHUP_FINAL_STATUSES.includes(matchup.status)) {
             leagueResponse.games.push({
               game: event.shortName || "",
               result: `Skipped - already final`,
@@ -161,19 +200,25 @@ export const scoreboards = action({
           const competition = event.competitions[0];
           const statusDetails = competition.status?.type?.detail;
           const homeTeam = competition.competitors.find(
-            (competitor) => competitor.id === matchup.homeTeam.id
+            (competitor) =>
+              competitor.id ===
+              (matchup?.homeTeam.id || pickemMatchups[0]?.homeTeam.id)
           );
           const awayTeam = competition.competitors.find(
-            (competitor) => competitor.id === matchup.awayTeam.id
+            (competitor) =>
+              competitor.id ===
+              (matchup?.awayTeam.id || pickemMatchups[0]?.awayTeam.id)
           );
+
           //check if no home or away team found
           if (!homeTeam || !awayTeam) {
             leagueResponse.games.push({
               game: event.shortName || "",
-              result: `Skipped - team IDs from ESPN (${competition.competitors.map((c) => c.id).join(", ")}) don't match stored matchup (home: ${matchup.homeTeam.id}, away: ${matchup.awayTeam.id})`,
+              result: `Skipped - team IDs from ESPN (${competition.competitors.map((c) => c.id).join(", ")}) don't match stored matchup (home: ${matchup?.homeTeam.id || pickemMatchups[0]?.homeTeam.id}, away: ${matchup?.awayTeam.id || pickemMatchups[0]?.awayTeam.id})`,
             });
             continue;
           }
+
           const homeScore = parseInt(homeTeam.score);
           const awayScore = parseInt(awayTeam.score);
 
@@ -181,6 +226,7 @@ export const scoreboards = action({
 
           ///////////////////MATCHUP STARTED////////////////////////
           if (
+            matchup &&
             MATCHUP_SCHEDULED_STATUSES.includes(matchup.status) &&
             (MATCHUP_IN_PROGRESS_STATUSES.includes(eventStatus) ||
               MATCHUP_DELAYED_STATUSES.includes(eventStatus))
@@ -212,9 +258,46 @@ export const scoreboards = action({
             });
           }
 
+          // Update pickem matchups that started (NFL only)
+          if (league === "NFL") {
+            for (const pickemMatchup of pickemMatchups) {
+              if (
+                pickemMatchup.status === "PENDING" &&
+                (MATCHUP_IN_PROGRESS_STATUSES.includes(eventStatus) ||
+                  MATCHUP_DELAYED_STATUSES.includes(eventStatus))
+              ) {
+                await ctx.runMutation(
+                  internal.pickem.handlePickemMatchupStarted,
+                  {
+                    matchupId: pickemMatchup._id,
+                    status: "LOCKED",
+                    homeTeam: {
+                      id: pickemMatchup.homeTeam.id,
+                      name: pickemMatchup.homeTeam.name,
+                      score: homeScore,
+                      image: pickemMatchup.homeTeam.image,
+                    },
+                    awayTeam: {
+                      id: pickemMatchup.awayTeam.id,
+                      name: pickemMatchup.awayTeam.name,
+                      score: awayScore,
+                      image: pickemMatchup.awayTeam.image,
+                    },
+                    metadata: {
+                      ...pickemMatchup.metadata,
+                      statusDetails: statusDetails,
+                    },
+                  }
+                );
+                leagueResponse.pickemMatchupsUpdated++;
+              }
+            }
+          }
+
           ///////////////////MATCHUP ENDED////////////////////////
 
           if (
+            matchup &&
             MATCHUP_IN_PROGRESS_STATUSES.includes(matchup.status) &&
             (competition.status?.type?.completed === true ||
               MATCHUP_FINAL_STATUSES.includes(eventStatus))
@@ -248,8 +331,45 @@ export const scoreboards = action({
             });
           }
 
+          // Update pickem matchups that finished (NFL only)
+          if (league === "NFL") {
+            for (const pickemMatchup of pickemMatchups) {
+              if (
+                pickemMatchup.status === "LOCKED" &&
+                (competition.status?.type?.completed === true ||
+                  MATCHUP_FINAL_STATUSES.includes(eventStatus))
+              ) {
+                await ctx.runMutation(
+                  internal.pickem.handlePickemMatchupFinished,
+                  {
+                    matchupId: pickemMatchup._id,
+                    homeTeam: {
+                      id: pickemMatchup.homeTeam.id,
+                      name: pickemMatchup.homeTeam.name,
+                      score: homeScore,
+                      image: pickemMatchup.homeTeam.image,
+                    },
+                    awayTeam: {
+                      id: pickemMatchup.awayTeam.id,
+                      name: pickemMatchup.awayTeam.name,
+                      score: awayScore,
+                      image: pickemMatchup.awayTeam.image,
+                    },
+                    status: "COMPLETE",
+                    metadata: {
+                      ...pickemMatchup.metadata,
+                      statusDetails: statusDetails,
+                    },
+                  }
+                );
+                leagueResponse.pickemMatchupsUpdated++;
+              }
+            }
+          }
+
           /////////////MATCHUP POSTPONED///////////////////////////
           if (
+            matchup &&
             MATCHUP_IN_PROGRESS_STATUSES.includes(matchup.status) &&
             MATCHUP_POSTPONED_STATUSES.includes(eventStatus)
           ) {
@@ -267,56 +387,103 @@ export const scoreboards = action({
           if (
             eventStatus &&
             !MATCHUP_FINAL_STATUSES.includes(eventStatus) &&
-            !MATCHUP_SCHEDULED_STATUSES.includes(matchup.status)
+            !MATCHUP_SCHEDULED_STATUSES.includes(matchup?.status || "LOCKED")
           ) {
             //#region CHECK FOR CHANGES IN MATCHUP and LOGGING
             let hasChanged = false;
             let hasChangedDetails = "";
-            if (matchup.status !== eventStatus) {
-              hasChanged = true;
-              hasChangedDetails += `status difference ours: ${matchup.status} espn: ${eventStatus} for ${event.shortName}`;
-            }
-            if (matchup.metadata?.statusDetails !== statusDetails) {
-              hasChanged = true;
-              hasChangedDetails += `status details difference ours: ${matchup.metadata?.statusDetails} espn: ${statusDetails} for ${event.shortName}`;
-            }
-            if (matchup.homeTeam.score !== homeScore) {
-              hasChanged = true;
-              hasChangedDetails += `home score changed from ${matchup.homeTeam.score} to ${homeScore} for ${event.shortName}`;
-            }
-            if (matchup.awayTeam.score !== awayScore) {
-              hasChanged = true;
-              hasChangedDetails += `away score changed from ${matchup.awayTeam.score} to ${awayScore} for ${event.shortName}`;
+
+            if (matchup) {
+              if (matchup.status !== eventStatus) {
+                hasChanged = true;
+                hasChangedDetails += `status difference ours: ${matchup.status} espn: ${eventStatus} for ${event.shortName}`;
+              }
+              if (matchup.metadata?.statusDetails !== statusDetails) {
+                hasChanged = true;
+                hasChangedDetails += `status details difference ours: ${matchup.metadata?.statusDetails} espn: ${statusDetails} for ${event.shortName}`;
+              }
+              if (matchup.homeTeam.score !== homeScore) {
+                hasChanged = true;
+                hasChangedDetails += `home score changed from ${matchup.homeTeam.score} to ${homeScore} for ${event.shortName}`;
+              }
+              if (matchup.awayTeam.score !== awayScore) {
+                hasChanged = true;
+                hasChangedDetails += `away score changed from ${matchup.awayTeam.score} to ${awayScore} for ${event.shortName}`;
+              }
             }
             //#endregion
-            if (!hasChanged) {
+
+            if (!hasChanged && pickemMatchups.length === 0) {
               leagueResponse.games.push({
                 game: event.shortName || "",
                 result: `No changes for ${event.shortName}, skipping update`,
               });
               continue;
             } else {
-              await ctx.runMutation(internal.matchups.handleMatchupUpdated, {
-                matchupId: matchup._id,
-                status: eventStatus,
-                homeTeam: {
-                  id: matchup.homeTeam.id,
-                  name: matchup.homeTeam.name,
-                  score: homeScore,
-                  image: matchup.homeTeam.image,
-                },
-                awayTeam: {
-                  id: matchup.awayTeam.id,
-                  name: matchup.awayTeam.name,
-                  score: awayScore,
-                  image: matchup.awayTeam.image,
-                },
-                metadata: {
-                  ...matchup.metadata,
-                  statusDetails: statusDetails,
-                },
-              });
-              leagueResponse.matchupsUpdated++;
+              if (matchup && hasChanged) {
+                await ctx.runMutation(internal.matchups.handleMatchupUpdated, {
+                  matchupId: matchup._id,
+                  status: eventStatus,
+                  homeTeam: {
+                    id: matchup.homeTeam.id,
+                    name: matchup.homeTeam.name,
+                    score: homeScore,
+                    image: matchup.homeTeam.image,
+                  },
+                  awayTeam: {
+                    id: matchup.awayTeam.id,
+                    name: matchup.awayTeam.name,
+                    score: awayScore,
+                    image: matchup.awayTeam.image,
+                  },
+                  metadata: {
+                    ...matchup.metadata,
+                    statusDetails: statusDetails,
+                  },
+                });
+                leagueResponse.matchupsUpdated++;
+              }
+
+              // Update pickem matchups (NFL only)
+              if (league === "NFL") {
+                for (const pickemMatchup of pickemMatchups) {
+                  let pickemHasChanged = false;
+                  if (pickemMatchup.status !== eventStatus)
+                    pickemHasChanged = true;
+                  if (pickemMatchup.homeTeam.score !== homeScore)
+                    pickemHasChanged = true;
+                  if (pickemMatchup.awayTeam.score !== awayScore)
+                    pickemHasChanged = true;
+
+                  if (pickemHasChanged) {
+                    await ctx.runMutation(
+                      internal.pickem.handlePickemMatchupUpdated,
+                      {
+                        matchupId: pickemMatchup._id,
+                        status: "LOCKED",
+                        homeTeam: {
+                          id: pickemMatchup.homeTeam.id,
+                          name: pickemMatchup.homeTeam.name,
+                          score: homeScore,
+                          image: pickemMatchup.homeTeam.image,
+                        },
+                        awayTeam: {
+                          id: pickemMatchup.awayTeam.id,
+                          name: pickemMatchup.awayTeam.name,
+                          score: awayScore,
+                          image: pickemMatchup.awayTeam.image,
+                        },
+                        metadata: {
+                          ...pickemMatchup.metadata,
+                          statusDetails: statusDetails,
+                        },
+                      }
+                    );
+                    leagueResponse.pickemMatchupsUpdated++;
+                  }
+                }
+              }
+
               leagueResponse.games.push({
                 game: event.shortName || "",
                 result: `Matchup updated with ${hasChangedDetails}`,

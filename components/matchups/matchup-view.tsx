@@ -20,7 +20,15 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 
-const MatchupView = ({ data, league }: { data: any; league: string }) => {
+const MatchupView = ({
+  data,
+  league,
+  boxScoreData,
+}: {
+  data: any;
+  league: string;
+  boxScoreData: any;
+}) => {
   const homeTeam = data.boxscore.teams[1].team;
   const awayTeam = data.boxscore.teams[0].team;
   const venue = data.gameInfo.venue;
@@ -30,6 +38,13 @@ const MatchupView = ({ data, league }: { data: any; league: string }) => {
   const lastFiveGames = data.lastFiveGames;
   const news = data.news;
   const espnSummaryUrl = data.header.links[0].href;
+
+  const homeTeamScore =
+    boxScoreData?.gamepackageJSON?.header?.competitions[0]?.competitors[1]
+      ?.score;
+  const awayTeamScore =
+    boxScoreData?.gamepackageJSON?.header?.competitions[0]?.competitors[0]
+      ?.score;
 
   return (
     <div className="container mx-auto p-4">
@@ -41,10 +56,24 @@ const MatchupView = ({ data, league }: { data: any; league: string }) => {
         </CardHeader>
         <CardContent className="flex flex-col items-center space-y-4">
           <div className="flex justify-center items-center space-x-8">
-            <TeamLogo team={awayTeam} />
+            <div className="flex flex-col items-center">
+              <TeamLogo team={awayTeam} />
+              <div className="text-2xl font-bold mt-2">{awayTeamScore}</div>
+            </div>
             <div className="text-3xl font-bold">VS</div>
-            <TeamLogo team={homeTeam} />
+            <div className="flex flex-col items-center">
+              <TeamLogo team={homeTeam} />
+              <div className="text-2xl font-bold mt-2">{homeTeamScore}</div>
+            </div>
           </div>
+          {league === "MLB" &&
+            boxScoreData?.gamepackageJSON?.header?.competitions && (
+              <BaseballBoxscore
+                boxScoreData={boxScoreData}
+                homeTeam={homeTeam}
+                awayTeam={awayTeam}
+              />
+            )}
           <VenueAndWeather venue={venue} weather={weather} />
           {espnSummaryUrl && (
             <div className="text-sm text-muted-foreground">
@@ -61,6 +90,8 @@ const MatchupView = ({ data, league }: { data: any; league: string }) => {
           awayTeam={awayTeam}
         />
       )}
+
+      {/* Add Baseball Boxscore for MLB games */}
 
       {playerStats && playerStats.length > 0 && (
         <PlayerStats playerStats={playerStats} league={league} />
@@ -669,5 +700,143 @@ const News = ({ news }: { news: { articles: any[] } }) => (
     </CardContent>
   </Card>
 );
+
+const BaseballBoxscore = ({
+  boxScoreData,
+  homeTeam,
+  awayTeam,
+}: {
+  boxScoreData: any;
+  homeTeam: any;
+  awayTeam: any;
+}) => {
+  const competitors =
+    boxScoreData.gamepackageJSON.header.competitions[0].competitors;
+  const awayTeamScores = competitors[0]?.linescores || [];
+  const homeTeamScores = competitors[1]?.linescores || [];
+
+  // Determine the maximum number of innings to display
+  const maxInnings = Math.max(awayTeamScores.length, homeTeamScores.length);
+  const inningHeaders = Array.from({ length: maxInnings }, (_, i) => i + 1);
+
+  // Helper to sum a property in the linescores array
+  const sumProp = (arr: any[], prop: string) =>
+    arr.reduce((sum, inning) => sum + (parseInt(inning[prop]) || 0), 0);
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold text-center">
+          Box Score
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="overflow-x-auto">
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center font-semibold">
+                  Team
+                </TableHead>
+                {inningHeaders.map((inning) => (
+                  <TableHead
+                    key={inning}
+                    className="text-center font-semibold w-12"
+                  >
+                    {inning}
+                  </TableHead>
+                ))}
+                <TableHead className="text-center font-semibold">R</TableHead>
+                <TableHead className="text-center font-semibold">H</TableHead>
+                <TableHead className="text-center font-semibold">E</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {/* Away Team Row */}
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <div className="flex items-center">
+                    <Avatar className="h-6 w-6 mr-2" height="24" width="24">
+                      <AvatarImage
+                        src={awayTeam.logo}
+                        alt={awayTeam.displayName}
+                      />
+                      <AvatarFallback>{awayTeam.abbreviation}</AvatarFallback>
+                    </Avatar>
+                    {awayTeam.abbreviation}
+                  </div>
+                </TableCell>
+                {inningHeaders.map((inning, index) => {
+                  const val = awayTeamScores[index]?.displayValue ?? "-";
+                  const shouldHighlight = parseInt(val) > 0;
+                  return (
+                    <TableCell key={inning} className="text-center">
+                      {shouldHighlight ? (
+                        <span className="bg-accent font-bold rounded px-2 py-1 inline-block">
+                          {val}
+                        </span>
+                      ) : (
+                        val
+                      )}
+                    </TableCell>
+                  );
+                })}
+                <TableCell className="text-center font-bold">
+                  {sumProp(awayTeamScores, "displayValue")}
+                </TableCell>
+                <TableCell className="text-center">
+                  {sumProp(awayTeamScores, "hits")}
+                </TableCell>
+                <TableCell className="text-center">
+                  {sumProp(awayTeamScores, "errors")}
+                </TableCell>
+              </TableRow>
+
+              {/* Home Team Row */}
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <div className="flex items-center">
+                    <Avatar className="h-6 w-6 mr-2" height="24" width="24">
+                      <AvatarImage
+                        src={homeTeam.logo}
+                        alt={homeTeam.displayName}
+                      />
+                      <AvatarFallback>{homeTeam.abbreviation}</AvatarFallback>
+                    </Avatar>
+                    {homeTeam.abbreviation}
+                  </div>
+                </TableCell>
+                {inningHeaders.map((inning, index) => {
+                  const val = homeTeamScores[index]?.displayValue ?? "-";
+                  const shouldHighlight = parseInt(val) > 0;
+                  return (
+                    <TableCell key={inning} className="text-center">
+                      {shouldHighlight ? (
+                        <span className="bg-accent font-bold rounded px-2 py-1 inline-block">
+                          {val}
+                        </span>
+                      ) : (
+                        val
+                      )}
+                    </TableCell>
+                  );
+                })}
+                <TableCell className="text-center font-bold">
+                  {sumProp(homeTeamScores, "displayValue")}
+                </TableCell>
+                <TableCell className="text-center">
+                  {sumProp(homeTeamScores, "hits")}
+                </TableCell>
+                <TableCell className="text-center">
+                  {sumProp(homeTeamScores, "errors")}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default MatchupView;

@@ -27,6 +27,8 @@ import type * as friends from "../friends.js";
 import type * as leaderboards from "../leaderboards.js";
 import type * as matchups from "../matchups.js";
 import type * as notifications from "../notifications.js";
+import type * as pickem from "../pickem.js";
+import type * as pickemSchedules from "../pickemSchedules.js";
 import type * as pickqueue from "../pickqueue.js";
 import type * as picks from "../picks.js";
 import type * as quiz from "../quiz.js";
@@ -63,6 +65,8 @@ declare const fullApi: ApiFromModules<{
   leaderboards: typeof leaderboards;
   matchups: typeof matchups;
   notifications: typeof notifications;
+  pickem: typeof pickem;
+  pickemSchedules: typeof pickemSchedules;
   pickqueue: typeof pickqueue;
   picks: typeof picks;
   quiz: typeof quiz;

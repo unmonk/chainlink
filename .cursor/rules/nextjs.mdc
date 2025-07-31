@@ -48,6 +48,7 @@ globs: **/*.tsx, **/*.ts, src/**/*.ts, src/**/*.tsx
 - Implement proper server-side validation
 - Handle form errors appropriately
 - Show loading states during form submission
+- use Zod and React Hooks Form for all forms
 
 ## State Management
 - Minimize client-side state

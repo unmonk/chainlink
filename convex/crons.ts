@@ -15,6 +15,18 @@ crons.daily(
   api.schedules.schedules
 );
 
+// Weekly pickem advancement - Tuesday 2am Hawaii time (12pm UTC)
+crons.weekly(
+  "Advance pickem campaigns to next week and activate matchups",
+  {
+    dayOfWeek: "tuesday",
+    hourUTC: 12,
+    minuteUTC: 0,
+  }, // Tuesday 12:00 UTC = Tuesday 2:00 AM HST
+  internal.pickem.advancePickemWeek,
+  {}
+);
+
 crons.monthly(
   "Monthly Campaign Finalization, Achievement Awards, and New Campaign Creation",
   { day: 1, hourUTC: 10, minuteUTC: 0 }, // 1st of the month at 10:00 UTC, Midnight HST

@@ -18,7 +18,7 @@ export const ENHANCED_SLOT_CONFIG = {
   payouts: [
     { line: 5, payout: 150 },
     { line: 4, payout: 20 },
-    { line: 3, payout: 8 },
+    { line: 3, payout: 10 },
   ],
   scatterPayouts: [
     { count: 5, payout: 250 },

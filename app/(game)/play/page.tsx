@@ -1,3 +1,4 @@
+import Footer from "@/components/landing/footer";
 import MatchupList from "@/components/matchups/matchup-list";
 import { ContentLayout } from "@/components/nav/content-layout";
 import { Metadata } from "next";
