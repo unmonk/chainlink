@@ -1,6 +1,6 @@
 "use node";
 import { internalAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 export const sendDailyPickReminder = internalAction({
   args: {},
@@ -28,7 +28,7 @@ export const sendDailyPickReminder = internalAction({
       },
     };
 
-    await ctx.runAction(internal.notifications.createMassNotification, {
+    await ctx.runAction(api.notifications.createMassNotification, {
       payload,
     });
   },

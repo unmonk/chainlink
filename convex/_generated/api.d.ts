@@ -33,6 +33,7 @@ import type * as pickqueue from "../pickqueue.js";
 import type * as picks from "../picks.js";
 import type * as quiz from "../quiz.js";
 import type * as reactions from "../reactions.js";
+import type * as reminders from "../reminders.js";
 import type * as scheduleprocessors from "../scheduleprocessors.js";
 import type * as schedules from "../schedules.js";
 import type * as scoreboards from "../scoreboards.js";
@@ -71,6 +72,7 @@ declare const fullApi: ApiFromModules<{
   picks: typeof picks;
   quiz: typeof quiz;
   reactions: typeof reactions;
+  reminders: typeof reminders;
   scheduleprocessors: typeof scheduleprocessors;
   schedules: typeof schedules;
   scoreboards: typeof scoreboards;
