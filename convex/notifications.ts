@@ -133,6 +133,102 @@ export const createMassNotification = action({
   },
 });
 
+export const sendDailyPickReminder = action({
+  args: {}, // No arguments for now
+  handler: async (ctx) => {
+    console.log("Starting daily pick reminder");
+
+    const payload: DailyPickReminderNotificationPayload = {
+      title: "Daily Pick Reminder",
+      message: "Don't forget to make your picks for today! Good luck!",
+      icon: "/icons/icon-512x512.png", // Assuming this path is correct
+      actions: [{ action: "openPicks", title: "Make Your Picks" }],
+      data: {
+        onActionClick: {
+          default: { operation: "openWindow" },
+          openPicks: {
+            operation: "focusLastFocusedOrOpen",
+            url: "/play", // URL where users make picks
+          },
+        },
+      },
+      tag: "daily-pick-reminder",
+    };
+
+    const users = await clerkClient().users.getUserList({
+      limit: 1000, // Adjust limit as needed
+      orderBy: "+username",
+    });
+    console.log(`Found ${users.data.length} users for daily reminder`);
+
+    let notificationsSent = 0;
+    let skippedUsers = 0;
+
+    for (const user of users.data) {
+      const userPushSubscriptions = user.privateMetadata
+        .pushSubscriptions as webPush.PushSubscription[];
+
+      if (!userPushSubscriptions?.length) {
+        skippedUsers++;
+        console.log(
+          `Skipping user ${user.id} for daily reminder - no push subscriptions`
+        );
+        continue;
+      }
+
+      console.log(
+        `Processing user ${user.id} for daily reminder with ${userPushSubscriptions.length} subscriptions`
+      );
+
+      for (const subscription of userPushSubscriptions) {
+        try {
+          webPush.setVapidDetails(
+            `mailto:${process.env.WEB_PUSH_EMAIL}`,
+            process.env.NEXT_PUBLIC_WEB_PUSH_KEY!,
+            process.env.WEB_PUSH_PRIVATE_KEY!
+          );
+
+          await webPush.sendNotification(
+            subscription,
+            JSON.stringify(payload) // Send the new payload structure
+          );
+          notificationsSent++;
+        } catch (err) {
+          console.error(
+            `Error sending daily reminder to user ${user.id}:`,
+            err
+          );
+
+          if (err instanceof webPush.WebPushError) {
+            if (err.statusCode === 410 || err.statusCode === 404) {
+              console.log(
+                `Removing invalid subscription for user ${user.id} during daily reminder`
+              );
+              try {
+                await unsubscribeUserFromPush(subscription, user.id);
+              } catch (unsubErr) {
+                console.error("Error in daily reminder unsubscribe:", unsubErr);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log(`Daily pick reminder complete:
+      - Total users processed: ${users.data.length}
+      - Notifications sent: ${notificationsSent}
+      - Users skipped: ${skippedUsers}
+    `);
+
+    return {
+      totalUsers: users.data.length,
+      notificationsSent,
+      skippedUsers,
+    };
+  },
+});
+
 //SEND NOTIFICATION action
 export const sendNotification = action({
   args: {
@@ -238,6 +334,21 @@ async function unsubscribeUserFromPush(
     console.error("Failed to unsubscribe user:", userId, error);
     throw new ConvexError(`Failed to unsubscribe user: ${error.message}`);
   }
+}
+
+// Add a shared interface for daily pick reminder notification payload
+export interface DailyPickReminderNotificationPayload {
+  title: string;
+  message: string;
+  icon: string;
+  actions: Array<{ action: string; title: string }>;
+  data: {
+    onActionClick: {
+      default: { operation: string };
+      openPicks?: { operation: string; url: string };
+    };
+  };
+  tag: string;
 }
 
 // Create a helper function for pick notifications

@@ -41,4 +41,10 @@ crons.monthly(
   { dryRun: false }
 );
 
+crons.daily(
+  "Daily Pick Reminder Notification",
+  { hourUTC: 12, minuteUTC: 0 }, // 12:00 PM UTC
+  api.notifications.sendDailyPickReminder
+);
+
 export default crons;
