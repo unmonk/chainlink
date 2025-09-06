@@ -73,7 +73,7 @@ export async function processLeague(
 
 export async function getExistingMatchups(ctx: ActionCtx, league: League) {
   const matchupsFromDatabase = await ctx.runQuery(
-    api.matchups.getMatchupsByLeague,
+    api.matchups.getAllMatchupsByLeagueForSchedule, // Changed from getMatchupsByLeague
     {
       league: league,
     }
