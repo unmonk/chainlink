@@ -47,4 +47,10 @@ crons.monthly(
   { dryRun: false }
 );
 
+crons.interval(
+  "Check PGA Matchups",
+  { minutes: 5 },
+  internal.pga_cron.checkPgaMatchups
+);
+
 export default crons;

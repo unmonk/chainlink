@@ -74,6 +74,34 @@ export function getAdminMenuList(pathname: string): Group[] {
           ],
         },
         {
+          href: "/admin/pga",
+          label: "PGA",
+          active: pathname.includes("/admin/pga"),
+          icon: TrophyIcon,
+          submenus: [
+            {
+              href: "/admin/pga",
+              label: "All Matchups",
+              active: pathname === "/admin/pga",
+            },
+            {
+              href: "/admin/pga/create",
+              label: "Create Matchup",
+              active: pathname.includes("/admin/pga/create"),
+            },
+            {
+              href: "/admin/pga/players",
+              label: "Players",
+              active: pathname.includes("/admin/pga/players"),
+            },
+            {
+              href: "/admin/pga/events",
+              label: "Events",
+              active: pathname.includes("/admin/pga/events"),
+            },
+          ],
+        },
+        {
           href: "/admin/pickem",
           label: "Pick'em",
           active: pathname.includes("/admin/pickem"),
