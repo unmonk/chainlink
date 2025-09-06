@@ -41,4 +41,10 @@ crons.monthly(
   { dryRun: false }
 );
 
+crons.daily(
+  "Fetch PGA players",
+  { hourUTC: 10, minuteUTC: 0 }, // 10:00 UTC, Midnight HST
+  api.pga.getPGAPlayers
+);
+
 export default crons;

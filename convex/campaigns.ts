@@ -102,35 +102,6 @@ export const createMonthlyCampaign = internalAction({
         });
 
         //todo notifications
-        const winners = await ctx.runQuery(api.users.queryByClerkIds, {
-          clerkUserIds: [highestChain.userId, highestWin.userId],
-        });
-        const chainWinner = winners.find(
-          (user) => user?.externalId === highestChain.userId
-        );
-        const winWinner = winners.find(
-          (user) => user?.externalId === highestWin.userId
-        );
-
-        if (chainWinner && winWinner) {
-          let message = "";
-          if (chainWinner._id === winWinner._id) {
-            message = `${chainWinner.name} had the longest chain this month with a ${highestChain.chain} and the most wins with ${highestWin.wins}!`;
-          } else {
-            message = `${chainWinner.name} had the longest chain this month with a ${highestChain.chain}. ${winWinner.name} had the most wins with ${highestWin.wins}.`;
-          }
-          await ctx.runAction(api.notifications.createMassNotification, {
-            payload: {
-              notification: {
-                title: "Monthly Winners Announced!",
-                message,
-                icon: "/logo.svg",
-                actions: [],
-                data: {},
-              },
-            },
-          });
-        }
 
         //award highest chain winner
         if (monthlyChainWinAchievement) {

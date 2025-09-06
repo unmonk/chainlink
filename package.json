@@ -52,6 +52,8 @@
     "cmdk": "^1.0.0",
     "convex": "^1.17.0",
     "convex-helpers": "^0.1.62",
+    "cheerio": "^1.0.0-rc.12",
+    "got": "^14.4.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.18.2",
     "html2canvas": "^1.4.1",
