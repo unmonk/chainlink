@@ -15,6 +15,12 @@ crons.daily(
   api.schedules.schedules
 );
 
+crons.daily(
+  "Send daily pick reminder notification",
+  { hourUTC: 12, minuteUTC: 0 }, // 12:00 UTC, 8am EDT
+  internal.reminders.sendDailyPickReminder
+);
+
 // Weekly pickem advancement - Tuesday 2am Hawaii time (12pm UTC)
 crons.weekly(
   "Advance pickem campaigns to next week and activate matchups",

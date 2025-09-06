@@ -51,11 +51,30 @@ export const createMassNotification = action({
   },
   handler: async (ctx, { payload }) => {
     console.log("Starting mass notification");
-    const users = await clerkClient().users.getUserList({
-      limit: 1000,
-      orderBy: "+username",
-    });
-    console.log(`Found ${users.data.length} users`);
+
+    // Fetch all users with pagination
+    const allUsers = [];
+    let hasMore = true;
+    let offset = 0;
+    const limit = 100; // Use a reasonable batch size
+
+    while (hasMore) {
+      const usersResponse = await clerkClient().users.getUserList({
+        limit,
+        offset,
+        orderBy: "+username",
+      });
+
+      allUsers.push(...usersResponse.data);
+      hasMore = usersResponse.data.length === limit;
+      offset += limit;
+
+      console.log(
+        `Fetched ${usersResponse.data.length} users (total: ${allUsers.length})`
+      );
+    }
+
+    console.log(`Found ${allUsers.length} total users`);
 
     const imageUrl =
       payload.notification.storageId &&
@@ -64,7 +83,7 @@ export const createMassNotification = action({
     let notificationsSent = 0;
     let skippedUsers = 0;
 
-    for (const user of users.data) {
+    for (const user of allUsers) {
       const userPushSubscriptions = user.privateMetadata
         .pushSubscriptions as webPush.PushSubscription[];
 
@@ -120,13 +139,13 @@ export const createMassNotification = action({
     }
 
     console.log(`Mass notification complete:
-      - Total users: ${users.data.length}
+      - Total users: ${allUsers.length}
       - Notifications sent: ${notificationsSent}
       - Users skipped: ${skippedUsers}
     `);
 
     return {
-      totalUsers: users.data.length,
+      totalUsers: allUsers.length,
       notificationsSent,
       skippedUsers,
     };
