@@ -781,4 +781,33 @@ export default defineSchema({
     .index("by_clerk_id", ["externalId"])
     .index("by_coins", ["coins"])
     .index("by_wins", ["stats.wins"]),
+
+  pgaPlayers: defineTable({
+    name: v.string(),
+    image: v.optional(v.string()),
+    externalId: v.string(),
+  }).index("by_externalId", ["externalId"]),
+
+  pgaEvents: defineTable({
+    name: v.string(),
+    leaderboardUrl: v.string(),
+    externalId: v.string(),
+  }).index("by_externalId", ["externalId"]),
+
+  pgaMatchups: defineTable({
+    golferAId: v.id("pgaPlayers"),
+    golferBId: v.id("pgaPlayers"),
+    holes: v.number(),
+    thru: v.number(),
+    startTime: v.number(),
+    league: v.string(),
+    active: v.boolean(),
+    status: v.string(),
+    winnerId: v.optional(v.id("pgaPlayers")),
+    eventId: v.string(),
+    golferAScore: v.optional(v.number()),
+    golferBScore: v.optional(v.number()),
+  })
+    .index("by_eventId", ["eventId"])
+    .index("by_active_startTime", ["active", "startTime"]),
 });
