@@ -243,6 +243,28 @@ export const getMatchupsByLeague = query({
   },
 });
 
+// Add new query for schedule processor that includes inactive matchups within a reasonable time window
+export const getAllMatchupsByLeagueForSchedule = query({
+  args: { league: v.string() },
+  handler: async (ctx, { league }) => {
+    const currentTime = Date.now();
+    const minus7Days = currentTime - 7 * 24 * 60 * 60 * 1000; // 7 days ago
+    const plus30Days = currentTime + 30 * 24 * 60 * 60 * 1000; // 30 days from now
+
+    const matchups = await ctx.db
+      .query("matchups")
+      .withIndex("by_league_time", (q) =>
+        q
+          .eq("league", league)
+          .gte("startTime", minus7Days)
+          .lte("startTime", plus30Days)
+      )
+      .take(500);
+
+    return matchups;
+  },
+});
+
 export const getMatchupsByLeagueAndTime = query({
   args: { league: v.string(), startTime: v.number() },
   handler: async (ctx, { league, startTime }) => {
