@@ -694,6 +694,16 @@ export default defineSchema({
   })
     .index("by_participant", ["participantId"])
     .index("by_matchup", ["matchupId"]),
+
+  //////////////////PGA//////////////////////////////
+  pgaPlayers: defineTable({
+    rank: v.number(),
+    name: v.string(),
+    country: v.string(),
+  })
+    .index("by_rank", ["rank"])
+    .index("by_name", ["name"]),
+
   //////////////////USERS//////////////////////////////
 
   friendRequests: defineTable({
