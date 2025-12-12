@@ -57,7 +57,7 @@
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.365.0",
     "motion": "^12.18.1",
-    "next": "^14.2.4",
+    "next": "^14.2.35",
     "next-client-cookies": "^1.1.1",
     "next-qrcode": "^2.5.1",
     "next-themes": "^0.3.0",
