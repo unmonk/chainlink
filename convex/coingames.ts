@@ -103,9 +103,7 @@ export const getEnhancedSpinGame = query({
     if (!user) return null;
 
     const lastFreeSpin = user.coinGames?.lastFreeSpin ?? 0;
-    const isPremium = user.isPremium ?? false;
     const canFreeSpin =
-      isPremium &&
       Date.now() - lastFreeSpin >= ENHANCED_SLOT_CONFIG.freeSpinInterval;
     const nextFreeSpinTime = canFreeSpin
       ? null
@@ -123,7 +121,6 @@ export const getEnhancedSpinGame = query({
       userId: user._id,
       userCoins: user.coins,
       canFreeSpin,
-      isPremium,
       nextFreeSpinTime,
       spins,
       config: ENHANCED_SLOT_CONFIG,
@@ -146,9 +143,6 @@ export const enhancedSpin = mutation({
 
     // Validate spin eligibility
     if (useFreeSpin) {
-      if (!user.isPremium) {
-        throw new Error("Free spins are for premium members only");
-      }
       const lastFreeSpin = user.coinGames?.lastFreeSpin ?? 0;
       if (Date.now() - lastFreeSpin < ENHANCED_SLOT_CONFIG.freeSpinInterval) {
         throw new Error("Free spin not available yet");

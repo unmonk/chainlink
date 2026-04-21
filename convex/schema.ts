@@ -758,7 +758,6 @@ export default defineSchema({
     externalId: v.string(),
     role: user_role,
     status: v.union(v.literal("ACTIVE"), v.literal("INACTIVE")),
-    isPremium: v.optional(v.boolean()),
     metadata: v.optional(
       v.object({
         avatarBackground: v.optional(v.string()),
