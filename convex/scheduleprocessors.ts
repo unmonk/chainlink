@@ -87,6 +87,114 @@ export async function fetchScheduleData(endpoint: string, league: League) {
 
   const scheduleData: Schedule = {};
 
+  if (league === "PGA") {
+    const event = data.events && data.events[0];
+    if (!event || !event.competitions || event.competitions.length === 0) {
+      return scheduleData;
+    }
+
+    const competitors = event.competitions[0].competitors;
+    if (!competitors) return scheduleData;
+
+    // Create matchups by pairing sequential competitors sorted by their stable ID to avoid shuffling during tournament.
+    const sortedCompetitors = [...competitors].sort((a, b) => {
+      const idA = a.athlete?.id || "";
+      const idB = b.athlete?.id || "";
+      return idA.localeCompare(idB);
+    });
+
+    const games: Game[] = [];
+    for (let i = 0; i < sortedCompetitors.length - 1; i += 2) {
+      const p1 = sortedCompetitors[i];
+      const p2 = sortedCompetitors[i + 1];
+      const p1Name = p1.athlete?.shortName || p1.athlete?.displayName || "TBD";
+      const p2Name = p2.athlete?.shortName || p2.athlete?.displayName || "TBD";
+
+      const teeTime = p1.status?.teeTime || p2.status?.teeTime || event.date;
+      const gameDate = teeTime ? teeTime.split("T")[0].replace(/-/g, "") : "";
+      if (!gameDate) continue;
+
+      const p1Period = p1.status?.period || 1;
+      const p2Period = p2.status?.period || 1;
+      const currentPeriod = Math.max(p1Period, p2Period);
+
+      // Get round specific score instead of tournament score
+      const p1LineScore = p1.linescores?.find((ls: any) => ls.period === currentPeriod);
+      const p2LineScore = p2.linescores?.find((ls: any) => ls.period === currentPeriod);
+
+      const p1Score = p1LineScore?.value?.toString() || "0";
+      const p2Score = p2LineScore?.value?.toString() || "0";
+
+      const gameId = `${event.id}-R${currentPeriod}-${p1.athlete?.id}-${p2.athlete?.id}`;
+
+      const game: Game = {
+        id: gameId,
+        uid: `${event.uid}-R${currentPeriod}-${p1.athlete?.id}-${p2.athlete?.id}`,
+        date: teeTime || event.date,
+        name: `${p1Name} vs ${p2Name}`,
+        shortName: `${p1Name} vs ${p2Name}`,
+        status: {
+          type: event.status.type,
+        },
+        season: event.season,
+        competitions: [
+          {
+            id: event.competitions[0].id,
+            date: teeTime || event.date,
+            status: {
+              type: event.status.type,
+            },
+            competitors: [
+              {
+                id: p1.athlete?.id || `tbd1-${i}`,
+                homeAway: "home",
+                score: p1Score,
+                team: {
+                  id: p1.athlete?.id || `tbd1-${i}`,
+                  name: p1.athlete?.displayName || "TBD",
+                  abbreviation: p1.athlete?.shortName || "TBD",
+                  displayName: p1.athlete?.displayName || "TBD",
+                  shortDisplayName: p1.athlete?.shortName || "TBD",
+                  logo: p1.athlete?.headshot?.href || "",
+                  links: [],
+                },
+              },
+              {
+                id: p2.athlete?.id || `tbd2-${i}`,
+                homeAway: "away",
+                score: p2Score,
+                team: {
+                  id: p2.athlete?.id || `tbd2-${i}`,
+                  name: p2.athlete?.displayName || "TBD",
+                  abbreviation: p2.athlete?.shortName || "TBD",
+                  displayName: p2.athlete?.displayName || "TBD",
+                  shortDisplayName: p2.athlete?.shortName || "TBD",
+                  logo: p2.athlete?.headshot?.href || "",
+                  links: [],
+                },
+              },
+            ],
+          },
+        ] as any,
+      };
+
+      scheduleData[gameDate] = {
+        games: scheduleData[gameDate]?.games
+          ? [...scheduleData[gameDate].games, game]
+          : [game],
+        leagueName: "PGA",
+        calendartype: "",
+        label: "",
+        seasonObj: {
+          year: event.season?.year || new Date().getFullYear(),
+          type: event.seasonType?.id ? parseInt(event.seasonType.id) : 0,
+          slug: "",
+        },
+      };
+    }
+    return scheduleData;
+  }
+
   if (league === "MBB" || league === "WBB") {
     const scoreboardData = data as ScoreboardScheduleResponse;
 

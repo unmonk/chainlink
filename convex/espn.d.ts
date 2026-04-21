@@ -114,21 +114,34 @@ export type Competitor = {
   uid?: string;
   type?: string;
   order?: number;
+  sortOrder?: number;
   homeAway?: string;
   winner?: boolean;
-  score: string;
+  score: string | { value?: number; displayValue?: string };
   hits?: number;
   errors?: number;
   linescores?: LineScore[];
   statistics?: Statistic[];
   records?: Record[];
   team: CompetitorTeam;
+  athlete?: CompetitorAthlete;
+  status?: EventStatus;
   probables?: any[];
   leaders?: any[];
 };
 
+export type CompetitorAthlete = {
+  id: string;
+  displayName?: string;
+  shortName?: string;
+  headshot?: { href?: string };
+};
+
 export type LineScore = {
   value?: number;
+  period?: number;
+  teeTime?: string;
+  displayValue?: string;
 };
 
 export type Statistic = {
@@ -222,6 +235,7 @@ export type EventStatus = {
   clock?: number;
   displayClock?: string;
   period?: number;
+  teeTime?: string;
   type?: {
     id?: string;
     name?: string;

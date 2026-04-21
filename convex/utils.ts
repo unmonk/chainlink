@@ -15,6 +15,10 @@ export function determineWinner(
     if (homeTeam.score === awayTeam.score) return "PUSH";
     return homeTeam.score > awayTeam.score ? homeTeam.id : awayTeam.id;
   }
+  if (type === "SCORE" && typeDetails === "LESS_THAN") {
+    if (homeTeam.score === awayTeam.score) return "PUSH";
+    return homeTeam.score < awayTeam.score ? homeTeam.id : awayTeam.id;
+  }
   return null;
 }
 
@@ -197,6 +201,7 @@ export const ACTIVE_LEAGUES: League[] = [
   "FRIENDLY",
   "CSL",
   "RPL",
+  "PGA",
 ];
 
 ////////////////////UTILS////////////////////
@@ -452,6 +457,7 @@ export const leagueLogos: {
   PLL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pll.png?w=100&h=100&transparent=true",
   EPL: "https://a.espncdn.com/combiner/i?img=/i/leaguelogos/soccer/500/23.png&transparent=true&w=100&h=100",
   UFL: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/ufl.png?w=100&h=100&transparent=true",
+  PGA: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/leagues/500/pga.png?w=100&h=100&transparent=true",
 };
 
 export const leagueNames: {
@@ -548,6 +554,8 @@ export const getLeagueColor = (league: string): string => {
       return "hsla(115, 78%, 60%, 1)"; //Green
     case "RPL":
       return "hsla(115, 78%, 75%, 1)"; //Green
+    case "PGA":
+      return "hsla(115, 60%, 40%, 1)"; // Darker Green
     default:
       return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
   }

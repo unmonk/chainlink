@@ -132,7 +132,7 @@ export const insertScoreMatchup = internalMutation({
       title,
       league,
       type: "SCORE",
-      typeDetails: "GREATER_THAN",
+      typeDetails: league === "PGA" ? "LESS_THAN" : "GREATER_THAN",
       status,
       gameId,
       homeTeam,
@@ -364,6 +364,10 @@ export function getScheduleEndpoints(league: League) {
     case "PLL":
       return [
         `http://cdn.espn.com/core/pll/schedule?dates=${new Date().getFullYear()}&xhr=1&render=false&device=desktop&userab=18`,
+      ];
+    case "PGA":
+      return [
+        `https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?league=pga`,
       ];
 
     default:
