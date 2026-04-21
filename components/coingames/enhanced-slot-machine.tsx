@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, Loader2, Minus, Plus, Crown } from "lucide-react";
+import { ChevronDown, Loader2, Minus, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import {
   Table,
   TableBody,
@@ -203,48 +202,30 @@ export function EnhancedSlotMachine() {
 
         {/* Controls */}
         <div className="grid grid-cols-2 gap-4">
-          {!spinGame.isPremium ? (
-            <Link href="/premium" className="w-full">
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full h-16 flex flex-col items-center justify-center border-yellow-500/50 hover:bg-yellow-500/10"
-              >
-                <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-yellow-500" />
-                  <span className="font-semibold">Get Free Spins</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Premium members only
-                </p>
-              </Button>
-            </Link>
-          ) : (
-            <Button
-              size="lg"
-              variant={spinGame.canFreeSpin ? "default" : "outline"}
-              disabled={isSpinning || !spinGame.canFreeSpin}
-              onClick={() => handleSpin(true)}
-              className="relative overflow-hidden h-16 flex flex-col items-center justify-center"
-            >
-              {isSpinning ? (
-                <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-              ) : (
-                <>
-                  {spinGame.canFreeSpin && (
-                    <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-75 animate-pulse blur-sm" />
-                  )}
-                  <span className="relative z-10 text-lg">Free Spin</span>
-                  {!spinGame.canFreeSpin && (
-                    <p className="text-center text-xs text-muted-foreground">
-                      available in{" "}
-                      {formatDistanceToNow(spinGame.nextFreeSpinTime!)}
-                    </p>
-                  )}
-                </>
-              )}
-            </Button>
-          )}
+          <Button
+            size="lg"
+            variant={spinGame.canFreeSpin ? "default" : "outline"}
+            disabled={isSpinning || !spinGame.canFreeSpin}
+            onClick={() => handleSpin(true)}
+            className="relative overflow-hidden h-16 flex flex-col items-center justify-center"
+          >
+            {isSpinning ? (
+              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+            ) : (
+              <>
+                {spinGame.canFreeSpin && (
+                  <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 opacity-75 animate-pulse blur-sm" />
+                )}
+                <span className="relative z-10 text-lg">Free Spin</span>
+                {!spinGame.canFreeSpin && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    available in{" "}
+                    {formatDistanceToNow(spinGame.nextFreeSpinTime!)}
+                  </p>
+                )}
+              </>
+            )}
+          </Button>
 
           <RainbowButton
             disabled={isSpinning || spinGame.userCoins < betAmount}

@@ -144,12 +144,6 @@ export function AdminUserInfo({
                   {user.banned ? "Banned" : "Active"}
                 </Badge>
               </div>
-              <div>
-                <p className="text-muted-foreground">Membership</p>
-                <Badge variant={convexUser.isPremium ? "default" : "secondary"}>
-                  {convexUser.isPremium ? "Premium" : "Free"}
-                </Badge>
-              </div>
             </div>
           </div>
         </CardContent>

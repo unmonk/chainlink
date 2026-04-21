@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { CoinAdjustmentModal } from "./admin-coin-adjust";
-import { AdminPremiumToggle } from "./admin-premium-toggle";
 
 interface AdminUserActionsProps {
   user: Doc<"users"> | null;
@@ -38,7 +37,6 @@ export function AdminUserActions({ user }: AdminUserActionsProps) {
       </Link>
 
       <CoinAdjustmentModal userId={user._id} />
-      <AdminPremiumToggle userId={user._id} isPremium={user.isPremium} />
     </div>
   );
 }

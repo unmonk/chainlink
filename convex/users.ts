@@ -554,20 +554,3 @@ export const updateAvatarBackground = mutation({
     return true;
   },
 });
-
-export const togglePremium = mutation({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, { userId }) => {
-    const user = await ctx.db.get(userId);
-    if (!user) {
-      throw new Error("USER_NOT_FOUND");
-    }
-
-    const newPremiumStatus = !user.isPremium;
-    await ctx.db.patch(userId, { isPremium: newPremiumStatus });
-
-    return newPremiumStatus;
-  },
-});

@@ -25,7 +25,7 @@ function determinePayout(status: BlackjackGameStatus, betAmount: number) {
     return Math.ceil(Math.abs(betAmount * 2.5)); // 3:2 payout for blackjack
   if (status === "PLAYER_WON") return Math.ceil(Math.abs(betAmount * 2)); // Even money (1:1) for regular win
   if (status === "DEALER_BUSTED") return Math.ceil(Math.abs(betAmount * 2)); // Even money (1:1) for dealer bust
-  if (status === "PUSH") return betAmount; // Push returns original bet
+  if (status === "PUSH") return 0; // Push returns original bet
   return undefined;
 }
 
