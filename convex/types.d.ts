@@ -20,7 +20,8 @@ export type League =
   | "CSL"
   | "NBAG"
   | "FRIENDLY"
-  | "UFL";
+  | "UFL"
+  | "PGA";
 
 declare module "*.json" {
   const value: any;
