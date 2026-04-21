@@ -64,10 +64,100 @@ export const scoreboards = action({
           }
 
           if (leagueData[league]?.events?.length) {
-            leagueData[league]!.events = leagueData[league]!.events.filter(
-              (event, index, self) =>
-                index === self.findIndex((t) => t.id === event.id)
-            );
+            if (league === "PGA") {
+              const event = leagueData[league]!.events[0];
+              if (event && event.competitions && event.competitions.length > 0) {
+                const competitors = event.competitions[0].competitors;
+                if (competitors) {
+                  const sortedCompetitors = [...competitors].sort(
+                    (a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)
+                  );
+                  const generatedGames = [];
+                  const stableCompetitors = [...competitors].sort((a, b) => {
+                    const idA = a.athlete?.id || "";
+                    const idB = b.athlete?.id || "";
+                    return idA.localeCompare(idB);
+                  });
+
+                  for (let i = 0; i < stableCompetitors.length - 1; i += 2) {
+                    const p1 = stableCompetitors[i];
+                    const p2 = stableCompetitors[i + 1];
+                    const p1Name = p1.athlete?.shortName || p1.athlete?.displayName || "TBD";
+                    const p2Name = p2.athlete?.shortName || p2.athlete?.displayName || "TBD";
+
+                    const teeTime = p1.status?.teeTime || p2.status?.teeTime || event.date;
+
+                    const p1Period = p1.status?.period || 1;
+                    const p2Period = p2.status?.period || 1;
+                    const currentPeriod = Math.max(p1Period, p2Period);
+
+                    const p1LineScore = p1.linescores?.find((ls) => ls.period === currentPeriod);
+                    const p2LineScore = p2.linescores?.find((ls) => ls.period === currentPeriod);
+
+                    const p1Score = p1LineScore?.value?.toString() || "0";
+                    const p2Score = p2LineScore?.value?.toString() || "0";
+
+                    const gameId = `${event.id}-R${currentPeriod}-${p1.athlete?.id}-${p2.athlete?.id}`;
+
+                    const statusType = event.competitions[0].status?.type || { name: "STATUS_SCHEDULED", description: "Scheduled", completed: false };
+
+                    generatedGames.push({
+                      id: gameId,
+                      uid: `${event.uid}-R${currentPeriod}-${p1.athlete?.id}-${p2.athlete?.id}`,
+                      date: teeTime || event.date,
+                      name: `${p1Name} vs ${p2Name}`,
+                      shortName: `${p1Name} vs ${p2Name}`,
+                      status: { type: statusType },
+                      season: event.season,
+                      competitions: [
+                        {
+                          id: event.competitions[0].id,
+                          date: teeTime || event.date,
+                          status: { type: statusType },
+                          competitors: [
+                            {
+                              id: p1.athlete?.id || `tbd1-${i}`,
+                              homeAway: "home",
+                              score: p1Score,
+                              team: {
+                                id: p1.athlete?.id || `tbd1-${i}`,
+                                name: p1.athlete?.displayName || "TBD",
+                                abbreviation: p1.athlete?.shortName || "TBD",
+                                displayName: p1.athlete?.displayName || "TBD",
+                                shortDisplayName: p1.athlete?.shortName || "TBD",
+                                logo: p1.athlete?.headshot?.href || "",
+                                links: [],
+                              },
+                            },
+                            {
+                              id: p2.athlete?.id || `tbd2-${i}`,
+                              homeAway: "away",
+                              score: p2Score,
+                              team: {
+                                id: p2.athlete?.id || `tbd2-${i}`,
+                                name: p2.athlete?.displayName || "TBD",
+                                abbreviation: p2.athlete?.shortName || "TBD",
+                                displayName: p2.athlete?.displayName || "TBD",
+                                shortDisplayName: p2.athlete?.shortName || "TBD",
+                                logo: p2.athlete?.headshot?.href || "",
+                                links: [],
+                              },
+                            },
+                          ],
+                        },
+                      ] as any,
+                    });
+                  }
+                  leagueData[league]!.events = generatedGames as any;
+                }
+              }
+            } else {
+              leagueData[league]!.events = leagueData[league]!.events.filter(
+                (event, index, self) =>
+                  index === self.findIndex((t) => t.id === event.id)
+              );
+            }
+
             chunkGameIds.push(
               ...leagueData[league]!.events.map((event) => event.id)
             );
@@ -219,8 +309,16 @@ export const scoreboards = action({
             continue;
           }
 
-          const homeScore = parseInt(homeTeam.score);
-          const awayScore = parseInt(awayTeam.score);
+          const homeScoreString = typeof homeTeam.score === "object" ? homeTeam.score?.value?.toString() : homeTeam.score;
+          const awayScoreString = typeof awayTeam.score === "object" ? awayTeam.score?.value?.toString() : awayTeam.score;
+
+          let homeScore = parseInt(homeScoreString || "0");
+          let awayScore = parseInt(awayScoreString || "0");
+
+          if (league === "PGA") {
+            homeScore = parseInt(homeScoreString || "0") || 0;
+            awayScore = parseInt(awayScoreString || "0") || 0;
+          }
 
           //#region HANDLE MATCHUP STATUS AND SCORE CHANGES
 
@@ -560,6 +658,8 @@ function getScoreboardUrl(league: League) {
       return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba-g-league/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
     case "NBAS":
       return `http://site.api.espn.com/apis/site/v2/sports/basketball/nba-summer/scoreboard?dates=${hawaiiDate}&limit=${limit}`;
+    case "PGA":
+      return `https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?league=pga`;
     default:
       throw new Error("Invalid league");
   }

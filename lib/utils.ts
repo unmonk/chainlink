@@ -32,6 +32,7 @@ export const getSportFromLeague = (league: string): string => {
   )
     return "soccer";
   if (["PLL"].includes(league)) return "lacrosse";
+  if (["PGA"].includes(league)) return "golf";
 
   return "other";
 };
