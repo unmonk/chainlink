@@ -10,6 +10,7 @@ import { ErrorBoundary } from "@sentry/nextjs";
 import { CookiesProvider } from "next-client-cookies/server";
 import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { SmartBanner } from "@/components/banner/smart-banner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -84,6 +85,7 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                   >
+                    <SmartBanner />
                     <main>{children}</main>
                     <Toaster />
                   </ThemeProvider>

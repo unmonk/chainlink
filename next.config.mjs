@@ -71,6 +71,7 @@ export default withSentryConfig(
     silent: true,
     org: "scott-weaver",
     project: "chainlink",
+    dryRun: true,
   },
   {
     // For all available options, see:
